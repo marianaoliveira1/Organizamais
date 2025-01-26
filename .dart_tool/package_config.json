@@ -92,6 +92,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "iconsax",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/iconsax-0.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "leak_tracker",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/leak_tracker-10.0.7",
       "packageUri": "lib/",
@@ -266,7 +272,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-01-26T22:52:43.629956Z",
+  "generated": "2025-01-26T23:06:51.015166Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///home/mariana/snap/flutter/common/flutter",
