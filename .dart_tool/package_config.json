@@ -68,6 +68,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "flutter_screenutil",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_screenutil-5.9.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///home/mariana/snap/flutter/common/flutter/packages/flutter_test",
       "packageUri": "lib/",
@@ -272,7 +278,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-01-26T23:06:51.015166Z",
+  "generated": "2025-01-26T23:24:18.967516Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///home/mariana/snap/flutter/common/flutter",
