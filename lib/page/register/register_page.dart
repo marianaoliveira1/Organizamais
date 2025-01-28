@@ -3,13 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
-import '../widgtes/default_button.dart';
-import '../widgtes/default_button_google.dart';
-import '../widgtes/default_continue_com.dart';
-import '../widgtes/default_text_field.dart';
+import '../../widgtes/default_button.dart';
+import '../../widgtes/default_button_google.dart';
+import '../../widgtes/default_continue_com.dart';
+import '../../widgtes/default_text_field.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
