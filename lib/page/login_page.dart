@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
+import '../widgtes/default_button.dart';
+import '../widgtes/default_button_google.dart';
+import '../widgtes/default_continue_com.dart';
 import '../widgtes/default_text_field.dart';
 
 class LoginPage extends StatelessWidget {
@@ -51,100 +54,39 @@ class LoginPage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
+            DefaultContinueCom(),
+            SizedBox(
+              height: 20.h,
+            ),
+            ButtonLoginWithGoogle(),
+            SizedBox(
+              height: 60.h,
+            ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Expanded(
-                  child: Divider(
-                    thickness: 1,
-                    color: Colors.grey, // Cor da linha
+                Text(
+                  "Não tem uma conta?",
+                  style: TextStyle(
+                    color: DefaultColors.grey,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                SizedBox(
+                  width: 3.w,
+                ),
+                GestureDetector(
+                  onTap: () {},
                   child: Text(
-                    "ou continue com",
-                    style: TextStyle(color: Colors.grey), // Cor do texto
-                  ),
-                ),
-                Expanded(
-                  child: Divider(
-                    thickness: 1,
-                    color: Colors.grey, // Cor da linha
+                    "Cadastre-se",
+                    style: TextStyle(
+                      color: DefaultColors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 20.h,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Container(
-                height: 50.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: DefaultColors.white,
-                  borderRadius: BorderRadius.circular(
-                    24.r,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/icon/google.png",
-                      height: 40.h,
-                      width: 25.w,
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
-                    Text(
-                      "Entrar com Google",
-                      style: TextStyle(
-                        color: DefaultColors.black,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class DefaultButton extends StatelessWidget {
-  const DefaultButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 50.h,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: DefaultColors.black,
-          borderRadius: BorderRadius.circular(
-            24.r,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            "Entrar",
-            style: TextStyle(
-              color: DefaultColors.white,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
         ),
       ),
     );
