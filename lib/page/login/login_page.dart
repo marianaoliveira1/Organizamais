@@ -31,6 +31,7 @@ class LoginPage extends StatelessWidget {
               style: TextStyle(
                 color: DefaultColors.black,
                 fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
               ),
             ),
             SizedBox(
@@ -75,7 +76,9 @@ class LoginPage extends StatelessWidget {
                   width: 3.w,
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, "/register");
+                  },
                   child: Text(
                     "Cadastre-se",
                     style: TextStyle(

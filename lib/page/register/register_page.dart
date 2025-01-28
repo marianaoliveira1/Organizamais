@@ -13,6 +13,7 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
@@ -37,11 +38,21 @@ class RegisterPage extends StatelessWidget {
               height: 70.h,
             ),
             DefaultTextField(
+              hintText: "Nome",
+              prefixIcon: Icon(Iconsax.profile_circle4),
+              controller: emailController,
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
+            DefaultTextField(
               hintText: "Email",
               prefixIcon: Icon(Iconsax.sms),
               controller: emailController,
             ),
-            SizedBox(height: 20.h),
+            SizedBox(
+              height: 20.h,
+            ),
             DefaultTextField(
               hintText: "Senha",
               prefixIcon: Icon(Iconsax.lock),
@@ -66,7 +77,7 @@ class RegisterPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "Não tem uma conta?",
+                  "Já tem uma conta?",
                   style: TextStyle(
                     color: DefaultColors.grey,
                   ),
@@ -75,9 +86,11 @@ class RegisterPage extends StatelessWidget {
                   width: 3.w,
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, "/login");
+                  },
                   child: Text(
-                    "Cadastre-se",
+                    "Entrar",
                     style: TextStyle(
                       color: DefaultColors.black,
                       fontWeight: FontWeight.bold,
