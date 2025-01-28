@@ -23,6 +23,16 @@ class LoginPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              "ORGANIZA+",
+              style: TextStyle(
+                color: DefaultColors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(
+              height: 70.h,
+            ),
             DefaultTextField(
               hintText: "Email",
               prefixIcon: Icon(Iconsax.sms),
@@ -41,6 +51,32 @@ class LoginPage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
+            Row(
+              children: [
+                Expanded(
+                  child: Divider(
+                    thickness: 1,
+                    color: Colors.grey, // Cor da linha
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    "ou continue com",
+                    style: TextStyle(color: Colors.grey), // Cor do texto
+                  ),
+                ),
+                Expanded(
+                  child: Divider(
+                    thickness: 1,
+                    color: Colors.grey, // Cor da linha
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
             InkWell(
               onTap: () {},
               child: Container(
@@ -55,9 +91,10 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Iconsax.activity,
-                      color: DefaultColors.black,
+                    Image.asset(
+                      "assets/icon/google.png",
+                      height: 40.h,
+                      width: 25.w,
                     ),
                     SizedBox(
                       width: 10.w,
