@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1008402942918",
+    "project_id": "organizamais-fe8f4",
+    "storage_bucket": "organizamais-fe8f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008402942918:android:bcb0e827db887fc43400c7",
+        "android_client_info": {
+          "package_name": "com.example.organizamais"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuYfWESeKc52_NhmAjWcCkaWluxXjpqsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
