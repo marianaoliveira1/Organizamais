@@ -4,14 +4,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:organizamais/utils/color.dart';
 
 class ButtonLoginWithGoogle extends StatelessWidget {
+  final String text;
+  final void Function() onTap;
+
   const ButtonLoginWithGoogle({
     super.key,
+    required this.text,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         height: 50.h,
         width: double.infinity,
@@ -33,7 +38,7 @@ class ButtonLoginWithGoogle extends StatelessWidget {
               width: 10.w,
             ),
             Text(
-              "Entrar com Google",
+              text,
               style: TextStyle(
                 color: DefaultColors.black,
                 fontSize: 15.sp,

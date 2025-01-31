@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
+import '../../controller/auth_controller.dart';
 import '../../widgtes/default_button.dart';
 import '../../widgtes/default_button_google.dart';
 import '../../widgtes/default_continue_com.dart';
@@ -13,6 +15,7 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find();
     final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
@@ -40,7 +43,7 @@ class RegisterPage extends StatelessWidget {
             DefaultTextField(
               hintText: "Nome",
               prefixIcon: Icon(Iconsax.profile_circle4),
-              controller: emailController,
+              controller: nameController,
             ),
             SizedBox(
               height: 20.h,
@@ -61,7 +64,14 @@ class RegisterPage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
-            DefaultButton(),
+            DefaultButton(
+              text: "Cadastrar",
+              onTap: () => authController.registerWithEmail(
+                nameController.text,
+                emailController.text,
+                passwordController.text,
+              ),
+            ),
             SizedBox(
               height: 20.h,
             ),
@@ -69,7 +79,10 @@ class RegisterPage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
-            ButtonLoginWithGoogle(),
+            ButtonLoginWithGoogle(
+              text: "Cadastrar com Google",
+              onTap: authController.signInWithGoogle,
+            ),
             SizedBox(
               height: 60.h,
             ),
