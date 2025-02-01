@@ -9,13 +9,25 @@ class AuthController extends GetxController {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Rx<User?> user = Rx<User?>(null);
+RxList<Map<String, dynamic>> userEntries = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     user.bindStream(_auth.authStateChanges());
   }
+
+  void fetchUserEntries() {
+    final String? uid = _auth.currentUser?.uid;
+    if (uid != null) {
+      _firestore.collection('entries')
+        .where('userId', isEqualTo: uid)
+        .snapshots()
+        .listen((snapshot) {
+          userEntries.value = snapshot.docs.map((doc) => doc.data()).toList();
+        });
+    }
+  
 
   Future<void> registerWithEmail(String name, String email, String password) async {
     try {

@@ -1,31 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:organizamais/page/cards/cards_page.dart';
+import 'package:organizamais/page/graphics/graphics_page.dart';
+import 'package:organizamais/page/initial/initial_page.dart';
 
 import '../../controller/navigation_controller.dart';
+import '../profile/profile_page.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
+class HomePage extends GetView<NavigationController> {
   @override
   Widget build(BuildContext context) {
     final navigationController = Get.put(NavigationController());
     return Scaffold(
-      body: Obx(() => navigationController.pages[navigationController.selectedIndex.value]),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 5,
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          child: BottomNavigationBar(
-            currentIndex: navigationController.selectedIndex.value,
-            onTap: navigationController.changeIndex,
+      body: Obx(() => IndexedStack(
+            index: controller.selectedIndex.value,
+            children: [
+              InitialPage(),
+              GraphicsPage(),
+              Container(),
+              CardsPage(),
+              ProfilePage(),
+            ],
+          )),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        child: Obx(
+          () => BottomNavigationBar(
+            currentIndex: controller.selectedIndex.value,
+            onTap: controller.changeIndex,
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
             selectedItemColor: Colors.blue,
