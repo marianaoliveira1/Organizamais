@@ -17,6 +17,7 @@ class DefaultTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      obscureText: hintText == "Senha" ? true : false,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         hintText: hintText,
