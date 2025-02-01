@@ -1,0 +1,1 @@
+ /home/mariana/Documents/Organizamais/.dart_tool/flutter_build/0609ff64014b7bb4d8db7ca08f15d2bc/native_assets.yaml: 
