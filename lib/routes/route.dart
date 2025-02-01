@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:organizamais/page/transaction_page.dart/transaction_page.dart';
 
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
@@ -17,5 +18,6 @@ class AppPages {
     GetPage(name: '/charts', page: () => GraphicsPage()),
     GetPage(name: '/card', page: () => CardsPage()),
     GetPage(name: '/profile', page: () => ProfilePage()),
+    GetPage(name: '/transaction', page: () => TransactionPage()),
   ];
 }
