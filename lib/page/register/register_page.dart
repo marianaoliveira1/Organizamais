@@ -66,7 +66,7 @@ class RegisterPage extends StatelessWidget {
             ),
             DefaultButton(
               text: "Cadastrar",
-              onTap: () => authController.registerWithEmail(
+              onTap: () => authController.register(
                 nameController.text,
                 emailController.text,
                 passwordController.text,
@@ -81,7 +81,7 @@ class RegisterPage extends StatelessWidget {
             ),
             ButtonLoginWithGoogle(
               text: "Cadastrar com Google",
-              onTap: authController.signInWithGoogle,
+              onTap: authController.googleSignIn,
             ),
             SizedBox(
               height: 60.h,

@@ -1,81 +1,77 @@
-// auth_controller.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-RxList<Map<String, dynamic>> userEntries = <Map<String, dynamic>>[].obs;
+  Rx<User?> user = Rx<User?>(null);
+  RxString userName = RxString('');
 
   @override
   void onInit() {
     super.onInit();
     user.bindStream(_auth.authStateChanges());
+    ever(user, _setInitialScreen);
   }
 
-  void fetchUserEntries() {
-    final String? uid = _auth.currentUser?.uid;
-    if (uid != null) {
-      _firestore.collection('entries')
-        .where('userId', isEqualTo: uid)
-        .snapshots()
-        .listen((snapshot) {
-          userEntries.value = snapshot.docs.map((doc) => doc.data()).toList();
-        });
+  void _setInitialScreen(User? user) async {
+    if (user != null) {
+      // Buscar nome do usuário
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        userName.value = userDoc.data()?['name'] ?? '';
+      }
     }
-  
+  }
 
-  Future<void> registerWithEmail(String name, String email, String password) async {
+  Future<void> register(String name, String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      // Criar usuário no Firebase Auth
+      final UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Save additional user data to Firestore
-      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      // Salvar informações adicionais no Firestore
+      await _firestore.collection('users').doc(result.user!.uid).set({
         'name': name,
         'email': email,
-        'createdAt': DateTime.now(),
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      Get.snackbar('Sucesso', 'Cadastro realizado com sucesso!');
+      userName.value = name;
       Get.offAllNamed('/home');
-    } on FirebaseAuthException catch (e) {
-      String message = 'Ocorreu um erro no cadastro';
-      if (e.code == 'weak-password') {
-        message = 'A senha fornecida é muito fraca';
-      } else if (e.code == 'email-already-in-use') {
-        message = 'Este email já está em uso';
-      }
-      Get.snackbar('Erro', message);
+    } catch (e) {
+      Get.snackbar(
+        'Erro no Cadastro',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
-  Future<void> loginWithEmail(String email, String password) async {
+  Future<void> login(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      Get.snackbar('Sucesso', 'Login realizado com sucesso!');
+      await _loadUserData();
       Get.offAllNamed('/home');
-    } on FirebaseAuthException catch (e) {
-      String message = 'Ocorreu um erro no login';
-      if (e.code == 'user-not-found') {
-        message = 'Usuário não encontrado';
-      } else if (e.code == 'wrong-password') {
-        message = 'Senha incorreta';
-      }
-      Get.snackbar('Erro', message);
+    } catch (e) {
+      Get.snackbar(
+        'Erro no Login',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<void> googleSignIn() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return;
@@ -86,27 +82,42 @@ RxList<Map<String, dynamic>> userEntries = <Map<String, dynamic>>[].obs;
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential result = await _auth.signInWithCredential(credential);
 
-      // Save Google user data to Firestore if it's a new user
-      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      // Verificar se é primeiro login e salvar dados
+      final userDoc = await _firestore.collection('users').doc(result.user!.uid).get();
+      if (!userDoc.exists) {
+        await _firestore.collection('users').doc(result.user!.uid).set({
           'name': googleUser.displayName,
           'email': googleUser.email,
-          'createdAt': DateTime.now(),
+          'createdAt': FieldValue.serverTimestamp(),
         });
       }
 
-      Get.snackbar('Sucesso', 'Login com Google realizado com sucesso!');
+      userName.value = googleUser.displayName ?? '';
       Get.offAllNamed('/home');
     } catch (e) {
-      Get.snackbar('Erro', 'Erro ao fazer login com Google');
+      Get.snackbar(
+        'Erro no Login com Google',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    if (user.value != null) {
+      final userDoc = await _firestore.collection('users').doc(user.value!.uid).get();
+      if (userDoc.exists) {
+        userName.value = userDoc.data()?['name'] ?? '';
+      }
     }
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
+    userName.value = '';
     Get.offAllNamed('/login');
   }
 }

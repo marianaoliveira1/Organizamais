@@ -56,7 +56,7 @@ class LoginPage extends StatelessWidget {
             ),
             DefaultButton(
               text: "Entrar",
-              onTap: () => authController.loginWithEmail(
+              onTap: () => authController.login(
                 emailController.text,
                 passwordController.text,
               ),
@@ -70,7 +70,7 @@ class LoginPage extends StatelessWidget {
             ),
             ButtonLoginWithGoogle(
               text: "Entrar com Google",
-              onTap: () => authController.signInWithGoogle(),
+              onTap: () => authController.googleSignIn(),
             ),
             SizedBox(
               height: 60.h,
