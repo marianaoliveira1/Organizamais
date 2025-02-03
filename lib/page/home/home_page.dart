@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:organizamais/page/cards/cards_page.dart';
 import 'package:organizamais/page/graphics/graphics_page.dart';
 import 'package:organizamais/page/initial/initial_page.dart';
-import 'package:organizamais/page/profile/profile_page.dart';
+
+import 'package:organizamais/page/resume/resume_pegae.dart';
 import 'package:organizamais/page/transaction_page.dart/transaction_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     GraphicsPage(),
     Container(), // Placeholder para o botão +
     CardsPage(),
-    ProfilePage(),
+    ResumePegae(),
   ];
 
   void _onItemTapped(int index) {
