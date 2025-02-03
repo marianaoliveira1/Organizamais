@@ -81,7 +81,7 @@ class RegisterPage extends StatelessWidget {
             ),
             ButtonLoginWithGoogle(
               text: "Cadastrar com Google",
-              onTap: authController.googleSignIn,
+              onTap: authController.loginWithGoogle,
             ),
             SizedBox(
               height: 60.h,

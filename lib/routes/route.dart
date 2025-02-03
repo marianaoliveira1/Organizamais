@@ -9,15 +9,28 @@ import '../page/register/register_page.dart';
 import '../page/resume/resume_pegae.dart';
 import '../page/transaction_page.dart/transaction_page.dart';
 
+class Routes {
+  static const LOGIN = '/login';
+  static const REGISTER = '/register';
+  static const HOME = '/home';
+  static const INITIAL = '/initial';
+  static const CHARTS = '/charts';
+  static const CARD = '/card';
+  static const RESUME = '/resume';
+  static const TRANSACTION = '/transaction';
+}
+
 class AppPages {
   static final routes = [
-    GetPage(name: '/login', page: () => const LoginPage()),
-    GetPage(name: '/register', page: () => const RegisterPage()),
-    GetPage(name: '/home', page: () => HomePage()),
-    GetPage(name: '/initial', page: () => const InitialPage()),
-    GetPage(name: '/charts', page: () => GraphicsPage()),
-    GetPage(name: '/card', page: () => CardsPage()),
-    GetPage(name: '/resume', page: () => ResumePegae()),
-    GetPage(name: '/transaction', page: () => TransactionPage()),
+    GetPage(name: Routes.LOGIN, page: () => const LoginPage()),
+    GetPage(name: Routes.REGISTER, page: () => const RegisterPage()),
+    GetPage(name: Routes.HOME, page: () => HomePage()),
+    GetPage(name: Routes.INITIAL, page: () => const InitialPage()),
+    GetPage(name: Routes.CHARTS, page: () => GraphicsPage()),
+    GetPage(name: Routes.CARD, page: () => CardsPage()),
+    GetPage(name: Routes.RESUME, page: () => ResumePegae()),
+    GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
   ];
+
+  static const INITIAL = Routes.LOGIN;
 }

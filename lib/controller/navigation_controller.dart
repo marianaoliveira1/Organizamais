@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/page/graphics/graphics_page.dart';
+import 'package:organizamais/page/resume/resume_pegae.dart';
 
 import '../page/cards/cards_page.dart';
 import '../page/initial/initial_page.dart';
-import '../page/profile/profile_page.dart';
 
 class NavigationController extends GetxController {
   var selectedIndex = 0.obs;
@@ -14,7 +14,7 @@ class NavigationController extends GetxController {
     GraphicsPage(),
     Container(), // Empty container for add button
     CardsPage(),
-    ProfilePage(),
+    ResumePegae(),
   ];
 
   void changeIndex(int index) {

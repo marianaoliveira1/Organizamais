@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
       child: GetMaterialApp(
         title: 'Organiza+',
         debugShowCheckedModeBanner: false,
+        initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
-        initialRoute: '/login',
         theme: ThemeData(
           textTheme: GoogleFonts.rubikTextTheme(),
         ),

@@ -70,7 +70,7 @@ class LoginPage extends StatelessWidget {
             ),
             ButtonLoginWithGoogle(
               text: "Entrar com Google",
-              onTap: () => authController.googleSignIn(),
+              onTap: () => authController.loginWithGoogle(),
             ),
             SizedBox(
               height: 60.h,
