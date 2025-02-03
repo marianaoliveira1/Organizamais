@@ -106,7 +106,7 @@ class InitialPage extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    "R\$ 2/3",
+                                    "2/3",
                                     style: TextStyle(
                                       color: DefaultColors.black,
                                       fontSize: 14.sp,
