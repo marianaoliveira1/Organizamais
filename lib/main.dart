@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:organizamais/page/login/login_page.dart';
 
 import 'controller/auth_controller.dart';
 import 'routes/route.dart';
@@ -29,10 +28,10 @@ class MyApp extends StatelessWidget {
         title: 'Organiza+',
         debugShowCheckedModeBanner: false,
         getPages: AppPages.routes,
+        initialRoute: '/login',
         theme: ThemeData(
           textTheme: GoogleFonts.rubikTextTheme(),
         ),
-        home: LoginPage(),
       ),
     );
   }
