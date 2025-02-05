@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '  category.dart';
 
 class TransactionPage extends StatefulWidget {
   final String? type;
@@ -152,7 +155,7 @@ class _TransactionPageState extends State<TransactionPage> {
               title: Text('selecione'),
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
-                // Implementar seleção de categoria
+                Get.to(() => Category());
               },
             ),
             SizedBox(height: 16),

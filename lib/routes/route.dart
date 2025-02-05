@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:organizamais/page/transaction_page.dart/%20%20category.dart';
 
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
@@ -18,6 +19,7 @@ class Routes {
   static const CARD = '/card';
   static const RESUME = '/resume';
   static const TRANSACTION = '/transaction';
+  static const CATEGORY = '/category';
 }
 
 class AppPages {
@@ -30,6 +32,7 @@ class AppPages {
     GetPage(name: Routes.CARD, page: () => CardsPage()),
     GetPage(name: Routes.RESUME, page: () => ResumePegae()),
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
+    GetPage(name: Routes.CATEGORY, page: () => Category()),
   ];
 
   static const INITIAL = Routes.LOGIN;
