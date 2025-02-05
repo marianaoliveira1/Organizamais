@@ -32,7 +32,7 @@ class InitialPage extends StatelessWidget {
                 ),
                 GoalProgressCard(
                   title: "Nubank",
-                  subtitle: "vence em dia 15",
+                  subtitle: "vence dia 15",
                   progress: 0.55, // 55%
                   startDate: "0",
                   endDate: "4000",

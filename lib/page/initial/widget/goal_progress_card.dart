@@ -5,7 +5,7 @@ import 'package:organizamais/utils/color.dart';
 class GoalProgressCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final double progress; // 0.0 a 1.0
+  final double progress;
   final String startDate;
   final String endDate;
 
@@ -40,8 +40,9 @@ class GoalProgressCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 10.w),
-              Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     title,
@@ -59,7 +60,6 @@ class GoalProgressCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const Spacer(),
             ],
           ),
           const SizedBox(height: 12),
