@@ -79,42 +79,7 @@ class _TransactionPageState extends State<TransactionPage> {
               DefaultTitleTransaction(
                 title: "Categoria",
               ),
-              InkWell(
-                onTap: () {
-                  Get.to(
-                    () => Category(),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.h,
-                    vertical: 10.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: DefaultColors.greyLight,
-                    borderRadius: BorderRadius.circular(
-                      14.r,
-                    ),
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Selecione",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                      Icon(
-                        Iconsax.arrow_down_2,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              DefaultButtonCategory(),
               DefaultTitleTransaction(
                 title: "Data",
               ),
@@ -165,6 +130,8 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ),
               ),
+              SizedBox(height: 16.h),
+              DefaultTitleTransaction(title: "Forma de pagamento"),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -219,6 +186,52 @@ class _TransactionPageState extends State<TransactionPage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DefaultButtonCategory extends StatelessWidget {
+  const DefaultButtonCategory({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Get.to(
+          () => Category(),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10.h,
+          vertical: 10.h,
+        ),
+        decoration: BoxDecoration(
+          color: DefaultColors.greyLight,
+          borderRadius: BorderRadius.circular(
+            14.r,
+          ),
+          border: Border.all(
+            color: Colors.grey,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Selecione",
+              style: TextStyle(
+                fontSize: 14.sp,
+              ),
+            ),
+            Icon(
+              Iconsax.arrow_down_2,
+            ),
+          ],
+        ),
       ),
     );
   }

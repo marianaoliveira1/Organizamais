@@ -11,6 +11,17 @@ class Category extends StatelessWidget {
 
   final List<Map<String, dynamic>> categories = [
     {
+      'name': 'Alimentação',
+      'color': DefaultColors.green,
+      'icon': 'assets/icon-category/food.png',
+      'subcategories': [
+        'Supermercado',
+        'Restaurantes',
+        'Delivery',
+        'Cafés e lanchonetes',
+      ],
+    },
+    {
       'name': 'Moradia e Contas Fixas',
       'color': DefaultColors.blue,
       'icon': 'assets/icon-category/home.png',
@@ -39,17 +50,6 @@ class Category extends StatelessWidget {
       ],
     },
     {
-      'name': 'Alimentação',
-      'color': DefaultColors.green,
-      'icon': 'assets/icon-category/food.png',
-      'subcategories': [
-        'Supermercado',
-        'Restaurantes',
-        'Delivery',
-        'Cafés e lanchonetes',
-      ],
-    },
-    {
       'name': 'Educação',
       'color': DefaultColors.purple,
       'icon': 'assets/icon-category/education.png',
@@ -61,9 +61,9 @@ class Category extends StatelessWidget {
       ],
     },
     {
-      'name': 'Beleza e Cuidados Pessoais',
+      'name': 'Compras e lazer',
       'color': DefaultColors.pink,
-      'icon': 'assets/icon-category/happy.png',
+      'icon': 'assets/icon-category/shopping.png',
       'subcategories': [
         'Cabeleireiro',
         'Manicure',
@@ -119,6 +119,7 @@ class Category extends StatelessWidget {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: DefaultColors.background,
+                maxRadius: 40.r,
                 child: Image.asset(
                   category['icon'],
                   height: 24.h,
