@@ -14,9 +14,9 @@ class TransactionPage extends StatefulWidget {
   final String? type;
 
   const TransactionPage({
-    Key? key,
+    super.key,
     this.type,
-  }) : super(key: key);
+  });
 
   @override
   _TransactionPageState createState() => _TransactionPageState();
@@ -79,33 +79,40 @@ class _TransactionPageState extends State<TransactionPage> {
               DefaultTitleTransaction(
                 title: "Categoria",
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: DefaultColors.greyLight,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey,
+              InkWell(
+                onTap: () {
+                  Get.to(
+                    () => Category(),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.h,
+                    vertical: 10.h,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Selecione",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                      ),
+                  decoration: BoxDecoration(
+                    color: DefaultColors.greyLight,
+                    borderRadius: BorderRadius.circular(
+                      14.r,
                     ),
-                    IconButton(
-                      icon: Icon(
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Selecione",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                      Icon(
                         Iconsax.arrow_down_2,
                       ),
-                      onPressed: () {
-                        Get.to(() => Category());
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               DefaultTitleTransaction(
@@ -114,44 +121,101 @@ class _TransactionPageState extends State<TransactionPage> {
               SizedBox(
                 height: 10.h,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey,
+              InkWell(
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2015, 8),
+                    lastDate: DateTime(2101),
+                  );
+                  if (picked != null && picked != selectedDate) {
+                    setState(() {
+                      selectedDate = picked;
+                    });
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.h,
+                    vertical: 10.h,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      "dd/mm/aaaa",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                      ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      14.r,
                     ),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "dd/mm/aaaa",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                      Icon(
                         Iconsax.calendar_1,
                       ),
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate,
-                          firstDate: DateTime(2015, 8),
-                          lastDate: DateTime(2101),
-                        );
-                        if (picked != null && picked != selectedDate)
-                          setState(() {
-                            selectedDate = picked;
-                          });
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              )
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    //button save
+                    child: Container(
+                      margin: EdgeInsets.only(top: 20.h),
+                      padding: EdgeInsets.all(16.h),
+                      decoration: BoxDecoration(
+                        color: DefaultColors.grey,
+                        borderRadius: BorderRadius.circular(
+                          32.r,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Cancelar",
+                          style: TextStyle(
+                            color: DefaultColors.black,
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    //button save
+                    child: Container(
+                      margin: EdgeInsets.only(top: 20.h),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: DefaultColors.black,
+                        borderRadius: BorderRadius.circular(
+                          32.r,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Salvar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
