@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:organizamais/page/transaction_page.dart/%20%20category.dart';
+import 'package:organizamais/page/transaction_page.dart/pages/%20%20category.dart';
 
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
