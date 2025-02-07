@@ -17,163 +17,172 @@ class InitialPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
-      body: ListView(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 20.w,
-              horizontal: 20.h,
-            ),
-            child: Column(
-              children: [
-                FinanceSummaryWidget(),
-                SizedBox(
-                  height: 20.h,
-                ),
-                Expanded(child: Obx(() {
-                  if (controller.fixedAccounts.isEmpty) {
-                    return Center(
-                      child: Text("Nenhuma conta fixa cadastrada"),
-                    );
-                  } else {
-                    return ListView.builder(
-                      itemCount: controller.fixedAccounts.length,
-                      itemBuilder: (context, index) {
-                        return FixedAccounts(
-                          id: controller.fixedAccounts[index].id,
-                          name: controller.fixedAccounts[index].name,
-                          date: controller.fixedAccounts[index].date,
-                          category: controller.fixedAccounts[index].category,
-                          amount: controller.fixedAccounts[index].amount,
-                          paymentMethod: controller.fixedAccounts[index].paymentMethod,
-                        );
-                      },
-                    );
-                  }
-                })),
-                FixedAccounts(
-                  id: '',
-                  name: '',
-                  date: '',
-                  category: '',
-                  amount: '',
-                  paymentMethod: '',
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                GoalProgressCard(
-                  title: "Nubank",
-                  subtitle: "vence dia 15",
-                  progress: 0.55, // 55%
-                  startDate: "0",
-                  endDate: "4000",
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 20.h,
-                    horizontal: 16.w,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 20.w,
+                horizontal: 20.h,
+              ),
+              child: Column(
+                children: [
+                  FinanceSummaryWidget(),
+                  SizedBox(
+                    height: 20.h,
                   ),
-                  decoration: BoxDecoration(
-                    color: DefaultColors.white,
-                    borderRadius: BorderRadius.circular(24.r),
+                  // Obx(() {
+                  //   if (controller.fixedAccounts.isEmpty) {
+                  //     return Center(
+                  //       child: Text(
+                  //         "",
+                  //         style: TextStyle(
+                  //           color: DefaultColors.grey,
+                  //           fontSize: 12.sp,
+                  //           fontWeight: FontWeight.w500,
+                  //         ),
+                  //       ),
+                  //     );
+                  //   } else {
+                  //     return ListView.builder(
+                  //       itemCount: controller.fixedAccounts.length,
+                  //       itemBuilder: (context, index) {
+                  //         return FixedAccounts(
+                  //           id: controller.fixedAccounts[index].id,
+                  //           name: controller.fixedAccounts[index].name,
+                  //           date: controller.fixedAccounts[index].date,
+                  //           category: controller.fixedAccounts[index].category,
+                  //           amount: controller.fixedAccounts[index].amount,
+                  //           paymentMethod: controller.fixedAccounts[index].paymentMethod,
+                  //         );
+                  //       },
+                  //     );
+                  //   }
+                  // }),
+                  FixedAccounts(
+                    id: '',
+                    name: '',
+                    date: '',
+                    category: '',
+                    amount: '',
+                    paymentMethod: '',
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Parcelas do cartão",
-                            style: TextStyle(
-                              color: DefaultColors.grey,
-                              fontSize: 12.sp,
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  GoalProgressCard(
+                    title: "Nubank",
+                    subtitle: "vence dia 15",
+                    progress: 0.55, // 55%
+                    startDate: "0",
+                    endDate: "4000",
+                  ),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 20.h,
+                      horizontal: 16.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: DefaultColors.white,
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Parcelas do cartão",
+                              style: TextStyle(
+                                color: DefaultColors.grey,
+                                fontSize: 12.sp,
+                              ),
                             ),
-                          ),
-                          Icon(Icons.add),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.shopping_bag,
-                                size: 30.h,
-                              ),
-                              SizedBox(
-                                width: 10.w,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Brusinha",
-                                    style: TextStyle(
-                                      color: DefaultColors.black,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Pix",
-                                    style: TextStyle(
-                                      color: DefaultColors.grey,
-                                      fontSize: 12.sp,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    "2/3",
-                                    style: TextStyle(
-                                      color: DefaultColors.black,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10.w,
-                                  ),
-                                  Text(
-                                    "R\$ 40,00",
-                                    style: TextStyle(
-                                      color: DefaultColors.black,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "15 jan 2025",
-                                style: TextStyle(
-                                  color: DefaultColors.grey,
-                                  fontSize: 12.sp,
+                            Icon(Icons.add),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.shopping_bag,
+                                  size: 30.h,
                                 ),
-                              ),
-                            ],
-                          )
-                        ],
-                      )
-                    ],
+                                SizedBox(
+                                  width: 10.w,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Brusinha",
+                                      style: TextStyle(
+                                        color: DefaultColors.black,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Pix",
+                                      style: TextStyle(
+                                        color: DefaultColors.grey,
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "2/3",
+                                      style: TextStyle(
+                                        color: DefaultColors.black,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10.w,
+                                    ),
+                                    Text(
+                                      "R\$ 40,00",
+                                      style: TextStyle(
+                                        color: DefaultColors.black,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  "15 jan 2025",
+                                  style: TextStyle(
+                                    color: DefaultColors.grey,
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
