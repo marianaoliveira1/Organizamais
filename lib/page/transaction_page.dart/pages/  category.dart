@@ -119,11 +119,9 @@ class Category extends StatelessWidget {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: DefaultColors.background,
-                child: Icon(
+                child: Image.asset(
                   category['icon'],
-                  color: DefaultColors.black,
-                  size: 18.sp,
-                  // color: category['color'],
+                  height: 24.h,
                 ),
               ),
               title: Text(
