@@ -1,54 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:uuid/uuid.dart';
 
-import '../page/initial/widget/expense_modal.dart';
+import '../utils/color.dart';
 
-class FixedAccountsController extends GetxController {
-  var id = ''.obs;
-  var name = ''.obs;
-  var date = ''.obs;
-  var category = ''.obs;
-  var amount = ''.obs;
-  var paymentMethod = ''.obs;
-
-  var fixedAccounts = <FixedAccount>[].obs; // Lista observável de contas fixas
-
-  void reset() {
-    id.value = const Uuid().v4();
-    name.value = '';
-    date.value = '';
-    category.value = '';
-    amount.value = '';
-    paymentMethod.value = '';
-  }
-
-  void addFixedAccount() {
-    if (name.value.isNotEmpty && amount.value.isNotEmpty && date.value.isNotEmpty) {
-      fixedAccounts.add(FixedAccount(
-        id: id.value,
-        name: name.value,
-        date: date.value,
-        category: category.value,
-        amount: amount.value,
-        paymentMethod: paymentMethod.value,
-      ));
-      Get.back(); // Fecha o modal após adicionar
-    }
-  }
-
-  void showBottomSheet() {
-    reset(); // Limpa os valores antes de abrir
-    Get.bottomSheet(
-      ExpenseModal(),
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-    );
-  }
-}
-
-// Modelo para representar uma conta fixa
 class FixedAccount {
   final String id;
   final String name;
@@ -65,4 +20,60 @@ class FixedAccount {
     required this.amount,
     required this.paymentMethod,
   });
+}
+
+class FixedAccountsController extends GetxController {
+  var fixedAccounts = <FixedAccount>[].obs; // ✅ Lista observável
+
+  void addFixedAccount(String name, String date, String category, String amount, String paymentMethod) {
+    fixedAccounts.add(FixedAccount(
+      id: const Uuid().v4(),
+      name: name,
+      date: date,
+      category: category,
+      amount: amount,
+      paymentMethod: paymentMethod,
+    ));
+    Get.back(); // Fecha o modal após adicionar a conta fixa
+  }
+
+  void showBottomSheet() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: DefaultColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Adicionar Conta Fixa",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              decoration: const InputDecoration(labelText: "Nome"),
+              controller: TextEditingController(),
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: "Valor"),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Aqui você adiciona os dados à lista de fixedAccounts
+                // Exemplo:
+                // fixedAccounts.add(FixedAccount(name: "Exemplo", amount: "100", ...));
+                Get.back(); // Fecha o modal
+              },
+              child: const Text("Adicionar"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

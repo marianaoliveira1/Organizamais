@@ -4,14 +4,28 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/utils/color.dart';
 
-class FixedAccounts extends GetView<FixedAccountsController> {
-  const FixedAccounts({super.key});
+class FixedAccounts extends StatelessWidget {
+  final String id;
+  final String name;
+  final String date;
+  final String category;
+  final String amount;
+  final String paymentMethod;
+
+  FixedAccounts({
+    super.key,
+    required this.id,
+    required this.name,
+    required this.date,
+    required this.category,
+    required this.amount,
+    required this.paymentMethod,
+  });
+
+  final FixedAccountsController controller = Get.put(FixedAccountsController());
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controller using GetX dependency injection
-    Get.put(FixedAccountsController());
-
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 20.h,
@@ -22,6 +36,7 @@ class FixedAccounts extends GetView<FixedAccountsController> {
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -33,75 +48,86 @@ class FixedAccounts extends GetView<FixedAccountsController> {
                   fontSize: 12.sp,
                 ),
               ),
-              GestureDetector(
-                onTap: () => controller.showBottomSheet(),
-                child: const Icon(Icons.add),
+              IconButton(
+                onPressed: controller.showBottomSheet,
+                icon: const Icon(Icons.add),
               ),
             ],
           ),
-          SizedBox(
-            height: 10.h,
-          ),
-          GetX<FixedAccountsController>(
-            builder: (controller) {
-              return Column(
-                children: controller.fixedAccounts.map((expense) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 8.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          SizedBox(height: 10.h),
+          Obx(() {
+            if (controller.fixedAccounts.isEmpty) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                child: Text(
+                  "Nenhuma conta fixa cadastrada",
+                  style: TextStyle(
+                    color: DefaultColors.grey,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              );
+            }
+
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.fixedAccounts.length,
+              separatorBuilder: (context, index) => SizedBox(height: 8.h),
+              itemBuilder: (context, index) {
+                final expense = controller.fixedAccounts[index];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Icon(Icons.home, size: 30.h),
-                            SizedBox(width: 10.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  expense.name,
-                                  style: TextStyle(
-                                    color: DefaultColors.black,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                                Text(
-                                  expense.paymentMethod,
-                                  style: TextStyle(
-                                    color: DefaultColors.grey,
-                                    fontSize: 12.sp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                        Icon(Icons.home, size: 30.h),
+                        SizedBox(width: 10.w),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "R\$ ${expense.amount}",
+                              expense.name,
                               style: TextStyle(
                                 color: DefaultColors.black,
                                 fontSize: 14.sp,
                               ),
                             ),
                             Text(
-                              expense.date,
+                              expense.paymentMethod,
                               style: TextStyle(
                                 color: DefaultColors.grey,
                                 fontSize: 12.sp,
                               ),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "R\$ ${expense.amount}",
+                          style: TextStyle(
+                            color: DefaultColors.black,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        Text(
+                          expense.date,
+                          style: TextStyle(
+                            color: DefaultColors.grey,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                );
+              },
+            );
+          }),
         ],
       ),
     );

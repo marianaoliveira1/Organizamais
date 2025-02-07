@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'controller/auth_controller.dart';
+import 'controller/fixed_accounts_controller.dart';
 import 'routes/route.dart';
 
 void main() async {
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController());
+    Get.put(FixedAccountsController());
 
     return ScreenUtilInit(
       designSize: const Size(360, 690),
