@@ -12,8 +12,8 @@ class Category extends StatelessWidget {
   final List<Map<String, dynamic>> categories = [
     {
       'name': 'Moradia e Contas Fixas',
-      'color': Colors.blue,
-      'icon': Icons.home,
+      'color': DefaultColors.blue,
+      'icon': 'assets/icon-category/home.png',
       'subcategories': [
         'Aluguel / Financiamento',
         'IPTU',
@@ -27,8 +27,8 @@ class Category extends StatelessWidget {
     },
     {
       'name': 'Transporte',
-      'color': Colors.orange,
-      'icon': Icons.directions_car,
+      'color': DefaultColors.orange,
+      'icon': 'assets/icon-category/car.png',
       'subcategories': [
         'Combustível',
         'Transporte público',
@@ -40,8 +40,8 @@ class Category extends StatelessWidget {
     },
     {
       'name': 'Alimentação',
-      'color': Colors.green,
-      'icon': Icons.restaurant,
+      'color': DefaultColors.green,
+      'icon': 'assets/icon-category/food.png',
       'subcategories': [
         'Supermercado',
         'Restaurantes',
@@ -51,8 +51,8 @@ class Category extends StatelessWidget {
     },
     {
       'name': 'Educação',
-      'color': Colors.purple,
-      'icon': Icons.school,
+      'color': DefaultColors.purple,
+      'icon': 'assets/icon-category/education.png',
       'subcategories': [
         'Mensalidade escolar',
         'Cursos online',
@@ -62,8 +62,8 @@ class Category extends StatelessWidget {
     },
     {
       'name': 'Beleza e Cuidados Pessoais',
-      'color': Colors.pink,
-      'icon': Icons.brush,
+      'color': DefaultColors.pink,
+      'icon': 'assets/icon-category/happy.png',
       'subcategories': [
         'Cabeleireiro',
         'Manicure',
@@ -73,8 +73,8 @@ class Category extends StatelessWidget {
     },
     {
       'name': 'Saúde',
-      'color': Colors.red,
-      'icon': Icons.local_hospital,
+      'color': DefaultColors.red,
+      'icon': 'assets/icon-category/emergency.png',
       'subcategories': [
         'Plano de saúde',
         'Consultas médicas',
@@ -147,52 +147,5 @@ class Category extends StatelessWidget {
         },
       ),
     );
-    // return Scaffold(
-    //   backgroundColor: DefaultColors.background,
-    //   appBar: AppBar(
-    //     backgroundColor: DefaultColors.background,
-    //     title: Text('Categorias'),
-    //   ),
-    //   body: Padding(
-    //     padding: EdgeInsets.symmetric(
-    //       vertical: 20.w,
-    //       horizontal: 20.h,
-    //     ),
-    //     child: Column(
-    //       children: [
-    //         Container(
-    //           padding: EdgeInsets.symmetric(
-    //             vertical: 20.h,
-    //             horizontal: 16.w,
-    //           ),
-    //           decoration: BoxDecoration(
-    //             color: DefaultColors.white,
-    //             borderRadius: BorderRadius.circular(24.r),
-    //           ),
-    //           child: Row(
-    //             children: [
-    //               CircleAvatar(
-    //                 radius: 26,
-    //                 backgroundColor: DefaultColors.background,
-    //                 child: Icon(
-    //                   Icons.home,
-    //                   color: DefaultColors.black,
-    //                 ),
-    //               ),
-    //               SizedBox(width: 10.w),
-    //               Text(
-    //                 "Casa",
-    //                 style: TextStyle(
-    //                   fontWeight: FontWeight.bold,
-    //                   fontSize: 16.sp,
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }
