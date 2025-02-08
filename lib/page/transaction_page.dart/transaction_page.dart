@@ -27,6 +27,7 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController valueController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  int? categoryId;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,14 @@ class _TransactionPageState extends State<TransactionPage> {
               DefaultTitleTransaction(
                 title: "Categoria",
               ),
-              DefaultButtonCategory(),
+              DefaultButtonSelectCategory(
+                selectedCategory: categoryId,
+                onTap: (category) {
+                  setState(() {
+                    categoryId = category;
+                  });
+                },
+              ),
               DefaultTitleTransaction(
                 title: "Data",
               ),
@@ -193,18 +201,24 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 }
 
-class DefaultButtonCategory extends StatelessWidget {
-  const DefaultButtonCategory({
+class DefaultButtonSelectCategory extends StatelessWidget {
+  const DefaultButtonSelectCategory({
     super.key,
+    required this.onTap,
+    required this.selectedCategory,
   });
+
+  final Function(int?) onTap;
+  final int? selectedCategory;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Get.to(
+      onTap: () async {
+        var category = await Get.to(
           () => Category(),
         );
+        onTap(category);
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -223,12 +237,26 @@ class DefaultButtonCategory extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Selecione",
-              style: TextStyle(
-                fontSize: 14.sp,
-              ),
-            ),
+            selectedCategory != null
+                ? Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: DefaultColors.white,
+                        child: Image.asset(
+                          categories.firstWhere((element) => element['id'] == selectedCategory)['icon'],
+                          width: 20.w,
+                          height: 20.h,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      Text(
+                        categories.firstWhere((element) => element['id'] == selectedCategory)['name'],
+                      ),
+                    ],
+                  )
+                : Text("Selecione"),
             Icon(
               Iconsax.arrow_down_2,
             ),

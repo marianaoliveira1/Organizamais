@@ -18,7 +18,6 @@ migrate_working_dir/
 *.iws
 .idea/
 
-
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
@@ -37,3 +36,6 @@ app.*.map.json
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
+
+# FVM Version Cache
+.fvm/

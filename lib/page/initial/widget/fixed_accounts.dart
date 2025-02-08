@@ -2,27 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/page/transaction_page.dart/pages/%20%20category.dart';
 import 'package:organizamais/utils/color.dart';
 
 class FixedAccounts extends StatelessWidget {
-  final String id;
-  final String name;
-  final String date;
-  final String category;
-  final String amount;
-  final String paymentMethod;
+  final List<FixedAccount> fixedAccounts;
 
-  FixedAccounts({
+  const FixedAccounts({
     super.key,
-    required this.id,
-    required this.name,
-    required this.date,
-    required this.category,
-    required this.amount,
-    required this.paymentMethod,
+    required this.fixedAccounts,
   });
-
-  final FixedAccountsController controller = Get.put(FixedAccountsController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +28,7 @@ class FixedAccounts extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Obx(() {
-            if (controller.fixedAccounts.isEmpty) {
+            if (fixedAccounts.isEmpty) {
               return Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 child: Text(
@@ -51,36 +40,32 @@ class FixedAccounts extends StatelessWidget {
                 ),
               );
             }
-
             return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.fixedAccounts.length,
+              itemCount: fixedAccounts.length,
               separatorBuilder: (context, index) => SizedBox(height: 8.h),
               itemBuilder: (context, index) {
-                final expense = controller.fixedAccounts[index];
+                final fixedAccount = fixedAccounts[index];
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.home, size: 30.h),
+                        Image.asset(
+                          categories.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                          width: 30.w,
+                          height: 30.h,
+                        ),
                         SizedBox(width: 10.w),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              expense.name,
+                              fixedAccount.title,
                               style: TextStyle(
                                 color: DefaultColors.black,
                                 fontSize: 14.sp,
-                              ),
-                            ),
-                            Text(
-                              expense.paymentMethod,
-                              style: TextStyle(
-                                color: DefaultColors.grey,
-                                fontSize: 12.sp,
                               ),
                             ),
                           ],
@@ -91,17 +76,10 @@ class FixedAccounts extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "R\$ ${expense.amount}",
+                          "R\$ ${fixedAccount.value}",
                           style: TextStyle(
                             color: DefaultColors.black,
                             fontSize: 14.sp,
-                          ),
-                        ),
-                        Text(
-                          expense.date,
-                          style: TextStyle(
-                            color: DefaultColors.grey,
-                            fontSize: 12.sp,
                           ),
                         ),
                       ],

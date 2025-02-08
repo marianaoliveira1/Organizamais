@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:get/get.dart';
+import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../transaction_page.dart/transaction_page.dart';
 import '../../transaction_page.dart/widget/text_field_transaction.dart';
 import '../../transaction_page.dart/widget/title_transaction.dart';
 
-class FixedAccotunsPage extends StatelessWidget {
+class FixedAccotunsPage extends StatefulWidget {
   const FixedAccotunsPage({super.key});
 
   @override
+  State<FixedAccotunsPage> createState() => _FixedAccotunsPageState();
+}
+
+class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
+  int? categoryId;
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController valueController = TextEditingController();
+  final TextEditingController dayOfTheMonthController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController titleController = TextEditingController();
-    final TextEditingController valueController = TextEditingController();
-    final TextEditingController daytionController = TextEditingController();
+    final FixedAccountsController fixedAccountsController = Get.put(FixedAccountsController());
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
@@ -58,38 +67,58 @@ class FixedAccotunsPage extends StatelessWidget {
             DefaultTitleTransaction(
               title: "Categoria",
             ),
-            DefaultButtonCategory(),
+            DefaultButtonSelectCategory(
+              onTap: (category) {
+                setState(() {
+                  categoryId = category;
+                });
+              },
+              selectedCategory: categoryId,
+            ),
             SizedBox(
               height: 10.h,
             ),
             DefaultTitleTransaction(
-              title: "Dia do pagamento",
+              title: "Dia do pagamento ( Mensal )",
             ),
             DefaultTextFieldTransaction(
               hintText: 'Dia do pagamento',
-              controller: valueController,
+              controller: dayOfTheMonthController,
               keyboardType: TextInputType.number,
             ),
             Spacer(),
-            Container(
-              width: 1.sw,
-              height: 50.h,
-              decoration: BoxDecoration(
-                color: DefaultColors.black,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  "Salvar",
-                  style: TextStyle(
-                    color: DefaultColors.white,
-                    fontSize: 14.sp,
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (categoryId != null) {
+                        fixedAccountsController.addFixedAccount(FixedAccount(
+                          title: titleController.text,
+                          value: valueController.text,
+                          category: categoryId ?? 0,
+                          paymentDay: dayOfTheMonthController.text,
+                        ));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: DefaultColors.black,
+                      padding: EdgeInsets.all(15.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      "Salvar",
+                      style: TextStyle(
+                        color: DefaultColors.white,
+                        fontSize: 14.sp,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

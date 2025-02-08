@@ -1,79 +1,129 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:uuid/uuid.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+import 'dart:convert';
 
-import '../utils/color.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:organizamais/controller/auth_controller.dart';
 
 class FixedAccount {
-  final String id;
-  final String name;
-  final String date;
-  final String category;
-  final String amount;
-  final String paymentMethod;
+  final String? id;
+  final String? userId;
+  final String title;
+  final String value;
+  final int category;
+  final String paymentDay;
 
   FixedAccount({
-    required this.id,
-    required this.name,
-    required this.date,
+    this.id,
+    this.userId,
+    required this.title,
+    required this.value,
     required this.category,
-    required this.amount,
-    required this.paymentMethod,
+    required this.paymentDay,
   });
+
+  FixedAccount copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? value,
+    int? category,
+    String? paymentDay,
+  }) {
+    return FixedAccount(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      value: value ?? this.value,
+      category: category ?? this.category,
+      paymentDay: paymentDay ?? this.paymentDay,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'value': value,
+      'category': category,
+      'paymentDay': paymentDay,
+    };
+  }
+
+  factory FixedAccount.fromMap(Map<String, dynamic> map) {
+    return FixedAccount(
+      id: map['id'] != null ? map['id'] as String : null,
+      userId: map['userId'] != null ? map['userId'] as String : null,
+      title: map['title'] as String,
+      value: map['value'] as String,
+      category: map['category'] as int,
+      paymentDay: map['paymentDay'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory FixedAccount.fromJson(String source) => FixedAccount.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'FixedAccount(id: $id, userId: $userId, title: $title, value: $value, category: $category, paymentDay: $paymentDay)';
+  }
+
+  @override
+  bool operator ==(covariant FixedAccount other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.id == id &&
+      other.userId == userId &&
+      other.title == title &&
+      other.value == value &&
+      other.category == category &&
+      other.paymentDay == paymentDay;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      userId.hashCode ^
+      title.hashCode ^
+      value.hashCode ^
+      category.hashCode ^
+      paymentDay.hashCode;
+  }
 }
 
 class FixedAccountsController extends GetxController {
-  var fixedAccounts = <FixedAccount>[].obs; // ✅ Lista observável
+  var fixedAccounts = <FixedAccount>[].obs; 
+  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? fixedAccountsStream;
 
-  void addFixedAccount(String name, String date, String category, String amount, String paymentMethod) {
-    fixedAccounts.add(FixedAccount(
-      id: const Uuid().v4(),
-      name: name,
-      date: date,
-      category: category,
-      amount: amount,
-      paymentMethod: paymentMethod,
-    ));
-    Get.back(); // Fecha o modal após adicionar a conta fixa
+
+  // init sync fixed accounts
+  @override
+  void onInit() {
+    super.onInit();
+    getFixedAccounts();
   }
 
-  void showBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: DefaultColors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Adicionar Conta Fixa",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              decoration: const InputDecoration(labelText: "Nome"),
-              controller: TextEditingController(),
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: "Valor"),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Aqui você adiciona os dados à lista de fixedAccounts
-                // Exemplo:
-                // fixedAccounts.add(FixedAccount(name: "Exemplo", amount: "100", ...));
-                Get.back(); // Fecha o modal
-              },
-              child: const Text("Adicionar"),
-            ),
-          ],
-        ),
-      ),
-    );
+  void getFixedAccounts() {
+    fixedAccountsStream = FirebaseFirestore.instance.collection('fixedAccounts')
+    .where(
+      'userId',
+      isEqualTo: Get.find<AuthController>().firebaseUser.value?.uid,
+    )
+    .snapshots()
+    .listen((snapshot) {
+      fixedAccounts.value = snapshot.docs.map((e) => FixedAccount.fromMap(e.data())).toList();
+    });
   }
+
+  Future<void> addFixedAccount(FixedAccount fixedAccount) async {
+    var fixedAccountWithUserId = fixedAccount.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
+     await FirebaseFirestore.instance.collection('fixedAccounts').add(fixedAccountWithUserId.toMap());
+    Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
+  }
+
 }

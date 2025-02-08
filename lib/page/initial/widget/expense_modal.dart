@@ -42,13 +42,13 @@ class ExpenseModal extends StatelessWidget {
           SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              controller.addFixedAccount(
-                nameController.text,
-                dateController.text,
-                categoryController.text,
-                amountController.text,
-                paymentMethodController.text,
-              );
+              // controller.addFixedAccount(
+              //   nameController.text,
+              //   dateController.text,
+              //   categoryController.text,
+              //   amountController.text,
+              //   paymentMethodController.text,
+              // );
             },
             child: Text("Adicionar"),
           ),

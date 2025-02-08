@@ -1,97 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import 'package:organizamais/utils/color.dart';
 
-class Category extends StatelessWidget {
-  Category({super.key});
+final List<Map<String, dynamic>> categories = [
+  {
+    'id': 1,
+    'name': 'Alimentação',
+    'icon': 'assets/icon-category/food.png'
+  },
+  {
+    'id': 2,
+    'name': 'Assinaturas e serviços',
+    'icon': 'assets/icon-category/cartao.png'
+  },
+  {
+    'id': 3,
+    'name': 'Bares e restaurantes',
+    'icon': 'assets/icon-category/wine.png'
+  },
+  {
+    'id': 4,
+    'name': 'Moradia',
+    'icon': 'assets/icon-category/home.png'
+  },
+  {
+    'id': 5,
+    'name': 'Compras',
+    'icon': 'assets/icon-category/shopping.png'
+  },
+  {
+    'id': 6,
+    'name': 'Cuidados pessoais',
+    'icon': 'assets/icon-category/skincare.png'
+  },
+  {
+    'id': 7,
+    'name': 'Dívidas e empréstimos',
+    'icon': 'assets/icon-category/mooney.png'
+  },
+  {
+    'id': 8,
+    'name': 'Educação',
+    'icon': 'assets/icon-category/education.png'
+  },
+  {
+    'id': 9,
+    'name': 'Família e filhos',
+    'icon': 'assets/icon-category/family.png'
+  },
+  {
+    'id': 10,
+    'name': 'Investimentos',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 11,
+    'name': 'Lazer e hobbies',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 12,
+    'name': 'Pets',
+    'icon': 'assets/icon-category/dog.png'
+  },
+  {
+    'id': 13,
+    'name': 'Presentes e doações',
+    'icon': 'assets/icon-category/gift.png'
+  },
+  {
+    'id': 14,
+    'name': 'Saúde',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 15,
+    'name': 'Trabalho',
+    'icon': 'assets/icon-category/work.png'
+  },
+  {
+    'id': 16,
+    'name': 'Transporte',
+    'icon': 'assets/icon-category/car.png'
+  },
+  {
+    'id': 17,
+    'name': 'Viagem',
+    'icon': 'assets/icon-category/aviao.png'
+  },
+  {
+    'id': 18,
+    'name': 'Manutenção e reparos',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 19,
+    'name': 'Saúde e bem-estar',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 20,
+    'name': 'Seguros',
+    'icon': 'assets/icon-category/digital.png'
+  },
+  {
+    'id': 21,
+    'name': 'Outros',
+    'icon': 'assets/icon-category/digital.png'
+  },
+];
 
-  final List<Map<String, dynamic>> categories = [
-    {
-      'name': 'Alimentação',
-      'icon': 'assets/icon-category/food.png'
-    },
-    {
-      'name': 'Assinaturas e serviços',
-      'icon': 'assets/icon-category/cartao.png'
-    },
-    {
-      'name': 'Bares e restaurantes',
-      'icon': 'assets/icon-category/wine.png'
-    },
-    {
-      'name': 'Moradia',
-      'icon': 'assets/icon-category/home.png'
-    },
-    {
-      'name': 'Compras',
-      'icon': 'assets/icon-category/shopping.png'
-    },
-    {
-      'name': 'Cuidados pessoais',
-      'icon': 'assets/icon-category/skincare.png'
-    },
-    {
-      'name': 'Dívidas e empréstimos',
-      'icon': 'assets/icon-category/mooney.png'
-    },
-    {
-      'name': 'Educação',
-      'icon': 'assets/icon-category/education.png'
-    },
-    {
-      'name': 'Família e filhos',
-      'icon': 'assets/icon-category/family.png'
-    },
-    {
-      'name': 'Investimentos',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Lazer e hobbies',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Pets',
-      'icon': 'assets/icon-category/dog.png'
-    },
-    {
-      'name': 'Presentes e doações',
-      'icon': 'assets/icon-category/gift.png'
-    },
-    {
-      'name': 'Saúde',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Trabalho',
-      'icon': 'assets/icon-category/work.png'
-    },
-    {
-      'name': 'Transporte',
-      'icon': 'assets/icon-category/car.png'
-    },
-    {
-      'name': 'Viagem',
-      'icon': 'assets/icon-category/aviao.png'
-    },
-    {
-      'name': 'Manutenção e reparos',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Saúde e bem-estar',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Seguros',
-      'icon': 'assets/icon-category/digital.png'
-    },
-    {
-      'name': 'Outros',
-      'icon': 'assets/icon-category/digital.png'
-    },
-  ];
+class Category extends StatelessWidget {
+  const Category({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -141,14 +163,11 @@ class Category extends StatelessWidget {
                   color: DefaultColors.black,
                 ),
               ),
-              // onTap: () {
-              //   Get.to(
-              //     () => SubcategoriesPage(
-              //       categoryName: category['name'],
-              //       subcategories: category['subcategories'],
-              //     ),
-              //   );
-              // },
+              onTap: () {
+                Get.back(
+                  result: category['id'],
+                );
+              },
             ),
           );
         },

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/page/initial/widget/finance_summary.dart';
+import 'package:organizamais/page/initial/widget/fixed_accounts.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/fixed_accounts_controller.dart';
-import 'widget/fixed_accounts.dart';
 import 'widget/goal_progress_card.dart';
 
 class InitialPage extends StatelessWidget {
@@ -13,7 +13,7 @@ class InitialPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FixedAccountsController controller = Get.put(FixedAccountsController());
+    Get.put(FixedAccountsController());
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
@@ -60,26 +60,13 @@ class InitialPage extends StatelessWidget {
                             ),
                           ],
                         ),
+                        FixedAccounts(
+                          fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
+                        )
                       ],
                     ),
                   ),
                   SizedBox(height: 10.h),
-                  // Obx(
-                  //   () {
-                  //     return Column(
-                  //       children: List.generate(controller.fixedAccounts.length, (index) {
-                  //         return FixedAccounts(
-                  //           id: controller.fixedAccounts[index].id,
-                  //           name: controller.fixedAccounts[index].name,
-                  //           date: controller.fixedAccounts[index].date,
-                  //           category: controller.fixedAccounts[index].category,
-                  //           amount: controller.fixedAccounts[index].amount,
-                  //           paymentMethod: controller.fixedAccounts[index].paymentMethod,
-                  //         );
-                  //       }),
-                  //     );
-                  //   },
-                  // ),
                   SizedBox(
                     height: 20.h,
                   ),
