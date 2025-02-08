@@ -43,7 +43,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
               title: "Titulo",
             ),
             DefaultTextFieldTransaction(
-              hintText: 'Titulo',
+              hintText: 'ex: Aluguel',
               controller: titleController,
               keyboardType: TextInputType.text,
             ),
@@ -54,7 +54,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
               title: "Valor",
             ),
             DefaultTextFieldTransaction(
-              hintText: 'Valor',
+              hintText: '0,00',
               controller: valueController,
               icon: Icon(
                 Icons.attach_money,
@@ -79,10 +79,10 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
               height: 10.h,
             ),
             DefaultTitleTransaction(
-              title: "Dia do pagamento ( Mensal )",
+              title: "Dia do pagamento ",
             ),
             DefaultTextFieldTransaction(
-              hintText: 'Dia do pagamento',
+              hintText: 'ex: 5',
               controller: dayOfTheMonthController,
               keyboardType: TextInputType.number,
             ),

@@ -12,10 +12,12 @@ import 'widget/title_transaction.dart';
 
 class TransactionPage extends StatefulWidget {
   final String? type;
+  final String? transactionType;
 
   const TransactionPage({
     super.key,
     this.type,
+    this.transactionType,
   });
 
   @override

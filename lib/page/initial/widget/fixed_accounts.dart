@@ -16,10 +16,6 @@ class FixedAccounts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 20.h,
-        horizontal: 16.w,
-      ),
       decoration: BoxDecoration(
         color: DefaultColors.white,
         borderRadius: BorderRadius.circular(24.r),
@@ -56,10 +52,10 @@ class FixedAccounts extends StatelessWidget {
                       children: [
                         Image.asset(
                           categories.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                          width: 20.w,
+                          width: 24.w,
                           height: 24.h,
                         ),
-                        SizedBox(width: 10.w),
+                        SizedBox(width: 20.w),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -68,14 +64,14 @@ class FixedAccounts extends StatelessWidget {
                               style: TextStyle(
                                 color: DefaultColors.black,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                               ),
                             ),
                             Text(
                               "Dia ${fixedAccount.paymentDay} de cada mês",
                               style: TextStyle(
                                 color: DefaultColors.grey,
-                                fontSize: 12.sp,
+                                fontSize: 10.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
