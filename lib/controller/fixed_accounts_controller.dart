@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+
 import 'package:organizamais/controller/auth_controller.dart';
 
 class FixedAccount {
@@ -13,7 +14,7 @@ class FixedAccount {
   final String value;
   final int category;
   final String paymentDay;
-  final String paymentType;
+  final String? paymentType;
 
   FixedAccount({
     this.id,
@@ -46,32 +47,71 @@ class FixedAccount {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'userId': userId,
-      'title': title,
-      'value': value,
-      'category': category,
-      'paymentDay': paymentDay,
-      'paymentType': paymentType,
-    };
+    final result = <String, dynamic>{};
+
+    if (id != null) {
+      result.addAll({
+        'id': id
+      });
+    }
+    if (userId != null) {
+      result.addAll({
+        'userId': userId
+      });
+    }
+    result.addAll({
+      'title': title
+    });
+    result.addAll({
+      'value': value
+    });
+    result.addAll({
+      'category': category
+    });
+    result.addAll({
+      'paymentDay': paymentDay
+    });
+    if (paymentType != null) {
+      result.addAll({
+        'paymentType': paymentType
+      });
+    }
+
+    return result;
   }
 
   factory FixedAccount.fromMap(Map<String, dynamic> map) {
     return FixedAccount(
-      id: map['id'] as String?,
-      userId: map['userId'] as String?,
-      title: map['title'] as String,
-      value: map['value'] as String,
-      category: map['category'] as int,
-      paymentDay: map['paymentDay'] as String,
-      paymentType: map['paymentType'] as String,
+      id: map['id'],
+      userId: map['userId'],
+      title: map['title'] ?? '',
+      value: map['value'] ?? '',
+      category: map['category']?.toInt() ?? 0,
+      paymentDay: map['paymentDay'] ?? '',
+      paymentType: map['paymentType'],
     );
   }
 
   String toJson() => json.encode(toMap());
 
   factory FixedAccount.fromJson(String source) => FixedAccount.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'FixedAccount(id: $id, userId: $userId, title: $title, value: $value, category: $category, paymentDay: $paymentDay, paymentType: $paymentType)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FixedAccount && other.id == id && other.userId == userId && other.title == title && other.value == value && other.category == category && other.paymentDay == paymentDay && other.paymentType == paymentType;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ value.hashCode ^ category.hashCode ^ paymentDay.hashCode ^ paymentType.hashCode;
+  }
 }
 
 class FixedAccountsController extends GetxController {
@@ -93,7 +133,11 @@ class FixedAccountsController extends GetxController {
         )
         .snapshots()
         .listen((snapshot) {
-      fixedAccounts.value = snapshot.docs.map((e) => FixedAccount.fromMap(e.data()).copyWith(id: e.id)).toList();
+      fixedAccounts.value = snapshot.docs
+          .map(
+            (e) => FixedAccount.fromMap(e.data()).copyWith(id: e.id),
+          )
+          .toList();
     });
   }
 

@@ -90,6 +90,14 @@ class FixedAccounts extends StatelessWidget {
                             fontSize: 14.sp,
                           ),
                         ),
+                        Text(
+                          "${fixedAccount.paymentType}",
+                          style: TextStyle(
+                            color: DefaultColors.grey,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     )
                   ],
