@@ -1,13 +1,14 @@
 import 'package:get/get.dart';
-import 'package:organizamais/page/transaction_page.dart/pages/%20%20category.dart';
 
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
 import '../page/home/home_page.dart';
 import '../page/initial/initial_page.dart';
+import '../page/initial/pages/fixed_accotuns_page.dart';
 import '../page/login/login_page.dart';
 import '../page/register/register_page.dart';
 import '../page/resume/resume_pegae.dart';
+import '../page/transaction_page.dart/pages/  category.dart';
 import '../page/transaction_page.dart/transaction_page.dart';
 
 class Routes {
@@ -20,6 +21,7 @@ class Routes {
   static const RESUME = '/resume';
   static const TRANSACTION = '/transaction';
   static const CATEGORY = '/category';
+  static const FIXED_ACCOUNTS = '/fixed-accounts';
 }
 
 class AppPages {
@@ -33,6 +35,7 @@ class AppPages {
     GetPage(name: Routes.RESUME, page: () => ResumePegae()),
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
+    GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
   ];
 
   static const INITIAL = Routes.LOGIN;

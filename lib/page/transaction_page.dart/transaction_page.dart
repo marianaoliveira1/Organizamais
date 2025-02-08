@@ -60,6 +60,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       icon: Icon(
                         Icons.attach_money,
                       ),
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
@@ -74,6 +75,7 @@ class _TransactionPageState extends State<TransactionPage> {
               DefaultTextFieldTransaction(
                 hintText: 'Ex: Compra de mercado',
                 controller: titleController,
+                keyboardType: TextInputType.text,
               ),
               SizedBox(height: 16),
               DefaultTitleTransaction(

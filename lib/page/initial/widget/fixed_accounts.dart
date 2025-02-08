@@ -38,23 +38,6 @@ class FixedAccounts extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Contas fixas",
-                style: TextStyle(
-                  color: DefaultColors.grey,
-                  fontSize: 12.sp,
-                ),
-              ),
-              IconButton(
-                onPressed: controller.showBottomSheet,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          SizedBox(height: 10.h),
           Obx(() {
             if (controller.fixedAccounts.isEmpty) {
               return Padding(

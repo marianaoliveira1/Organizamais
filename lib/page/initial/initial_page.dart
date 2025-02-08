@@ -31,51 +31,55 @@ class InitialPage extends StatelessWidget {
                   SizedBox(
                     height: 20.h,
                   ),
-                  // Obx(() {
-                  //   if (controller.fixedAccounts.isEmpty) {
-                  //     return Center(
-                  //       child: Text(
-                  //         "",
-                  //         style: TextStyle(
-                  //           color: DefaultColors.grey,
-                  //           fontSize: 12.sp,
-                  //           fontWeight: FontWeight.w500,
-                  //         ),
-                  //       ),
-                  //     );
-                  //   } else {
-                  // return ListView.builder(
-                  //   itemCount: controller.fixedAccounts.length,
-                  //   itemBuilder: (context, index) {
-                  //     return FixedAccounts(
-                  //       id: controller.fixedAccounts[index].id,
-                  //       name: controller.fixedAccounts[index].name,
-                  //       date: controller.fixedAccounts[index].date,
-                  //       category: controller.fixedAccounts[index].category,
-                  //       amount: controller.fixedAccounts[index].amount,
-                  //       paymentMethod: controller.fixedAccounts[index].paymentMethod,
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 20.h,
+                      horizontal: 16.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: DefaultColors.white,
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Contas fixas",
+                              style: TextStyle(
+                                color: DefaultColors.grey,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Get.toNamed("/fixed-accounts");
+                              },
+                              icon: const Icon(Icons.add),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  // Obx(
+                  //   () {
+                  //     return Column(
+                  //       children: List.generate(controller.fixedAccounts.length, (index) {
+                  //         return FixedAccounts(
+                  //           id: controller.fixedAccounts[index].id,
+                  //           name: controller.fixedAccounts[index].name,
+                  //           date: controller.fixedAccounts[index].date,
+                  //           category: controller.fixedAccounts[index].category,
+                  //           amount: controller.fixedAccounts[index].amount,
+                  //           paymentMethod: controller.fixedAccounts[index].paymentMethod,
+                  //         );
+                  //       }),
                   //     );
                   //   },
-                  // );
-                  //   }
-                  // }),
-                  Obx(
-                    () {
-                      return Column(
-                        children: List.generate(controller.fixedAccounts.length, (index) {
-                          return FixedAccounts(
-                            id: controller.fixedAccounts[index].id,
-                            name: controller.fixedAccounts[index].name,
-                            date: controller.fixedAccounts[index].date,
-                            category: controller.fixedAccounts[index].category,
-                            amount: controller.fixedAccounts[index].amount,
-                            paymentMethod: controller.fixedAccounts[index].paymentMethod,
-                          );
-                        }),
-                      );
-                    },
-                  ),
-
+                  // ),
                   SizedBox(
                     height: 20.h,
                   ),

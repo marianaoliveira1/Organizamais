@@ -13,13 +13,21 @@ class DefaultTitleTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 12.sp,
-        color: DefaultColors.black,
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12.sp,
+            color: DefaultColors.black,
+          ),
+        ),
+        SizedBox(
+          height: 15.h,
+        )
+      ],
     );
   }
 }

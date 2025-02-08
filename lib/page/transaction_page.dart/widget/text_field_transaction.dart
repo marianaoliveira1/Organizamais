@@ -6,6 +6,7 @@ import 'package:organizamais/utils/color.dart';
 class DefaultTextFieldTransaction extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
+  final TextInputType keyboardType;
   final Icon? icon;
 
   const DefaultTextFieldTransaction({
@@ -13,6 +14,7 @@ class DefaultTextFieldTransaction extends StatelessWidget {
     required this.controller,
     this.icon,
     required this.hintText,
+    required this.keyboardType,
   });
 
   @override
@@ -25,7 +27,7 @@ class DefaultTextFieldTransaction extends StatelessWidget {
         fontWeight: FontWeight.w500,
         color: DefaultColors.black,
       ),
-      keyboardType: TextInputType.number,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
