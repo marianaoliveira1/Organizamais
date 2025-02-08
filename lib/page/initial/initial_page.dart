@@ -44,29 +44,38 @@ class InitialPage extends StatelessWidget {
                   //       ),
                   //     );
                   //   } else {
-                  //     return ListView.builder(
-                  //       itemCount: controller.fixedAccounts.length,
-                  //       itemBuilder: (context, index) {
-                  //         return FixedAccounts(
-                  //           id: controller.fixedAccounts[index].id,
-                  //           name: controller.fixedAccounts[index].name,
-                  //           date: controller.fixedAccounts[index].date,
-                  //           category: controller.fixedAccounts[index].category,
-                  //           amount: controller.fixedAccounts[index].amount,
-                  //           paymentMethod: controller.fixedAccounts[index].paymentMethod,
-                  //         );
-                  //       },
+                  // return ListView.builder(
+                  //   itemCount: controller.fixedAccounts.length,
+                  //   itemBuilder: (context, index) {
+                  //     return FixedAccounts(
+                  //       id: controller.fixedAccounts[index].id,
+                  //       name: controller.fixedAccounts[index].name,
+                  //       date: controller.fixedAccounts[index].date,
+                  //       category: controller.fixedAccounts[index].category,
+                  //       amount: controller.fixedAccounts[index].amount,
+                  //       paymentMethod: controller.fixedAccounts[index].paymentMethod,
                   //     );
+                  //   },
+                  // );
                   //   }
                   // }),
-                  FixedAccounts(
-                    id: '',
-                    name: '',
-                    date: '',
-                    category: '',
-                    amount: '',
-                    paymentMethod: '',
+                  Obx(
+                    () {
+                      return Column(
+                        children: List.generate(controller.fixedAccounts.length, (index) {
+                          return FixedAccounts(
+                            id: controller.fixedAccounts[index].id,
+                            name: controller.fixedAccounts[index].name,
+                            date: controller.fixedAccounts[index].date,
+                            category: controller.fixedAccounts[index].category,
+                            amount: controller.fixedAccounts[index].amount,
+                            paymentMethod: controller.fixedAccounts[index].paymentMethod,
+                          );
+                        }),
+                      );
+                    },
                   ),
+
                   SizedBox(
                     height: 20.h,
                   ),
