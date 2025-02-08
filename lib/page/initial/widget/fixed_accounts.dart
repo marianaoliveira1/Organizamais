@@ -44,7 +44,9 @@ class FixedAccounts extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: fixedAccounts.length,
-              separatorBuilder: (context, index) => SizedBox(height: 8.h),
+              separatorBuilder: (context, index) => SizedBox(
+                height: 14.h,
+              ),
               itemBuilder: (context, index) {
                 final fixedAccount = fixedAccounts[index];
                 return Row(
@@ -54,8 +56,8 @@ class FixedAccounts extends StatelessWidget {
                       children: [
                         Image.asset(
                           categories.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                          width: 30.w,
-                          height: 30.h,
+                          width: 20.w,
+                          height: 24.h,
                         ),
                         SizedBox(width: 10.w),
                         Column(
@@ -65,7 +67,16 @@ class FixedAccounts extends StatelessWidget {
                               fixedAccount.title,
                               style: TextStyle(
                                 color: DefaultColors.black,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 14.sp,
+                              ),
+                            ),
+                            Text(
+                              "Dia ${fixedAccount.paymentDay} de cada mês",
+                              style: TextStyle(
+                                color: DefaultColors.grey,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -79,6 +90,7 @@ class FixedAccounts extends StatelessWidget {
                           "R\$ ${fixedAccount.value}",
                           style: TextStyle(
                             color: DefaultColors.black,
+                            fontWeight: FontWeight.bold,
                             fontSize: 14.sp,
                           ),
                         ),
