@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:organizamais/utils/color.dart';
 
-class DefaultTextFieldTransaction extends StatelessWidget {
+class DefaultTextFieldTransaction extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
   final TextInputType keyboardType;
@@ -18,29 +18,59 @@ class DefaultTextFieldTransaction extends StatelessWidget {
   });
 
   @override
+  State<DefaultTextFieldTransaction> createState() => _DefaultTextFieldTransactionState();
+}
+
+class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransaction> {
+  final FocusNode _focusNode = FocusNode();
+  bool isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Adiciona listener para detectar mudança de foco
+    _focusNode.addListener(() {
+      setState(() {
+        isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
+      controller: widget.controller,
       cursorColor: DefaultColors.black,
       style: TextStyle(
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
         color: DefaultColors.black,
       ),
-      keyboardType: keyboardType,
+      keyboardType: widget.keyboardType,
+      focusNode: _focusNode,
       decoration: InputDecoration(
+        fillColor: isFocused ? DefaultColors.background : DefaultColors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             12.r,
           ),
         ),
-        prefixIcon: icon,
+        prefixIcon: widget.icon,
+        prefixIconColor: DefaultColors.grey,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             12.r,
           ),
         ),
-        hintText: hintText,
+        focusColor: DefaultColors.black,
+        hintText: widget.hintText,
         hintStyle: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,

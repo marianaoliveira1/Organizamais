@@ -34,9 +34,9 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.white,
       appBar: AppBar(
-        backgroundColor: DefaultColors.background,
+        backgroundColor: DefaultColors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -51,36 +51,28 @@ class _TransactionPageState extends State<TransactionPage> {
               DefaultTitleTransaction(
                 title: 'Valor',
               ),
+              DefaultTextFieldTransaction(
+                hintText: '0,00',
+                controller: valueController,
+                icon: Icon(
+                  Icons.attach_money,
+                ),
+                keyboardType: TextInputType.number,
+              ),
               SizedBox(
-                height: 10.h,
+                height: 16.h,
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: DefaultTextFieldTransaction(
-                      hintText: '0,00',
-                      controller: valueController,
-                      icon: Icon(
-                        Icons.attach_money,
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24),
               DefaultTitleTransaction(
                 title: 'Título',
-              ),
-              SizedBox(
-                height: 10.h,
               ),
               DefaultTextFieldTransaction(
                 hintText: 'Ex: Compra de mercado',
                 controller: titleController,
                 keyboardType: TextInputType.text,
               ),
-              SizedBox(height: 16),
+              SizedBox(
+                height: 16.h,
+              ),
               DefaultTitleTransaction(
                 title: "Categoria",
               ),
@@ -92,11 +84,11 @@ class _TransactionPageState extends State<TransactionPage> {
                   });
                 },
               ),
+              SizedBox(
+                height: 16.h,
+              ),
               DefaultTitleTransaction(
                 title: "Data",
-              ),
-              SizedBox(
-                height: 10.h,
               ),
               InkWell(
                 onTap: () async {
@@ -115,7 +107,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.h,
-                    vertical: 10.h,
+                    vertical: 15.h,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -132,6 +124,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       Text(
                         "dd/mm/aaaa",
                         style: TextStyle(
+                          color: DefaultColors.grey,
                           fontSize: 14.sp,
                         ),
                       ),
@@ -143,6 +136,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
               ),
               SizedBox(height: 16.h),
+              //de for despesas: pago com
+              //se for receita recebi em
+              //se for transfrencia conta origem - conta destino e com + na frente
               DefaultTitleTransaction(title: "Forma de pagamento"),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,7 +221,7 @@ class DefaultButtonSelectCategory extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: 10.h,
-          vertical: 10.h,
+          vertical: 15.h,
         ),
         decoration: BoxDecoration(
           color: DefaultColors.greyLight,
@@ -255,13 +251,14 @@ class DefaultButtonSelectCategory extends StatelessWidget {
                       ),
                       Text(
                         categories.firstWhere((element) => element['id'] == selectedCategory)['name'],
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: DefaultColors.black,
+                        ),
                       ),
                     ],
                   )
                 : Text("Selecione"),
-            Icon(
-              Iconsax.arrow_down_2,
-            ),
           ],
         ),
       ),
