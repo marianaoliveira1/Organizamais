@@ -20,6 +20,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
+  final TextEditingController paymentTypeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +87,17 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
               controller: dayOfTheMonthController,
               keyboardType: TextInputType.number,
             ),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Tipo de pagamento",
+            ),
+            DefaultTextFieldTransaction(
+              hintText: 'ex: Pix',
+              controller: paymentTypeController,
+              keyboardType: TextInputType.text,
+            ),
             Spacer(),
             Row(
               children: [
@@ -99,6 +111,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                           value: valueController.text,
                           category: categoryId ?? 0,
                           paymentDay: dayOfTheMonthController.text,
+                          paymentType: paymentTypeController.text,
                         ));
                       }
                     },
