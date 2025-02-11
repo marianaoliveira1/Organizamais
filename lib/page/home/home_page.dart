@@ -10,6 +10,8 @@ import 'package:organizamais/page/resume/resume_pegae.dart';
 import 'package:organizamais/page/transaction_page.dart/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
+import '../../model/transaction_model.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -60,21 +62,15 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
             _buildOptionButton("Receita", DefaultColors.green, Icons.add, () {
-              Get.to(
-                () => TransactionPage(),
-              );
+              Get.to(() => TransactionPage(transactionType: TransactionType.receita));
             }),
             const SizedBox(height: 10),
             _buildOptionButton("Despesa", DefaultColors.red, Icons.remove, () {
-              Get.to(
-                () => TransactionPage(),
-              );
+              Get.to(() => TransactionPage(transactionType: TransactionType.despesa));
             }),
             const SizedBox(height: 10),
             _buildOptionButton("Transferência", DefaultColors.grey, Icons.swap_horiz, () {
-              Get.to(
-                () => TransactionPage(),
-              );
+              Get.to(() => TransactionPage(transactionType: TransactionType.transferencia));
             }),
           ],
         ),
