@@ -107,7 +107,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                     onPressed: () {
                       Navigator.pop(context);
                       if (categoryId != null) {
-                        fixedAccountsController.addFixedAccount(FixedAccount(
+                        fixedAccountsController.addFixedAccount(FixedAccountModel(
                           title: titleController.text,
                           value: valueController.text,
                           category: categoryId ?? 0,

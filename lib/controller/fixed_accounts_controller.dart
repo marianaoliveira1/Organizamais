@@ -9,7 +9,7 @@ import 'package:organizamais/controller/auth_controller.dart';
 import '../model/fixed_account_model.dart';
 
 class FixedAccountsController extends GetxController {
-  var fixedAccounts = <FixedAccount>[].obs;
+  var fixedAccounts = <FixedAccountModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? fixedAccountsStream;
 
   @override
@@ -29,19 +29,19 @@ class FixedAccountsController extends GetxController {
         .listen((snapshot) {
       fixedAccounts.value = snapshot.docs
           .map(
-            (e) => FixedAccount.fromMap(e.data()).copyWith(id: e.id),
+            (e) => FixedAccountModel.fromMap(e.data()).copyWith(id: e.id),
           )
           .toList();
     });
   }
 
-  Future<void> addFixedAccount(FixedAccount fixedAccount) async {
+  Future<void> addFixedAccount(FixedAccountModel fixedAccount) async {
     var fixedAccountWithUserId = fixedAccount.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
     await FirebaseFirestore.instance.collection('fixedAccounts').add(fixedAccountWithUserId.toMap());
     Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
   }
 
-  Future<void> updateFixedAccount(FixedAccount fixedAccount) async {
+  Future<void> updateFixedAccount(FixedAccountModel fixedAccount) async {
     if (fixedAccount.id == null) return;
     await FirebaseFirestore.instance.collection('fixedAccounts').doc(fixedAccount.id).update(fixedAccount.toMap());
     Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');

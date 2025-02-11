@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class FixedAccount {
+class FixedAccountModel {
   final String? id;
   final String? userId;
   final String title;
@@ -9,7 +9,7 @@ class FixedAccount {
   final String paymentDay;
   final String? paymentType;
 
-  FixedAccount({
+  FixedAccountModel({
     this.id,
     this.userId,
     required this.title,
@@ -19,7 +19,7 @@ class FixedAccount {
     required this.paymentType,
   });
 
-  FixedAccount copyWith({
+  FixedAccountModel copyWith({
     String? id,
     String? userId,
     String? title,
@@ -28,7 +28,7 @@ class FixedAccount {
     String? paymentDay,
     String? paymentType,
   }) {
-    return FixedAccount(
+    return FixedAccountModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       title: title ?? this.title,
@@ -73,8 +73,8 @@ class FixedAccount {
     return result;
   }
 
-  factory FixedAccount.fromMap(Map<String, dynamic> map) {
-    return FixedAccount(
+  factory FixedAccountModel.fromMap(Map<String, dynamic> map) {
+    return FixedAccountModel(
       id: map['id'],
       userId: map['userId'],
       title: map['title'] ?? '',
@@ -87,7 +87,7 @@ class FixedAccount {
 
   String toJson() => json.encode(toMap());
 
-  factory FixedAccount.fromJson(String source) => FixedAccount.fromMap(json.decode(source));
+  factory FixedAccountModel.fromJson(String source) => FixedAccountModel.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -98,7 +98,7 @@ class FixedAccount {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is FixedAccount && other.id == id && other.userId == userId && other.title == title && other.value == value && other.category == category && other.paymentDay == paymentDay && other.paymentType == paymentType;
+    return other is FixedAccountModel && other.id == id && other.userId == userId && other.title == title && other.value == value && other.category == category && other.paymentDay == paymentDay && other.paymentType == paymentType;
   }
 
   @override

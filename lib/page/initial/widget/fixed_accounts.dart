@@ -8,7 +8,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../model/fixed_account_model.dart';
 
 class FixedAccounts extends StatelessWidget {
-  final List<FixedAccount> fixedAccounts;
+  final List<FixedAccountModel> fixedAccounts;
 
   const FixedAccounts({
     super.key,
