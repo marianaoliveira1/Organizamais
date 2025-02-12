@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 enum TransactionType {
   receita,
   despesa,
@@ -6,50 +8,115 @@ enum TransactionType {
 
 class TransactionModel {
   final String id;
-  final String description;
+  final String? userId;
+  final String title;
   final double amount;
   final DateTime date;
-  final String categoryId;
+  final int categoryId;
   final TransactionType type;
-  final String accountId;
-  final bool isRecurring;
-  final bool isInstallment;
-
+  final String? paymentType;
   TransactionModel({
     required this.id,
-    required this.description,
+    this.userId,
+    required this.title,
     required this.amount,
     required this.date,
     required this.categoryId,
     required this.type,
-    required this.accountId,
-    this.isRecurring = false,
-    this.isInstallment = false,
+    this.paymentType,
   });
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'description': description,
-        'amount': amount,
-        'date': date.toIso8601String(),
-        'categoryId': categoryId,
-        'type': type.toString(),
-        'accountId': accountId,
-        'isRecurring': isRecurring,
-        'isInstallment': isInstallment,
-      };
+  TransactionModel copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    double? amount,
+    DateTime? date,
+    int? categoryId,
+    TransactionType? type,
+    String? paymentType,
+  }) {
+    return TransactionModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      categoryId: categoryId ?? this.categoryId,
+      type: type ?? this.type,
+      paymentType: paymentType ?? this.paymentType,
+    );
+  }
 
-  factory TransactionModel.fromJson(Map<String, dynamic> json) => TransactionModel(
-        id: json['id'],
-        description: json['description'],
-        amount: json['amount'],
-        date: DateTime.parse(json['date']),
-        categoryId: json['categoryId'],
-        type: TransactionType.values.firstWhere(
-          (e) => e.toString() == json['type'],
-        ),
-        accountId: json['accountId'],
-        isRecurring: json['isRecurring'],
-        isInstallment: json['isInstallment'],
-      );
+  Map<String, dynamic> toMap() {
+    final result = <String, dynamic>{};
+
+    result.addAll({
+      'id': id
+    });
+    if (userId != null) {
+      result.addAll({
+        'userId': userId
+      });
+    }
+    result.addAll({
+      'title': title
+    });
+    result.addAll({
+      'amount': amount
+    });
+    result.addAll({
+      'date': date.millisecondsSinceEpoch
+    });
+    result.addAll({
+      'categoryId': categoryId
+    });
+    result.addAll({
+      'type': type.toString(),
+    });
+    if (paymentType != null) {
+      result.addAll({
+        'paymentType': paymentType
+      });
+    }
+
+    return result;
+  }
+
+  factory TransactionModel.fromMap(Map<String, dynamic> map) {
+    return TransactionModel(
+      id: map['id'] ?? '',
+      userId: map['userId'],
+      title: map['title'] ?? '',
+      amount: map['amount']?.toDouble() ?? 0.0,
+      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+      categoryId: map['categoryId']?.toInt() ?? 0,
+      type: TransactionType.values.firstWhere(
+        (e) => e.toString() == map['type'],
+        orElse: () => TransactionType.despesa,
+      ),
+      paymentType: map['paymentType'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TransactionModel.fromJson(String source) => TransactionModel.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'TransactionModel(id: $id, userId: $userId, title: $title, amount: $amount, date: $date, categoryId: $categoryId, type: $type, paymentType: $paymentType)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TransactionModel && other.id == id && other.userId == userId && other.title == title && other.amount == amount && other.date == date && other.categoryId == categoryId && other.type == type && other.paymentType == paymentType;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ amount.hashCode ^ date.hashCode ^ categoryId.hashCode ^ type.hashCode ^ paymentType.hashCode;
+  }
 }
