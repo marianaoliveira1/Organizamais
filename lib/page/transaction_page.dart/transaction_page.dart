@@ -28,6 +28,42 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
 
+  Future<void> _selectDate() async {
+    final DateTime? date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date != null) {
+      dayOfTheMonthController.text = '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
+  Widget _buildDatePickerField() {
+    return TextField(
+      controller: dayOfTheMonthController,
+      readOnly: true,
+      style: TextStyle(
+        fontSize: 16.sp,
+        color: DefaultColors.black,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        hintText: "A data da sua conquista",
+        hintStyle: TextStyle(
+          fontSize: 16.sp,
+          color: DefaultColors.grey,
+          fontWeight: FontWeight.w500,
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: DefaultColors.black),
+        ),
+      ),
+      onTap: _selectDate,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final TransactionController transactionController = Get.put(TransactionController());
@@ -84,21 +120,15 @@ class _TransactionPageState extends State<TransactionPage> {
             DefaultTitleTransaction(
               title: "Dia do pagamento ",
             ),
-            DefaultTextFieldTransaction(
-              hintText: 'ex: 5',
-              controller: dayOfTheMonthController,
-              keyboardType: TextInputType.number,
-            ),
+            _buildDatePickerField(),
             SizedBox(
               height: 10.h,
             ),
             DefaultTitleTransaction(
               title: "Tipo de pagamento",
             ),
-            DefaultTextFieldTransaction(
-              hintText: 'ex: Pix',
+            PaymentTypeField(
               controller: paymentTypeController,
-              keyboardType: TextInputType.text,
             ),
             Spacer(),
             Row(
@@ -139,6 +169,110 @@ class _TransactionPageState extends State<TransactionPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class PaymentTypeField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const PaymentTypeField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  void _showPaymentOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.r),
+        ),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Selecione o método de pagamento',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: DefaultColors.black,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            _buildPaymentOption(
+              context,
+              'Cartão',
+              Icons.credit_card,
+              controller,
+            ),
+            _buildPaymentOption(
+              context,
+              'Dinheiro',
+              Icons.attach_money,
+              controller,
+            ),
+            _buildPaymentOption(
+              context,
+              'PIX',
+              Icons.pix,
+              controller,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentOption(
+    BuildContext context,
+    String title,
+    IconData icon,
+    TextEditingController controller,
+  ) {
+    return ListTile(
+      leading: Icon(icon, color: DefaultColors.black),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.sp,
+          color: DefaultColors.black,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onTap: () {
+        controller.text = title;
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      style: TextStyle(
+        fontSize: 16.sp,
+        color: DefaultColors.black,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        hintText: "Selecione o tipo de pagamento",
+        hintStyle: TextStyle(
+          fontSize: 16.sp,
+          color: DefaultColors.grey,
+          fontWeight: FontWeight.w500,
+        ),
+        suffixIcon: Icon(Icons.arrow_drop_down, color: DefaultColors.black),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: DefaultColors.black),
+        ),
+      ),
+      onTap: () => _showPaymentOptions(context),
     );
   }
 }

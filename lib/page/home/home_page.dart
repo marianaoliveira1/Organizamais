@@ -26,8 +26,8 @@ class _HomePageState extends State<HomePage> {
     InitialPage(),
     GraphicsPage(),
     Container(),
-    CardsPage(),
     ResumePage(),
+    CardsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -130,12 +130,12 @@ class _HomePageState extends State<HomePage> {
             label: "",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card),
-            label: "Cartões",
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Iconsax.receipt),
             label: "Resumo",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.credit_card),
+            label: "Cartões",
           ),
         ],
         currentIndex: _selectedIndex,
