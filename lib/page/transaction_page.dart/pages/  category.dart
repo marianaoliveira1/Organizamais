@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/utils/color.dart';
 
-final List<Map<String, dynamic>> categories = [
+final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 1,
     'name': 'Alimentação',
@@ -122,18 +122,21 @@ final List<Map<String, dynamic>> categories = [
   },
   {
     'id': 24,
+    'name': 'Outros',
+    'icon': 'assets/icon-category/outros.png'
+  },
+];
+
+final List<Map<String, dynamic>> categories_income = [
+  {
+    'id': 1,
     'name': 'Renda',
     'icon': 'assets/icon-category/mooney.png'
   },
   {
-    'id': 25,
+    'id': 2,
     'name': 'Poupança',
     'icon': 'assets/icon-category/renda.png'
-  },
-  {
-    'id': 26,
-    'name': 'Outros',
-    'icon': 'assets/icon-category/outros.png'
   },
 ];
 
@@ -155,9 +158,9 @@ class Category extends StatelessWidget {
           vertical: 20.h,
           horizontal: 20.w,
         ),
-        itemCount: categories.length,
+        itemCount: categories_expenses.length,
         itemBuilder: (context, index) {
-          final category = categories[index];
+          final category = categories_expenses[index];
           return Container(
             margin: EdgeInsets.only(
               bottom: 10.h,

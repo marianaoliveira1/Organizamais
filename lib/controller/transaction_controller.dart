@@ -1,56 +1,115 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:organizamais/model/transaction_model.dart';
+
+import '../model/transaction_model.dart';
 
 class TransactionController extends GetxController {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final CollectionReference _transactionsCollection = FirebaseFirestore.instance.collection('transactions');
+  final _transactions = <TransactionModel>[].obs;
+  final _selectedCategory = Rxn<String>();
+  final _description = ''.obs;
+  final _amount = 0.0.obs;
+  final _date = DateTime.now().obs;
+  final _isRecurring = false.obs;
+  final _isInstallment = false.obs;
 
-  var transactions = <TransactionModel>[].obs;
+  // Getters
+  List<TransactionModel> get transactions => _transactions;
+  String? get selectedCategory => _selectedCategory.value;
+  String get description => _description.value;
+  double get amount => _amount.value;
+  DateTime get date => _date.value;
+  bool get isRecurring => _isRecurring.value;
+  bool get isInstallment => _isInstallment.value;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchTransactions();
+  // Filtered transactions by type
+  List<TransactionModel> getTransactionsByType(TransactionType type) {
+    return _transactions.where((t) => t.type == type).toList();
   }
 
-  Future<void> fetchTransactions() async {
-    try {
-      QuerySnapshot snapshot = await _transactionsCollection.get();
-      transactions.value = snapshot.docs.map((doc) => TransactionModel.fromFirestore(doc)).toList();
-    } catch (error) {
-      print("Error fetching transactions: $error");
+  // CRUD Operations
+  Future<void> addTransaction(TransactionType type, String accountId) async {
+    if (_selectedCategory.value == null || _description.value.isEmpty || _amount.value <= 0) {
+      Get.snackbar('Erro', 'Preencha todos os campos obrigatórios');
+      return;
     }
+
+    final transaction = TransactionModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      description: _description.value,
+      amount: _amount.value,
+      date: _date.value,
+      categoryId: _selectedCategory.value!,
+      type: type,
+      accountId: accountId,
+      isRecurring: _isRecurring.value,
+      isInstallment: _isInstallment.value,
+    );
+
+    _transactions.add(transaction);
+    _clearForm();
+    Get.back();
+    Get.snackbar('Sucesso', 'Transação adicionada com sucesso');
   }
 
-  Future<void> addTransaction(TransactionModel transaction) async {
-    try {
-      DocumentReference docRef = await _transactionsCollection.add(transaction.toFirestore());
-      transaction.id = docRef.id; // Update the transaction ID
-      transactions.add(transaction);
-    } catch (error) {
-      print("Error adding transaction: $error");
+  Future<void> updateTransaction(String id, TransactionType type, String accountId) async {
+    final index = _transactions.indexWhere((t) => t.id == id);
+    if (index == -1) {
+      Get.snackbar('Erro', 'Transação não encontrada');
+      return;
     }
-  }
 
-  Future<void> updateTransaction(TransactionModel transaction) async {
-    try {
-      await _transactionsCollection.doc(transaction.id).update(transaction.toFirestore());
-      int index = transactions.indexWhere((t) => t.id == transaction.id);
-      if (index != -1) {
-        transactions[index] = transaction;
-      }
-    } catch (error) {
-      print("Error updating transaction: $error");
-    }
+    final updatedTransaction = TransactionModel(
+      id: id,
+      description: _description.value,
+      amount: _amount.value,
+      date: _date.value,
+      categoryId: _selectedCategory.value!,
+      type: type,
+      accountId: accountId,
+      isRecurring: _isRecurring.value,
+      isInstallment: _isInstallment.value,
+    );
+
+    _transactions[index] = updatedTransaction;
+    _clearForm();
+    Get.back();
+    Get.snackbar('Sucesso', 'Transação atualizada com sucesso');
   }
 
   Future<void> deleteTransaction(String id) async {
-    try {
-      await _transactionsCollection.doc(id).delete();
-      transactions.removeWhere((t) => t.id == id);
-    } catch (error) {
-      print("Error deleting transaction: $error");
+    final index = _transactions.indexWhere((t) => t.id == id);
+    if (index == -1) {
+      Get.snackbar('Erro', 'Transação não encontrada');
+      return;
     }
+
+    _transactions.removeAt(index);
+    Get.snackbar('Sucesso', 'Transação excluída com sucesso');
   }
+
+  void loadTransactionForEdit(String id) {
+    final transaction = _transactions.firstWhere((t) => t.id == id);
+    _description.value = transaction.description;
+    _amount.value = transaction.amount;
+    _date.value = transaction.date;
+    _selectedCategory.value = transaction.categoryId;
+    _isRecurring.value = transaction.isRecurring;
+    _isInstallment.value = transaction.isInstallment;
+  }
+
+  void _clearForm() {
+    _description.value = '';
+    _amount.value = 0.0;
+    _date.value = DateTime.now();
+    _selectedCategory.value = null;
+    _isRecurring.value = false;
+    _isInstallment.value = false;
+  }
+
+  // Setters
+  void setCategory(String categoryId) => _selectedCategory.value = categoryId;
+  void setDescription(String description) => _description.value = description;
+  void setAmount(double amount) => _amount.value = amount;
+  void setDate(DateTime date) => _date.value = date;
+  void toggleRecurring() => _isRecurring.value = !_isRecurring.value;
+  void toggleInstallment() => _isInstallment.value = !_isInstallment.value;
 }

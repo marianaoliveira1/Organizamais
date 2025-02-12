@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     GraphicsPage(),
     Container(),
     CardsPage(),
-    ResumePegae(),
+    ResumePage(),
   ];
 
   void _onItemTapped(int index) {

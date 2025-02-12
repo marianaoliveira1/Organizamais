@@ -53,7 +53,7 @@ class FixedAccounts extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          categories.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                          categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
                           width: 24.w,
                           height: 24.h,
                         ),

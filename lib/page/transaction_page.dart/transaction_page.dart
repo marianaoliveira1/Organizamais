@@ -1,550 +1,177 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:organizamais/page/transaction_page.dart/pages/%20%20category.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
-import 'widget/text_field_transaction.dart';
-import 'widget/title_transaction.dart';
+import '../../utils/color.dart';
+import 'widget/button_select_category.dart';
 
-class TransactionPage extends StatefulWidget {
-  final TransactionType transactionType;
+class TransactionPage extends StatelessWidget {
+  final TransactionType? transactionType;
+  final bool isEditing;
+  final String? transactionId;
+  final controller = Get.find<TransactionController>();
 
-  const TransactionPage({super.key, required this.transactionType});
-
-  @override
-  _TransactionPageState createState() => _TransactionPageState();
-}
-
-class _TransactionPageState extends State<TransactionPage> {
-  DateTime selectedDate = DateTime.now();
-  final TextEditingController valueController = TextEditingController();
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  int? categoryId;
-  String paymentMethod = '';
-  final _formKey = GlobalKey<FormState>(); // Chave para o formulário
+  TransactionPage({
+    this.transactionType,
+    this.isEditing = false,
+    this.transactionId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.white,
       appBar: AppBar(
-        backgroundColor: DefaultColors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: Text(_getTitle()),
+        backgroundColor: _getColor(),
       ),
       body: SingleChildScrollView(
-        // Use SingleChildScrollView para evitar overflow
-        padding: EdgeInsets.all(16),
-        child: Form(
-          // Envolva o conteúdo com um Form
-          key: _formKey, // Defina a chave do formulário
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DefaultTitleTransaction(title: 'Valor'),
-              DefaultTextFieldTransaction(
-                hintText: '0,00',
-                controller: valueController,
-                icon: const Icon(Icons.attach_money),
-                keyboardType: TextInputType.number,
-                // validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return 'Campo obrigatório';
-                //   }
-                //   return null;
-                // },
-              ),
-              SizedBox(height: 16.h),
-
-              DefaultTitleTransaction(title: 'Título'),
-              DefaultTextFieldTransaction(
-                hintText: 'Ex: Compra de mercado',
-                controller: titleController,
-                keyboardType: TextInputType.text,
-                // validator: (value) { // Validação do campo Título
-                //   if (value == null || value.isEmpty) {
-                //     return 'Campo obrigatório';
-                //   }
-                //   return null;
-                // },
-              ),
-              SizedBox(height: 16.h),
-
-              DefaultTitleTransaction(title: "Categoria"),
-              DefaultButtonSelectCategory(
-                selectedCategory: categoryId,
-                onTap: (category) {
-                  setState(() {
-                    categoryId = category;
-                  });
-                },
-              ),
-              SizedBox(height: 16.h),
-
-              DefaultTitleTransaction(title: "Data"),
-              InkWell(
-                onTap: () async {
-                  final DateTime? picked = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2015, 8),
-                    lastDate: DateTime(2101),
-                  );
-                  if (picked != null && picked != selectedDate) {
-                    setState(() {
-                      selectedDate = picked;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 15.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-                        style: TextStyle(color: DefaultColors.grey, fontSize: 14.sp),
-                      ),
-                      const Icon(Iconsax.calendar_1),
-                    ],
-                  ),
+        padding: EdgeInsets.all(16.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Descrição',
+                hintText: 'Adicione a descrição',
+                prefixIcon: Icon(Icons.description),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14.r),
                 ),
               ),
-              SizedBox(height: 16.h),
-
-              _buildPaymentSection(), // Seção de pagamento condicional
-
-              SizedBox(height: 16.h),
-
-              // Botões Salvar e Cancelar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context), // Ação de cancelar
-                    child: Container(
-                      margin: EdgeInsets.only(top: 20.h),
-                      padding: EdgeInsets.all(16.h),
-                      decoration: BoxDecoration(
-                        color: DefaultColors.grey,
-                        borderRadius: BorderRadius.circular(32.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Cancelar",
-                          style: TextStyle(color: DefaultColors.black, fontSize: 16.sp),
-                        ),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Valida o formulário
-                        TransactionModel newTransaction = TransactionModel(
-                          id: '',
-                          type: widget.transactionType,
-                          description: titleController.text,
-                          category: categories.firstWhere((element) => element['id'] == categoryId)['name'],
-                          paymentMethod: paymentMethod,
-                          date: selectedDate,
-                          amount: double.parse(valueController.text),
-                          isFixed: false,
-                          isInstallment: false,
-                        );
-                        Get.find<TransactionController>().addTransaction(newTransaction);
-                        Get.back();
-                      }
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(top: 20.h),
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      decoration: BoxDecoration(
-                        color: DefaultColors.black,
-                        borderRadius: BorderRadius.circular(32.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Salvar",
-                          style: TextStyle(color: Colors.white, fontSize: 16.sp),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              onChanged: controller.setDescription,
+              controller: TextEditingController(text: controller.description),
+            ),
+            SizedBox(height: 16.h),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Valor',
+                hintText: '0,00',
+                prefixIcon: Icon(Icons.attach_money),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
               ),
-            ],
-          ),
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              onChanged: (value) {
+                controller.setAmount(double.tryParse(value.replaceAll(',', '.')) ?? 0);
+              },
+              controller: TextEditingController(
+                text: controller.amount > 0 ? controller.amount.toString() : '',
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Obx(() => DefaultButtonSelectCategory(
+                  selectedCategory: controller.selectedCategory != null ? int.tryParse(controller.selectedCategory!) : null,
+                  onTap: (categoryId) {
+                    if (categoryId != null) {
+                      controller.setCategory(
+                        categoryId.toString(),
+                      );
+                    }
+                  },
+                )),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(
+                  child: Obx(() => _buildCheckbox(
+                        'Fixo',
+                        controller.isRecurring,
+                        controller.toggleRecurring,
+                      )),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Obx(() => _buildCheckbox(
+                        'Parcelado',
+                        controller.isInstallment,
+                        controller.toggleInstallment,
+                      )),
+                ),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton(
+              onPressed: () {
+                if (transactionType == null) return;
+
+                if (isEditing && transactionId != null) {
+                  controller.updateTransaction(
+                    transactionId!,
+                    transactionType!,
+                    'contaInicial',
+                  );
+                } else {
+                  controller.addTransaction(
+                    transactionType!,
+                    'contaInicial',
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _getColor(),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+              ),
+              child: Text(
+                'Salvar',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildPaymentSection() {
-    switch (widget.transactionType) {
-      case TransactionType.despesa:
-        return _buildPaymentOptions("Pago com");
+  Widget _buildCheckbox(String label, bool value, VoidCallback onChanged) {
+    return Container(
+      decoration: BoxDecoration(
+        color: DefaultColors.greyLight,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: CheckboxListTile(
+        title: Text(
+          label,
+          style: TextStyle(fontSize: 14.sp),
+        ),
+        value: value,
+        onChanged: (_) => onChanged(),
+        controlAffinity: ListTileControlAffinity.leading,
+      ),
+    );
+  }
+
+  String _getTitle() {
+    if (transactionType == null) return '';
+    final prefix = isEditing ? 'Editar' : 'Nova';
+    switch (transactionType!) {
       case TransactionType.receita:
-        return _buildPaymentOptions("Recebido em");
+        return '$prefix Receita';
+      case TransactionType.despesa:
+        return '$prefix Despesa';
       case TransactionType.transferencia:
-        return Column(
-          children: [
-            _buildPaymentOptions("Conta Origem"),
-            SizedBox(height: 16.h),
-            _buildPaymentOptions("Conta Destino"),
-          ],
-        );
-      default:
-        return Container();
+        return '$prefix Transferência';
     }
   }
 
-  Widget _buildPaymentOptions(String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DefaultTitleTransaction(title: title),
-        DropdownButton<String>(
-          value: paymentMethod.isEmpty ? null : paymentMethod,
-          hint: const Text('Selecione'),
-          items: <String>[
-            'Opção 1',
-            'Opção 2',
-            'Opção 3'
-          ] // Substitua pelas suas opções
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              paymentMethod = newValue!;
-            });
-          },
-        ),
-      ],
-    );
+  Color _getColor() {
+    if (transactionType == null) return DefaultColors.grey;
+    switch (transactionType!) {
+      case TransactionType.receita:
+        return DefaultColors.green;
+      case TransactionType.despesa:
+        return DefaultColors.red;
+      case TransactionType.transferencia:
+        return DefaultColors.grey;
+    }
   }
 }
-
-class DefaultButtonSelectCategory extends StatelessWidget {
-  const DefaultButtonSelectCategory({
-    super.key,
-    required this.onTap,
-    required this.selectedCategory,
-  });
-
-  final Function(int?) onTap;
-  final int? selectedCategory;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        var category = await Get.to(
-          () => Category(),
-        );
-        onTap(category);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10.h,
-          vertical: 15.h,
-        ),
-        decoration: BoxDecoration(
-          color: DefaultColors.greyLight,
-          borderRadius: BorderRadius.circular(
-            14.r,
-          ),
-          border: Border.all(
-            color: Colors.grey,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// // ignore_for_file: library_private_types_in_public_api
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:get/get.dart';
-// import 'package:iconsax/iconsax.dart';
-// import 'package:organizamais/utils/color.dart';
-
-// import 'pages/  category.dart';
-// import 'widget/text_field_transaction.dart';
-// import 'widget/title_transaction.dart';
-
-// class TransactionPage extends StatefulWidget {
-//   final String? type;
-//   final String? transactionType;
-
-//   const TransactionPage({
-//     super.key,
-//     this.type,
-//     this.transactionType,
-//   });
-
-//   @override
-//   _TransactionPageState createState() => _TransactionPageState();
-// }
-
-// class _TransactionPageState extends State<TransactionPage> {
-//   DateTime selectedDate = DateTime.now();
-//   final TextEditingController valueController = TextEditingController();
-//   final TextEditingController titleController = TextEditingController();
-//   final TextEditingController descriptionController = TextEditingController();
-//   int? categoryId;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: DefaultColors.white,
-//       appBar: AppBar(
-//         backgroundColor: DefaultColors.white,
-//         leading: IconButton(
-//           icon: Icon(Icons.arrow_back),
-//           onPressed: () => Navigator.pop(context),
-//         ),
-//       ),
-//       body: ListView(
-//         padding: EdgeInsets.all(16),
-//         children: [
-//           Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               DefaultTitleTransaction(
-//                 title: 'Valor',
-//               ),
-//               DefaultTextFieldTransaction(
-//                 hintText: '0,00',
-//                 controller: valueController,
-//                 icon: Icon(
-//                   Icons.attach_money,
-//                 ),
-//                 keyboardType: TextInputType.number,
-//               ),
-//               SizedBox(
-//                 height: 16.h,
-//               ),
-//               DefaultTitleTransaction(
-//                 title: 'Título',
-//               ),
-//               DefaultTextFieldTransaction(
-//                 hintText: 'Ex: Compra de mercado',
-//                 controller: titleController,
-//                 keyboardType: TextInputType.text,
-//               ),
-//               SizedBox(
-//                 height: 16.h,
-//               ),
-//               DefaultTitleTransaction(
-//                 title: "Categoria",
-//               ),
-//               DefaultButtonSelectCategory(
-//                 selectedCategory: categoryId,
-//                 onTap: (category) {
-//                   setState(() {
-//                     categoryId = category;
-//                   });
-//                 },
-//               ),
-//               SizedBox(
-//                 height: 16.h,
-//               ),
-//               DefaultTitleTransaction(
-//                 title: "Data",
-//               ),
-//               InkWell(
-//                 onTap: () async {
-//                   final DateTime? picked = await showDatePicker(
-//                     context: context,
-//                     initialDate: selectedDate,
-//                     firstDate: DateTime(2015, 8),
-//                     lastDate: DateTime(2101),
-//                   );
-//                   if (picked != null && picked != selectedDate) {
-//                     setState(() {
-//                       selectedDate = picked;
-//                     });
-//                   }
-//                 },
-//                 child: Container(
-//                   padding: EdgeInsets.symmetric(
-//                     horizontal: 10.h,
-//                     vertical: 15.h,
-//                   ),
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(
-//                       14.r,
-//                     ),
-//                     border: Border.all(
-//                       color: Colors.grey,
-//                     ),
-//                   ),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       Text(
-//                         "dd/mm/aaaa",
-//                         style: TextStyle(
-//                           color: DefaultColors.grey,
-//                           fontSize: 14.sp,
-//                         ),
-//                       ),
-//                       Icon(
-//                         Iconsax.calendar_1,
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//               SizedBox(height: 16.h),
-//               //de for despesas: pago com
-//               //se for receita recebi em
-//               //se for transfrencia conta origem - conta destino e com + na frente
-//               DefaultTitleTransaction(title: "Forma de pagamento"),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   InkWell(
-//                     //button save
-//                     child: Container(
-//                       margin: EdgeInsets.only(top: 20.h),
-//                       padding: EdgeInsets.all(16.h),
-//                       decoration: BoxDecoration(
-//                         color: DefaultColors.grey,
-//                         borderRadius: BorderRadius.circular(
-//                           32.r,
-//                         ),
-//                       ),
-//                       child: Center(
-//                         child: Text(
-//                           "Cancelar",
-//                           style: TextStyle(
-//                             color: DefaultColors.black,
-//                             fontSize: 16.sp,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                   InkWell(
-//                     //button save
-//                     child: Container(
-//                       margin: EdgeInsets.only(top: 20.h),
-//                       padding: EdgeInsets.symmetric(
-//                         vertical: 16.h,
-//                       ),
-//                       decoration: BoxDecoration(
-//                         color: DefaultColors.black,
-//                         borderRadius: BorderRadius.circular(
-//                           32.r,
-//                         ),
-//                       ),
-//                       child: Center(
-//                         child: Text(
-//                           "Salvar",
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: 16.sp,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class DefaultButtonSelectCategory extends StatelessWidget {
-//   const DefaultButtonSelectCategory({
-//     super.key,
-//     required this.onTap,
-//     required this.selectedCategory,
-//   });
-
-//   final Function(int?) onTap;
-//   final int? selectedCategory;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: () async {
-//         var category = await Get.to(
-//           () => Category(),
-//         );
-//         onTap(category);
-//       },
-//       child: Container(
-//         padding: EdgeInsets.symmetric(
-//           horizontal: 10.h,
-//           vertical: 15.h,
-//         ),
-//         decoration: BoxDecoration(
-//           color: DefaultColors.greyLight,
-//           borderRadius: BorderRadius.circular(
-//             14.r,
-//           ),
-//           border: Border.all(
-//             color: Colors.grey,
-//           ),
-//         ),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             selectedCategory != null
-//                 ? Row(
-//                     children: [
-//                       CircleAvatar(
-//                         backgroundColor: DefaultColors.white,
-//                         child: Image.asset(
-//                           categories.firstWhere((element) => element['id'] == selectedCategory)['icon'],
-//                           width: 20.w,
-//                           height: 20.h,
-//                         ),
-//                       ),
-//                       SizedBox(
-//                         width: 10.w,
-//                       ),
-//                       Text(
-//                         categories.firstWhere((element) => element['id'] == selectedCategory)['name'],
-//                         style: TextStyle(
-//                           fontSize: 14.sp,
-//                           color: DefaultColors.black,
-//                         ),
-//                       ),
-//                     ],
-//                   )
-//                 : Text("Selecione"),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

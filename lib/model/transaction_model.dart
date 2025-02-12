@@ -1,65 +1,55 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class TransactionModel {
-  String id;
-  TransactionType type;
-  String description;
-  String category;
-  String paymentMethod;
-  DateTime date;
-  bool isFixed;
-  bool isInstallment;
-  double amount;
-
-  TransactionModel({
-    required this.id,
-    required this.type,
-    required this.description,
-    required this.category,
-    required this.paymentMethod,
-    required this.date,
-    required this.isFixed,
-    required this.isInstallment,
-    required this.amount,
-  });
-
-  // Factory constructor for fromFirestore
-  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
-    // <--- Corrected
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return TransactionModel(
-      id: doc.id,
-      type: _getTypeFromString(data['type']),
-      description: data['description'],
-      category: data['category'],
-      paymentMethod: data['paymentMethod'],
-      date: (data['date'] as Timestamp).toDate(),
-      isFixed: data['isFixed'],
-      isInstallment: data['isInstallment'],
-      amount: (data['amount'] as num).toDouble(), // Safe cast to double
-    );
-  }
-
-  static TransactionType _getTypeFromString(String type) {
-    return TransactionType.values.firstWhere((e) => e.toString().split('.').last == type);
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'type': type.toString().split('.').last,
-      'description': description,
-      'category': category,
-      'paymentMethod': paymentMethod,
-      'date': date,
-      'isFixed': isFixed,
-      'isInstallment': isInstallment,
-      'amount': amount,
-    };
-  }
-}
-
 enum TransactionType {
   receita,
   despesa,
   transferencia
+}
+
+class TransactionModel {
+  final String id;
+  final String description;
+  final double amount;
+  final DateTime date;
+  final String categoryId;
+  final TransactionType type;
+  final String accountId;
+  final bool isRecurring;
+  final bool isInstallment;
+
+  TransactionModel({
+    required this.id,
+    required this.description,
+    required this.amount,
+    required this.date,
+    required this.categoryId,
+    required this.type,
+    required this.accountId,
+    this.isRecurring = false,
+    this.isInstallment = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'description': description,
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'categoryId': categoryId,
+        'type': type.toString(),
+        'accountId': accountId,
+        'isRecurring': isRecurring,
+        'isInstallment': isInstallment,
+      };
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) => TransactionModel(
+        id: json['id'],
+        description: json['description'],
+        amount: json['amount'],
+        date: DateTime.parse(json['date']),
+        categoryId: json['categoryId'],
+        type: TransactionType.values.firstWhere(
+          (e) => e.toString() == json['type'],
+        ),
+        accountId: json['accountId'],
+        isRecurring: json['isRecurring'],
+        isInstallment: json['isInstallment'],
+      );
 }

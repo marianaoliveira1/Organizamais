@@ -32,7 +32,7 @@ class AppPages {
     GetPage(name: Routes.INITIAL, page: () => const InitialPage()),
     GetPage(name: Routes.CHARTS, page: () => GraphicsPage()),
     GetPage(name: Routes.CARD, page: () => CardsPage()),
-    GetPage(name: Routes.RESUME, page: () => ResumePegae()),
+    GetPage(name: Routes.RESUME, page: () => ResumePage()),
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
