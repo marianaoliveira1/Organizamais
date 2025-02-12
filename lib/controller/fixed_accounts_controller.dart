@@ -37,13 +37,17 @@ class FixedAccountsController extends GetxController {
 
   Future<void> addFixedAccount(FixedAccountModel fixedAccount) async {
     var fixedAccountWithUserId = fixedAccount.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
-    await FirebaseFirestore.instance.collection('fixedAccounts').add(fixedAccountWithUserId.toMap());
+    await FirebaseFirestore.instance.collection('fixedAccounts').add(
+          fixedAccountWithUserId.toMap(),
+        );
     Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
   }
 
   Future<void> updateFixedAccount(FixedAccountModel fixedAccount) async {
     if (fixedAccount.id == null) return;
-    await FirebaseFirestore.instance.collection('fixedAccounts').doc(fixedAccount.id).update(fixedAccount.toMap());
+    await FirebaseFirestore.instance.collection('fixedAccounts').doc(fixedAccount.id).update(
+          fixedAccount.toMap(),
+        );
     Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');
   }
 
