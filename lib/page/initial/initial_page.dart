@@ -31,13 +31,13 @@ class InitialPage extends StatelessWidget {
                     height: 20.h,
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10.h,
-                      horizontal: 16.w,
-                    ),
                     decoration: BoxDecoration(
                       color: DefaultColors.white,
                       borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 16.w,
                     ),
                     child: Column(
                       children: [
@@ -51,11 +51,11 @@ class InitialPage extends StatelessWidget {
                                 fontSize: 12.sp,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
+                            GestureDetector(
+                              onTap: () {
                                 Get.toNamed("/fixed-accounts");
                               },
-                              icon: Icon(
+                              child: Icon(
                                 Icons.add,
                                 size: 16.sp,
                                 color: DefaultColors.grey,
@@ -65,7 +65,7 @@ class InitialPage extends StatelessWidget {
                         ),
                         FixedAccounts(
                           fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
-                        )
+                        ),
                       ],
                     ),
                   ),

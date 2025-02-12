@@ -45,6 +45,7 @@ dependencies:
   fl_chart: ^0.70.2
   intl: ^0.20.2
   uuid: ^4.5.1
+  font_awesome_flutter: ^10.8.0
 
 
 

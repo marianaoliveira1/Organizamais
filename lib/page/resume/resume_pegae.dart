@@ -13,11 +13,7 @@ class ResumePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Resumo'),
-          centerTitle: true,
-          backgroundColor: DefaultColors.background,
-        ),
+        backgroundColor: DefaultColors.background,
         body: Column(
           children: [
             Container(

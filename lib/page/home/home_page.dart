@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/page/cards/cards_page.dart';
@@ -115,11 +116,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: DefaultColors.white,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Iconsax.home),
+            icon: FaIcon(FontAwesomeIcons.house),
             label: "Início",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Iconsax.chart_1),
+            icon: FaIcon(FontAwesomeIcons.chartPie),
             label: "Gráficos",
           ),
           BottomNavigationBarItem(
@@ -130,11 +131,11 @@ class _HomePageState extends State<HomePage> {
             label: "",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Iconsax.receipt),
+            icon: FaIcon(FontAwesomeIcons.arrowsLeftRight),
             label: "Resumo",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card),
+            icon: FaIcon(FontAwesomeIcons.receipt),
             label: "Cartões",
           ),
         ],

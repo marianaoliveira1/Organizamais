@@ -164,6 +164,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "font_awesome_flutter",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/font_awesome_flutter-10.8.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "get",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/get-4.6.6",
       "packageUri": "lib/",
@@ -422,7 +428,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-08T15:12:22.913514Z",
+  "generated": "2025-02-12T20:31:17.992918Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///home/mariana/snap/flutter/common/flutter",
