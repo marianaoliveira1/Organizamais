@@ -6,172 +6,139 @@ import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 import '../../utils/color.dart';
 import 'widget/button_select_category.dart';
+import 'widget/text_field_transaction.dart';
+import 'widget/title_transaction.dart';
 
-class TransactionPage extends StatelessWidget {
+class TransactionPage extends StatefulWidget {
   final TransactionType? transactionType;
-  final bool isEditing;
-  final String? transactionId;
-  final controller = Get.find<TransactionController>();
 
-  TransactionPage({
+  const TransactionPage({
     this.transactionType,
-    this.isEditing = false,
-    this.transactionId,
+    super.key,
   });
 
   @override
+  State<TransactionPage> createState() => _TransactionPageState();
+}
+
+class _TransactionPageState extends State<TransactionPage> {
+  int? categoryId;
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController valueController = TextEditingController();
+  final TextEditingController dayOfTheMonthController = TextEditingController();
+  final TextEditingController paymentTypeController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
+    final TransactionController transactionController = Get.put(TransactionController());
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_getTitle()),
-        backgroundColor: _getColor(),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.h),
+      appBar: AppBar(),
+      body: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: 20.w,
+          horizontal: 20.h,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Descrição',
-                hintText: 'Adicione a descrição',
-                prefixIcon: Icon(Icons.description),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-              ),
-              onChanged: controller.setDescription,
-              controller: TextEditingController(text: controller.description),
+            DefaultTitleTransaction(
+              title: "Titulo",
             ),
-            SizedBox(height: 16.h),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Valor',
-                hintText: '0,00',
-                prefixIcon: Icon(Icons.attach_money),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
+            DefaultTextFieldTransaction(
+              hintText: 'ex: Aluguel',
+              controller: titleController,
+              keyboardType: TextInputType.text,
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Valor",
+            ),
+            DefaultTextFieldTransaction(
+              hintText: '0,00',
+              controller: valueController,
+              icon: Icon(
+                Icons.attach_money,
               ),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              onChanged: (value) {
-                controller.setAmount(double.tryParse(value.replaceAll(',', '.')) ?? 0);
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Categoria",
+            ),
+            DefaultButtonSelectCategory(
+              onTap: (category) {
+                setState(() {
+                  categoryId = category;
+                });
               },
-              controller: TextEditingController(
-                text: controller.amount > 0 ? controller.amount.toString() : '',
-              ),
+              selectedCategory: categoryId,
             ),
-            SizedBox(height: 16.h),
-            Obx(() => DefaultButtonSelectCategory(
-                  selectedCategory: controller.selectedCategory != null ? int.tryParse(controller.selectedCategory!) : null,
-                  onTap: (categoryId) {
-                    if (categoryId != null) {
-                      controller.setCategory(
-                        categoryId.toString(),
-                      );
-                    }
-                  },
-                )),
-            SizedBox(height: 16.h),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Dia do pagamento ",
+            ),
+            DefaultTextFieldTransaction(
+              hintText: 'ex: 5',
+              controller: dayOfTheMonthController,
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Tipo de pagamento",
+            ),
+            DefaultTextFieldTransaction(
+              hintText: 'ex: Pix',
+              controller: paymentTypeController,
+              keyboardType: TextInputType.text,
+            ),
+            Spacer(),
             Row(
               children: [
                 Expanded(
-                  child: Obx(() => _buildCheckbox(
-                        'Fixo',
-                        controller.isRecurring,
-                        controller.toggleRecurring,
-                      )),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Obx(() => _buildCheckbox(
-                        'Parcelado',
-                        controller.isInstallment,
-                        controller.toggleInstallment,
-                      )),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (categoryId != null) {
+                        transactionController.addTransaction(TransactionModel(
+                          title: titleController.text,
+                          value: valueController.text,
+                          category: categoryId ?? 0,
+                          paymentDay: dayOfTheMonthController.text,
+                          paymentType: paymentTypeController.text,
+                          type: widget.transactionType!,
+                        ));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: DefaultColors.black,
+                      padding: EdgeInsets.all(15.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      "Salvar",
+                      style: TextStyle(
+                        color: DefaultColors.white,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
                 ),
               ],
-            ),
-            SizedBox(height: 32.h),
-            ElevatedButton(
-              onPressed: () {
-                if (transactionType == null) return;
-
-                if (isEditing && transactionId != null) {
-                  controller.updateTransaction(
-                    transactionId!,
-                    transactionType!,
-                    'contaInicial',
-                  );
-                } else {
-                  controller.addTransaction(
-                    transactionType!,
-                    'contaInicial',
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _getColor(),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-              ),
-              child: Text(
-                'Salvar',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildCheckbox(String label, bool value, VoidCallback onChanged) {
-    return Container(
-      decoration: BoxDecoration(
-        color: DefaultColors.greyLight,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: CheckboxListTile(
-        title: Text(
-          label,
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        value: value,
-        onChanged: (_) => onChanged(),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-    );
-  }
-
-  String _getTitle() {
-    if (transactionType == null) return '';
-    final prefix = isEditing ? 'Editar' : 'Nova';
-    switch (transactionType!) {
-      case TransactionType.receita:
-        return '$prefix Receita';
-      case TransactionType.despesa:
-        return '$prefix Despesa';
-      case TransactionType.transferencia:
-        return '$prefix Transferência';
-    }
-  }
-
-  Color _getColor() {
-    if (transactionType == null) return DefaultColors.grey;
-    switch (transactionType!) {
-      case TransactionType.receita:
-        return DefaultColors.green;
-      case TransactionType.despesa:
-        return DefaultColors.red;
-      case TransactionType.transferencia:
-        return DefaultColors.grey;
-    }
   }
 }

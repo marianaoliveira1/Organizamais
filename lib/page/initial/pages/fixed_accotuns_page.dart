@@ -5,7 +5,7 @@ import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';
-import '../../transaction_page.dart/transaction_page.dart';
+
 import '../../transaction_page.dart/widget/button_select_category.dart';
 import '../../transaction_page.dart/widget/text_field_transaction.dart';
 import '../../transaction_page.dart/widget/title_transaction.dart';

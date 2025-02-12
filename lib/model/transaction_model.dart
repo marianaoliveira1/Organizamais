@@ -7,21 +7,21 @@ enum TransactionType {
 }
 
 class TransactionModel {
-  final String id;
+  final String? id;
   final String? userId;
   final String title;
-  final double amount;
-  final DateTime date;
-  final int categoryId;
+  final String value;
+  final String paymentDay;
+  final int category;
   final TransactionType type;
   final String? paymentType;
   TransactionModel({
-    required this.id,
+    this.id,
     this.userId,
     required this.title,
-    required this.amount,
-    required this.date,
-    required this.categoryId,
+    required this.value,
+    required this.paymentDay,
+    required this.category,
     required this.type,
     this.paymentType,
   });
@@ -30,9 +30,9 @@ class TransactionModel {
     String? id,
     String? userId,
     String? title,
-    double? amount,
-    DateTime? date,
-    int? categoryId,
+    String? value,
+    String? paymentDay,
+    int? category,
     TransactionType? type,
     String? paymentType,
   }) {
@@ -40,9 +40,9 @@ class TransactionModel {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       title: title ?? this.title,
-      amount: amount ?? this.amount,
-      date: date ?? this.date,
-      categoryId: categoryId ?? this.categoryId,
+      value: value ?? this.value,
+      paymentDay: paymentDay ?? this.paymentDay,
+      category: category ?? this.category,
       type: type ?? this.type,
       paymentType: paymentType ?? this.paymentType,
     );
@@ -63,16 +63,16 @@ class TransactionModel {
       'title': title
     });
     result.addAll({
-      'amount': amount
+      'value': value
     });
     result.addAll({
-      'date': date.millisecondsSinceEpoch
+      'paymentDay': paymentDay
     });
     result.addAll({
-      'categoryId': categoryId
+      'category': category
     });
     result.addAll({
-      'type': type.toString(),
+      'type': type.toString(), // Armazena como string
     });
     if (paymentType != null) {
       result.addAll({
@@ -88,12 +88,12 @@ class TransactionModel {
       id: map['id'] ?? '',
       userId: map['userId'],
       title: map['title'] ?? '',
-      amount: map['amount']?.toDouble() ?? 0.0,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
-      categoryId: map['categoryId']?.toInt() ?? 0,
+      value: map['value'] ?? '',
+      paymentDay: map['paymentDay'] ?? '',
+      category: map['category']?.toInt() ?? 0,
       type: TransactionType.values.firstWhere(
         (e) => e.toString() == map['type'],
-        orElse: () => TransactionType.despesa,
+        orElse: () => TransactionType.despesa, // Defina um valor padrão, se necessário
       ),
       paymentType: map['paymentType'],
     );
@@ -105,18 +105,18 @@ class TransactionModel {
 
   @override
   String toString() {
-    return 'TransactionModel(id: $id, userId: $userId, title: $title, amount: $amount, date: $date, categoryId: $categoryId, type: $type, paymentType: $paymentType)';
+    return 'TransactionModel(id: $id, userId: $userId, title: $title, value: $value, paymentDay: $paymentDay, category: $category, type: $type, paymentType: $paymentType)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TransactionModel && other.id == id && other.userId == userId && other.title == title && other.amount == amount && other.date == date && other.categoryId == categoryId && other.type == type && other.paymentType == paymentType;
+    return other is TransactionModel && other.id == id && other.userId == userId && other.title == title && other.value == value && other.paymentDay == paymentDay && other.category == category && other.type == type && other.paymentType == paymentType;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ amount.hashCode ^ date.hashCode ^ categoryId.hashCode ^ type.hashCode ^ paymentType.hashCode;
+    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ value.hashCode ^ paymentDay.hashCode ^ category.hashCode ^ type.hashCode ^ paymentType.hashCode;
   }
 }
