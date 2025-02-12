@@ -41,7 +41,7 @@ class FinanceSummaryWidget extends StatelessWidget {
             children: [
               _buildCategory("Receita", "\$3,317.74", DefaultColors.green),
               _buildCategory("Despesas", "\$2,841.98", DefaultColors.red),
-              _buildCategory("Investimento", "\$2,267.92", Colors.grey),
+              _buildCategory("Transferencia", "\$2,267.92", Colors.grey),
             ],
           ),
         ],

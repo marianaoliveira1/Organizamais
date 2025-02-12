@@ -15,6 +15,17 @@ class FixedAccounts extends StatelessWidget {
     required this.fixedAccounts,
   });
 
+  String _calculateTotal() {
+    double total = 0;
+    for (var account in fixedAccounts) {
+      // Convertendo a string para double, removendo o possível R$ e trocando , por .
+      String valueString = account.value.replaceAll('R\$', '').replaceAll('.', '').replaceAll(',', '.');
+      total += double.tryParse(valueString) ?? 0;
+    }
+    // Formatando o número para o padrão brasileiro (R$ 0.000,00)
+    return total.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,90 +34,104 @@ class FixedAccounts extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Obx(() {
-            if (fixedAccounts.isEmpty) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                child: Text(
-                  "Nenhuma conta fixa cadastrada",
-                  style: TextStyle(
-                    color: DefaultColors.grey,
-                    fontSize: 12.sp,
-                  ),
-                ),
-              );
-            }
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: fixedAccounts.length,
-              separatorBuilder: (context, index) => SizedBox(
-                height: 14.h,
-              ),
-              itemBuilder: (context, index) {
-                final fixedAccount = fixedAccounts[index];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                          width: 24.w,
-                          height: 24.h,
-                        ),
-                        SizedBox(width: 20.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              fixedAccount.title,
-                              style: TextStyle(
-                                color: DefaultColors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                            Text(
-                              "Dia ${fixedAccount.paymentDay} de cada mês",
-                              style: TextStyle(
-                                color: DefaultColors.grey,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+          Obx(
+            () {
+              if (fixedAccounts.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  child: Text(
+                    "Nenhuma conta fixa cadastrada",
+                    style: TextStyle(
+                      color: DefaultColors.grey,
+                      fontSize: 12.sp,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          "R\$ ${fixedAccount.value}",
-                          style: TextStyle(
-                            color: DefaultColors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                        Text(
-                          "${fixedAccount.paymentType}",
-                          style: TextStyle(
-                            color: DefaultColors.grey,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                  ),
                 );
-              },
-            );
-          }),
+              }
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: fixedAccounts.length,
+                separatorBuilder: (context, index) => SizedBox(
+                  height: 14.h,
+                ),
+                itemBuilder: (context, index) {
+                  final fixedAccount = fixedAccounts[index];
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset(
+                            categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                            width: 24.w,
+                            height: 24.h,
+                          ),
+                          SizedBox(width: 20.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                fixedAccount.title,
+                                style: TextStyle(
+                                  color: DefaultColors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                              Text(
+                                "Dia ${fixedAccount.paymentDay} de cada mês",
+                                style: TextStyle(
+                                  color: DefaultColors.grey,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "R\$ ${fixedAccount.value}",
+                            style: TextStyle(
+                              color: DefaultColors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          Text(
+                            "${fixedAccount.paymentType}",
+                            style: TextStyle(
+                              color: DefaultColors.grey,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10.h),
+            child: Text(
+              "R\$ ${_calculateTotal()}",
+              style: TextStyle(
+                color: DefaultColors.black,
+                fontWeight: FontWeight.w500,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
         ],
       ),
     );
