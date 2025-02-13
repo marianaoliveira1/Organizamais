@@ -25,11 +25,10 @@ class InitialPage extends StatelessWidget {
                 horizontal: 20.h,
               ),
               child: Column(
+                spacing: 20.h,
                 children: [
                   FinanceSummaryWidget(),
-                  SizedBox(
-                    height: 20.h,
-                  ),
+                  DefaultWidgetFixedAccounts(),
                   Container(
                     decoration: BoxDecoration(
                       color: DefaultColors.white,
@@ -39,41 +38,71 @@ class InitialPage extends StatelessWidget {
                       vertical: 10.h,
                       horizontal: 16.w,
                     ),
-                    child: Column(
+                    child: Row(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Contas fixas",
-                              style: TextStyle(
-                                color: DefaultColors.grey,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Get.toNamed("/fixed-accounts");
-                              },
-                              child: Icon(
-                                Icons.add,
-                                size: 16.sp,
-                                color: DefaultColors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        FixedAccounts(
-                          fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
-                        ),
+                        Text("Meus Cartões"),
+                        IconButton(
+                            onPressed: () {
+                              Get.toNamed("/bank");
+                            },
+                            icon: Icon(Icons.add))
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DefaultWidgetFixedAccounts extends StatelessWidget {
+  const DefaultWidgetFixedAccounts({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: DefaultColors.white,
+        borderRadius: BorderRadius.circular(24.r),
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: 10.h,
+        horizontal: 16.w,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Contas fixas",
+                style: TextStyle(
+                  color: DefaultColors.grey,
+                  fontSize: 12.sp,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed("/fixed-accounts");
+                },
+                child: Icon(
+                  Icons.add,
+                  size: 16.sp,
+                  color: DefaultColors.grey,
+                ),
+              ),
+            ],
+          ),
+          FixedAccounts(
+            fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
+          ),
+        ],
       ),
     );
   }

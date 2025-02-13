@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
 import '../page/home/home_page.dart';
+import '../page/initial/bank.dart';
 import '../page/initial/initial_page.dart';
 import '../page/initial/pages/fixed_accotuns_page.dart';
 import '../page/login/login_page.dart';
@@ -22,6 +23,7 @@ class Routes {
   static const TRANSACTION = '/transaction';
   static const CATEGORY = '/category';
   static const FIXED_ACCOUNTS = '/fixed-accounts';
+  static const BANK = '/bank';
 }
 
 class AppPages {
@@ -36,6 +38,7 @@ class AppPages {
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
+    GetPage(name: Routes.BANK, page: () => BankSearchPage()),
   ];
 
   static const INITIAL = Routes.LOGIN;
