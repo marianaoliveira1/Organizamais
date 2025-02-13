@@ -78,6 +78,7 @@ flutter:
     - assets/icon/
     - assets/icon-category/
     - assets/icon-payment/
+    - assets/icon-bank/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
