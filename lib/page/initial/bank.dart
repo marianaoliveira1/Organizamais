@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:organizamais/utils/color.dart';
 
 class BankSearchPage extends StatefulWidget {
   const BankSearchPage({super.key});
@@ -214,21 +215,39 @@ class _BankSearchPageState extends State<BankSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Olha seu banco')),
+      backgroundColor: DefaultColors.background,
+      appBar: AppBar(
+        backgroundColor: DefaultColors.background,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Pesquisar banco',
+                hintText: 'Pesquisar banco',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onChanged: _filterBanks,
             ),
             SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Icone generico'),
+                Image.asset(
+                  'assets/icon-bank/icone-generico.png',
+                  width: 40,
+                  height: 40,
+                ),
+              ],
+            ),
+            Text('Icones de instuições bancarias'),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredBanks.length,
