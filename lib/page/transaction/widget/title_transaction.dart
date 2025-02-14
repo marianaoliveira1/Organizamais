@@ -19,9 +19,9 @@ class DefaultTitleTransaction extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             fontSize: 12.sp,
-            color: DefaultColors.black,
+            color: DefaultColors.grey,
           ),
         ),
         SizedBox(

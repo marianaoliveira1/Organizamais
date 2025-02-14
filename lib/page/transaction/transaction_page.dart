@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:organizamais/model/transaction_model.dart';
+import 'package:organizamais/page/transaction/pages/%20%20category.dart';
 
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
 import 'widget/button_select_category.dart';
+import 'widget/title_transaction.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -20,6 +22,7 @@ class _TransactionPageState extends State<TransactionPage> {
   TransactionType _selectedType = TransactionType.despesa;
 
   int? categoryId;
+  DateTime? _selectedDate;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController valuecontroller = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
@@ -89,10 +92,39 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
+  String _getFormattedDate(DateTime date) {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final selectedDate = DateTime(date.year, date.month, date.day);
+
+    if (selectedDate == DateTime(now.year, now.month, now.day)) {
+      return 'Hoje';
+    } else if (selectedDate == yesterday) {
+      return 'Ontem';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date != null) {
+      setState(() {
+        _selectedDate = date;
+      });
+      dayOfTheMonthController.text = _getFormattedDate(date);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Color currentTypeColor = _getTypeColor(_selectedType);
-    final TransactionController transactionController = Get.put(TransactionController());
+    Get.put(TransactionController());
 
     return Scaffold(
       appBar: AppBar(
@@ -118,13 +150,8 @@ class _TransactionPageState extends State<TransactionPage> {
             const SizedBox(height: 20),
             _buildTransactionFields(),
             const SizedBox(height: 20),
-            Text(
-              "Valor",
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: DefaultColors.grey,
-                fontWeight: FontWeight.w500,
-              ),
+            DefaultTitleTransaction(
+              title: "Valor",
             ),
             TextField(
               controller: valuecontroller,
@@ -133,6 +160,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 hintStyle: TextStyle(
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
+                  fontSize: 30.sp,
                 ),
                 focusedBorder: const UnderlineInputBorder(
                   borderSide: BorderSide.none,
@@ -143,20 +171,53 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               style: TextStyle(
                 color: currentTypeColor,
-                fontSize: 16,
+                fontSize: 30.sp,
                 fontWeight: FontWeight.bold,
               ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 20),
-            const Text("Category"),
+            DefaultTitleTransaction(
+              title: "Categoria",
+            ),
             DefaultButtonSelectCategory(
+              selectedCategory: categoryId,
               onTap: (category) {
                 setState(() {
                   categoryId = category;
                 });
               },
-              selectedCategory: categoryId,
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Data",
+            ),
+            TextField(
+              controller: dayOfTheMonthController,
+              readOnly: true,
+              style: TextStyle(
+                fontSize: 16.sp,
+                color: DefaultColors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: "Data",
+                hintStyle: TextStyle(
+                  fontSize: 16.sp,
+                  color: DefaultColors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+                prefixIcon: Icon(
+                  Icons.calendar_month,
+                  color: DefaultColors.black,
+                ),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: DefaultColors.black),
+                ),
+              ),
+              onTap: _selectDate,
             ),
             const SizedBox(height: 30),
           ],

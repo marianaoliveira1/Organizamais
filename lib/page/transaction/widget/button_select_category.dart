@@ -15,12 +15,42 @@ class DefaultButtonSelectCategory extends StatelessWidget {
   final Function(int?) onTap;
   final int? selectedCategory;
 
+  Map<String, dynamic>? _findCategoryById(int? id) {
+    if (id == null) return null;
+
+    // First search in expenses categories
+    final expenseCategory = categories_expenses.firstWhere(
+      (category) => category['id'] == id,
+      orElse: () => {
+        'id': 0,
+        'name': '',
+        'icon': ''
+      },
+    );
+    if (expenseCategory['id'] != 0) return expenseCategory;
+
+    // If not found in expenses, search in income categories
+    final incomeCategory = categories_income.firstWhere(
+      (category) => category['id'] == id,
+      orElse: () => {
+        'id': 0,
+        'name': '',
+        'icon': ''
+      },
+    );
+    if (incomeCategory['id'] != 0) return incomeCategory;
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final selectedCategoryData = _findCategoryById(selectedCategory);
+
     return InkWell(
       onTap: () async {
-        var category = await Get.to(() => Category());
-        onTap(category as int?);
+        var categoryId = await Get.to(() => const Category());
+        onTap(categoryId as int?);
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -34,16 +64,23 @@ class DefaultButtonSelectCategory extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.category, color: DefaultColors.grey),
+            if (selectedCategoryData != null)
+              Image.asset(
+                selectedCategoryData['icon'],
+                height: 24.h,
+                width: 24.w,
+              )
+            else
+              Icon(Icons.category, color: DefaultColors.grey),
             SizedBox(width: 10.w),
             Text(
-              selectedCategory != null ? 'Categoria $selectedCategory' : 'Selecione uma categoria',
+              selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
               style: TextStyle(
                 color: DefaultColors.grey,
                 fontSize: 16.sp,
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Icon(Icons.arrow_forward_ios, color: DefaultColors.grey, size: 20.w),
           ],
         ),
