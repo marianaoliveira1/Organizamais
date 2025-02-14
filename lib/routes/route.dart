@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../page/cards/cards_page.dart';
 import '../page/graphics/graphics_page.dart';
 import '../page/home/home_page.dart';
-import '../page/initial/bank.dart';
+import '../page/initial/pages/bank.dart';
 import '../page/initial/initial_page.dart';
 import '../page/initial/pages/credit_card.dart';
 import '../page/initial/pages/fixed_accotuns_page.dart';

@@ -5,6 +5,7 @@ import 'package:organizamais/page/initial/widget/finance_summary.dart';
 import 'package:organizamais/page/initial/widget/fixed_accounts.dart';
 import 'package:organizamais/utils/color.dart';
 
+import '../../controller/card_controller.dart';
 import '../../controller/fixed_accounts_controller.dart';
 
 class InitialPage extends StatelessWidget {
@@ -13,6 +14,7 @@ class InitialPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(FixedAccountsController());
+    final CardController cardController = Get.put(CardController());
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
@@ -50,13 +52,64 @@ class InitialPage extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                            onPressed: () {
-                              Get.toNamed("/credit-card");
-                            },
-                            icon: Icon(Icons.add))
+                          onPressed: () {
+                            Get.toNamed("/credit-card");
+                          },
+                          icon: Icon(Icons.add),
+                        )
                       ],
                     ),
-                  )
+                  ),
+                  SizedBox(height: 10.h),
+                  Obx(() => Column(
+                        children: cardController.card
+                            .map((card) => Container(
+                                  margin: EdgeInsets.only(bottom: 10.h),
+                                  decoration: BoxDecoration(
+                                    color: DefaultColors.white,
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
+                                  padding: EdgeInsets.all(16.w),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.credit_card,
+                                        size: 30.w,
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              card.title,
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Limite: R\$ ${card.limit}',
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                color: DefaultColors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () => cardController.deleteCard(card.id!),
+                                        icon: Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      )),
                 ],
               ),
             ),
