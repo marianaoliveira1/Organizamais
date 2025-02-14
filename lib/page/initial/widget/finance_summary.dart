@@ -24,7 +24,7 @@ class FinanceSummaryWidget extends StatelessWidget {
             "Total",
             style: TextStyle(
               color: DefaultColors.grey,
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -32,10 +32,11 @@ class FinanceSummaryWidget extends StatelessWidget {
             "R\$ 4000,00",
             style: TextStyle(
               color: DefaultColors.black,
-              fontSize: 30.sp,
+              fontSize: 26.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
+          SizedBox(height: 6.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -53,38 +54,37 @@ class FinanceSummaryWidget extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Linha colorida ao lado do texto
         Container(
-          height: 46.h, // Ajuste conforme necessário
+          height: 38.h,
           width: 2.w,
           color: color,
         ),
-        SizedBox(width: 6.w), // Espaço entre a linha e o texto
+        SizedBox(width: 6.w),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 10.sp,
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 4.h),
+            SizedBox(height: 2.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  value.split('.')[0], // Parte inteira do valor
+                  value.split('.')[0],
                   style: TextStyle(
-                    fontSize: 18.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                 ),
                 Text(
-                  ".${value.split('.')[1]}", // Casas decimais em opacidade menor
+                  ".${value.split('.')[1]}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.black.withOpacity(0.4),
