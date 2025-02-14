@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:organizamais/utils/color.dart';
 
 class BankSearchPage extends StatefulWidget {
@@ -12,7 +13,8 @@ class BankSearchPage extends StatefulWidget {
 
 class _BankSearchPageState extends State<BankSearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> banks = [
+
+  static const List<Map<String, String>> banks = [
     {
       'name': 'ABC Brasil',
       'icon': 'assets/icon-bank/abc-brasil.png'
@@ -253,10 +255,16 @@ class _BankSearchPageState extends State<BankSearchPage> {
                 itemCount: filteredBanks.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    leading: Image.asset(
-                      filteredBanks[index]['icon']!,
-                      width: 40,
-                      height: 40,
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        20.r,
+                      ),
+                      child: Image.asset(
+                        filteredBanks[index]['icon']!,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     title: Text(filteredBanks[index]['name']!),
                   );

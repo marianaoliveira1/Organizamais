@@ -91,6 +91,12 @@ class _CreditCardPageState extends State<CreditCardPage> {
                       color: DefaultColors.grey,
                     ),
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.r),
+                    borderSide: BorderSide(
+                      color: DefaultColors.black,
+                    ),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -157,6 +163,12 @@ class _CreditCardPageState extends State<CreditCardPage> {
                     borderRadius: BorderRadius.circular(5.r),
                     borderSide: BorderSide(
                       color: DefaultColors.grey,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.r),
+                    borderSide: BorderSide(
+                      color: DefaultColors.black,
                     ),
                   ),
                 ),
