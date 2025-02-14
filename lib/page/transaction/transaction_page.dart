@@ -139,7 +139,7 @@ class _TransactionPageState extends State<TransactionPage> {
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: 20.w,
+          horizontal: 20.h,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,9 +152,8 @@ class _TransactionPageState extends State<TransactionPage> {
                 _buildTypeButton("Transferencia", TransactionType.transferencia),
               ],
             ),
-            const SizedBox(height: 20),
             _buildTransactionFields(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             DefaultTitleTransaction(
               title: "Valor",
             ),
@@ -181,7 +180,9 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 20),
+            SizedBox(
+              height: 20.h,
+            ),
             DefaultTitleTransaction(
               title: "Categoria",
             ),
@@ -230,7 +231,6 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               onTap: _selectDate,
             ),
-            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -245,13 +245,31 @@ class _TransactionPageState extends State<TransactionPage> {
       onTap: () => _setTransactionType(type),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? typeColor : Colors.grey,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 12.sp,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Minimiza o tamanho vertical
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? typeColor : Colors.grey,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 12.sp,
+              ),
+            ),
+            SizedBox(
+              height: 2.h,
+            ),
+            SizedBox(
+              width: 85.w,
+              child: Container(
+                height: 2.h,
+                decoration: BoxDecoration(
+                  color: isSelected ? typeColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

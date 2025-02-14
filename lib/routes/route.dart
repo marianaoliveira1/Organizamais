@@ -5,7 +5,7 @@ import '../page/graphics/graphics_page.dart';
 import '../page/home/home_page.dart';
 import '../page/initial/bank.dart';
 import '../page/initial/initial_page.dart';
-import '../page/initial/pages/credit card.dart';
+import '../page/initial/pages/credit_card.dart';
 import '../page/initial/pages/fixed_accotuns_page.dart';
 import '../page/login/login_page.dart';
 import '../page/register/register_page.dart';
