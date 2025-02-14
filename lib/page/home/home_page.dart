@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     if (index == 2) {
-      _showTransactionBottomSheet();
+      Get.to(() => TransactionPage()); // Abre a TransactionPage ao clicar no botão "+"
     } else {
       setState(() {
         _selectedIndex = index;
@@ -41,43 +41,43 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _showTransactionBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(20.h),
-        decoration: BoxDecoration(
-          color: DefaultColors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20.r),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "O que você quer adicionar?",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildOptionButton("Receita", DefaultColors.green, Icons.add, () {
-              Get.to(() => TransactionPage(transactionType: TransactionType.receita));
-            }),
-            const SizedBox(height: 10),
-            _buildOptionButton("Despesa", DefaultColors.red, Icons.remove, () {
-              Get.to(() => TransactionPage(transactionType: TransactionType.despesa));
-            }),
-            const SizedBox(height: 10),
-            _buildOptionButton("Transferência", DefaultColors.grey, Icons.swap_horiz, () {
-              Get.to(() => TransactionPage(transactionType: TransactionType.transferencia));
-            }),
-          ],
-        ),
-      ),
-    );
-  }
+  // void _showTransactionBottomSheet() {
+  //   Get.bottomSheet(
+  //     Container(
+  //       padding: EdgeInsets.all(20.h),
+  //       decoration: BoxDecoration(
+  //         color: DefaultColors.white,
+  //         borderRadius: BorderRadius.vertical(
+  //           top: Radius.circular(20.r),
+  //         ),
+  //       ),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text(
+  //             "O que você quer adicionar?",
+  //             style: TextStyle(
+  //               fontSize: 18.sp,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 20),
+  //           _buildOptionButton("Receita", DefaultColors.green, Icons.add, () {
+  //             Get.to(() => TransactionPage(transactionType: TransactionType.receita));
+  //           }),
+  //           const SizedBox(height: 10),
+  //           _buildOptionButton("Despesa", DefaultColors.red, Icons.remove, () {
+  //             Get.to(() => TransactionPage(transactionType: TransactionType.despesa));
+  //           }),
+  //           const SizedBox(height: 10),
+  //           _buildOptionButton("Transferência", DefaultColors.grey, Icons.swap_horiz, () {
+  //             Get.to(() => TransactionPage(transactionType: TransactionType.transferencia));
+  //           }),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildOptionButton(String text, Color color, IconData icon, VoidCallback onTap) {
     return GestureDetector(

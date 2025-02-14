@@ -15,6 +15,7 @@ class TransactionModel {
   final int category;
   final TransactionType type;
   final String? paymentType;
+
   TransactionModel({
     this.id,
     this.userId,
@@ -72,7 +73,7 @@ class TransactionModel {
       'category': category
     });
     result.addAll({
-      'type': type.toString(), // Armazena como string
+      'type': type.toString()
     });
     if (paymentType != null) {
       result.addAll({
@@ -93,7 +94,7 @@ class TransactionModel {
       category: map['category']?.toInt() ?? 0,
       type: TransactionType.values.firstWhere(
         (e) => e.toString() == map['type'],
-        orElse: () => TransactionType.despesa, // Defina um valor padrão, se necessário
+        orElse: () => TransactionType.despesa,
       ),
       paymentType: map['paymentType'],
     );

@@ -18,11 +18,10 @@ class FixedAccounts extends StatelessWidget {
   String _calculateTotal() {
     double total = 0;
     for (var account in fixedAccounts) {
-      // Convertendo a string para double, removendo o possível R$ e trocando , por .
       String valueString = account.value.replaceAll('R\$', '').replaceAll('.', '').replaceAll(',', '.');
       total += double.tryParse(valueString) ?? 0;
     }
-    // Formatando o número para o padrão brasileiro (R$ 0.000,00)
+
     return total.toStringAsFixed(2).replaceAll('.', ',');
   }
 
@@ -46,7 +45,7 @@ class FixedAccounts extends StatelessWidget {
                     "Nenhuma conta fixa cadastrada",
                     style: TextStyle(
                       color: DefaultColors.grey,
-                      fontSize: 12.sp,
+                      fontSize: 14.sp,
                     ),
                   ),
                 );
@@ -67,8 +66,8 @@ class FixedAccounts extends StatelessWidget {
                         children: [
                           Image.asset(
                             categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                            width: 24.w,
-                            height: 24.h,
+                            width: 26.w,
+                            height: 26.h,
                           ),
                           SizedBox(width: 20.w),
                           Column(
@@ -79,14 +78,14 @@ class FixedAccounts extends StatelessWidget {
                                 style: TextStyle(
                                   color: DefaultColors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 12.sp,
+                                  fontSize: 14.sp,
                                 ),
                               ),
                               Text(
                                 "Dia ${fixedAccount.paymentDay} de cada mês",
                                 style: TextStyle(
                                   color: DefaultColors.grey,
-                                  fontSize: 10.sp,
+                                  fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -109,7 +108,7 @@ class FixedAccounts extends StatelessWidget {
                             "${fixedAccount.paymentType}",
                             style: TextStyle(
                               color: DefaultColors.grey,
-                              fontSize: 10.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -120,6 +119,9 @@ class FixedAccounts extends StatelessWidget {
                 },
               );
             },
+          ),
+          SizedBox(
+            height: 12.h,
           ),
           Padding(
             padding: EdgeInsets.only(top: 10.h),
