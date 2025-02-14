@@ -123,51 +123,6 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
-  void _showWalletSelection() {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Selecione uma carteira",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 16),
-              ListTile(
-                leading: Icon(Icons.account_balance_wallet),
-                title: Text("Conta Inicial"),
-                onTap: () {
-                  setState(() {
-                    paymentTypeController.text = "Conta Inicial";
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.credit_card),
-                title: Text("Nubank"),
-                onTap: () {
-                  setState(() {
-                    paymentTypeController.text = "Nubank";
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Color currentTypeColor = _getTypeColor(_selectedType);

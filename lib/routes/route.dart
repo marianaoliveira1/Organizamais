@@ -5,6 +5,7 @@ import '../page/graphics/graphics_page.dart';
 import '../page/home/home_page.dart';
 import '../page/initial/bank.dart';
 import '../page/initial/initial_page.dart';
+import '../page/initial/pages/credit card.dart';
 import '../page/initial/pages/fixed_accotuns_page.dart';
 import '../page/login/login_page.dart';
 import '../page/register/register_page.dart';
@@ -24,6 +25,7 @@ class Routes {
   static const CATEGORY = '/category';
   static const FIXED_ACCOUNTS = '/fixed-accounts';
   static const BANK = '/bank';
+  static const CREDITCARD = '/credit-card';
 }
 
 class AppPages {
@@ -39,6 +41,7 @@ class AppPages {
     GetPage(name: Routes.CATEGORY, page: () => Category()),
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
     GetPage(name: Routes.BANK, page: () => BankSearchPage()),
+    GetPage(name: Routes.CREDITCARD, page: () => CreditCardPage()),
   ];
 
   static const INITIAL = Routes.LOGIN;

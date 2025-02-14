@@ -39,11 +39,19 @@ class InitialPage extends StatelessWidget {
                       horizontal: 16.w,
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Meus Cartões"),
+                        Text(
+                          "Meus Cartões",
+                          style: TextStyle(
+                            color: DefaultColors.grey,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.sp,
+                          ),
+                        ),
                         IconButton(
                             onPressed: () {
-                              Get.toNamed("/bank");
+                              Get.toNamed("/credit-card");
                             },
                             icon: Icon(Icons.add))
                       ],
@@ -84,6 +92,7 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
                 "Contas fixas",
                 style: TextStyle(
                   color: DefaultColors.grey,
+                  fontWeight: FontWeight.w500,
                   fontSize: 12.sp,
                 ),
               ),
