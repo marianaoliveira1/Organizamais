@@ -103,19 +103,33 @@ class GraphicsPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          Text("Casa"),
+                          Text(
+                            "Casa",
+                            style: TextStyle(
+                              color: DefaultColors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                            ),
+                          ),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text("R\$ 4000,00"),
+                          Text(
+                            "R\$ 4000,00",
+                            style: TextStyle(
+                              color: DefaultColors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                            ),
+                          ),
                           Text(
                             "5%",
                             style: TextStyle(
                               color: DefaultColors.grey,
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
