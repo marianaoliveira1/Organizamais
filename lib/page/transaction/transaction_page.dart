@@ -6,18 +6,28 @@ import 'package:organizamais/model/transaction_model.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../controller/transaction_controller.dart';
+import 'widget/button_select_category.dart';
+
 class TransactionPage extends StatefulWidget {
+  const TransactionPage({super.key});
+
   @override
   _TransactionPageState createState() => _TransactionPageState();
 }
 
 class _TransactionPageState extends State<TransactionPage> {
   TransactionType _selectedType = TransactionType.despesa;
-  final TextEditingController _amountController = TextEditingController();
+
+  int? categoryId;
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController valuecontroller = TextEditingController();
+  final TextEditingController dayOfTheMonthController = TextEditingController();
+  final TextEditingController paymentTypeController = TextEditingController();
 
   @override
   void dispose() {
-    _amountController.dispose();
+    valuecontroller.dispose();
     super.dispose();
   }
 
@@ -82,6 +92,7 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     Color currentTypeColor = _getTypeColor(_selectedType);
+    final TransactionController transactionController = Get.put(TransactionController());
 
     return Scaffold(
       appBar: AppBar(
@@ -107,21 +118,27 @@ class _TransactionPageState extends State<TransactionPage> {
             const SizedBox(height: 20),
             _buildTransactionFields(),
             const SizedBox(height: 20),
-            const Text("Amount"),
+            Text(
+              "Valor",
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: DefaultColors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             TextField(
-              controller: _amountController,
+              controller: valuecontroller,
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.attach_money, color: currentTypeColor),
-                hintText: "Enter amount",
-                hintStyle: TextStyle(color: Colors.grey),
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: currentTypeColor),
+                hintText: "R\$0,00",
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
                 ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: currentTypeColor, width: 2),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide.none,
                 ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: currentTypeColor),
+                enabledBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide.none,
                 ),
               ),
               style: TextStyle(
@@ -133,32 +150,15 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
             const SizedBox(height: 20),
             const Text("Category"),
-            DropdownButtonFormField<String>(
-              items: [
-                "Food",
-                "Transport",
-                "Shopping"
-              ].map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: (value) {},
+            DefaultButtonSelectCategory(
+              onTap: (category) {
+                setState(() {
+                  categoryId = category;
+                });
+              },
+              selectedCategory: categoryId,
             ),
             const SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: DefaultColors.purple,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text("Add Record"),
-              ),
-            ),
           ],
         ),
       ),
@@ -173,22 +173,13 @@ class _TransactionPageState extends State<TransactionPage> {
       onTap: () => _setTransactionType(type),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? typeColor : Colors.grey,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Container(
-              width: 60,
-              height: 2,
-              color: isSelected ? typeColor : Colors.transparent,
-            ),
-          ],
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? typeColor : Colors.grey,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12.sp,
+          ),
         ),
       ),
     );

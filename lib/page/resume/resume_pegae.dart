@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 import '../../utils/color.dart';
-import '../transaction_page.dart/pages/  category.dart';
+import '../transaction/pages/  category.dart';
 
 class ResumePage extends StatelessWidget {
   final TransactionController controller = Get.put(TransactionController());

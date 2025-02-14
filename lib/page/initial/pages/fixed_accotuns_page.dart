@@ -6,9 +6,9 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';
 
-import '../../transaction_page.dart/widget/button_select_category.dart';
-import '../../transaction_page.dart/widget/text_field_transaction.dart';
-import '../../transaction_page.dart/widget/title_transaction.dart';
+import '../../transaction/widget/button_select_category.dart';
+import '../../transaction/widget/text_field_transaction.dart';
+import '../../transaction/widget/title_transaction.dart';
 
 class FixedAccotunsPage extends StatefulWidget {
   const FixedAccotunsPage({super.key});

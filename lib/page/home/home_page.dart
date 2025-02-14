@@ -8,7 +8,7 @@ import 'package:organizamais/page/graphics/graphics_page.dart';
 import 'package:organizamais/page/initial/initial_page.dart';
 
 import 'package:organizamais/page/resume/resume_pegae.dart';
-import 'package:organizamais/page/transaction_page.dart/transaction_page.dart';
+import 'package:organizamais/page/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../model/transaction_model.dart';
