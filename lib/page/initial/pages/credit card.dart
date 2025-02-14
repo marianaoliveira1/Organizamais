@@ -11,6 +11,7 @@ class CreditCardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController nameController = TextEditingController();
+    TextEditingController limitController = TextEditingController();
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
@@ -81,6 +82,28 @@ class CreditCardPage extends StatelessWidget {
                       ),
                     )
                   ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
+            DefaultTitleTransaction(
+              title: 'Limite do cartão',
+            ),
+            TextField(
+              controller: limitController,
+              decoration: InputDecoration(
+                hintText: 'Digite o limite do cartão',
+                hintStyle: TextStyle(
+                  fontSize: 12.sp,
+                  color: DefaultColors.grey,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.r),
+                  borderSide: BorderSide(
+                    color: DefaultColors.grey,
+                  ),
                 ),
               ),
             ),
