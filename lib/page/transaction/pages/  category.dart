@@ -107,7 +107,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 21,
-    'name': 'iFood',
+    'name': 'Delivery',
     'icon': 'assets/icon-category/ifood.png'
   },
   {

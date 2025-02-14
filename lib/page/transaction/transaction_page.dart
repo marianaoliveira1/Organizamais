@@ -1,9 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:organizamais/model/transaction_model.dart';
-import 'package:organizamais/page/transaction/pages/%20%20category.dart';
 
 import 'package:organizamais/utils/color.dart';
 
@@ -121,21 +122,69 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
+  void _showWalletSelection() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Selecione uma carteira",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              ListTile(
+                leading: Icon(Icons.account_balance_wallet),
+                title: Text("Conta Inicial"),
+                onTap: () {
+                  setState(() {
+                    paymentTypeController.text = "Conta Inicial";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.credit_card),
+                title: Text("Nubank"),
+                onTap: () {
+                  setState(() {
+                    paymentTypeController.text = "Nubank";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Color currentTypeColor = _getTypeColor(_selectedType);
     Get.put(TransactionController());
 
     return Scaffold(
+      backgroundColor: DefaultColors.white,
       appBar: AppBar(
-        title: const Text("Add Record"),
+        backgroundColor: DefaultColors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20.w,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -190,6 +239,13 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
             SizedBox(
               height: 10.h,
+            ),
+            DefaultTitleTransaction(
+              title: "Pago com",
+            ),
+            ElevatedButton(
+              onPressed: _showWalletSelection,
+              child: Text(paymentTypeController.text.isEmpty ? "Selecionar carteira" : paymentTypeController.text),
             ),
             DefaultTitleTransaction(
               title: "Data",
