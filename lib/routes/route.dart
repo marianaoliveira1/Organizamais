@@ -9,6 +9,7 @@ import '../page/initial/pages/credit_card.dart';
 import '../page/initial/pages/fixed_accotuns_page.dart';
 import '../page/login/login_page.dart';
 import '../page/register/register_page.dart';
+
 import '../page/resume/resume_pegae.dart';
 import '../page/transaction/pages/  category.dart';
 import '../page/transaction/transaction_page.dart';
