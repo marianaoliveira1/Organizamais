@@ -52,12 +52,14 @@ class _CreditCardPageState extends State<CreditCardPage> {
     try {
       final card = CardsModel(
         title: titleController.text,
-        icon: selectedIcon!, // Agora o selectedIcon está sendo atualizado corretamente
+        icon: selectedIcon!,
         limit: limitController.text,
       );
 
       await _cardController.addCard(card);
-      Get.back();
+
+      // Redireciona para a página inicial
+      Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar(
         'Erro',
