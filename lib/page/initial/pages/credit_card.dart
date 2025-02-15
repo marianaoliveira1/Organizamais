@@ -8,7 +8,9 @@ import '../../../model/cards_model.dart';
 import '../../transaction/widget/title_transaction.dart';
 
 class CreditCardPage extends StatefulWidget {
-  const CreditCardPage({super.key});
+  final CardsModel? card;
+
+  const CreditCardPage({super.key, this.card});
 
   @override
   State<CreditCardPage> createState() => _CreditCardPageState();
@@ -19,7 +21,19 @@ class _CreditCardPageState extends State<CreditCardPage> {
   final CardController _cardController = Get.find<CardController>();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController limitController = TextEditingController();
-  int? selectedIcon; // Ícone selecionado
+  int? selectedIcon;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Se estiver editando, carregar os dados do cartão
+    if (widget.card != null) {
+      titleController.text = widget.card!.title;
+      limitController.text = widget.card!.limit;
+      selectedIcon = widget.card!.icon;
+    }
+  }
 
   @override
   void dispose() {
@@ -51,19 +65,23 @@ class _CreditCardPageState extends State<CreditCardPage> {
 
     try {
       final card = CardsModel(
+        id: widget.card?.id ?? '', // Se for edição, mantém o ID
         title: titleController.text,
         icon: selectedIcon!,
         limit: limitController.text,
       );
 
-      await _cardController.addCard(card);
+      if (widget.card == null) {
+        await _cardController.addCard(card);
+      } else {
+        await _cardController.updateCard(card);
+      }
 
-      // Redireciona para a página inicial
       Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar(
         'Erro',
-        'Ocorreu um erro ao adicionar o cartão',
+        'Ocorreu um erro ao salvar o cartão',
         backgroundColor: Colors.red,
         colorText: DefaultColors.white,
       );
@@ -77,12 +95,16 @@ class _CreditCardPageState extends State<CreditCardPage> {
       appBar: AppBar(
         backgroundColor: DefaultColors.background,
         elevation: 0,
+        actions: [
+          if (widget.card != null)
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: _deleteCard, // Chama o método para excluir
+            ),
+        ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 20.h,
-          vertical: 20.h,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 20.h),
         child: Form(
           key: _formKey,
           child: Column(
@@ -98,24 +120,20 @@ class _CreditCardPageState extends State<CreditCardPage> {
                     borderRadius: BorderRadius.circular(5.r),
                     borderSide: BorderSide(color: DefaultColors.grey),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.r),
-                    borderSide: BorderSide(color: DefaultColors.black),
-                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, digite o nome do cartão';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? 'Digite o nome do cartão' : null,
               ),
               SizedBox(height: 20.h),
               DefaultTitleTransaction(title: 'Escolha um ícone'),
               BankSelector(
+                initialBank: selectedIcon != null
+                    ? {
+                        'id': selectedIcon
+                      }
+                    : null,
                 onBankSelected: (bank) {
                   setState(() {
-                    selectedIcon = bank['id']; // Atualiza o ícone selecionado corretamente
+                    selectedIcon = bank['id'];
                   });
                 },
               ),
@@ -131,17 +149,8 @@ class _CreditCardPageState extends State<CreditCardPage> {
                     borderRadius: BorderRadius.circular(5.r),
                     borderSide: BorderSide(color: DefaultColors.grey),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.r),
-                    borderSide: BorderSide(color: DefaultColors.black),
-                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, digite o limite do cartão';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? 'Digite o limite do cartão' : null,
               ),
               Spacer(),
               InkWell(
@@ -154,7 +163,7 @@ class _CreditCardPageState extends State<CreditCardPage> {
                   ),
                   child: Center(
                     child: Text(
-                      'Adicionar Cartão',
+                      widget.card == null ? 'Adicionar Cartão' : 'Atualizar Cartão',
                       style: TextStyle(fontSize: 12.sp, color: DefaultColors.white),
                     ),
                   ),
@@ -166,12 +175,31 @@ class _CreditCardPageState extends State<CreditCardPage> {
       ),
     );
   }
+
+  void _deleteCard() async {
+    try {
+      await _cardController.deleteCard(widget.card!.id);
+      Get.offAllNamed('/home');
+    } catch (e) {
+      Get.snackbar(
+        'Erro',
+        'Erro ao excluir o cartão',
+        backgroundColor: Colors.red,
+        colorText: DefaultColors.white,
+      );
+    }
+  }
 }
 
 class BankSelector extends StatefulWidget {
+  final Map<String, dynamic>? initialBank;
   final Function(Map<String, dynamic>)? onBankSelected;
 
-  const BankSelector({super.key, this.onBankSelected});
+  const BankSelector({
+    super.key,
+    this.onBankSelected,
+    this.initialBank,
+  });
 
   @override
   State<BankSelector> createState() => _BankSelectorState();

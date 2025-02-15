@@ -176,8 +176,54 @@ class CreditCardSection extends StatelessWidget {
                     padding: EdgeInsets.all(16.w),
                     itemCount: cardController.card.length,
                     itemBuilder: (context, index) {
-                      return CreditCardItem(
-                        card: cardController.card[index],
+                      final card = cardController.card[index];
+                      return Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.credit_card,
+                            color: DefaultColors.green,
+                          ),
+                          title: Text(
+                            card.title,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Limite: ${card.limit}',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Ícone de editar
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  Get.toNamed("/credit-card", arguments: card);
+                                },
+                              ),
+                              // Ícone de excluir
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  Get.toNamed(
+                                    "/credit-card",
+                                    arguments: card.copyWith(title: card.title ?? ''),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   ),
