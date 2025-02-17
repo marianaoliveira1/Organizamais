@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get.put(AuthController());
-    // Get.put(FixedAccountsController());
-    // Get.put(CardController());
+    Get.put(AuthController());
+    Get.put(FixedAccountsController());
+    Get.put(CardController());
 
     return ScreenUtilInit(
       designSize: const Size(360, 690),

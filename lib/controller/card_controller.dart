@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 import '../model/cards_model.dart';
@@ -10,14 +9,11 @@ import 'auth_controller.dart';
 class CardController extends GetxController {
   var card = <CardsModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? cardStream;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  Rx<User?> firebaseUser = Rx<User?>(null);
 
   @override
   void onInit() {
     super.onInit();
     getTransaction();
-    firebaseUser.bindStream(_auth.authStateChanges());
   }
 
   void getTransaction() {
