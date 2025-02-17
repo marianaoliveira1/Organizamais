@@ -28,16 +28,23 @@ class DefaultFirebaseOptions {
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return linux;
       default:
         return web;
     }
   }
 
   static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCPOXB5rfgLjZhi80mr9oZEIzVRiiZpk9Y',
+    appId: '1:1008402942918:web:0de7ead39b29b0093400c7',
+    messagingSenderId: '1008402942918',
+    projectId: 'organizamais-fe8f4',
+    authDomain: 'organizamais-fe8f4.firebaseapp.com',
+    storageBucket: 'organizamais-fe8f4.firebasestorage.app',
+    measurementId: 'G-PHWDEZD6ZN',
+  );
+
+  static const FirebaseOptions linux = FirebaseOptions(
     apiKey: 'AIzaSyCPOXB5rfgLjZhi80mr9oZEIzVRiiZpk9Y',
     appId: '1:1008402942918:web:0de7ead39b29b0093400c7',
     messagingSenderId: '1008402942918',

@@ -12,13 +12,7 @@ class FixedAccountsController extends GetxController {
   var fixedAccounts = <FixedAccountModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? fixedAccountsStream;
 
-  @override
-  void onInit() {
-    super.onInit();
-    getFixedAccounts();
-  }
-
-  void getFixedAccounts() {
+  void startFixedAccountsStream() {
     fixedAccountsStream = FirebaseFirestore.instance
         .collection('fixedAccounts')
         .where(

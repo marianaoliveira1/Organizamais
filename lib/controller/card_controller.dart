@@ -10,13 +10,7 @@ class CardController extends GetxController {
   var card = <CardsModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? cardStream;
 
-  @override
-  void onInit() {
-    super.onInit();
-    getTransaction();
-  }
-
-  void getTransaction() {
+  void startCardStream() {
     cardStream = FirebaseFirestore.instance
         .collection('cards')
         .where(

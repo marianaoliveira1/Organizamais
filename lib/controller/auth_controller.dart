@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:organizamais/controller/card_controller.dart';
+import 'package:organizamais/controller/fixed_accounts_controller.dart';
 
 import '../routes/route.dart';
 
@@ -11,15 +13,25 @@ class AuthController extends GetxController {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late Rx<User?> firebaseUser;
+  Rx<User?> firebaseUser = Rx<User?>(null);
   var isLoading = false.obs;
+  var loadedOtherControllers = false;
 
   @override
   void onReady() {
     super.onReady();
-    firebaseUser = Rx<User?>(_auth.currentUser);
     firebaseUser.bindStream(_auth.authStateChanges());
     ever(firebaseUser, _setInitialScreen);
+    ever(firebaseUser, _loadOtherComponents);
+  }
+
+  _loadOtherComponents(User? user) {
+    if (user == null) return;
+    if (loadedOtherControllers) return;
+
+    loadedOtherControllers = true;
+    Get.find<CardController>().startCardStream();
+    Get.find<FixedAccountsController>().startFixedAccountsStream();
   }
 
   _setInitialScreen(User? user) {
@@ -68,13 +80,13 @@ class AuthController extends GetxController {
 
   Future<void> login(String email, String password) async {
     try {
-      isLoading(true);
+      // isLoading(true);
       _showLoadingDialog();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
       Get.snackbar("Erro ao entrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
-      isLoading(false);
+      // isLoading(false);
       _hideLoadingDialog();
     }
   }
