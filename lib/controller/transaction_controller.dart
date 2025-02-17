@@ -10,13 +10,7 @@ class TransactionController extends GetxController {
   var transaction = <TransactionModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
 
-  @override
-  void onInit() {
-    super.onInit();
-    getTransaction();
-  }
-
-  void getTransaction() {
+  void startTransactionStream() {
     transactionStream = FirebaseFirestore.instance
         .collection('transactions')
         .where(
