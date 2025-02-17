@@ -127,42 +127,51 @@ class CreditCardSection extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: Column(
-        children: [
-          Card(
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Meus Cartões',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Widget de Meus Cartões
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Meus Cartões',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.add_circle, color: Colors.blue),
-                        onPressed: () {
-                          Get.to(() => AddCardPage(
-                                isEditing: false,
-                              ));
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Obx(() => cardController.card.isEmpty
-                      ? Center(
+                        IconButton(
+                          icon: Icon(Icons.add_circle, color: Colors.blue),
+                          onPressed: () {
+                            Get.to(() => AddCardPage(
+                                  isEditing: false,
+                                ));
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Obx(() {
+                      // Verificamos se já temos cartões carregados
+                      if (cardController.card.isEmpty) {
+                        return Container(
+                          height: 150,
+                          alignment: Alignment.center,
                           child: Text('Nenhum cartão adicionado'),
-                        )
-                      : SizedBox(
-                          height: 200,
+                        );
+                      } else {
+                        return Container(
+                          height: 150,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: cardController.card.length,
@@ -178,9 +187,9 @@ class CreditCardSection extends StatelessWidget {
                                         ));
                                   },
                                   child: Container(
-                                    width: 150,
+                                    width: 200,
                                     decoration: BoxDecoration(
-                                      color: Colors.blueGrey,
+                                      color: Colors.blue.shade700,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     padding: EdgeInsets.all(16),
@@ -202,6 +211,7 @@ class CreditCardSection extends StatelessWidget {
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -211,14 +221,19 @@ class CreditCardSection extends StatelessWidget {
                                         Spacer(),
                                         Text(
                                           'Limite: R\$ ${card.limit.toStringAsFixed(2)}',
-                                          style: TextStyle(color: Colors.white),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
                                         ),
                                         SizedBox(height: 8),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
                                             IconButton(
-                                              icon: Icon(Icons.edit, color: Colors.white),
+                                              icon: Icon(Icons.edit, color: Colors.white, size: 20),
+                                              constraints: BoxConstraints(),
+                                              padding: EdgeInsets.zero,
                                               onPressed: () {
                                                 Get.to(() => AddCardPage(
                                                       isEditing: true,
@@ -226,8 +241,11 @@ class CreditCardSection extends StatelessWidget {
                                                     ));
                                               },
                                             ),
+                                            SizedBox(width: 8),
                                             IconButton(
-                                              icon: Icon(Icons.delete, color: Colors.white),
+                                              icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                                              constraints: BoxConstraints(),
+                                              padding: EdgeInsets.zero,
                                               onPressed: () {
                                                 showDialog(
                                                   context: context,
@@ -262,12 +280,15 @@ class CreditCardSection extends StatelessWidget {
                               );
                             },
                           ),
-                        )),
-                ],
+                        );
+                      }
+                    }),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
