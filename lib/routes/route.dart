@@ -41,8 +41,8 @@ class AppPages {
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
-    GetPage(name: Routes.BANK, page: () => BankSearchPage()),
-    GetPage(name: Routes.CREDITCARD, page: () => CreditCardPage()),
+    // GetPage(name: Routes.BANK, page: () => BankSearchPage()),
+    // GetPage(name: Routes.CREDITCARD, page: () => CreditCardPage()),
   ];
 
   static const INITIAL = Routes.LOGIN;

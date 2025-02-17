@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:organizamais/firebase_options.dart';
 
 import 'controller/auth_controller.dart';
+import 'controller/card_controller.dart';
 import 'routes/route.dart';
 
 void main() async {
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController());
+    Get.lazyPut(() => CardController(), fenix: true);
 
     return ScreenUtilInit(
       designSize: const Size(360, 690),
