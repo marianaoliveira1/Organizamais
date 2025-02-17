@@ -58,22 +58,65 @@ class _AddCardPageState extends State<AddCardPage> {
             DefaultTitleTransaction(title: "Nome do cartão"),
             TextField(
               controller: nameController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: DefaultColors.black,
+              ),
               decoration: InputDecoration(
-                hintText: 'Nome do Cartão',
+                hintText: 'Digite o nome do Cartão',
                 hintStyle: TextStyle(
                   color: DefaultColors.grey,
                   fontSize: 14.sp,
                 ),
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: DefaultColors.grey,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: DefaultColors.grey,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 16),
+            DefaultTitleTransaction(title: "Limite do cartão"),
             TextField(
               controller: limitController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: DefaultColors.black,
+              ),
               decoration: InputDecoration(
-                labelText: 'Limite',
-                border: OutlineInputBorder(),
-                prefixText: 'R\$ ',
+                prefix: Text('R\$ '),
+                hintText: 'Limtie do cartão',
+                hintStyle: TextStyle(
+                  color: DefaultColors.grey,
+                  fontSize: 14.sp,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: DefaultColors.grey,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: DefaultColors.grey,
+                  ),
+                ),
               ),
               keyboardType: TextInputType.numberWithOptions(decimal: true),
             ),
