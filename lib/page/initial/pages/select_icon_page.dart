@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
+import '../../../utils/color.dart';
+
 class SelectIconPage extends StatefulWidget {
   final Function(String, String) onIconSelected;
 
@@ -336,7 +338,9 @@ class _SelectIconPageState extends State<SelectIconPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DefaultColors.background,
       appBar: AppBar(
+        backgroundColor: DefaultColors.background,
         title: Text('Selecionar Ícone'),
       ),
       body: Column(
@@ -351,9 +355,12 @@ class _SelectIconPageState extends State<SelectIconPage> {
                 });
               },
               decoration: InputDecoration(
-                labelText: 'Pesquisar banco',
+                hintText: 'Buscar um ícone',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -364,40 +371,24 @@ class _SelectIconPageState extends State<SelectIconPage> {
                 ? Center(
                     child: Text('Nenhum banco encontrado'),
                   )
-                : GridView.builder(
+                : ListView.builder(
                     padding: EdgeInsets.all(16),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
                     itemCount: filteredBankIcons.length,
                     itemBuilder: (context, index) {
                       final bank = filteredBankIcons[index];
-                      return GestureDetector(
+                      return ListTile(
                         onTap: () {
                           widget.onIconSelected(bank['path']!, bank['name']!);
                           Get.back();
                         },
-                        child: Card(
-                          elevation: 2,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                bank['path']!,
-                                width: 48,
-                                height: 48,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                bank['name']!,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
+                        leading: Image.asset(
+                          bank['path']!,
+                          width: 40,
+                          height: 40,
+                        ),
+                        title: Text(
+                          bank['name']!,
+                          style: TextStyle(fontSize: 16),
                         ),
                       );
                     },
