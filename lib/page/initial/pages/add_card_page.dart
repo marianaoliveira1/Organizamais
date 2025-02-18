@@ -1,6 +1,9 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 
 import 'package:organizamais/page/transaction/widget/title_transaction.dart';
 
@@ -121,26 +124,8 @@ class _AddCardPageState extends State<AddCardPage> {
               keyboardType: TextInputType.numberWithOptions(decimal: true),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  selectedIconPath != null
-                      ? Row(
-                          children: [
-                            Image.asset(
-                              selectedIconPath!,
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(width: 8),
-                            Text(selectedBankName ?? ''),
-                          ],
-                        )
-                      : Text('Selecionar Ícone'),
-                ],
-              ),
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 Get.to(() => SelectIconPage(
                       onIconSelected: (path, name) {
                         setState(() {
@@ -150,6 +135,39 @@ class _AddCardPageState extends State<AddCardPage> {
                       },
                     ));
               },
+              child: Row(
+                children: [
+                  selectedIconPath != null
+                      ? Row(
+                          children: [
+                            Image.asset(
+                              selectedIconPath!,
+                              width: 24.w,
+                              height: 24.h,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(selectedBankName ?? ''),
+                          ],
+                        )
+                      : Row(children: [
+                          Icon(
+                            Iconsax.add,
+                            size: 24.sp,
+                            color: DefaultColors.black,
+                          ),
+                          SizedBox(
+                            width: 8.w,
+                          ),
+                          Text(
+                            'Selecione um ícone',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                        ]),
+                ],
+              ),
             ),
             Spacer(),
             ElevatedButton(

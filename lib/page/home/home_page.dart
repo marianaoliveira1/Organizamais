@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,8 +12,6 @@ import 'package:organizamais/page/initial/initial_page.dart';
 import 'package:organizamais/page/resume/resume_pegae.dart';
 import 'package:organizamais/page/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
-
-import '../../model/transaction_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,44 +40,6 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
-  // void _showTransactionBottomSheet() {
-  //   Get.bottomSheet(
-  //     Container(
-  //       padding: EdgeInsets.all(20.h),
-  //       decoration: BoxDecoration(
-  //         color: DefaultColors.white,
-  //         borderRadius: BorderRadius.vertical(
-  //           top: Radius.circular(20.r),
-  //         ),
-  //       ),
-  //       child: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(
-  //             "O que você quer adicionar?",
-  //             style: TextStyle(
-  //               fontSize: 18.sp,
-  //               fontWeight: FontWeight.bold,
-  //             ),
-  //           ),
-  //           const SizedBox(height: 20),
-  //           _buildOptionButton("Receita", DefaultColors.green, Icons.add, () {
-  //             Get.to(() => TransactionPage(transactionType: TransactionType.receita));
-  //           }),
-  //           const SizedBox(height: 10),
-  //           _buildOptionButton("Despesa", DefaultColors.red, Icons.remove, () {
-  //             Get.to(() => TransactionPage(transactionType: TransactionType.despesa));
-  //           }),
-  //           const SizedBox(height: 10),
-  //           _buildOptionButton("Transferência", DefaultColors.grey, Icons.swap_horiz, () {
-  //             Get.to(() => TransactionPage(transactionType: TransactionType.transferencia));
-  //           }),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildOptionButton(String text, Color color, IconData icon, VoidCallback onTap) {
     return GestureDetector(
