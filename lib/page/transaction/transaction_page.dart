@@ -168,7 +168,7 @@ class _TransactionPageState extends State<TransactionPage> {
               ],
             ),
           ),
-          _buildTransactionFields(),
+          // _buildTransactionFields(),
           SizedBox(
             height: 20.h,
           ),
@@ -197,39 +197,46 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
           ),
           Divider(),
-          DefaultTitleTransaction(
-            title: "Categoria",
-          ),
-          DefaultButtonSelectCategory(
-            selectedCategory: categoryId,
-            onTap: (category) {
-              setState(() {
-                categoryId = category;
-              });
-            },
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Divider(),
-          SizedBox(
-            height: 10.h,
-          ),
-          if (_selectedType == TransactionType.receita)
-            DefaultTitleTransaction(
-              title: "Recebi em",
+          if (_selectedType != TransactionType.transferencia)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DefaultTitleTransaction(
+                  title: "Categoria",
+                ),
+                DefaultButtonSelectCategory(
+                  selectedCategory: categoryId,
+                  onTap: (category) {
+                    setState(() {
+                      categoryId = category;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Divider(),
+                SizedBox(
+                  height: 10.h,
+                ),
+                if (_selectedType == TransactionType.receita)
+                  DefaultTitleTransaction(
+                    title: "Recebi em",
+                  ),
+                if (_selectedType == TransactionType.despesa)
+                  DefaultTitleTransaction(
+                    title: "Pago com",
+                  ),
+                PaymentTypeField(
+                  controller: paymentTypeController,
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Divider(),
+              ],
             ),
-          if (_selectedType == TransactionType.despesa)
-            DefaultTitleTransaction(
-              title: "Pago com",
-            ),
-          PaymentTypeField(
-            controller: paymentTypeController,
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Divider(),
+
           SizedBox(
             height: 10.h,
           ),

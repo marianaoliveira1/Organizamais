@@ -11,8 +11,8 @@ class TransactionModel {
   final String? userId;
   final String title;
   final String value;
-  final String paymentDay;
-  final int category;
+  final String? paymentDay;
+  final int? category;
   final TransactionType type;
   final String? paymentType;
 
