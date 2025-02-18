@@ -50,11 +50,28 @@ class _AddCardPageState extends State<AddCardPage> {
     return Scaffold(
       backgroundColor: DefaultColors.background,
       appBar: AppBar(
-        backgroundColor: DefaultColors.background,
-        title: Text(widget.isEditing ? 'Editar Cartão' : 'Criar Cartão'),
+        backgroundColor: DefaultColors.green,
+        iconTheme: IconThemeData(
+          color: DefaultColors.white,
+        ),
+        leading: IconButton(
+          icon: Icon(Iconsax.arrow_left),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        title: Text(
+          widget.isEditing ? 'Editar Cartão' : 'Criar Cartão',
+          style: TextStyle(
+            color: DefaultColors.white,
+          ),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20.w,
+          vertical: 20.h,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -89,7 +106,9 @@ class _AddCardPageState extends State<AddCardPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(
+              height: 16.h,
+            ),
             DefaultTitleTransaction(title: "Limite do cartão"),
             TextField(
               controller: limitController,
@@ -150,10 +169,15 @@ class _AddCardPageState extends State<AddCardPage> {
                           ],
                         )
                       : Row(children: [
-                          Icon(
-                            Iconsax.add,
-                            size: 24.sp,
-                            color: DefaultColors.black,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              8.r,
+                            ),
+                            child: Icon(
+                              Iconsax.add,
+                              size: 24.sp,
+                              color: DefaultColors.black,
+                            ),
                           ),
                           SizedBox(
                             width: 8.w,
@@ -170,15 +194,27 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
             ),
             Spacer(),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16),
+            InkWell(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                decoration: BoxDecoration(
+                  color: DefaultColors.background,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: DefaultColors.green,
+                  ),
+                ),
+                child: Text(
+                  widget.isEditing ? 'Atualizar Cartão' : 'Adicionar Cartão',
+                  style: TextStyle(
+                    color: DefaultColors.green,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              child: Text(
-                widget.isEditing ? 'Atualizar Cartão' : 'Adicionar Cartão',
-                style: TextStyle(fontSize: 16),
-              ),
-              onPressed: () {
+              onTap: () {
                 if (nameController.text.isEmpty || limitController.text.isEmpty || selectedIconPath == null) {
                   Get.snackbar('Erro', 'Preencha todos os campos', snackPosition: SnackPosition.BOTTOM);
                   return;
