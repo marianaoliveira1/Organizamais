@@ -20,16 +20,16 @@ class PaymentTypeField extends StatelessWidget {
           top: Radius.circular(20.r),
         ),
       ),
-      isScrollControlled: true, // Permite que o modal ocupe mais espaço
+      isScrollControlled: true,
       builder: (context) => Padding(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom, // Ajusta conforme teclado
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: SingleChildScrollView(
           child: Container(
             padding: EdgeInsets.all(16.w),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Evita que a Column ocupe mais espaço do que precisa
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'Selecione o método de pagamento',
@@ -41,8 +41,8 @@ class PaymentTypeField extends StatelessWidget {
                 ),
                 SizedBox(height: 10.h),
                 ListView(
-                  shrinkWrap: true, // Evita overflow
-                  physics: NeverScrollableScrollPhysics(), // Desativa rolagem dupla
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   children: [
                     _buildPaymentOption(
                       context,
@@ -145,9 +145,10 @@ class PaymentTypeField extends StatelessWidget {
           color: Colors.grey,
           fontWeight: FontWeight.w500,
         ),
-        suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.black),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
+        border: InputBorder.none,
+        prefixIcon: Icon(
+          Icons.payment,
+          color: DefaultColors.grey,
         ),
       ),
       onTap: () => _showPaymentOptions(context),

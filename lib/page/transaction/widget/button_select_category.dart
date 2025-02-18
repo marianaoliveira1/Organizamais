@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../../utils/color.dart';
 import '../pages/  category.dart';
@@ -53,25 +54,20 @@ class DefaultButtonSelectCategory extends StatelessWidget {
         onTap(categoryId as int?);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10.h,
-          vertical: 15.h,
-        ),
-        decoration: BoxDecoration(
-          color: DefaultColors.greyLight,
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: Colors.grey),
-        ),
+        padding: EdgeInsets.symmetric(),
         child: Row(
           children: [
             if (selectedCategoryData != null)
               Image.asset(
                 selectedCategoryData['icon'],
-                height: 24.h,
-                width: 24.w,
+                height: 28.h,
+                width: 28.w,
               )
             else
-              Icon(Icons.category, color: DefaultColors.grey),
+              Icon(
+                Iconsax.textalign_justifycenter,
+                color: DefaultColors.grey,
+              ),
             SizedBox(width: 10.w),
             Text(
               selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
@@ -80,8 +76,6 @@ class DefaultButtonSelectCategory extends StatelessWidget {
                 fontSize: 16.sp,
               ),
             ),
-            const Spacer(),
-            Icon(Icons.arrow_forward_ios, color: DefaultColors.grey, size: 20.w),
           ],
         ),
       ),

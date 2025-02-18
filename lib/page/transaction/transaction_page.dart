@@ -55,19 +55,6 @@ class _TransactionPageState extends State<TransactionPage> {
 
   Widget _buildTransactionFields() {
     switch (_selectedType) {
-      case TransactionType.receita:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Recebi com"),
-            TextField(
-              decoration: const InputDecoration(
-                hintText: "Digite o método de recebimento",
-                border: UnderlineInputBorder(),
-              ),
-            ),
-          ],
-        );
       case TransactionType.transferencia:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,6 +171,30 @@ class _TransactionPageState extends State<TransactionPage> {
               height: 20.h,
             ),
             DefaultTitleTransaction(
+              title: "Descrição",
+            ),
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                hintText: 'Adicione a descrição',
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16.sp,
+                ),
+                prefixIcon: Icon(
+                  Icons.edit_outlined,
+                  color: Colors.grey,
+                  size: 24.sp,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+              ),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+              ),
+            ),
+            DefaultTitleTransaction(
               title: "Categoria",
             ),
             DefaultButtonSelectCategory(
@@ -197,11 +208,19 @@ class _TransactionPageState extends State<TransactionPage> {
             SizedBox(
               height: 10.h,
             ),
-            DefaultTitleTransaction(
-              title: "Pago com",
-            ),
+            if (_selectedType == TransactionType.receita)
+              DefaultTitleTransaction(
+                title: "Recebi em",
+              ),
+            if (_selectedType == TransactionType.despesa)
+              DefaultTitleTransaction(
+                title: "Pago com",
+              ),
             PaymentTypeField(
               controller: paymentTypeController,
+            ),
+            SizedBox(
+              height: 10.h,
             ),
             DefaultTitleTransaction(
               title: "Data",
@@ -225,12 +244,33 @@ class _TransactionPageState extends State<TransactionPage> {
                   Icons.calendar_month,
                   color: DefaultColors.black,
                 ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: DefaultColors.black),
-                ),
+                border: InputBorder.none,
               ),
               onTap: _selectDate,
             ),
+            SizedBox(
+              height: 20.h,
+            ),
+            InkWell(
+              child: Container(
+                width: 1.sw,
+                height: 50.h,
+                decoration: BoxDecoration(
+                  color: DefaultColors.black,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Center(
+                  child: Text(
+                    "Salvar",
+                    style: TextStyle(
+                      color: DefaultColors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -275,182 +315,3 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:get/get.dart';
-
-// import '../../controller/transaction_controller.dart';
-// import '../../model/transaction_model.dart';
-// import '../../utils/color.dart';
-// import 'widget/button_select_category.dart';
-// import 'widget/text_field_transaction.dart';
-// import 'widget/title_transaction.dart';
-
-// class TransactionPage extends StatefulWidget {
-//   final TransactionType? transactionType;
-
-//   const TransactionPage({
-//     this.transactionType,
-//     super.key,
-//   });
-
-//   @override
-//   State<TransactionPage> createState() => _TransactionPageState();
-// }
-
-// class _TransactionPageState extends State<TransactionPage> {
-//   int? categoryId;
-//   final TextEditingController titleController = TextEditingController();
-//   final TextEditingController valueController = TextEditingController();
-//   final TextEditingController dayOfTheMonthController = TextEditingController();
-//   final TextEditingController paymentTypeController = TextEditingController();
-
-//   Future<void> _selectDate() async {
-//     final DateTime? date = await showDatePicker(
-//       context: context,
-//       initialDate: DateTime.now(),
-//       firstDate: DateTime(2000),
-//       lastDate: DateTime(2100),
-//     );
-//     if (date != null) {
-//       dayOfTheMonthController.text = '${date.day}/${date.month}/${date.year}';
-//     }
-//   }
-
-//   Widget _buildDatePickerField() {
-//     return TextField(
-//       controller: dayOfTheMonthController,
-//       readOnly: true,
-//       style: TextStyle(
-//         fontSize: 16.sp,
-//         color: DefaultColors.black,
-//         fontWeight: FontWeight.w500,
-//       ),
-//       decoration: InputDecoration(
-//         hintText: "Data",
-//         hintStyle: TextStyle(
-//           fontSize: 16.sp,
-//           color: DefaultColors.grey,
-//           fontWeight: FontWeight.w500,
-//         ),
-//         prefixIcon: Icon(
-//           Icons.calendar_month,
-//           color: DefaultColors.black,
-//         ),
-//         focusedBorder: const UnderlineInputBorder(
-//           borderSide: BorderSide(color: DefaultColors.black),
-//         ),
-//       ),
-//       onTap: _selectDate,
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final TransactionController transactionController = Get.put(TransactionController());
-
-//     return Scaffold(
-//       appBar: AppBar(),
-//       body: Container(
-//         padding: EdgeInsets.symmetric(
-//           vertical: 20.w,
-//           horizontal: 20.h,
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             DefaultTitleTransaction(
-//               title: "Titulo",
-//             ),
-//             DefaultTextFieldTransaction(
-//               hintText: 'ex: Aluguel',
-//               controller: titleController,
-//               keyboardType: TextInputType.text,
-//             ),
-//             SizedBox(
-//               height: 10.h,
-//             ),
-//             DefaultTitleTransaction(
-//               title: "Valor",
-//             ),
-//             DefaultTextFieldTransaction(
-//               hintText: '0,00',
-//               controller: valueController,
-//               icon: Icon(
-//                 Icons.attach_money,
-//               ),
-//               keyboardType: TextInputType.number,
-//             ),
-//             SizedBox(
-//               height: 10.h,
-//             ),
-//             DefaultTitleTransaction(
-//               title: "Categoria",
-//             ),
-//             DefaultButtonSelectCategory(
-//               onTap: (category) {
-//                 setState(() {
-//                   categoryId = category;
-//                 });
-//               },
-//               selectedCategory: categoryId,
-//             ),
-//             SizedBox(
-//               height: 10.h,
-//             ),
-//             DefaultTitleTransaction(
-//               title: "Dia do pagamento ",
-//             ),
-//             _buildDatePickerField(),
-//             SizedBox(
-//               height: 10.h,
-//             ),
-//             DefaultTitleTransaction(
-//               title: "Tipo de pagamento",
-//             ),
-//             PaymentTypeField(
-//               controller: paymentTypeController,
-//             ),
-//             Spacer(),
-//             Row(
-//               children: [
-//                 Expanded(
-//                   child: ElevatedButton(
-//                     onPressed: () {
-//                       Navigator.pop(context);
-//                       if (categoryId != null) {
-//                         transactionController.addTransaction(TransactionModel(
-//                           title: titleController.text,
-//                           value: valueController.text,
-//                           category: categoryId ?? 0,
-//                           paymentDay: dayOfTheMonthController.text,
-//                           paymentType: paymentTypeController.text,
-//                           type: widget.transactionType!,
-//                         ));
-//                       }
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: DefaultColors.black,
-//                       padding: EdgeInsets.all(15.h),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(12.r),
-//                       ),
-//                     ),
-//                     child: Text(
-//                       "Salvar",
-//                       style: TextStyle(
-//                         color: DefaultColors.white,
-//                         fontSize: 14.sp,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
