@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -64,12 +66,23 @@ class FixedAccounts extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Image.asset(
-                            categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                            width: 26.w,
-                            height: 26.h,
+                          Container(
+                            padding: EdgeInsets.all(
+                              12.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: DefaultColors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(50.r),
+                            ),
+                            child: Image.asset(
+                              categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                              width: 24.w,
+                              height: 24.h,
+                            ),
                           ),
-                          SizedBox(width: 20.w),
+                          SizedBox(
+                            width: 10.w,
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
