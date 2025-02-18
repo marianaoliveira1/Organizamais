@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 
@@ -372,7 +373,10 @@ class _SelectIconPageState extends State<SelectIconPage> {
                     child: Text('Nenhum banco encontrado'),
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 2.h,
+                    ),
                     itemCount: filteredBankIcons.length,
                     itemBuilder: (context, index) {
                       final bank = filteredBankIcons[index];

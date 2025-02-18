@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -169,14 +169,18 @@ class _AddCardPageState extends State<AddCardPage> {
                           ],
                         )
                       : Row(children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              8.r,
+                          Container(
+                            padding: EdgeInsets.all(
+                              8.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: DefaultColors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(50.r),
                             ),
                             child: Icon(
                               Iconsax.add,
                               size: 24.sp,
-                              color: DefaultColors.black,
+                              color: DefaultColors.black.withOpacity(0.7),
                             ),
                           ),
                           SizedBox(

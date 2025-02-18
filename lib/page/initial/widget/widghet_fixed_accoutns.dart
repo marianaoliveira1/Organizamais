@@ -27,34 +27,53 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Contas fixas",
-                style: TextStyle(
-                  color: DefaultColors.grey,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12.sp,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed("/fixed-accounts");
-                },
-                child: Icon(
-                  Icons.add,
-                  size: 16.sp,
-                  color: DefaultColors.grey,
-                ),
-              ),
-            ],
+          DefaultTitleCard(
+            text: "Contas fixas",
+            onTap: () {
+              Get.toNamed("/fixed-accounts");
+            },
           ),
           FixedAccounts(
             fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
           ),
         ],
       ),
+    );
+  }
+}
+
+class DefaultTitleCard extends StatelessWidget {
+  final String text;
+  void Function() onTap;
+
+  DefaultTitleCard({
+    super.key,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            color: DefaultColors.grey,
+            fontWeight: FontWeight.w500,
+            fontSize: 12.sp,
+          ),
+        ),
+        GestureDetector(
+          onTap: onTap,
+          child: Icon(
+            Icons.add,
+            size: 16.sp,
+            color: DefaultColors.grey,
+          ),
+        ),
+      ],
     );
   }
 }
