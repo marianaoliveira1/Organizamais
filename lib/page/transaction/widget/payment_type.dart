@@ -52,7 +52,7 @@ class PaymentTypeField extends StatelessWidget {
                     ),
                     _buildPaymentOption(
                       context,
-                      'PIX',
+                      'Pix',
                       'assets/icon-payment/pix.png',
                       controller,
                     ),

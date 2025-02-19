@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
+
+import '../../controller/transaction_controller.dart';
 
 class CardsPage extends StatelessWidget {
   const CardsPage({super.key});
@@ -47,6 +50,7 @@ class DefaultCardResume extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TransactionController transactionController = Get.put(TransactionController());
     return Container(
       decoration: BoxDecoration(
         color: DefaultColors.white,
