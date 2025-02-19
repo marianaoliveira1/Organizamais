@@ -118,249 +118,264 @@ class _TransactionPageState extends State<TransactionPage> {
 
     return Scaffold(
       backgroundColor: DefaultColors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-            color: _selectedType == TransactionType.receita
-                ? Colors.green
-                : _selectedType == TransactionType.despesa
-                    ? Colors.red
-                    : Colors.grey,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 26.h,
-                ),
-                Row(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                color: _selectedType == TransactionType.receita
+                    ? Colors.green
+                    : _selectedType == TransactionType.despesa
+                        ? Colors.red
+                        : Colors.grey,
+                child: Column(
                   children: [
-                    _buildTypeButton("Receita", TransactionType.receita),
-                    _buildTypeButton("Despesa", TransactionType.despesa),
-                    _buildTypeButton("Transferencia", TransactionType.transferencia),
+                    SizedBox(
+                      height: 26.h,
+                    ),
+                    Row(
+                      children: [
+                        _buildTypeButton("Receita", TransactionType.receita),
+                        _buildTypeButton("Despesa", TransactionType.despesa),
+                        _buildTypeButton(
+                            "Transferencia", TransactionType.transferencia),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    TextField(
+                      controller: valuecontroller,
+                      decoration: InputDecoration(
+                        hintText: "R\$0,00",
+                        hintStyle: TextStyle(
+                          color: DefaultColors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 30.sp,
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: DefaultColors.white,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
                   ],
                 ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                TextField(
-                  controller: valuecontroller,
-                  decoration: InputDecoration(
-                    hintText: "R\$0,00",
-                    hintStyle: TextStyle(
-                      color: DefaultColors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 30.sp,
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: DefaultColors.white,
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-          ),
-          // _buildTransactionFields(),
-          SizedBox(
-            height: 20.h,
-          ),
-          DefaultTitleTransaction(
-            title: "Descrição",
-          ),
-          TextField(
-            controller: titleController,
-            decoration: InputDecoration(
-              hintText: 'Adicione a descrição',
-              hintStyle: TextStyle(
-                color: Colors.grey,
-                fontSize: 16.sp,
               ),
-              prefixIcon: Icon(
-                Icons.edit_outlined,
-                color: Colors.grey,
-                size: 24.sp,
+              // _buildTransactionFields(),
+              SizedBox(
+                height: 20.h,
               ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 12.0),
-            ),
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: Colors.black87,
-            ),
-          ),
-          Divider(),
-          if (_selectedType != TransactionType.transferencia)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DefaultTitleTransaction(
-                  title: "Categoria",
-                ),
-                DefaultButtonSelectCategory(
-                  selectedCategory: categoryId,
-                  onTap: (category) {
-                    setState(() {
-                      categoryId = category;
-                    });
-                  },
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                Divider(),
-                SizedBox(
-                  height: 10.h,
-                ),
-                if (_selectedType == TransactionType.receita)
-                  DefaultTitleTransaction(
-                    title: "Recebi em",
+              DefaultTitleTransaction(
+                title: "Descrição",
+              ),
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  hintText: 'Adicione a descrição',
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16.sp,
                   ),
-                if (_selectedType == TransactionType.despesa)
-                  DefaultTitleTransaction(
-                    title: "Pago com",
+                  prefixIcon: Icon(
+                    Icons.edit_outlined,
+                    color: Colors.grey,
+                    size: 24.sp,
                   ),
-                PaymentTypeField(
-                  controller: paymentTypeController,
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 12.0),
                 ),
-                SizedBox(
-                  height: 10.h,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black87,
                 ),
-                Divider(),
-              ],
-            ),
+              ),
+              Divider(),
+              if (_selectedType != TransactionType.transferencia)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTitleTransaction(
+                      title: "Categoria",
+                    ),
+                    DefaultButtonSelectCategory(
+                      selectedCategory: categoryId,
+                      onTap: (category) {
+                        setState(() {
+                          categoryId = category;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    if (_selectedType == TransactionType.receita)
+                      DefaultTitleTransaction(
+                        title: "Recebi em",
+                      ),
+                    if (_selectedType == TransactionType.despesa)
+                      DefaultTitleTransaction(
+                        title: "Pago com",
+                      ),
+                    PaymentTypeField(
+                      controller: paymentTypeController,
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Divider(),
+                  ],
+                ),
 
-          SizedBox(
-            height: 10.h,
-          ),
-          DefaultTitleTransaction(
-            title: "Data",
-          ),
-          TextField(
-            controller: dayOfTheMonthController,
-            readOnly: true,
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: DefaultColors.black,
-              fontWeight: FontWeight.w500,
-            ),
-            decoration: InputDecoration(
-              hintText: "Data",
-              hintStyle: TextStyle(
-                fontSize: 16.sp,
-                color: DefaultColors.grey,
-                fontWeight: FontWeight.w500,
+              SizedBox(
+                height: 10.h,
               ),
-              prefixIcon: Icon(
-                Icons.calendar_month,
-                color: DefaultColors.black,
+              DefaultTitleTransaction(
+                title: "Data",
               ),
-              border: InputBorder.none,
-            ),
-            onTap: _selectDate,
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Divider(),
-          SizedBox(
-            height: 10.h,
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {
-                  Get.back();
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  decoration: BoxDecoration(
+              TextField(
+                controller: dayOfTheMonthController,
+                readOnly: true,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: DefaultColors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Data",
+                  hintStyle: TextStyle(
+                    fontSize: 16.sp,
+                    color: DefaultColors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.calendar_month,
                     color: DefaultColors.black,
-                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Center(
-                    child: Text(
-                      "Cancelar",
-                      style: TextStyle(
-                        color: DefaultColors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+                  border: InputBorder.none,
+                ),
+                onTap: _selectDate,
+              ),
+              SizedBox(
+                height: 10.h,
+              ),
+              Divider(),
+              SizedBox(
+                height: 10.h,
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 10.h),
+                      decoration: BoxDecoration(
+                        color: DefaultColors.black,
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Cancelar",
+                          style: TextStyle(
+                            color: DefaultColors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
-                    Get.snackbar(
-                      'Erro',
-                      'Preencha todos os campos obrigatórios',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                    return;
-                  }
+                  InkWell(
+                    onTap: () async {
+                      if (titleController.text.isEmpty ||
+                          valuecontroller.text.isEmpty ||
+                          _selectedDate == null ||
+                          (_selectedType != TransactionType.transferencia &&
+                              categoryId == null) ||
+                          (_selectedType != TransactionType.transferencia &&
+                              paymentTypeController.text.isEmpty)) {
+                        Get.snackbar(
+                          'Erro',
+                          'Preencha todos os campos obrigatórios',
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
 
-                  final TransactionController transactionController = Get.find<TransactionController>();
-                  String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
+                      final TransactionController transactionController =
+                          Get.find<TransactionController>();
+                      String valueText =
+                          valuecontroller.text.replaceAll('R\$', '').trim();
 
-                  final TransactionModel newTransaction = TransactionModel(
-                    title: titleController.text,
-                    value: valueText,
-                    type: _selectedType,
-                    category: categoryId,
-                    paymentDay: _selectedDate!.toString().split(' ')[0],
-                    paymentType: paymentTypeController.text,
-                  );
+                      final TransactionModel newTransaction = TransactionModel(
+                        title: titleController.text,
+                        value: valueText,
+                        type: _selectedType,
+                        category: categoryId,
+                        paymentDay: _selectedDate!.toString().split(' ')[0],
+                        paymentType: paymentTypeController.text,
+                      );
 
-                  try {
-                    await transactionController.addTransaction(newTransaction);
+                      try {
+                        await transactionController
+                            .addTransaction(newTransaction);
 
-                    // Fecha a TransactionPage e retorna o índice da ResumePage (3)
-                    Get.back(result: 3);
-                  } catch (e) {
-                    Get.snackbar(
-                      'Erro',
-                      'Erro ao salvar a transação: ${e.toString()}',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  decoration: BoxDecoration(
-                    color: DefaultColors.black,
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Salvar",
-                      style: TextStyle(
-                        color: DefaultColors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+                        Navigator.pop(context);
+                      } catch (e) {
+                        Get.snackbar(
+                          'Erro',
+                          'Erro ao salvar a transação: ${e.toString()}',
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 10.h),
+                      decoration: BoxDecoration(
+                        color: DefaultColors.black,
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Salvar",
+                          style: TextStyle(
+                            color: DefaultColors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )
+                  )
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -11,6 +11,8 @@ class ExpenseModal extends StatelessWidget {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController paymentMethodController = TextEditingController();
 
+  ExpenseModal({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

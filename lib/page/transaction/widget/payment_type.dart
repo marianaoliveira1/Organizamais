@@ -7,9 +7,9 @@ class PaymentTypeField extends StatelessWidget {
   final TextEditingController controller;
 
   const PaymentTypeField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   void _showPaymentOptions(BuildContext context) {
     showModalBottomSheet(

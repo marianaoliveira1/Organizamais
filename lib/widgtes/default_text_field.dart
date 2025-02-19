@@ -6,7 +6,7 @@ class DefaultTextField extends StatelessWidget {
   final TextEditingController controller;
   final Widget prefixIcon;
 
-  DefaultTextField({
+  const DefaultTextField({
     super.key,
     required this.controller,
     required this.hintText,
