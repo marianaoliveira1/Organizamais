@@ -3,7 +3,16 @@ import 'dart:convert';
 enum TransactionType {
   receita,
   despesa,
-  transferencia
+  transferencia;
+
+  /// Converte o enum para uma string para ser salvo no Firebase
+  String toJson() => name;
+
+  /// Converte uma string do Firebase para o enum correspondente
+  static TransactionType fromJson(String value) => TransactionType.values.firstWhere(
+        (e) => e.name == value,
+        orElse: () => throw ArgumentError('Tipo de transação inválido: $value'),
+      );
 }
 
 class TransactionModel {
@@ -87,7 +96,7 @@ class TransactionModel {
       });
     }
     result.addAll({
-      'type': type.toString()
+      'type': type.toJson()
     });
     if (paymentType != null) {
       result.addAll({
@@ -107,7 +116,7 @@ class TransactionModel {
       paymentDay: map['paymentDay'],
       category: map['category']?.toInt(),
       iconPath: map['iconPath'],
-      type: TransactionType.values.firstWhere((e) => e.toString() == map['type']),
+      type: TransactionType.fromJson(map['type']),
       paymentType: map['paymentType'],
     );
   }
