@@ -175,29 +175,53 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               // _buildTransactionFields(),
               SizedBox(
-                height: 20.h,
+                height: 24.h,
               ),
-              DefaultTitleTransaction(
-                title: "Descrição",
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTitleTransaction(
+                      title: "Descrição",
+                    ),
+                    TextFieldDescriptionTransaction(
+                      titleController: titleController,
+                    ),
+                  ],
+                ),
               ),
-              TextFieldDescriptionTransaction(
-                titleController: titleController,
-              ),
+
               Divider(),
               if (_selectedType != TransactionType.transferencia)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DefaultTitleTransaction(
-                      title: "Categoria",
+                    SizedBox(
+                      height: 10.h,
                     ),
-                    DefaultButtonSelectCategory(
-                      selectedCategory: categoryId,
-                      onTap: (category) {
-                        setState(() {
-                          categoryId = category;
-                        });
-                      },
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DefaultTitleTransaction(
+                            title: "Categoria",
+                          ),
+                          DefaultButtonSelectCategory(
+                            selectedCategory: categoryId,
+                            onTap: (category) {
+                              setState(() {
+                                categoryId = category;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: 10.h,
@@ -206,16 +230,26 @@ class _TransactionPageState extends State<TransactionPage> {
                     SizedBox(
                       height: 10.h,
                     ),
-                    if (_selectedType == TransactionType.receita)
-                      DefaultTitleTransaction(
-                        title: "Recebi em",
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.h,
                       ),
-                    if (_selectedType == TransactionType.despesa)
-                      DefaultTitleTransaction(
-                        title: "Pago com",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_selectedType == TransactionType.receita)
+                            DefaultTitleTransaction(
+                              title: "Recebi em",
+                            ),
+                          if (_selectedType == TransactionType.despesa)
+                            DefaultTitleTransaction(
+                              title: "Pago com",
+                            ),
+                          PaymentTypeField(
+                            controller: paymentTypeController,
+                          ),
+                        ],
                       ),
-                    PaymentTypeField(
-                      controller: paymentTypeController,
                     ),
                     SizedBox(
                       height: 10.h,
@@ -227,32 +261,41 @@ class _TransactionPageState extends State<TransactionPage> {
               SizedBox(
                 height: 10.h,
               ),
-              DefaultTitleTransaction(
-                title: "Data",
-              ),
-              TextField(
-                controller: dayOfTheMonthController,
-                readOnly: true,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: DefaultColors.black,
-                  fontWeight: FontWeight.w500,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTitleTransaction(
+                      title: "Data",
+                    ),
+                    TextField(
+                      controller: dayOfTheMonthController,
+                      readOnly: true,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: DefaultColors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Data",
+                        hintStyle: TextStyle(
+                          fontSize: 16.sp,
+                          color: DefaultColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.calendar_month,
+                          color: DefaultColors.black,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      onTap: _selectDate,
+                    ),
+                  ],
                 ),
-                decoration: InputDecoration(
-                  hintText: "Data",
-                  hintStyle: TextStyle(
-                    fontSize: 16.sp,
-                    color: DefaultColors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.calendar_month,
-                    color: DefaultColors.black,
-                  ),
-                  border: InputBorder.none,
-                ),
-                onTap: _selectDate,
               ),
+
               SizedBox(
                 height: 10.h,
               ),
