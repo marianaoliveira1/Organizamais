@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:organizamais/controller/card_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/controller/transaction_controller.dart';
 
 import '../routes/route.dart';
 
@@ -32,6 +33,7 @@ class AuthController extends GetxController {
     loadedOtherControllers = true;
     Get.find<CardController>().startCardStream();
     Get.find<FixedAccountsController>().startFixedAccountsStream();
+    Get.find<TransactionController>().startTransactionStream();
   }
 
   _setInitialScreen(User? user) {
