@@ -60,42 +60,48 @@ class PaymentTypeField extends StatelessWidget {
                         return ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: cardController.card.length,
+                          itemCount: cardController.card.length * 2,
                           separatorBuilder: (context, index) => SizedBox(
-                            height: 14.h,
+                            height: 0.h,
                           ),
                           itemBuilder: (context, index) {
-                            final card = cardController.card[index];
+                            final card = cardController.card[index ~/ 2];
+                            final isCredit = index.isEven;
+
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
                                 color: DefaultColors.background,
                               ),
                               padding: EdgeInsets.symmetric(
-                                vertical: 10.h,
-                                horizontal: 20.w,
+                                vertical: 4.h,
+                                horizontal: 10.w,
                               ),
                               margin: EdgeInsets.only(
                                 bottom: 14.h,
                               ),
-                              child: ListTile(
-                                leading: Image.asset(
-                                  card.iconPath!,
-                                  width: 22.w,
-                                  height: 22.h,
-                                ),
-                                title: Text(
-                                  card.name,
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Image.asset(
+                                      card.iconPath!,
+                                      width: 22.w,
+                                      height: 22.h,
+                                    ),
+                                    title: Text(
+                                      "${card.name} ${isCredit ? 'crédito' : 'débito'}",
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      controller.text = card.name;
+                                      Navigator.pop(context);
+                                    },
                                   ),
-                                ),
-                                onTap: () {
-                                  controller.text = card.name;
-                                  Navigator.pop(context);
-                                },
+                                ],
                               ),
                             );
                           },
@@ -117,12 +123,6 @@ class PaymentTypeField extends StatelessWidget {
                       context,
                       'Boleto',
                       'assets/icon-payment/fatura.png',
-                      controller,
-                    ),
-                    _buildPaymentOption(
-                      context,
-                      'Criptomoedas',
-                      'assets/icon-payment/cifrao.png',
                       controller,
                     ),
                     _buildPaymentOption(
