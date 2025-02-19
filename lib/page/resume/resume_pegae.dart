@@ -1,152 +1,185 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
-import '../../controller/transaction_controller.dart';
-import '../../model/transaction_model.dart';
-import '../../utils/color.dart';
-import '../transaction/pages/  category.dart';
+import 'package:intl/intl.dart';
+import 'package:organizamais/model/transaction_model.dart';
+import 'package:organizamais/utils/color.dart';
 
 class ResumePage extends StatelessWidget {
-  final TransactionController controller = Get.put(TransactionController());
+  final TransactionModel? transaction;
+
+  ResumePage({Key? key, this.transaction}) : super(key: key);
+
+  Color _getTypeColor(TransactionType type) {
+    switch (type) {
+      case TransactionType.receita:
+        return Colors.green;
+      case TransactionType.despesa:
+        return Colors.red;
+      case TransactionType.transferencia:
+        return Colors.grey;
+    }
+  }
+
+  String _getTypeText(TransactionType type) {
+    switch (type) {
+      case TransactionType.receita:
+        return "Receita";
+      case TransactionType.despesa:
+        return "Despesa";
+      case TransactionType.transferencia:
+        return "Transferência";
+    }
+  }
+
+  String _formatCurrency(String value) {
+    // Tentativa de converter para double para formatação
+    try {
+      double numericValue = double.parse(value.replaceAll(',', '.'));
+      return NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(numericValue);
+    } catch (e) {
+      // Se não conseguir converter, retorna o valor original
+      return "R\$ $value";
+    }
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return "Data não disponível";
+
+    try {
+      DateTime date = DateTime.parse(dateStr);
+      return DateFormat('dd/MM/yyyy').format(date);
+    } catch (e) {
+      return dateStr; // Retorna a string original se não conseguir formatar
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Se não houver transação, exibe uma mensagem
+    if (transaction == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Resumo da Transação"),
+          backgroundColor: Colors.grey,
+          foregroundColor: DefaultColors.white,
+        ),
+        body: Center(
+          child: Text(
+            "Nenhuma transação disponível para exibir",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-        backgroundColor: DefaultColors.background,
-        body: Column(
+      appBar: AppBar(
+        title: Text("Resumo da Transação"),
+        backgroundColor: _getTypeColor(transaction!.type),
+        foregroundColor: DefaultColors.white,
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 10.h,
-                horizontal: 16.w,
-              ),
-              decoration: BoxDecoration(
-                color: DefaultColors.white,
-                borderRadius: BorderRadius.circular(24.r),
-              ),
+            Center(
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Fluxo de caixa",
-                        style: TextStyle(
-                          color: DefaultColors.grey,
-                          fontSize: 12.sp,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    _getTypeText(transaction!.type),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: _getTypeColor(transaction!.type),
+                    ),
                   ),
-                  TransactionCard(transactions: Get.find<TransactionController>().transaction),
+                  SizedBox(height: 10.h),
+                  Text(
+                    _formatCurrency(transaction!.value),
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.bold,
+                      color: _getTypeColor(transaction!.type),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ));
-  }
-}
-
-class TransactionCard extends StatelessWidget {
-  final List<TransactionModel> transactions;
-
-  const TransactionCard({
-    super.key,
-    required this.transactions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: DefaultColors.white,
-        borderRadius: BorderRadius.circular(24.r),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Obx(() {
-            if (transactions.isEmpty) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                child: Text(
-                  "Nenhuma conta cadastrada",
-                  style: TextStyle(
-                    color: DefaultColors.grey,
-                    fontSize: 12.sp,
+            SizedBox(height: 30.h),
+            _buildInfoItem("Descrição", transaction!.title),
+            Divider(),
+            if (transaction!.type != TransactionType.transferencia && transaction!.category != null) ...[
+              _buildInfoItem("Categoria", "Categoria ${transaction!.category}"),
+              Divider(),
+            ],
+            if (transaction!.type != TransactionType.transferencia && transaction!.paymentType != null) ...[
+              _buildInfoItem(transaction!.type == TransactionType.receita ? "Recebido em" : "Pago com", transaction!.paymentType!),
+              Divider(),
+            ],
+            _buildInfoItem("Data", _formatDate(transaction!.paymentDay)),
+            Divider(),
+            SizedBox(height: 40.h),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.back();
+                  Get.back(); // Voltar duas telas para ir à tela inicial
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: DefaultColors.black,
+                  padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 15.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
-              );
-            }
-            return ListView.separated(
-              itemCount: transactions.length,
-              physics: const NeverScrollableScrollPhysics(),
-              separatorBuilder: (context, index) => SizedBox(
-                height: 14.h,
+                child: Text(
+                  "Voltar para a tela inicial",
+                  style: TextStyle(
+                    color: DefaultColors.white,
+                    fontSize: 16.sp,
+                  ),
+                ),
               ),
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          categories_expenses.firstWhere((element) => element['id'] == transaction.category)['icon'],
-                          width: 24.w,
-                          height: 24.h,
-                        ),
-                        SizedBox(width: 20.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              transaction.title,
-                              style: TextStyle(
-                                color: DefaultColors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                            Text(
-                              "Dia ${transaction.paymentDay} de cada mês",
-                              style: TextStyle(
-                                color: DefaultColors.grey,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          "R\$ ${transaction.value}",
-                          style: TextStyle(
-                            color: DefaultColors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                        Text(
-                          "${transaction.paymentType}",
-                          style: TextStyle(
-                            color: DefaultColors.grey,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                );
-              },
-            );
-          })
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoItem(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: DefaultColors.grey,
+            ),
+          ),
+          SizedBox(height: 5.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: DefaultColors.black,
+            ),
+          ),
         ],
       ),
     );

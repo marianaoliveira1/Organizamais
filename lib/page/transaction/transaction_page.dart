@@ -9,6 +9,7 @@ import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
+import '../resume/resume_pegae.dart';
 import 'widget/button_select_category.dart';
 import 'widget/payment_type.dart';
 import 'widget/title_transaction.dart';
@@ -159,7 +160,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                   ),
                   style: TextStyle(
-                    color: currentTypeColor,
+                    color: DefaultColors.white,
                     fontSize: 30.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -273,10 +274,17 @@ class _TransactionPageState extends State<TransactionPage> {
           SizedBox(
             height: 10.h,
           ),
+          // Substitua a parte dos botões na TransactionPage com este código
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               InkWell(
+                onTap: () {
+                  // Cancelar a transação e voltar para a página anterior
+                  Get.back();
+                },
                 child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                   decoration: BoxDecoration(
                     color: DefaultColors.black,
                     borderRadius: BorderRadius.circular(10.r),
@@ -293,11 +301,53 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                width: 10.w,
-              ),
               InkWell(
+                onTap: () async {
+                  // Validar se os campos necessários estão preenchidos
+                  if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
+                    Get.snackbar(
+                      'Erro',
+                      'Preencha todos os campos obrigatórios',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  // Criar o modelo de transação
+                  final TransactionController transactionController = Get.find<TransactionController>();
+
+                  // Formatar o valor como string (mantendo como String conforme o modelo)
+                  String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
+
+                  final TransactionModel newTransaction = TransactionModel(
+                    title: titleController.text,
+                    value: valueText, // Mantendo como string conforme o modelo
+                    type: _selectedType,
+                    category: categoryId, // Usando categoryId diretamente
+                    paymentDay: _selectedDate!.toString().split(' ')[0], // Convertendo a data para String no formato YYYY-MM-DD
+                    paymentType: paymentTypeController.text,
+                  );
+
+                  try {
+                    // Adicionar a transação ao controller (que salva no Firestore)
+                    await transactionController.addTransaction(newTransaction);
+
+                    // Navegar para a página de resumo
+                    Get.to(() => ResumePage(transaction: newTransaction));
+                  } catch (e) {
+                    Get.snackbar(
+                      'Erro',
+                      'Erro ao salvar a transação: ${e.toString()}',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  }
+                },
                 child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                   decoration: BoxDecoration(
                     color: DefaultColors.black,
                     borderRadius: BorderRadius.circular(10.r),
