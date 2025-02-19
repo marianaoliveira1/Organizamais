@@ -162,7 +162,7 @@ class ResumePage extends StatelessWidget {
                                       Text(
                                         formatValue(transaction.value),
                                         style: TextStyle(
-                                          color: transaction.type == 'receita' ? DefaultColors.darkBlue : DefaultColors.red,
+                                          color: transaction.type == 'receita' ? DefaultColors.green : DefaultColors.red,
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.bold,
                                         ),
