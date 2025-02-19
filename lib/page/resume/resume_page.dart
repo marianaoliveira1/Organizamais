@@ -41,30 +41,40 @@ class ResumePage extends StatelessWidget {
                 itemCount: transactionController.transaction.length,
                 itemBuilder: (context, index) {
                   final transaction = transactionController.transaction[index];
-                  return Column(
-                    children: [
-                      Text(
-                        transaction.title,
-                        style: TextStyle(
-                          color: DefaultColors.primary,
-                          fontSize: 16.sp,
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: DefaultColors.white,
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 16.w,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          transaction.title,
+                          style: TextStyle(
+                            color: DefaultColors.primary,
+                            fontSize: 16.sp,
+                          ),
                         ),
-                      ),
-                      Text(
-                        transaction.value.toString(),
-                        style: TextStyle(
-                          color: DefaultColors.primary,
-                          fontSize: 16.sp,
+                        Text(
+                          transaction.value.toString(),
+                          style: TextStyle(
+                            color: DefaultColors.primary,
+                            fontSize: 16.sp,
+                          ),
                         ),
-                      ),
-                      Text(
-                        transaction.paymentDay.toString(),
-                        style: TextStyle(
-                          color: DefaultColors.primary,
-                          fontSize: 16.sp,
+                        Text(
+                          transaction.paymentDay.toString(),
+                          style: TextStyle(
+                            color: DefaultColors.primary,
+                            fontSize: 16.sp,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 },
               );
