@@ -9,7 +9,7 @@ import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
-import '../resume/resume_pegae.dart';
+
 import 'widget/button_select_category.dart';
 import 'widget/payment_type.dart';
 import 'widget/title_transaction.dart';
@@ -54,33 +54,33 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
-  Widget _buildTransactionFields() {
-    switch (_selectedType) {
-      case TransactionType.transferencia:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Recebi de"),
-            TextField(
-              decoration: const InputDecoration(
-                hintText: "Digite quem enviou",
-                border: UnderlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text("Para"),
-            TextField(
-              decoration: const InputDecoration(
-                hintText: "Digite o destinatário",
-                border: UnderlineInputBorder(),
-              ),
-            ),
-          ],
-        );
-      default:
-        return const SizedBox.shrink();
-    }
-  }
+  // Widget _buildTransactionFields() {
+  //   switch (_selectedType) {
+  //     case TransactionType.transferencia:
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text("Recebi de"),
+  //           TextField(
+  //             decoration: const InputDecoration(
+  //               hintText: "Digite quem enviou",
+  //               border: UnderlineInputBorder(),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 16),
+  //           const Text("Para"),
+  //           TextField(
+  //             decoration: const InputDecoration(
+  //               hintText: "Digite o destinatário",
+  //               border: UnderlineInputBorder(),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     default:
+  //       return const SizedBox.shrink();
+  //   }
+  // }
 
   String _getFormattedDate(DateTime date) {
     final now = DateTime.now();
@@ -113,7 +113,7 @@ class _TransactionPageState extends State<TransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color currentTypeColor = _getTypeColor(_selectedType);
+    _getTypeColor(_selectedType);
     Get.put(TransactionController());
 
     return Scaffold(
@@ -274,13 +274,12 @@ class _TransactionPageState extends State<TransactionPage> {
           SizedBox(
             height: 10.h,
           ),
-          // Substitua a parte dos botões na TransactionPage com este código
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               InkWell(
                 onTap: () {
-                  // Cancelar a transação e voltar para a página anterior
                   Get.back();
                 },
                 child: Container(
@@ -303,7 +302,6 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               InkWell(
                 onTap: () async {
-                  // Validar se os campos necessários estão preenchidos
                   if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
                     Get.snackbar(
                       'Erro',
@@ -315,27 +313,23 @@ class _TransactionPageState extends State<TransactionPage> {
                     return;
                   }
 
-                  // Criar o modelo de transação
                   final TransactionController transactionController = Get.find<TransactionController>();
-
-                  // Formatar o valor como string (mantendo como String conforme o modelo)
                   String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
 
                   final TransactionModel newTransaction = TransactionModel(
                     title: titleController.text,
-                    value: valueText, // Mantendo como string conforme o modelo
+                    value: valueText,
                     type: _selectedType,
-                    category: categoryId, // Usando categoryId diretamente
-                    paymentDay: _selectedDate!.toString().split(' ')[0], // Convertendo a data para String no formato YYYY-MM-DD
+                    category: categoryId,
+                    paymentDay: _selectedDate!.toString().split(' ')[0],
                     paymentType: paymentTypeController.text,
                   );
 
                   try {
-                    // Adicionar a transação ao controller (que salva no Firestore)
                     await transactionController.addTransaction(newTransaction);
 
-                    // Navegar para a página de resumo
-                    Get.to(() => ResumePage(transaction: newTransaction));
+                    // Fecha a TransactionPage e retorna o índice da ResumePage (3)
+                    Get.back(result: 3);
                   } catch (e) {
                     Get.snackbar(
                       'Erro',

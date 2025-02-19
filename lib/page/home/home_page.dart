@@ -31,9 +31,17 @@ class _HomePageState extends State<HomePage> {
     CardsPage(),
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
     if (index == 2) {
-      Get.to(() => TransactionPage()); // Abre a TransactionPage ao clicar no botão "+"
+      // Abre TransactionPage e aguarda o retorno
+      final result = await Get.to(() => TransactionPage());
+
+      // Se a TransactionPage retornar um índice válido, atualiza a BottomNavigationBar
+      if (result != null && result is int) {
+        setState(() {
+          _selectedIndex = result;
+        });
+      }
     } else {
       setState(() {
         _selectedIndex = index;

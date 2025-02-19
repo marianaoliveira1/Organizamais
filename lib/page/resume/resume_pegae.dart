@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,7 +10,7 @@ import 'package:organizamais/utils/color.dart';
 class ResumePage extends StatelessWidget {
   final TransactionModel? transaction;
 
-  ResumePage({Key? key, this.transaction}) : super(key: key);
+  const ResumePage({Key? key, this.transaction}) : super(key: key);
 
   Color _getTypeColor(TransactionType type) {
     switch (type) {
