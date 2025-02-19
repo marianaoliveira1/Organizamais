@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
+import '../../../controller/card_controller.dart';
 import '../../../utils/color.dart';
 
 class PaymentTypeField extends StatelessWidget {
@@ -12,6 +14,8 @@ class PaymentTypeField extends StatelessWidget {
   });
 
   void _showPaymentOptions(BuildContext context) {
+    final CardController cardController = Get.find<CardController>();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: DefaultColors.white,
@@ -44,6 +48,62 @@ class PaymentTypeField extends StatelessWidget {
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   children: [
+                    Obx(() {
+                      if (cardController.card.isEmpty) {
+                        return Container(
+                          height: 150,
+                          alignment: Alignment.center,
+                          child: Text('Nenhum cartão adicionado'),
+                        );
+                      }
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: cardController.card.length,
+                        separatorBuilder: (context, index) => SizedBox(
+                          height: 14.h,
+                        ),
+                        itemBuilder: (context, index) {
+                          final card = cardController.card[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.r),
+                              color: DefaultColors.background,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10.h,
+                              horizontal: 20.w,
+                            ),
+                            margin: EdgeInsets.only(
+                              bottom: 14.h,
+                            ),
+                            child: Row(
+                              children: [
+                                if (card.iconPath != null)
+                                  Image.asset(
+                                    card.iconPath!,
+                                    width: 22.w,
+                                    height: 22.h,
+                                  ),
+                                SizedBox(
+                                  width: 8.h,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    card.name,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }),
                     _buildPaymentOption(
                       context,
                       'Dinheiro',
