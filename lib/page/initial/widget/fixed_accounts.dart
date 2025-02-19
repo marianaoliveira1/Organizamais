@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:organizamais/page/transaction/pages/%20%20category.dart';
+import 'package:organizamais/page/transaction/pages/%20category.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';

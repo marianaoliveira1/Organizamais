@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../utils/color.dart';
-import '../pages/  category.dart';
+import '../pages/ category.dart';
 
 class DefaultButtonSelectCategory extends StatelessWidget {
   const DefaultButtonSelectCategory({
