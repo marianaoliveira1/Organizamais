@@ -9,7 +9,7 @@ import 'package:organizamais/page/cards/cards_page.dart';
 import 'package:organizamais/page/graphics/graphics_page.dart';
 import 'package:organizamais/page/initial/initial_page.dart';
 
-import 'package:organizamais/page/resume/resume_pegae.dart';
+import 'package:organizamais/page/resume/resume_page.dart';
 import 'package:organizamais/page/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 

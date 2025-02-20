@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
+import '../../../controller/card_controller.dart';
 import '../../../utils/color.dart';
 
 class PaymentTypeField extends StatelessWidget {
@@ -12,6 +14,8 @@ class PaymentTypeField extends StatelessWidget {
   });
 
   void _showPaymentOptions(BuildContext context) {
+    final CardController cardController = Get.find<CardController>();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: DefaultColors.white,
@@ -44,6 +48,65 @@ class PaymentTypeField extends StatelessWidget {
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   children: [
+                    if (cardController.card.isNotEmpty)
+                      Obx(() {
+                        if (cardController.card.isEmpty) {
+                          return Container(
+                            height: 150,
+                            alignment: Alignment.center,
+                            child: Text('Nenhum cartão adicionado'),
+                          );
+                        }
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: cardController.card.length * 2,
+                          separatorBuilder: (context, index) => SizedBox(
+                            height: 0.h,
+                          ),
+                          itemBuilder: (context, index) {
+                            final card = cardController.card[index ~/ 2];
+                            final isCredit = index.isEven;
+
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16.r),
+                                color: DefaultColors.background,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4.h,
+                                horizontal: 10.w,
+                              ),
+                              margin: EdgeInsets.only(
+                                bottom: 14.h,
+                              ),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Image.asset(
+                                      card.iconPath!,
+                                      width: 22.w,
+                                      height: 22.h,
+                                    ),
+                                    title: Text(
+                                      "${card.name} ${isCredit ? 'crédito' : 'débito'}",
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      controller.text = card.name;
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
                     _buildPaymentOption(
                       context,
                       'Dinheiro',
@@ -52,7 +115,7 @@ class PaymentTypeField extends StatelessWidget {
                     ),
                     _buildPaymentOption(
                       context,
-                      'PIX',
+                      'Pix',
                       'assets/icon-payment/pix.png',
                       controller,
                     ),
@@ -60,12 +123,6 @@ class PaymentTypeField extends StatelessWidget {
                       context,
                       'Boleto',
                       'assets/icon-payment/fatura.png',
-                      controller,
-                    ),
-                    _buildPaymentOption(
-                      context,
-                      'Criptomoedas',
-                      'assets/icon-payment/cifrao.png',
                       controller,
                     ),
                     _buildPaymentOption(

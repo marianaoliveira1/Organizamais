@@ -19,11 +19,17 @@ class TransactionController extends GetxController {
         )
         .snapshots()
         .listen((snapshot) {
-      transaction.value = snapshot.docs
-          .map(
-            (e) => TransactionModel.fromMap(e.data()).copyWith(id: e.id),
-          )
-          .toList();
+      var map = snapshot.docs.map(
+        (e) {
+          try {
+            return TransactionModel.fromMap(e.data()).copyWith(id: e.id);
+          } catch (e) {
+            return null;
+          }
+        },
+      ).toList();
+      var filteredMap = map.where((e) => e != null).toList();
+      transaction.value = filteredMap.cast<TransactionModel>();
     });
   }
 

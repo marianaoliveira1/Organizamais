@@ -10,8 +10,10 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
 
+import 'widget/button_back.dart';
 import 'widget/button_select_category.dart';
 import 'widget/payment_type.dart';
+import 'widget/textifield_description.dart';
 import 'widget/title_transaction.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -139,8 +141,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       children: [
                         _buildTypeButton("Receita", TransactionType.receita),
                         _buildTypeButton("Despesa", TransactionType.despesa),
-                        _buildTypeButton(
-                            "Transferencia", TransactionType.transferencia),
+                        _buildTypeButton("Transferencia", TransactionType.transferencia),
                       ],
                     ),
                     SizedBox(
@@ -174,47 +175,53 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               // _buildTransactionFields(),
               SizedBox(
-                height: 20.h,
+                height: 24.h,
               ),
-              DefaultTitleTransaction(
-                title: "Descrição",
-              ),
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  hintText: 'Adicione a descrição',
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16.sp,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.edit_outlined,
-                    color: Colors.grey,
-                    size: 24.sp,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.h,
                 ),
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Colors.black87,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTitleTransaction(
+                      title: "Descrição",
+                    ),
+                    TextFieldDescriptionTransaction(
+                      titleController: titleController,
+                    ),
+                  ],
                 ),
               ),
+
               Divider(),
               if (_selectedType != TransactionType.transferencia)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DefaultTitleTransaction(
-                      title: "Categoria",
+                    SizedBox(
+                      height: 10.h,
                     ),
-                    DefaultButtonSelectCategory(
-                      selectedCategory: categoryId,
-                      onTap: (category) {
-                        setState(() {
-                          categoryId = category;
-                        });
-                      },
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DefaultTitleTransaction(
+                            title: "Categoria",
+                          ),
+                          DefaultButtonSelectCategory(
+                            selectedCategory: categoryId,
+                            onTap: (category) {
+                              setState(() {
+                                categoryId = category;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: 10.h,
@@ -223,16 +230,26 @@ class _TransactionPageState extends State<TransactionPage> {
                     SizedBox(
                       height: 10.h,
                     ),
-                    if (_selectedType == TransactionType.receita)
-                      DefaultTitleTransaction(
-                        title: "Recebi em",
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.h,
                       ),
-                    if (_selectedType == TransactionType.despesa)
-                      DefaultTitleTransaction(
-                        title: "Pago com",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_selectedType == TransactionType.receita)
+                            DefaultTitleTransaction(
+                              title: "Recebi em",
+                            ),
+                          if (_selectedType == TransactionType.despesa)
+                            DefaultTitleTransaction(
+                              title: "Pago com",
+                            ),
+                          PaymentTypeField(
+                            controller: paymentTypeController,
+                          ),
+                        ],
                       ),
-                    PaymentTypeField(
-                      controller: paymentTypeController,
                     ),
                     SizedBox(
                       height: 10.h,
@@ -244,32 +261,41 @@ class _TransactionPageState extends State<TransactionPage> {
               SizedBox(
                 height: 10.h,
               ),
-              DefaultTitleTransaction(
-                title: "Data",
-              ),
-              TextField(
-                controller: dayOfTheMonthController,
-                readOnly: true,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: DefaultColors.black,
-                  fontWeight: FontWeight.w500,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTitleTransaction(
+                      title: "Data",
+                    ),
+                    TextField(
+                      controller: dayOfTheMonthController,
+                      readOnly: true,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: DefaultColors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Data",
+                        hintStyle: TextStyle(
+                          fontSize: 16.sp,
+                          color: DefaultColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.calendar_month,
+                          color: DefaultColors.black,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      onTap: _selectDate,
+                    ),
+                  ],
                 ),
-                decoration: InputDecoration(
-                  hintText: "Data",
-                  hintStyle: TextStyle(
-                    fontSize: 16.sp,
-                    color: DefaultColors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.calendar_month,
-                    color: DefaultColors.black,
-                  ),
-                  border: InputBorder.none,
-                ),
-                onTap: _selectDate,
               ),
+
               SizedBox(
                 height: 10.h,
               ),
@@ -281,38 +307,10 @@ class _TransactionPageState extends State<TransactionPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  InkWell(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 10.h),
-                      decoration: BoxDecoration(
-                        color: DefaultColors.black,
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Cancelar",
-                          style: TextStyle(
-                            color: DefaultColors.white,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  ButtonBackTransaction(),
                   InkWell(
                     onTap: () async {
-                      if (titleController.text.isEmpty ||
-                          valuecontroller.text.isEmpty ||
-                          _selectedDate == null ||
-                          (_selectedType != TransactionType.transferencia &&
-                              categoryId == null) ||
-                          (_selectedType != TransactionType.transferencia &&
-                              paymentTypeController.text.isEmpty)) {
+                      if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
                         Get.snackbar(
                           'Erro',
                           'Preencha todos os campos obrigatórios',
@@ -323,10 +321,8 @@ class _TransactionPageState extends State<TransactionPage> {
                         return;
                       }
 
-                      final TransactionController transactionController =
-                          Get.find<TransactionController>();
-                      String valueText =
-                          valuecontroller.text.replaceAll('R\$', '').trim();
+                      final TransactionController transactionController = Get.find<TransactionController>();
+                      String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
 
                       final TransactionModel newTransaction = TransactionModel(
                         title: titleController.text,
@@ -338,8 +334,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       );
 
                       try {
-                        await transactionController
-                            .addTransaction(newTransaction);
+                        await transactionController.addTransaction(newTransaction);
 
                         Navigator.pop(context);
                       } catch (e) {
@@ -353,8 +348,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       }
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 10.h),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                       decoration: BoxDecoration(
                         color: DefaultColors.black,
                         borderRadius: BorderRadius.circular(10.r),
@@ -370,7 +364,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],

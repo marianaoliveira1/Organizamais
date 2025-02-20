@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../utils/color.dart';
-import '../pages/  category.dart';
+import '../pages/ category.dart';
 
 class DefaultButtonSelectCategory extends StatelessWidget {
   const DefaultButtonSelectCategory({
@@ -16,37 +16,9 @@ class DefaultButtonSelectCategory extends StatelessWidget {
   final Function(int?) onTap;
   final int? selectedCategory;
 
-  Map<String, dynamic>? _findCategoryById(int? id) {
-    if (id == null) return null;
-
-    // First search in expenses categories
-    final expenseCategory = categories_expenses.firstWhere(
-      (category) => category['id'] == id,
-      orElse: () => {
-        'id': 0,
-        'name': '',
-        'icon': ''
-      },
-    );
-    if (expenseCategory['id'] != 0) return expenseCategory;
-
-    // If not found in expenses, search in income categories
-    final incomeCategory = categories_income.firstWhere(
-      (category) => category['id'] == id,
-      orElse: () => {
-        'id': 0,
-        'name': '',
-        'icon': ''
-      },
-    );
-    if (incomeCategory['id'] != 0) return incomeCategory;
-
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final selectedCategoryData = _findCategoryById(selectedCategory);
+    final selectedCategoryData = findCategoryById(selectedCategory);
 
     return InkWell(
       onTap: () async {
