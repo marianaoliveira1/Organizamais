@@ -33,10 +33,8 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) async {
     if (index == 2) {
-      // Abre TransactionPage e aguarda o retorno
       final result = await Get.to(() => TransactionPage());
 
-      // Se a TransactionPage retornar um índice válido, atualiza a BottomNavigationBar
       if (result != null && result is int) {
         setState(() {
           _selectedIndex = result;
@@ -86,11 +84,15 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: DefaultColors.white,
         items: const [
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.house),
-            label: "Início",
+            icon: Icon(
+              Iconsax.home,
+            ),
+            label: "Inicio",
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.chartPie),
+            icon: Icon(
+              Iconsax.graph,
+            ),
             label: "Gráficos",
           ),
           BottomNavigationBarItem(
@@ -101,11 +103,15 @@ class _HomePageState extends State<HomePage> {
             label: "",
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.arrowsLeftRight),
+            icon: Icon(
+              Iconsax.arrow_swap_horizontal,
+            ),
             label: "Resumo",
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.receipt),
+            icon: Icon(
+              Iconsax.more_circle,
+            ),
             label: "Cartões",
           ),
         ],

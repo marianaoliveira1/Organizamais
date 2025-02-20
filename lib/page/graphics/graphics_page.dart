@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/page/transaction/pages/%20category.dart';
 import 'package:organizamais/utils/color.dart';
+import 'package:organizamais/model/transaction_model.dart';
 
 class GraphicsPage extends StatelessWidget {
   const GraphicsPage({super.key});
@@ -12,12 +13,16 @@ class GraphicsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TransactionController transactionController = Get.put(TransactionController());
-    var categories = transactionController.transaction.map((e) => e.category).toSet().toList();
+
+    // Filtrar apenas despesas
+    var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+    var categories = despesas.map((e) => e.category).toSet().toList();
+
     var data = categories
         .map(
           (e) => {
             "chart": PieChartSectionData(
-              value: transactionController.transaction.where((element) => element.category == e).fold(0, (previousValue, element) {
+              value: despesas.where((element) => element.category == e).fold(0, (previousValue, element) {
                 return (previousValue ?? 0) + double.parse(element.value);
               }),
               color: findCategoryById(e)?['color'],
@@ -46,7 +51,6 @@ class GraphicsPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Main Pie Chart
                   Expanded(
                     flex: 1,
                     child: PieChart(
@@ -58,10 +62,7 @@ class GraphicsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 26.w,
-                  ),
-                  // Legend
+                  SizedBox(width: 26.w),
                   Expanded(
                     flex: 1,
                     child: Column(
@@ -143,7 +144,6 @@ class GraphicsPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 15.w),
-                      // Category Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,9 +166,8 @@ class GraphicsPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Amount
                       Text(
-                        "R\$ ${item['chart']?.value?.toStringAsFixed(2)}",
+                        "R\$${item['chart']?.value?.toStringAsFixed(2)}",
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
