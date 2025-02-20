@@ -1,20 +1,47 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'package:organizamais/model/transaction_model.dart';
-
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
-
 import 'widget/button_back.dart';
 import 'widget/button_select_category.dart';
 import 'widget/payment_type.dart';
 import 'widget/textifield_description.dart';
 import 'widget/title_transaction.dart';
+
+/// Formatter para converter a entrada em formato de moeda (R$)
+class CurrencyInputFormatter extends TextInputFormatter {
+  final NumberFormat currencyFormat = NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    // Remove tudo que não for dígito
+    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (newText.isEmpty) {
+      return TextEditingValue(
+        text: "R\$0,00",
+        selection: TextSelection.collapsed(offset: "R\$0,00".length),
+      );
+    }
+
+    // Interpreta o valor como centavos
+    double value = double.parse(newText) / 100;
+    String formattedText = currencyFormat.format(value);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -25,7 +52,6 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   TransactionType _selectedType = TransactionType.despesa;
-
   int? categoryId;
   DateTime? _selectedDate;
   final TextEditingController titleController = TextEditingController();
@@ -36,6 +62,9 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void dispose() {
     valuecontroller.dispose();
+    titleController.dispose();
+    dayOfTheMonthController.dispose();
+    paymentTypeController.dispose();
     super.dispose();
   }
 
@@ -101,9 +130,7 @@ class _TransactionPageState extends State<TransactionPage> {
               color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 26.h,
-                  ),
+                  SizedBox(height: 26.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -111,9 +138,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       _buildTypeButton("Despesa", TransactionType.despesa),
                     ],
                   ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
+                  SizedBox(height: 20.h),
                   TextField(
                     controller: valuecontroller,
                     decoration: InputDecoration(
@@ -136,17 +161,16 @@ class _TransactionPageState extends State<TransactionPage> {
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      CurrencyInputFormatter()
+                    ],
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 24.h,
-            ),
+            SizedBox(height: 24.h),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.h,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 20.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,13 +188,9 @@ class _TransactionPageState extends State<TransactionPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                  SizedBox(height: 10.h),
                   Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20.h),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -188,17 +208,11 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                  SizedBox(height: 10.h),
                   Divider(),
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                  SizedBox(height: 10.h),
                   Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20.h),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -216,15 +230,11 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                  SizedBox(height: 10.h),
                   Divider(),
                 ],
               ),
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.h),
               child: Column(
@@ -259,13 +269,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             Divider(),
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -297,7 +303,6 @@ class _TransactionPageState extends State<TransactionPage> {
 
                     try {
                       await transactionController.addTransaction(newTransaction);
-
                       Navigator.pop(context);
                     } catch (e) {
                       Get.snackbar(
@@ -344,7 +349,7 @@ class _TransactionPageState extends State<TransactionPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Minimiza o tamanho vertical
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               label,
@@ -354,9 +359,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 fontSize: 12.sp,
               ),
             ),
-            SizedBox(
-              height: 2.h,
-            ),
+            SizedBox(height: 2.h),
             SizedBox(
               width: 85.w,
               child: Container(
