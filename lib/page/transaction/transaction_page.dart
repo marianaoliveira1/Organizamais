@@ -127,21 +127,23 @@ class _TransactionPageState extends State<TransactionPage> {
             children: [
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                color: _selectedType == TransactionType.receita
-                    ? Colors.green
-                    : _selectedType == TransactionType.despesa
-                        ? Colors.red
-                        : Colors.grey,
+                color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
+
+                // color: _selectedType == TransactionType.receita
+                //     ? Colors.green
+                //     : _selectedType == TransactionType.despesa
+                //         ? Colors.red
+                //         : Colors.grey,
                 child: Column(
                   children: [
                     SizedBox(
                       height: 26.h,
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _buildTypeButton("Receita", TransactionType.receita),
                         _buildTypeButton("Despesa", TransactionType.despesa),
-                        _buildTypeButton("Transferencia", TransactionType.transferencia),
                       ],
                     ),
                     SizedBox(

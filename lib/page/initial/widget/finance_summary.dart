@@ -38,11 +38,10 @@ class FinanceSummaryWidget extends StatelessWidget {
           ),
           SizedBox(height: 6.h),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildCategory("Receita", "\$3,317.74", DefaultColors.green),
+              SizedBox(width: 50.w),
               _buildCategory("Despesas", "\$2,841.98", DefaultColors.red),
-              _buildCategory("Transferencia", "\$2,267.92", Colors.grey),
             ],
           ),
         ],

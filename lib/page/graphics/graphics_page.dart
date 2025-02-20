@@ -52,7 +52,8 @@ class GraphicsPage extends StatelessWidget {
                     child: PieChart(
                       PieChartData(
                         sectionsSpace: 0,
-                        centerSpaceRadius: 50,
+                        centerSpaceRadius: 26,
+                        centerSpaceColor: DefaultColors.background,
                         sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
                       ),
                     ),
@@ -115,20 +116,14 @@ class GraphicsPage extends StatelessWidget {
                         width: 45.w,
                         height: 45.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: DefaultColors.white,
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: PieChart(
                           PieChartData(
                             sectionsSpace: 0,
                             centerSpaceRadius: 15,
+                            centerSpaceColor: DefaultColors.background,
                             startDegreeOffset: -90,
                             sections: [
                               PieChartSectionData(
@@ -139,7 +134,7 @@ class GraphicsPage extends StatelessWidget {
                               ),
                               PieChartSectionData(
                                 value: totalValue - (item['chart']?.value ?? 0),
-                                color: DefaultColors.white,
+                                color: DefaultColors.background,
                                 radius: 15,
                                 showTitle: false,
                               ),
