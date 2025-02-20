@@ -1,86 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
-
-import '../../controller/transaction_controller.dart';
 
 class CardsPage extends StatelessWidget {
   const CardsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TransactionController transactionController = Get.put(TransactionController());
+
     return Scaffold(
       backgroundColor: DefaultColors.background,
+      appBar: AppBar(
+        title: const Text('Transações'),
+        backgroundColor: DefaultColors.background,
+      ),
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: 20.w,
-          horizontal: 20.h,
-        ),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          spacing: 20.h,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DefaultCardResume(
-              text: "Entradas",
-              color: DefaultColors.green,
-            ),
+            _buildTransactionSection(transactionController, TransactionType.receita, 'Entradas', Colors.green),
+            const SizedBox(height: 20),
+            _buildTransactionSection(transactionController, TransactionType.despesa, 'Saídas', Colors.red),
           ],
         ),
       ),
     );
   }
-}
 
-class DefaultCardResume extends StatelessWidget {
-  final String text;
-  final Color color;
-  const DefaultCardResume({
-    super.key,
-    required this.text,
-    required this.color,
-  });
+  Widget _buildTransactionSection(TransactionController controller, TransactionType type, String title, Color color) {
+    return Obx(
+      () {
+        var transactions = controller.transaction.where((t) => t.type == type).toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 10),
+            transactions.isEmpty
+                ? Text(
+                    'Nenhuma transação registrada.',
+                    style: TextStyle(color: Colors.grey),
+                  )
+                : Column(
+                    spacing: 16.h,
+                    children: transactions.map((t) => _buildTransactionCard(t, color)).toList(),
+                  ),
+          ],
+        );
+      },
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final TransactionController transactions = Get.put(TransactionController());
+  Widget _buildTransactionCard(TransactionModel transaction, Color color) {
     return Container(
       decoration: BoxDecoration(
         color: DefaultColors.white,
         borderRadius: BorderRadius.circular(24.r),
       ),
       padding: EdgeInsets.symmetric(
-        vertical: 10.h,
-        horizontal: 16.w,
+        vertical: 16.h,
+        horizontal: 12.w,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            text,
+            transaction.title,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 12.sp,
-              color: DefaultColors.grey,
+              color: DefaultColors.black,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(
-            height: 10.h,
-          ),
-          ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(
-              height: 14.h,
+          Text(
+            'R\$ ${transaction.value}',
+            style: TextStyle(
+              color: DefaultColors.black,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
             ),
-            itemCount: transactions.transaction.length,
-            itemBuilder: (context, index) {
-              final transaction = transactions.transaction[index];
-              return Row(
-                children: [
-                  Text(transaction.title),
-                  Text(transaction.value),
-                ],
-              );
-            },
           )
         ],
       ),

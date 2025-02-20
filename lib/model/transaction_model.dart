@@ -5,10 +5,8 @@ enum TransactionType {
   despesa,
   transferencia;
 
-  /// Converte o enum para uma string para ser salvo no Firebase
   String toJson() => name;
 
-  /// Converte uma string do Firebase para o enum correspondente
   static TransactionType fromJson(String value) => TransactionType.values.firstWhere(
         (e) => e.name == value,
         orElse: () => throw ArgumentError('Tipo de transação inválido: $value'),
