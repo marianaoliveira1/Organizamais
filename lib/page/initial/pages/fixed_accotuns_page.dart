@@ -6,6 +6,7 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';
 
+import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
@@ -56,13 +57,42 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
             DefaultTitleTransaction(
               title: "Valor",
             ),
-            DefaultTextFieldTransaction(
-              hintText: '0,00',
+            TextField(
               controller: valueController,
-              icon: Icon(
-                Icons.attach_money,
+              cursorColor: DefaultColors.black,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.black,
               ),
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                CurrencyInputFormatter(),
+              ],
+              decoration: InputDecoration(
+                fillColor: DefaultColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                ),
+                prefixIcon: Icon(
+                  Icons.attach_money,
+                ),
+                prefixIconColor: DefaultColors.grey,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                ),
+                focusColor: DefaultColors.black,
+                hintText: "0,00",
+                hintStyle: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: DefaultColors.black.withOpacity(0.5),
+                ),
+              ),
             ),
             SizedBox(
               height: 10.h,
