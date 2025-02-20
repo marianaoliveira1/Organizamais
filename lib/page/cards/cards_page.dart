@@ -14,18 +14,26 @@ class CardsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: DefaultColors.background,
-      appBar: AppBar(
-        title: const Text('Transações'),
-        backgroundColor: DefaultColors.background,
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTransactionSection(transactionController, TransactionType.receita, 'Entradas', Colors.green),
-            const SizedBox(height: 20),
-            _buildTransactionSection(transactionController, TransactionType.despesa, 'Saídas', Colors.red),
+            _buildTransactionSection(
+              transactionController,
+              TransactionType.receita,
+              'Entradas',
+              Colors.green,
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
+            _buildTransactionSection(
+              transactionController,
+              TransactionType.despesa,
+              'Saídas',
+              Colors.red,
+            ),
           ],
         ),
       ),
@@ -42,19 +50,21 @@ class CardsPage extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
-                color: color,
+                color: DefaultColors.grey,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(
+              height: 10.h,
+            ),
             transactions.isEmpty
                 ? Text(
                     'Nenhuma transação registrada.',
                     style: TextStyle(color: Colors.grey),
                   )
                 : Column(
-                    spacing: 16.h,
+                    spacing: 10.h,
                     children: transactions.map((t) => _buildTransactionCard(t, color)).toList(),
                   ),
           ],
