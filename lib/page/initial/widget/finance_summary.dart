@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
@@ -12,9 +14,16 @@ class FinanceSummaryWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final TransactionController transactionController = Get.put(TransactionController());
 
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: "pt_BR",
+      symbol: "R\$",
+    );
+
     return Obx(() {
       double totalReceita = transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(0, (sum, t) => sum + double.parse(t.value));
+
       double totalDespesas = transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(0, (sum, t) => sum + double.parse(t.value));
+
       double total = totalReceita - totalDespesas;
 
       return Container(
@@ -28,30 +37,38 @@ class FinanceSummaryWidget extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               "Total",
               style: TextStyle(
-                color: DefaultColors.grey,
                 fontSize: 12.sp,
+                color: DefaultColors.grey,
                 fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 8.h),
             Text(
-              "R\$ ${total.toStringAsFixed(2)}",
+              formatter.format(total),
               style: TextStyle(
-                color: DefaultColors.black,
-                fontSize: 26.sp,
+                fontSize: 30.sp,
                 fontWeight: FontWeight.bold,
+                color: DefaultColors.black,
               ),
             ),
-            SizedBox(height: 6.h),
+            SizedBox(height: 12.h),
             Row(
               children: [
-                _buildCategory("Receita", "R\$ ${totalReceita.toStringAsFixed(2)}", DefaultColors.green),
-                SizedBox(width: 50.w),
-                _buildCategory("Despesas", "R\$ ${totalDespesas.toStringAsFixed(2)}", DefaultColors.red),
+                _buildCategory(
+                  "Receita",
+                  formatter.format(totalReceita), // <-- formatter
+                  DefaultColors.green,
+                ),
+                SizedBox(width: 24.w),
+                _buildCategory(
+                  "Despesas",
+                  formatter.format(totalDespesas), // <-- formatter
+                  DefaultColors.red,
+                ),
               ],
             ),
           ],
@@ -62,32 +79,36 @@ class FinanceSummaryWidget extends StatelessWidget {
 
   Widget _buildCategory(String title, String value, Color color) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Barrinha colorida à esquerda
         Container(
-          height: 38.h,
+          height: 44.h,
           width: 2.w,
           color: color,
         ),
-        SizedBox(width: 6.w),
+        SizedBox(width: 8.w),
+        // Título e valor
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Título da categoria
             Text(
               title,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: 12.sp,
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 2.h),
+            SizedBox(height: 4.h),
+            // Valor da categoria
             Text(
               value,
               style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: DefaultColors.black,
               ),
             ),
           ],
