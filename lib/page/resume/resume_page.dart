@@ -16,6 +16,12 @@ class ResumePage extends StatelessWidget {
     final TransactionController transactionController = Get.put(TransactionController());
     final selectedMonth = ''.obs;
 
+    // Cria um NumberFormat para formato brasileiro com símbolo R$
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: "pt_BR",
+      symbol: "R\$",
+    );
+
     // Lista fixa de todos os meses do ano atual
     List<String> getAllMonths() {
       List<String> months = [];
@@ -41,13 +47,15 @@ class ResumePage extends StatelessWidget {
       }
     }
 
+    // Função para formatar o valor usando o formatter
     String formatValue(dynamic value) {
       if (value is String) {
-        return 'R\$ ${double.tryParse(value)?.toStringAsFixed(2) ?? '0.00'}';
+        double? doubleValue = double.tryParse(value);
+        return doubleValue != null ? formatter.format(doubleValue) : formatter.format(0);
       } else if (value is num) {
-        return 'R\$ ${value.toStringAsFixed(2)}';
+        return formatter.format(value);
       }
-      return "R\$ 0.00";
+      return formatter.format(0);
     }
 
     Map<String, List<dynamic>> groupTransactionsByDate(List transactions, String selectedMonth) {
@@ -89,7 +97,7 @@ class ResumePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Mês buttons in a horizontal scrollable list
+              // Mês buttons em uma lista horizontal
               SizedBox(
                 height: 16.h,
                 child: ListView.separated(
@@ -100,13 +108,6 @@ class ResumePage extends StatelessWidget {
                     final month = getAllMonths()[index];
                     return Obx(
                       () => GestureDetector(
-                        // style: ElevatedButton.styleFrom(
-                        //   backgroundColor: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
-                        //   foregroundColor: selectedMonth.value == month ? DefaultColors.white : DefaultColors.black,
-                        //   shape: RoundedRectangleBorder(
-                        //     borderRadius: BorderRadius.circular(20.r),
-                        //   ),
-                        // ),
                         onTap: () {
                           if (selectedMonth.value == month) {
                             selectedMonth.value = '';
@@ -115,7 +116,7 @@ class ResumePage extends StatelessWidget {
                           }
                         },
                         child: Text(
-                          month.split('/')[0].capitalize!, // Apenas o nome do mês com primeira letra maiúscula
+                          month.split('/')[0].capitalize!,
                           style: TextStyle(fontSize: 12.sp),
                         ),
                       ),
@@ -124,13 +125,16 @@ class ResumePage extends StatelessWidget {
                 ),
               ),
 
-              // Transactions list
+              // Lista de transações
               Obx(() {
                 if (transactionController.transaction.isEmpty) {
                   return const DefaultTextNotTransaction();
                 }
 
-                final groupedTransactions = groupTransactionsByDate(transactionController.transaction, selectedMonth.value);
+                final groupedTransactions = groupTransactionsByDate(
+                  transactionController.transaction,
+                  selectedMonth.value,
+                );
 
                 if (groupedTransactions.isEmpty) {
                   return Text(
@@ -184,7 +188,9 @@ class ResumePage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Image.asset(
-                                    categories_expenses.firstWhere((element) => element['id'] == transaction.category)['icon'],
+                                    categories_expenses.firstWhere(
+                                      (element) => element['id'] == transaction.category,
+                                    )['icon'],
                                     width: 28.w,
                                     height: 28.h,
                                   ),
@@ -203,7 +209,9 @@ class ResumePage extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            categories_expenses.firstWhere((element) => element['id'] == transaction.category)['name'],
+                                            categories_expenses.firstWhere(
+                                              (element) => element['id'] == transaction.category,
+                                            )['name'],
                                             style: TextStyle(
                                               color: DefaultColors.greyLight,
                                               fontSize: 12.sp,
@@ -217,7 +225,7 @@ class ResumePage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        formatValue(transaction.value),
+                                        formatValue(transaction.value), // <-- aqui formata com o padrão brasileiro
                                         style: TextStyle(
                                           color: DefaultColors.black,
                                           fontSize: 14.sp,
@@ -294,7 +302,7 @@ class DefaultTextNotTransaction extends StatelessWidget {
           ],
         ),
         Text(
-          " para adicionar um lancamento ",
+          " para adicionar um lançamento ",
           style: TextStyle(
             fontWeight: FontWeight.w500,
             color: DefaultColors.grey,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart'; // <-- Import do intl
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
 class CardsPage extends StatelessWidget {
-  const CardsPage({super.key});
+  CardsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,12 @@ class CardsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionSection(TransactionController controller, TransactionType type, String title, Color color) {
+  Widget _buildTransactionSection(
+    TransactionController controller,
+    TransactionType type,
+    String title,
+    Color color,
+  ) {
     return Obx(
       () {
         var transactions = controller.transaction.where((t) => t.type == type).toList();
@@ -55,17 +61,20 @@ class CardsPage extends StatelessWidget {
                 color: DefaultColors.grey,
               ),
             ),
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             transactions.isEmpty
                 ? Text(
                     'Nenhuma transação registrada.',
                     style: TextStyle(color: Colors.grey),
                   )
                 : Column(
-                    spacing: 10.h,
-                    children: transactions.map((t) => _buildTransactionCard(t, color)).toList(),
+                    // O 'spacing' não existe diretamente em Column, use SizedBox ou outra abordagem
+                    children: transactions
+                        .map((t) => Padding(
+                              padding: EdgeInsets.only(bottom: 10.h),
+                              child: _buildTransactionCard(t, color),
+                            ))
+                        .toList(),
                   ),
           ],
         );
@@ -73,7 +82,17 @@ class CardsPage extends StatelessWidget {
     );
   }
 
+  // Formatter para valores em real com pontuação de milhar
+  final NumberFormat formatter = NumberFormat.currency(
+    locale: "pt_BR",
+    symbol: "R\$",
+  );
+
   Widget _buildTransactionCard(TransactionModel transaction, Color color) {
+    // Converte o valor string para double e formata
+    double valueDouble = double.tryParse(transaction.value) ?? 0.0;
+    String formattedValue = formatter.format(valueDouble);
+
     return Container(
       decoration: BoxDecoration(
         color: DefaultColors.white,
@@ -95,13 +114,13 @@ class CardsPage extends StatelessWidget {
             ),
           ),
           Text(
-            'R\$ ${transaction.value}',
+            formattedValue, // Exibe o valor formatado, ex.: "R$ 1.000,00"
             style: TextStyle(
               color: DefaultColors.black,
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
-          )
+          ),
         ],
       ),
     );
