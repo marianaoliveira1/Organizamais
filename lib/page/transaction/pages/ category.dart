@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,145 +11,145 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 1,
     'name': 'Alimentação',
     'icon': 'assets/icon-category/food.png',
-    'color': Colors.red
+    'color': DefaultColors.orange, // Comida geralmente remete a tons quentes
   },
   {
     'id': 2,
     'name': 'Assinaturas e serviços',
     'icon': 'assets/icon-category/cartao.png',
-    'color': Colors.blue
+    'color': DefaultColors.navy, // Um tom mais sério, remetendo a tecnologia
   },
   {
     'id': 3,
     'name': 'Bares',
     'icon': 'assets/icon-category/wine.png',
-    'color': Colors.green
+    'color': DefaultColors.purple, // Um tom mais sofisticado e noturno
   },
   {
     'id': 4,
     'name': 'Restaurantes',
     'icon': 'assets/icon-category/restaurante.png',
-    'color': Colors.yellow
+    'color': DefaultColors.orange, // Mesma lógica de alimentação
   },
   {
     'id': 5,
     'name': 'Moradia',
     'icon': 'assets/icon-category/home.png',
-    'color': Colors.orange
+    'color': DefaultColors.blue, // Estabilidade e segurança
   },
   {
     'id': 6,
     'name': 'Compras',
     'icon': 'assets/icon-category/shopping.png',
-    'color': Colors.purple
+    'color': DefaultColors.teal, // Uma cor vibrante que remete a consumo
   },
   {
     'id': 7,
     'name': 'Cuidados pessoais',
     'icon': 'assets/icon-category/skincare.png',
-    'color': Colors.pink
+    'color': DefaultColors.pink, // Associado a bem-estar e beleza
   },
   {
     'id': 8,
     'name': 'Dívidas e empréstimos',
     'icon': 'assets/icon-category/dividas.png',
-    'color': Colors.red
+    'color': DefaultColors.darkGrey, // Algo mais neutro e sério
   },
   {
     'id': 9,
     'name': 'Educação',
     'icon': 'assets/icon-category/education.png',
-    'color': Colors.blue
+    'color': DefaultColors.purple, // Conhecimento e criatividade
   },
   {
     'id': 10,
     'name': 'Família e filhos',
     'icon': 'assets/icon-category/family.png',
-    'color': Colors.green
+    'color': DefaultColors.green, // Crescimento e harmonia
   },
   {
     'id': 11,
     'name': 'Investimentos',
     'icon': 'assets/icon-category/investimentos.png',
-    'color': Colors.yellow
+    'color': DefaultColors.gold, // Riqueza e prosperidade
   },
   {
     'id': 12,
     'name': 'Lazer e hobbies',
     'icon': 'assets/icon-category/lazer.png',
-    'color': Colors.purple
+    'color': DefaultColors.teal, // Algo mais descontraído e versátil
   },
   {
     'id': 13,
     'name': 'Pets',
     'icon': 'assets/icon-category/dog.png',
-    'color': Colors.pink
+    'color': DefaultColors.orange, // Cor vibrante e amigável
   },
   {
     'id': 14,
     'name': 'Presentes e doações',
     'icon': 'assets/icon-category/gift.png',
-    'color': Colors.red
+    'color': DefaultColors.red, // Paixão e generosidade
   },
   {
     'id': 15,
     'name': 'Saúde',
     'icon': 'assets/icon-category/saude.png',
-    'color': Colors.blue
+    'color': DefaultColors.brightRed, // Urgência e vitalidade
   },
   {
     'id': 16,
     'name': 'Trabalho',
     'icon': 'assets/icon-category/work.png',
-    'color': Colors.green
+    'color': DefaultColors.darkBlue, // Profissionalismo e seriedade
   },
   {
     'id': 17,
     'name': 'Transporte',
     'icon': 'assets/icon-category/car.png',
-    'color': Colors.yellow
+    'color': DefaultColors.darkGrey, // Remete a asfalto e veículos
   },
   {
     'id': 18,
     'name': 'Viagem',
     'icon': 'assets/icon-category/aviao.png',
-    'color': Colors.purple
+    'color': DefaultColors.blue, // Céu, liberdade e aventura
   },
   {
     'id': 19,
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
-    'color': Colors.red
+    'color': DefaultColors.grey, // Algo mais neutro e técnico
   },
   {
     'id': 20,
     'name': 'Roupas',
     'icon': 'assets/icon-category/roupas.png',
-    'color': Colors.blue
+    'color': DefaultColors.pink, // Moda e estilo
   },
   {
     'id': 21,
     'name': 'Delivery',
     'icon': 'assets/icon-category/ifood.png',
-    'color': Colors.green
+    'color': DefaultColors.orange, // Remete a comida rápida
   },
   {
     'id': 22,
     'name': 'Uber',
     'icon': 'assets/icon-category/uber.png',
-    'color': Colors.yellow
+    'color': DefaultColors.darkGrey, // Tecnologia e mobilidade
   },
   {
     'id': 23,
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
-    'color': Colors.purple
+    'color': DefaultColors.navy, // Tecnologia e entretenimento
   },
   {
     'id': 24,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
-    'color': Colors.red
+    'color': DefaultColors.grey, // Categoria genérica e neutra
   },
 ];
 
@@ -166,34 +168,36 @@ final List<Map<String, dynamic>> categories_income = [
   },
 ];
 
-final List<Map<String, dynamic>> all_categories = [...categories_expenses, ...categories_income];
+final List<Map<String, dynamic>> all_categories = [
+  ...categories_expenses,
+  ...categories_income
+];
 
-  Map<String, dynamic>? findCategoryById(int? id) {
-    if (id == null) return null;
+Map<String, dynamic>? findCategoryById(int? id) {
+  if (id == null) return null;
 
-    final expenseCategory = categories_expenses.firstWhere(
-      (category) => category['id'] == id,
-      orElse: () => {
-        'id': 0,
-        'name': '',
-        'icon': ''
-      },
-    );
-    if (expenseCategory['id'] != 0) return expenseCategory;
+  final expenseCategory = categories_expenses.firstWhere(
+    (category) => category['id'] == id,
+    orElse: () => {
+      'id': 0,
+      'name': '',
+      'icon': ''
+    },
+  );
+  if (expenseCategory['id'] != 0) return expenseCategory;
 
-    final incomeCategory = categories_income.firstWhere(
-      (category) => category['id'] == id,
-      orElse: () => {
-        'id': 0,
-        'name': '',
-        'icon': ''
-      },
-    );
-    if (incomeCategory['id'] != 0) return incomeCategory;
+  final incomeCategory = categories_income.firstWhere(
+    (category) => category['id'] == id,
+    orElse: () => {
+      'id': 0,
+      'name': '',
+      'icon': ''
+    },
+  );
+  if (incomeCategory['id'] != 0) return incomeCategory;
 
-    return null;
-  }
-
+  return null;
+}
 
 class Category extends StatelessWidget {
   const Category({super.key});

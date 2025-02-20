@@ -4,8 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/page/initial/widget/my_card_widget.dart';
 
-import 'package:organizamais/utils/color.dart';
-
 import '../../../controller/card_controller.dart';
 import '../pages/add_card_page.dart';
 import 'title_card.dart';

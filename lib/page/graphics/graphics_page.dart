@@ -23,6 +23,7 @@ class GraphicsPage extends StatelessWidget {
               color: findCategoryById(e)?['color'],
               title: '${findCategoryById(e)?['name']}',
               radius: 50,
+              showTitle: false, // Remove os títulos do gráfico
             ),
             "icon": findCategoryById(e)?['icon'],
           },
@@ -35,108 +36,134 @@ class GraphicsPage extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(
           vertical: 20.w,
           horizontal: 20.h,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Main Pie Chart
             SizedBox(
               height: 200.h,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 0,
-                  centerSpaceRadius: 40,
-                  sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
-                ),
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-                horizontal: 16.w,
-              ),
-              decoration: BoxDecoration(
-                color: DefaultColors.white,
-                borderRadius: BorderRadius.circular(24.r),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    "Gastos por categoria",
-                    style: TextStyle(
-                      color: DefaultColors.grey,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 40,
+                        sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
+                      ),
                     ),
                   ),
+                  // Legend
                   SizedBox(
-                    height: 10.h,
-                  ),
-                  for (var item in data)
-                    Column(
+                    width: 120.w,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                        for (var item in data)
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4.h),
+                            child: Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: DefaultColors.background,
-                                  child: Image.asset(
-                                    item['icon'] ?? '',
-                                    width: 24.w,
-                                    height: 24.h,
+                                Container(
+                                  width: 12.w,
+                                  height: 12.h,
+                                  decoration: BoxDecoration(
+                                    color: item['chart']?.color,
+                                    borderRadius: BorderRadius.circular(2.r),
                                   ),
                                 ),
-                                SizedBox(width: 10.w),
+                                SizedBox(width: 8.w),
                                 Text(
                                   item['chart']?.title ?? '',
                                   style: TextStyle(
+                                    fontSize: 12.sp,
                                     color: DefaultColors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14.sp,
                                   ),
                                 ),
                               ],
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "R\$ ${item['chart']?.value}",
-                                  style: TextStyle(
-                                    color: DefaultColors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                                Text(
-                                  "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(2)}%",
-                                  style: TextStyle(
-                                    color: DefaultColors.grey,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        Divider(
-                          color: DefaultColors.grey,
-                          height: 10.h,
-                        ),
+                          ),
                       ],
-                    )
+                    ),
+                  ),
                 ],
               ),
-            )
+            ),
+            SizedBox(height: 20.h),
+            // Categories List with Mini Charts
+            for (var item in data)
+              Padding(
+                padding: EdgeInsets.only(bottom: 16.h),
+                child: Row(
+                  children: [
+                    // Mini Pie Chart
+                    SizedBox(
+                      width: 50.w,
+                      height: 50.h,
+                      child: PieChart(
+                        PieChartData(
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 20,
+                          sections: [
+                            PieChartSectionData(
+                              value: item['chart']?.value ?? 0,
+                              color: item['chart']?.color ?? DefaultColors.grey,
+                              radius: 25,
+                              showTitle: false,
+                            ),
+                            PieChartSectionData(
+                              value: totalValue - (item['chart']?.value ?? 0),
+                              color: DefaultColors.background,
+                              radius: 25,
+                              showTitle: false,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    // Category Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item['chart']?.title ?? '',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                              color: DefaultColors.black,
+                            ),
+                          ),
+                          Text(
+                            "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(0)}%",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Amount
+                    Text(
+                      "R\$ ${item['chart']?.value?.toStringAsFixed(2)}",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

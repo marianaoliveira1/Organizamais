@@ -20,6 +20,4 @@ class DefaultColors {
   static const darkBlue = Color(0xFF34495E); // Trabalho e Negócios
   static const gold = Color(0xFFF39C12); // Finanças e Investimentos
   static const navy = Color(0xFF2C3E50);
-
-  static var primary; // Outros
 }
