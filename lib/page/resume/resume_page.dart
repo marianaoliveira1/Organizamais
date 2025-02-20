@@ -91,37 +91,38 @@ class ResumePage extends StatelessWidget {
             children: [
               // Mês buttons in a horizontal scrollable list
               SizedBox(
-                height: 40.h,
+                height: 16.h,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: getAllMonths().length,
                   separatorBuilder: (context, index) => SizedBox(width: 10.w),
                   itemBuilder: (context, index) {
                     final month = getAllMonths()[index];
-                    return Obx(() => ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
-                            foregroundColor: selectedMonth.value == month ? DefaultColors.white : DefaultColors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (selectedMonth.value == month) {
-                              selectedMonth.value = '';
-                            } else {
-                              selectedMonth.value = month;
-                            }
-                          },
-                          child: Text(
-                            month.split('/')[0].capitalize!, // Apenas o nome do mês com primeira letra maiúscula
-                            style: TextStyle(fontSize: 12.sp),
-                          ),
-                        ));
+                    return Obx(
+                      () => GestureDetector(
+                        // style: ElevatedButton.styleFrom(
+                        //   backgroundColor: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
+                        //   foregroundColor: selectedMonth.value == month ? DefaultColors.white : DefaultColors.black,
+                        //   shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.circular(20.r),
+                        //   ),
+                        // ),
+                        onTap: () {
+                          if (selectedMonth.value == month) {
+                            selectedMonth.value = '';
+                          } else {
+                            selectedMonth.value = month;
+                          }
+                        },
+                        child: Text(
+                          month.split('/')[0].capitalize!, // Apenas o nome do mês com primeira letra maiúscula
+                          style: TextStyle(fontSize: 12.sp),
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
-              SizedBox(height: 20.h),
 
               // Transactions list
               Obx(() {
@@ -144,7 +145,7 @@ class ResumePage extends StatelessWidget {
                 return ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) => SizedBox(height: 20.h),
+                  separatorBuilder: (context, index) => SizedBox(height: 10.h),
                   itemCount: groupedTransactions.length,
                   itemBuilder: (context, index) {
                     String date = groupedTransactions.keys.elementAt(index);

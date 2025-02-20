@@ -56,34 +56,6 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
-  // Widget _buildTransactionFields() {
-  //   switch (_selectedType) {
-  //     case TransactionType.transferencia:
-  //       return Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           const Text("Recebi de"),
-  //           TextField(
-  //             decoration: const InputDecoration(
-  //               hintText: "Digite quem enviou",
-  //               border: UnderlineInputBorder(),
-  //             ),
-  //           ),
-  //           const SizedBox(height: 16),
-  //           const Text("Para"),
-  //           TextField(
-  //             decoration: const InputDecoration(
-  //               hintText: "Digite o destinatário",
-  //               border: UnderlineInputBorder(),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     default:
-  //       return const SizedBox.shrink();
-  //   }
-  // }
-
   String _getFormattedDate(DateTime date) {
     final now = DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 1);
@@ -121,256 +93,243 @@ class _TransactionPageState extends State<TransactionPage> {
     return Scaffold(
       backgroundColor: DefaultColors.white,
       body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
-
-                // color: _selectedType == TransactionType.receita
-                //     ? Colors.green
-                //     : _selectedType == TransactionType.despesa
-                //         ? Colors.red
-                //         : Colors.grey,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 26.h,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 26.h,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildTypeButton("Receita", TransactionType.receita),
+                      _buildTypeButton("Despesa", TransactionType.despesa),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  TextField(
+                    controller: valuecontroller,
+                    decoration: InputDecoration(
+                      hintText: "R\$0,00",
+                      hintStyle: TextStyle(
+                        color: DefaultColors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 30.sp,
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    style: TextStyle(
+                      color: DefaultColors.white,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 24.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.h,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DefaultTitleTransaction(
+                    title: "Descrição",
+                  ),
+                  TextFieldDescriptionTransaction(
+                    titleController: titleController,
+                  ),
+                ],
+              ),
+            ),
+            Divider(),
+            if (_selectedType != TransactionType.transferencia)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildTypeButton("Receita", TransactionType.receita),
-                        _buildTypeButton("Despesa", TransactionType.despesa),
+                        DefaultTitleTransaction(
+                          title: "Categoria",
+                        ),
+                        DefaultButtonSelectCategory(
+                          selectedCategory: categoryId,
+                          onTap: (category) {
+                            setState(() {
+                              categoryId = category;
+                            });
+                          },
+                        ),
                       ],
                     ),
-                    SizedBox(
-                      height: 20.h,
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Divider(),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
                     ),
-                    TextField(
-                      controller: valuecontroller,
-                      decoration: InputDecoration(
-                        hintText: "R\$0,00",
-                        hintStyle: TextStyle(
-                          color: DefaultColors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 30.sp,
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      style: TextStyle(
-                        color: DefaultColors.white,
-                        fontSize: 30.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ],
-                ),
-              ),
-              // _buildTransactionFields(),
-              SizedBox(
-                height: 24.h,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20.h,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DefaultTitleTransaction(
-                      title: "Descrição",
-                    ),
-                    TextFieldDescriptionTransaction(
-                      titleController: titleController,
-                    ),
-                  ],
-                ),
-              ),
-
-              Divider(),
-              if (_selectedType != TransactionType.transferencia)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_selectedType == TransactionType.receita)
                           DefaultTitleTransaction(
-                            title: "Categoria",
+                            title: "Recebi em",
                           ),
-                          DefaultButtonSelectCategory(
-                            selectedCategory: categoryId,
-                            onTap: (category) {
-                              setState(() {
-                                categoryId = category;
-                              });
-                            },
+                        if (_selectedType == TransactionType.despesa)
+                          DefaultTitleTransaction(
+                            title: "Pago com",
                           ),
-                        ],
-                      ),
+                        PaymentTypeField(
+                          controller: paymentTypeController,
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Divider(),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_selectedType == TransactionType.receita)
-                            DefaultTitleTransaction(
-                              title: "Recebi em",
-                            ),
-                          if (_selectedType == TransactionType.despesa)
-                            DefaultTitleTransaction(
-                              title: "Pago com",
-                            ),
-                          PaymentTypeField(
-                            controller: paymentTypeController,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Divider(),
-                  ],
-                ),
-
-              SizedBox(
-                height: 10.h,
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Divider(),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DefaultTitleTransaction(
-                      title: "Data",
+            SizedBox(
+              height: 10.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DefaultTitleTransaction(
+                    title: "Data",
+                  ),
+                  TextField(
+                    controller: dayOfTheMonthController,
+                    readOnly: true,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: DefaultColors.black,
+                      fontWeight: FontWeight.w500,
                     ),
-                    TextField(
-                      controller: dayOfTheMonthController,
-                      readOnly: true,
-                      style: TextStyle(
+                    decoration: InputDecoration(
+                      hintText: "Data",
+                      hintStyle: TextStyle(
                         fontSize: 16.sp,
-                        color: DefaultColors.black,
+                        color: DefaultColors.grey,
                         fontWeight: FontWeight.w500,
                       ),
-                      decoration: InputDecoration(
-                        hintText: "Data",
-                        hintStyle: TextStyle(
-                          fontSize: 16.sp,
-                          color: DefaultColors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.calendar_month,
-                          color: DefaultColors.black,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      onTap: _selectDate,
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(
-                height: 10.h,
-              ),
-              Divider(),
-              SizedBox(
-                height: 10.h,
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ButtonBackTransaction(),
-                  InkWell(
-                    onTap: () async {
-                      if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
-                        Get.snackbar(
-                          'Erro',
-                          'Preencha todos os campos obrigatórios',
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
-                        return;
-                      }
-
-                      final TransactionController transactionController = Get.find<TransactionController>();
-                      String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
-
-                      final TransactionModel newTransaction = TransactionModel(
-                        title: titleController.text,
-                        value: valueText,
-                        type: _selectedType,
-                        category: categoryId,
-                        paymentDay: _selectedDate!.toString().split(' ')[0],
-                        paymentType: paymentTypeController.text,
-                      );
-
-                      try {
-                        await transactionController.addTransaction(newTransaction);
-
-                        Navigator.pop(context);
-                      } catch (e) {
-                        Get.snackbar(
-                          'Erro',
-                          'Erro ao salvar a transação: ${e.toString()}',
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                      decoration: BoxDecoration(
+                      prefixIcon: Icon(
+                        Icons.calendar_month,
                         color: DefaultColors.black,
-                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: Center(
-                        child: Text(
-                          "Salvar",
-                          style: TextStyle(
-                            color: DefaultColors.white,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      border: InputBorder.none,
+                    ),
+                    onTap: _selectDate,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            Divider(),
+            SizedBox(
+              height: 10.h,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ButtonBackTransaction(),
+                InkWell(
+                  onTap: () async {
+                    if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
+                      Get.snackbar(
+                        'Erro',
+                        'Preencha todos os campos obrigatórios',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+
+                    final TransactionController transactionController = Get.find<TransactionController>();
+                    String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
+
+                    final TransactionModel newTransaction = TransactionModel(
+                      title: titleController.text,
+                      value: valueText,
+                      type: _selectedType,
+                      category: categoryId,
+                      paymentDay: _selectedDate!.toString().split(' ')[0],
+                      paymentType: paymentTypeController.text,
+                    );
+
+                    try {
+                      await transactionController.addTransaction(newTransaction);
+
+                      Navigator.pop(context);
+                    } catch (e) {
+                      Get.snackbar(
+                        'Erro',
+                        'Erro ao salvar a transação: ${e.toString()}',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    decoration: BoxDecoration(
+                      color: DefaultColors.black,
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Salvar",
+                        style: TextStyle(
+                          color: DefaultColors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
