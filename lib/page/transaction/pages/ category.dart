@@ -50,12 +50,6 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.pink, // Associado a bem-estar e beleza
   },
   {
-    'id': 8,
-    'name': 'Dívidas e empréstimos',
-    'icon': 'assets/icon-category/dividas.png',
-    'color': DefaultColors.darkGrey, // Algo mais neutro e sério
-  },
-  {
     'id': 9,
     'name': 'Educação',
     'icon': 'assets/icon-category/education.png',
@@ -66,12 +60,6 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Família e filhos',
     'icon': 'assets/icon-category/family.png',
     'color': DefaultColors.green, // Crescimento e harmonia
-  },
-  {
-    'id': 11,
-    'name': 'Investimentos',
-    'icon': 'assets/icon-category/investimentos.png',
-    'color': DefaultColors.gold, // Riqueza e prosperidade
   },
   {
     'id': 12,
@@ -130,7 +118,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 21,
     'name': 'Delivery',
-    'icon': 'assets/icon-category/ifood.png',
+    'icon': 'assets/icon-category/delivery-bike.png',
     'color': DefaultColors.orange, // Remete a comida rápida
   },
   {
