@@ -11,6 +11,8 @@ class TextFieldDescriptionTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return TextField(
       controller: titleController,
       decoration: InputDecoration(
@@ -29,7 +31,7 @@ class TextFieldDescriptionTransaction extends StatelessWidget {
       ),
       style: TextStyle(
         fontSize: 16.sp,
-        color: Colors.black87,
+        color: theme.primaryColor,
       ),
     );
   }

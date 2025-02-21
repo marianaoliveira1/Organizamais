@@ -14,11 +14,13 @@ class PaymentTypeField extends StatelessWidget {
   });
 
   void _showPaymentOptions(BuildContext context) {
+    final theme = Theme.of(context);
+
     final CardController cardController = Get.find<CardController>();
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: DefaultColors.white,
+      backgroundColor: theme.primaryColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(20.r),
@@ -40,7 +42,7 @@ class PaymentTypeField extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: theme.primaryColor,
                   ),
                 ),
                 SizedBox(height: 10.h),
@@ -71,7 +73,7 @@ class PaymentTypeField extends StatelessWidget {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
-                                color: DefaultColors.backgroundLight,
+                                color: theme.cardColor,
                               ),
                               padding: EdgeInsets.symmetric(
                                 vertical: 4.h,
@@ -92,7 +94,7 @@ class PaymentTypeField extends StatelessWidget {
                                       "${card.name} ${isCredit ? 'crédito' : 'débito'}",
                                       style: TextStyle(
                                         fontSize: 14.sp,
-                                        color: Colors.black,
+                                        color: theme.primaryColor,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -107,35 +109,30 @@ class PaymentTypeField extends StatelessWidget {
                           },
                         );
                       }),
-                    _buildPaymentOption(
-                      context,
-                      'Dinheiro',
-                      'assets/icon-payment/money.png',
-                      controller,
+                    PaymentOption(
+                      title: 'Dinheiro',
+                      assetPath: 'assets/icon-payment/money.png',
+                      controller: controller,
                     ),
-                    _buildPaymentOption(
-                      context,
-                      'Pix',
-                      'assets/icon-payment/pix.png',
-                      controller,
+                    PaymentOption(
+                      title: 'Cartão de Crédito',
+                      assetPath: 'assets/icon-payment/cartoes-de-credito.png',
+                      controller: controller,
                     ),
-                    _buildPaymentOption(
-                      context,
-                      'Boleto',
-                      'assets/icon-payment/fatura.png',
-                      controller,
+                    PaymentOption(
+                      title: 'Boleto',
+                      assetPath: 'assets/icon-payment/fatura.png',
+                      controller: controller,
                     ),
-                    _buildPaymentOption(
-                      context,
-                      'Vale Refeição',
-                      'assets/icon-payment/cartoes-de-credito.png',
-                      controller,
+                    PaymentOption(
+                      title: 'Vale Refeição',
+                      assetPath: 'assets/icon-payment/cartoes-de-credito.png',
+                      controller: controller,
                     ),
-                    _buildPaymentOption(
-                      context,
-                      'TED',
-                      'assets/icon-payment/ted.png',
-                      controller,
+                    PaymentOption(
+                      title: 'TED',
+                      assetPath: 'assets/icon-payment/ted.png',
+                      controller: controller,
                     ),
                   ],
                 ),
@@ -147,59 +144,22 @@ class PaymentTypeField extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentOption(
-    BuildContext context,
-    String title,
-    String assetPath,
-    TextEditingController controller,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        color: DefaultColors.backgroundLight,
-      ),
-      padding: EdgeInsets.symmetric(
-        vertical: 4.h,
-        horizontal: 10.w,
-      ),
-      margin: EdgeInsets.only(bottom: 14.h),
-      child: ListTile(
-        leading: Image.asset(
-          assetPath,
-          width: 22.w,
-          height: 22.h,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        onTap: () {
-          controller.text = title;
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return TextField(
       controller: controller,
       readOnly: true,
       style: TextStyle(
         fontSize: 16.sp,
-        color: Colors.black,
+        color: theme.primaryColor,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
         hintText: "Selecione o tipo de pagamento",
         hintStyle: TextStyle(
           fontSize: 16.sp,
-          color: Colors.grey,
+          color: theme.primaryColor,
           fontWeight: FontWeight.w500,
         ),
         border: InputBorder.none,
@@ -209,6 +169,54 @@ class PaymentTypeField extends StatelessWidget {
         ),
       ),
       onTap: () => _showPaymentOptions(context),
+    );
+  }
+}
+
+class PaymentOption extends StatelessWidget {
+  final String title;
+  final String assetPath;
+  final TextEditingController controller;
+
+  const PaymentOption({
+    Key? key,
+    required this.title,
+    required this.assetPath,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16), color: theme.cardColor, // Substitua por DefaultColors.backgroundLight
+      ),
+      padding: const EdgeInsets.symmetric(
+        vertical: 4,
+        horizontal: 10,
+      ),
+      margin: const EdgeInsets.only(bottom: 14),
+      child: ListTile(
+        leading: Image.asset(
+          assetPath,
+          width: 22,
+          height: 22,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            color: theme.primaryColor,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        onTap: () {
+          controller.text = title;
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 }

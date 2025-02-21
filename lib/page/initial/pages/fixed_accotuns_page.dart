@@ -159,7 +159,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: DefaultColors.black,
+                      backgroundColor: theme.primaryColor,
                       padding: EdgeInsets.all(15.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
@@ -168,7 +168,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                     child: Text(
                       "Salvar",
                       style: TextStyle(
-                        color: DefaultColors.white,
+                        color: theme.cardColor,
                         fontSize: 14.sp,
                       ),
                     ),

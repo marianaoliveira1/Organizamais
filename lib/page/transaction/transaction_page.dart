@@ -119,8 +119,10 @@ class _TransactionPageState extends State<TransactionPage> {
     _getTypeColor(_selectedType);
     Get.put(TransactionController());
 
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +158,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                     ),
                     style: TextStyle(
-                      color: DefaultColors.white,
+                      color: theme.primaryColor,
                       fontSize: 30.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -248,7 +250,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     readOnly: true,
                     style: TextStyle(
                       fontSize: 16.sp,
-                      color: DefaultColors.black,
+                      color: theme.primaryColor.withOpacity(.5),
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
@@ -260,7 +262,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                       prefixIcon: Icon(
                         Icons.calendar_month,
-                        color: DefaultColors.black,
+                        color: theme.primaryColor.withOpacity(.5),
                       ),
                       border: InputBorder.none,
                     ),
@@ -317,14 +319,14 @@ class _TransactionPageState extends State<TransactionPage> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                     decoration: BoxDecoration(
-                      color: DefaultColors.black,
+                      color: theme.cardColor,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Center(
                       child: Text(
                         "Salvar",
                         style: TextStyle(
-                          color: DefaultColors.white,
+                          color: theme.primaryColor,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
