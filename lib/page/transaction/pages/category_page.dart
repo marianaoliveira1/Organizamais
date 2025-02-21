@@ -193,9 +193,9 @@ class Category extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: DefaultColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundIght,
+        backgroundColor: DefaultColors.backgroundLight,
         title: Text(
           'Categorias',
         ),
@@ -224,7 +224,7 @@ class Category extends StatelessWidget {
             ),
             child: ListTile(
               leading: CircleAvatar(
-                backgroundColor: DefaultColors.backgroundIght,
+                backgroundColor: DefaultColors.backgroundLight,
                 child: Image.asset(
                   category['icon'],
                   height: 26.h,

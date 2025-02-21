@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/firebase_options.dart';
+import 'package:organizamais/utils/color.dart';
 
 import 'controller/auth_controller.dart';
 import 'controller/card_controller.dart';
@@ -42,6 +43,16 @@ class MyApp extends StatelessWidget {
         getPages: AppPages.routes,
         theme: ThemeData(
           textTheme: GoogleFonts.rubikTextTheme(),
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: DefaultColors.backgroundLight,
+          primaryColor: DefaultColors.black,
+          cardColor: DefaultColors.white,
+        ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: DefaultColors.backgroundDark,
+          primaryColor: DefaultColors.white,
+          cardColor: DefaultColors.backgroundCard,
         ),
       ),
     );

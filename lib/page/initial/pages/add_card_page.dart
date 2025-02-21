@@ -48,7 +48,7 @@ class _AddCardPageState extends State<AddCardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: DefaultColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: DefaultColors.green,
         iconTheme: IconThemeData(
@@ -202,7 +202,7 @@ class _AddCardPageState extends State<AddCardPage> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                 decoration: BoxDecoration(
-                  color: DefaultColors.backgroundIght,
+                  color: DefaultColors.backgroundLight,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
                     color: DefaultColors.green,

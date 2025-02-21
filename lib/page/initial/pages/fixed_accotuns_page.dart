@@ -30,9 +30,9 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
     final FixedAccountsController fixedAccountsController = Get.put(FixedAccountsController());
 
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: DefaultColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundIght,
+        backgroundColor: DefaultColors.backgroundLight,
         title: const Text("Contas fixas"),
       ),
       body: Container(
@@ -70,7 +70,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                 CurrencyInputFormatter(),
               ],
               decoration: InputDecoration(
-                fillColor: DefaultColors.backgroundIght,
+                fillColor: DefaultColors.backgroundLight,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(
                     12.r,

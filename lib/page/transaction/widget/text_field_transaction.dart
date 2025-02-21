@@ -56,7 +56,7 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
       decoration: InputDecoration(
-        fillColor: isFocused ? DefaultColors.backgroundIght : DefaultColors.white,
+        fillColor: isFocused ? DefaultColors.backgroundLight : DefaultColors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             12.r,

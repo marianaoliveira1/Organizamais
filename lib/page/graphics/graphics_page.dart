@@ -50,7 +50,7 @@ class GraphicsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: DefaultColors.backgroundLight,
       body: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -151,7 +151,7 @@ class GraphicsPage extends StatelessWidget {
                             PieChartData(
                               sectionsSpace: 0,
                               centerSpaceRadius: 26,
-                              centerSpaceColor: DefaultColors.backgroundIght,
+                              centerSpaceColor: DefaultColors.backgroundLight,
                               sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
                             ),
                           ),
@@ -218,7 +218,7 @@ class GraphicsPage extends StatelessWidget {
                                 PieChartData(
                                   sectionsSpace: 0,
                                   centerSpaceRadius: 15,
-                                  centerSpaceColor: DefaultColors.backgroundIght,
+                                  centerSpaceColor: DefaultColors.backgroundLight,
                                   startDegreeOffset: -90,
                                   sections: [
                                     PieChartSectionData(
@@ -229,7 +229,7 @@ class GraphicsPage extends StatelessWidget {
                                     ),
                                     PieChartSectionData(
                                       value: totalValue - (item['chart']?.value ?? 0),
-                                      color: DefaultColors.backgroundIght,
+                                      color: DefaultColors.backgroundLight,
                                       radius: 15,
                                       showTitle: false,
                                     ),

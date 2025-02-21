@@ -19,6 +19,8 @@ class FinanceSummaryWidget extends StatelessWidget {
       symbol: "R\$",
     );
 
+    final theme = Theme.of(context);
+
     return Obx(() {
       double totalReceita = transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(0, (sum, t) => sum + double.parse(t.value));
 
@@ -32,7 +34,7 @@ class FinanceSummaryWidget extends StatelessWidget {
           horizontal: 16.w,
         ),
         decoration: BoxDecoration(
-          color: DefaultColors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(24.r),
         ),
         child: Column(
@@ -52,22 +54,22 @@ class FinanceSummaryWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 30.sp,
                 fontWeight: FontWeight.bold,
-                color: DefaultColors.black,
+                color: theme.primaryColor,
               ),
             ),
             SizedBox(height: 12.h),
             Row(
               children: [
-                _buildCategory(
-                  "Receita",
-                  formatter.format(totalReceita), // <-- formatter
-                  DefaultColors.green,
+                CategoryValue(
+                  title: "Receita",
+                  value: formatter.format(totalReceita),
+                  color: DefaultColors.green,
                 ),
                 SizedBox(width: 24.w),
-                _buildCategory(
-                  "Despesas",
-                  formatter.format(totalDespesas), // <-- formatter
-                  DefaultColors.red,
+                CategoryValue(
+                  title: "Despesas",
+                  value: formatter.format(totalDespesas),
+                  color: DefaultColors.red,
                 ),
               ],
             ),
@@ -76,8 +78,23 @@ class FinanceSummaryWidget extends StatelessWidget {
       );
     });
   }
+}
 
-  Widget _buildCategory(String title, String value, Color color) {
+class CategoryValue extends StatelessWidget {
+  final String title;
+  final String value;
+  final Color color;
+
+  const CategoryValue({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,7 +125,7 @@ class FinanceSummaryWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
-                color: DefaultColors.black,
+                color: theme.primaryColor,
               ),
             ),
           ],

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class DefaultColors {
-  static const backgroundIght = Color(0xFFF6F6F6);
+  static const backgroundLight = Color(0xFFF6F6F6);
   static const grey = Color(0xFF808080);
   static const greyLight = Color(0xFF91919F);
   static const black = Color(0xFF000000);
   static const white = Color(0xFFFFFFFF);
   static const green = Color(0xFF50bb77);
   static const red = Color(0xFFFD3C4A);
+
+  static const backgroundDark = Color(0xFF0f0f0c);
+  static const backgroundCard = Color(0xFF20211a);
+  static const backgroundgreyDark = Color(0xFF606455);
 
   // Cores das categorias
   static const blue = Color(0xFF4A90E2); // Casa

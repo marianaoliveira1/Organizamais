@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/page/initial/widget/finance_summary.dart';
 
-import 'package:organizamais/utils/color.dart';
-
 import '../../controller/fixed_accounts_controller.dart';
 
 import 'widget/credit_card_selection.dart';
@@ -17,8 +15,10 @@ class InitialPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(FixedAccountsController());
 
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -341,9 +341,9 @@ class _SelectIconPageState extends State<SelectIconPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundIght,
+      backgroundColor: DefaultColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundIght,
+        backgroundColor: DefaultColors.backgroundLight,
         title: Text('Selecionar Ícone'),
       ),
       body: Column(
