@@ -47,8 +47,10 @@ class _AddCardPageState extends State<AddCardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: DefaultColors.green,
         iconTheme: IconThemeData(
@@ -80,12 +82,12 @@ class _AddCardPageState extends State<AddCardPage> {
               controller: nameController,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: DefaultColors.black,
+                color: theme.primaryColor,
               ),
               decoration: InputDecoration(
                 hintText: 'Digite o nome do Cartão',
                 hintStyle: TextStyle(
-                  color: DefaultColors.grey,
+                  color: theme.primaryColor.withOpacity(0.5),
                   fontSize: 14.sp,
                 ),
                 border: OutlineInputBorder(
@@ -93,7 +95,7 @@ class _AddCardPageState extends State<AddCardPage> {
                     8.r,
                   ),
                   borderSide: BorderSide(
-                    color: DefaultColors.grey,
+                    color: theme.primaryColor.withOpacity(0.5),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -101,7 +103,8 @@ class _AddCardPageState extends State<AddCardPage> {
                     8.r,
                   ),
                   borderSide: BorderSide(
-                    color: DefaultColors.grey,
+                    color: theme.primaryColor.withOpacity(0.5),
+                    // color: DefaultColors.grey,
                   ),
                 ),
               ),
@@ -114,13 +117,12 @@ class _AddCardPageState extends State<AddCardPage> {
               controller: limitController,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: DefaultColors.black,
+                color: theme.primaryColor,
               ),
               decoration: InputDecoration(
-                prefix: Text('R\$ '),
                 hintText: 'Limtie do cartão',
                 hintStyle: TextStyle(
-                  color: DefaultColors.grey,
+                  color: theme.primaryColor.withOpacity(0.5),
                   fontSize: 14.sp,
                 ),
                 border: OutlineInputBorder(
@@ -128,7 +130,7 @@ class _AddCardPageState extends State<AddCardPage> {
                     8.r,
                   ),
                   borderSide: BorderSide(
-                    color: DefaultColors.grey,
+                    color: theme.primaryColor.withOpacity(0.5),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -136,7 +138,7 @@ class _AddCardPageState extends State<AddCardPage> {
                     8.r,
                   ),
                   borderSide: BorderSide(
-                    color: DefaultColors.grey,
+                    color: theme.primaryColor.withOpacity(0.5),
                   ),
                 ),
               ),
@@ -180,7 +182,7 @@ class _AddCardPageState extends State<AddCardPage> {
                             child: Icon(
                               Iconsax.add,
                               size: 24.sp,
-                              color: DefaultColors.black.withOpacity(0.7),
+                              color: theme.primaryColor.withOpacity(0.5),
                             ),
                           ),
                           SizedBox(
@@ -202,7 +204,7 @@ class _AddCardPageState extends State<AddCardPage> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                 decoration: BoxDecoration(
-                  color: DefaultColors.backgroundLight,
+                  color: theme.scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
                     color: DefaultColors.green,

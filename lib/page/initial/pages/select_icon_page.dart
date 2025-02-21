@@ -340,11 +340,16 @@ class _SelectIconPageState extends State<SelectIconPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundLight,
-        title: Text('Selecionar Ícone'),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        title: Text(
+          'Selecionar Ícone',
+          style: TextStyle(color: theme.primaryColor),
+        ),
       ),
       body: Column(
         children: [
@@ -389,12 +394,15 @@ class _SelectIconPageState extends State<SelectIconPage> {
                         },
                         leading: Image.asset(
                           bank['path']!,
-                          width: 40,
-                          height: 40,
+                          width: 40.w,
+                          height: 40.h,
                         ),
                         title: Text(
                           bank['name']!,
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: theme.primaryColor,
+                          ),
                         ),
                       );
                     },
