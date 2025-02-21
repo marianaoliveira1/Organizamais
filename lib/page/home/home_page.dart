@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.more_circle,
+              Iconsax.card,
             ),
             label: "Cartões",
           ),
