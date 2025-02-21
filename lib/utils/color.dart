@@ -9,8 +9,8 @@ class DefaultColors {
   static const green = Color(0xFF50bb77);
   static const red = Color(0xFFFD3C4A);
 
-  static const backgroundDark = Color(0xFF0f0f0c);
-  static const backgroundCard = Color(0xFF20211a);
+  static const backgroundDark = Color(0xFF1A1919);
+  static const backgroundCard = Color(0xFF242424);
   static const backgroundgreyDark = Color(0xFF606455);
 
   // Cores das categorias
