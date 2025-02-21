@@ -45,21 +45,25 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return TextField(
       controller: widget.controller,
-      cursorColor: DefaultColors.black,
+      cursorColor: theme.primaryColor,
       style: TextStyle(
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
-        color: DefaultColors.black,
+        color: theme.primaryColor,
       ),
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
       decoration: InputDecoration(
-        fillColor: isFocused ? DefaultColors.backgroundLight : DefaultColors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             12.r,
+          ),
+          borderSide: BorderSide(
+            color: theme.primaryColor.withOpacity(.5),
           ),
         ),
         prefixIcon: widget.icon,
@@ -68,13 +72,16 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
           borderRadius: BorderRadius.circular(
             12.r,
           ),
+          borderSide: BorderSide(
+            color: theme.primaryColor.withOpacity(.5),
+          ),
         ),
-        focusColor: DefaultColors.black,
+        focusColor: theme.primaryColor,
         hintText: widget.hintText,
         hintStyle: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,
-          color: DefaultColors.black.withOpacity(0.5),
+          color: theme.primaryColor.withOpacity(.5),
         ),
       ),
     );

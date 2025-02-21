@@ -18,6 +18,8 @@ class DefaultButtonSelectCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final selectedCategoryData = findCategoryById(selectedCategory);
 
     return InkWell(

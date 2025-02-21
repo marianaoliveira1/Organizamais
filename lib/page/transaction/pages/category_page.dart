@@ -192,10 +192,12 @@ class Category extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundLight,
+        backgroundColor: theme.scaffoldBackgroundColor,
         title: Text(
           'Categorias',
         ),
@@ -217,17 +219,20 @@ class Category extends StatelessWidget {
               horizontal: 6.w,
             ),
             decoration: BoxDecoration(
-              color: DefaultColors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(
                 14.r,
               ),
             ),
             child: ListTile(
               leading: CircleAvatar(
-                backgroundColor: DefaultColors.backgroundLight,
-                child: Image.asset(
-                  category['icon'],
-                  height: 26.h,
+                backgroundColor: DefaultColors.grey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    category['icon'],
+                    height: 26.h,
+                  ),
                 ),
               ),
               title: Text(
@@ -235,7 +240,7 @@ class Category extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
-                  color: DefaultColors.black,
+                  color: theme.primaryColor,
                 ),
               ),
               onTap: () {

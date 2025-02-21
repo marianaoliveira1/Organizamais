@@ -29,11 +29,19 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
   Widget build(BuildContext context) {
     final FixedAccountsController fixedAccountsController = Get.put(FixedAccountsController());
 
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: DefaultColors.backgroundLight,
-        title: const Text("Contas fixas"),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        title: Text(
+          "Contas fixas",
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 16.sp,
+          ),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(
@@ -59,18 +67,18 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
             ),
             TextField(
               controller: valueController,
-              cursorColor: DefaultColors.black,
+              cursorColor: theme.primaryColor,
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
-                color: DefaultColors.black,
+                color: theme.primaryColor,
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [
                 CurrencyInputFormatter(),
               ],
               decoration: InputDecoration(
-                fillColor: DefaultColors.backgroundLight,
+                fillColor: theme.primaryColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(
                     12.r,
@@ -84,13 +92,16 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                   borderRadius: BorderRadius.circular(
                     12.r,
                   ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(.5),
+                  ),
                 ),
-                focusColor: DefaultColors.black,
+                focusColor: theme.primaryColor,
                 hintText: "0,00",
                 hintStyle: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
-                  color: DefaultColors.black.withOpacity(0.5),
+                  color: theme.primaryColor.withOpacity(0.5),
                 ),
               ),
             ),
