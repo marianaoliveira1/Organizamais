@@ -32,7 +32,7 @@ class CardsPage extends StatelessWidget {
     final selectedMonth = 0.obs; // Janeiro como padrão (0-based index)
 
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.backgroundIght,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(

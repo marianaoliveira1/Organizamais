@@ -96,7 +96,7 @@ class ResumePage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.backgroundIght,
       body: Padding(
         padding: EdgeInsets.symmetric(
           vertical: 20.w,

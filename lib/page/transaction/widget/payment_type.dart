@@ -71,7 +71,7 @@ class PaymentTypeField extends StatelessWidget {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
-                                color: DefaultColors.background,
+                                color: DefaultColors.backgroundIght,
                               ),
                               padding: EdgeInsets.symmetric(
                                 vertical: 4.h,
@@ -156,7 +156,7 @@ class PaymentTypeField extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.r),
-        color: DefaultColors.background,
+        color: DefaultColors.backgroundIght,
       ),
       padding: EdgeInsets.symmetric(
         vertical: 4.h,

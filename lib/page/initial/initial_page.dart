@@ -18,7 +18,7 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.backgroundIght,
       body: SingleChildScrollView(
         child: Column(
           children: [

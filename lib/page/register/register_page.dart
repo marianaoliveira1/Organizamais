@@ -21,7 +21,7 @@ class RegisterPage extends StatelessWidget {
     final TextEditingController passwordController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: DefaultColors.background,
+      backgroundColor: DefaultColors.backgroundIght,
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 30.h,
