@@ -2,19 +2,19 @@
 
 import 'package:get/get.dart';
 
-import '../page/cards/cards_page.dart';
-import '../page/graphics/graphics_page.dart';
-import '../page/home/home_page.dart';
+import '../pages/cards/cards_page.dart';
+import '../pages/graphics/graphics_page.dart';
+import '../pages/home/home_page.dart';
 
-import '../page/initial/initial_page.dart';
+import '../pages/initial/initial_page.dart';
 
-import '../page/initial/pages/fixed_accotuns_page.dart';
-import '../page/login/login_page.dart';
-import '../page/register/register_page.dart';
+import '../pages/initial/pages/fixed_accotuns_page.dart';
+import '../pages/login/login_page.dart';
+import '../pages/register/register_page.dart';
 
-import '../page/resume/resume_page.dart';
-import '../page/transaction/pages/category_page.dart';
-import '../page/transaction/transaction_page.dart';
+import '../pages/resume/resume_page.dart';
+import '../pages/transaction/pages/category_page.dart';
+import '../pages/transaction/transaction_page.dart';
 
 class Routes {
   static const LOGIN = '/login';
