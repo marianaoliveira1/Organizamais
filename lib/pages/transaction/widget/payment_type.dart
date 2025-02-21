@@ -115,8 +115,8 @@ class PaymentTypeField extends StatelessWidget {
                       controller: controller,
                     ),
                     PaymentOption(
-                      title: 'Cartão de Crédito',
-                      assetPath: 'assets/icon-payment/cartoes-de-credito.png',
+                      title: 'Pix',
+                      assetPath: 'assets/icon-payment/pix.png',
                       controller: controller,
                     ),
                     PaymentOption(

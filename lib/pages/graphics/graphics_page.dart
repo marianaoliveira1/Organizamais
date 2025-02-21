@@ -80,7 +80,7 @@ class GraphicsPage extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         decoration: BoxDecoration(
-                          color: Colors.transparent, // Removido background
+                          color: Colors.transparent,
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
@@ -113,9 +113,13 @@ class GraphicsPage extends StatelessWidget {
                   .map(
                     (e) => {
                       "chart": PieChartSectionData(
-                        value: filteredTransactions.where((element) => element.category == e).fold(0, (previousValue, element) {
-                          return (previousValue ?? 0) + double.parse(element.value);
-                        }),
+                        value: filteredTransactions.where((element) => element.category == e).fold(
+                          0,
+                          (previousValue, element) {
+                            // Remove os pontos e troca vírgula por ponto para corrigir o parse
+                            return (previousValue ?? 0) + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
+                          },
+                        ),
                         color: findCategoryById(e)?['color'],
                         title: '${findCategoryById(e)?['name']}',
                         radius: 50,
@@ -204,7 +208,7 @@ class GraphicsPage extends StatelessWidget {
                   SizedBox(height: 20.h),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: data.length,
                     itemBuilder: (context, index) {
                       var item = data[index];
@@ -212,36 +216,6 @@ class GraphicsPage extends StatelessWidget {
                         padding: EdgeInsets.only(bottom: 20.h),
                         child: Row(
                           children: [
-                            // Container(
-                            //   width: 45.w,
-                            //   height: 45.h,
-                            //   decoration: BoxDecoration(
-                            //     color: theme.primaryColor,
-                            //     shape: BoxShape.circle,
-                            //   ),
-                            //   child: PieChart(
-                            //     PieChartData(
-                            //       sectionsSpace: 0,
-                            //       centerSpaceRadius: 15,
-                            //       centerSpaceColor: theme.primaryColor,
-                            //       startDegreeOffset: -90,
-                            //       sections: [
-                            //         PieChartSectionData(
-                            //           value: item['chart']?.value ?? 0,
-                            //           color: item['chart']?.color ?? Colors.grey,
-                            //           radius: 15,
-                            //           showTitle: false,
-                            //         ),
-                            //         PieChartSectionData(
-                            //           value: totalValue - (item['chart']?.value ?? 0),
-                            //           color: theme.primaryColor,
-                            //           radius: 15,
-                            //           showTitle: false,
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
                             CircleAvatar(
                               radius: 24,
                               child: Image.asset(
@@ -274,7 +248,7 @@ class GraphicsPage extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "R\$${item['chart']?.value?.toStringAsFixed(2)}",
+                              "R\$${item['chart']?.value.toStringAsFixed(2)}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,

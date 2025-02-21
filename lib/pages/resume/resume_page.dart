@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../transaction/pages/category_page.dart';
-
 import 'widgtes/text_not_transaction.dart';
 
 class ResumePage extends StatelessWidget {
@@ -57,7 +56,8 @@ class ResumePage extends StatelessWidget {
 
     String formatValue(dynamic value) {
       if (value is String) {
-        double? doubleValue = double.tryParse(value);
+        // Remove separadores de milhar e troca vírgula por ponto
+        double? doubleValue = double.tryParse(value.replaceAll('.', '').replaceAll(',', '.'));
         return doubleValue != null ? formatter.format(doubleValue) : formatter.format(0);
       } else if (value is num) {
         return formatter.format(value);
@@ -130,7 +130,6 @@ class ResumePage extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           decoration: BoxDecoration(
-                            // Sem background: removemos a cor de fundo
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(

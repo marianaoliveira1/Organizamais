@@ -28,9 +28,27 @@ class FinanceSummaryWidget extends StatelessWidget {
 
     return Obx(() {
       // Se for o primeiro dia, os valores serão zerados.
-      double totalReceita = isFirstDay ? 0 : transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(0, (sum, t) => sum + double.parse(t.value));
+      double totalReceita = isFirstDay
+          ? 0
+          : transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(
+                0,
+                (sum, t) =>
+                    sum +
+                    double.parse(
+                      t.value.replaceAll('.', '').replaceAll(',', '.'),
+                    ),
+              );
 
-      double totalDespesas = isFirstDay ? 0 : transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(0, (sum, t) => sum + double.parse(t.value));
+      double totalDespesas = isFirstDay
+          ? 0
+          : transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(
+                0,
+                (sum, t) =>
+                    sum +
+                    double.parse(
+                      t.value.replaceAll('.', '').replaceAll(',', '.'),
+                    ),
+              );
 
       double total = totalReceita - totalDespesas;
 

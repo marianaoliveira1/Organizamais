@@ -26,14 +26,18 @@ class CardsPage extends StatelessWidget {
     'Dez'
   ];
 
+  final NumberFormat formatter = NumberFormat.currency(
+    locale: "pt_BR",
+    symbol: "R\$",
+  );
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final TransactionController transactionController = Get.put(TransactionController());
 
-    // Adiciona uma variável observável para o mês selecionado
-    final selectedMonth = 0.obs; // Janeiro como padrão (0-based index)
+    // Variável observável para o mês selecionado (0-based index)
+    final selectedMonth = 0.obs;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -53,8 +57,8 @@ class CardsPage extends StatelessWidget {
                         padding: EdgeInsets.only(right: 8.w),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent, // Remove o background
-                            elevation: 0, // Remove a sombra
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                               side: BorderSide(
@@ -66,7 +70,7 @@ class CardsPage extends StatelessWidget {
                           child: Text(
                             months[index],
                             style: TextStyle(
-                              color: selectedMonth.value == index ? theme.primaryColor : DefaultColors.grey, // Alterado para cinza
+                              color: selectedMonth.value == index ? theme.primaryColor : DefaultColors.grey,
                               fontSize: 12.sp,
                             ),
                           ),
@@ -75,7 +79,6 @@ class CardsPage extends StatelessWidget {
                 },
               ),
             ),
-
             SizedBox(height: 20.h),
             Expanded(
               child: Obx(() => SingleChildScrollView(
@@ -106,11 +109,6 @@ class CardsPage extends StatelessWidget {
       ),
     );
   }
-
-  final NumberFormat formatter = NumberFormat.currency(
-    locale: "pt_BR",
-    symbol: "R\$",
-  );
 }
 
 class TransactionSection extends StatelessWidget {
@@ -177,8 +175,6 @@ class TransactionSection extends StatelessWidget {
 class TransactionCard extends StatelessWidget {
   final TransactionModel transaction;
   final Color color;
-  // Supondo que o 'formatter' seja acessível globalmente ou seja passado por parâmetro,
-  // caso contrário, ajuste conforme necessário.
   final NumberFormat formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
   TransactionCard({
@@ -189,7 +185,11 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double valueDouble = double.tryParse(transaction.value) ?? 0.0;
+    // Corrige o parse removendo separadores de milhar e trocando vírgula por ponto
+    double valueDouble = double.tryParse(
+          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+        ) ??
+        0.0;
     String formattedValue = formatter.format(valueDouble);
 
     final theme = Theme.of(context);
