@@ -6,7 +6,7 @@ class DefaultColors {
   static const greyLight = Color(0xFF91919F);
   static const black = Color(0xFF000000);
   static const white = Color(0xFFFFFFFF);
-  static const green = Color(0xFF00A86B);
+  static const green = Color(0xFF50bb77);
   static const red = Color(0xFFFD3C4A);
 
   // Cores das categorias
