@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
-import 'package:organizamais/page/transaction/pages/%20category.dart';
+import 'package:organizamais/page/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 

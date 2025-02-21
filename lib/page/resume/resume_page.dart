@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/utils/color.dart';
 
-import '../transaction/pages/ category.dart';
+import '../transaction/pages/category_page.dart';
+
 import 'widgtes/text_not_transaction.dart';
 
 class ResumePage extends StatelessWidget {
@@ -17,21 +17,26 @@ class ResumePage extends StatelessWidget {
     final TransactionController transactionController = Get.put(TransactionController());
     final selectedMonth = ''.obs;
 
-    // Cria um NumberFormat para formato brasileiro com símbolo R$
     final NumberFormat formatter = NumberFormat.currency(
       locale: "pt_BR",
       symbol: "R\$",
     );
 
-    // Lista fixa de todos os meses do ano atual
     List<String> getAllMonths() {
-      List<String> months = [];
-      DateTime now = DateTime.now();
-      for (int i = 0; i < 12; i++) {
-        DateTime month = DateTime(now.year, i + 1);
-        String monthYear = DateFormat('MMMM/yyyy', 'pt_BR').format(month);
-        months.add(monthYear);
-      }
+      final months = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ];
       return months;
     }
 
@@ -48,7 +53,6 @@ class ResumePage extends StatelessWidget {
       }
     }
 
-    // Função para formatar o valor usando o formatter
     String formatValue(dynamic value) {
       if (value is String) {
         double? doubleValue = double.tryParse(value);
@@ -59,18 +63,21 @@ class ResumePage extends StatelessWidget {
       return formatter.format(0);
     }
 
-    Map<String, List<dynamic>> groupTransactionsByDate(List transactions, String selectedMonth) {
+    Map<String, List<dynamic>> groupTransactionsByDate(List transactions) {
       Map<String, List<dynamic>> grouped = {};
 
       for (var transaction in transactions) {
-        DateTime transactionDate = DateTime.parse(transaction.paymentDay);
-        String transactionMonth = DateFormat('MMMM/yyyy', 'pt_BR').format(transactionDate);
+        DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
 
-        if (selectedMonth.isNotEmpty && transactionMonth != selectedMonth) {
-          continue;
+        // Filtrar por mês selecionado
+        if (selectedMonth.value.isNotEmpty) {
+          String monthName = getAllMonths()[transactionDate.month - 1];
+          if (monthName != selectedMonth.value) {
+            continue;
+          }
         }
 
-        String relativeDate = getRelativeDate(transaction.paymentDay);
+        String relativeDate = getRelativeDate(transaction.paymentDay!);
         if (!grouped.containsKey(relativeDate)) {
           grouped[relativeDate] = [];
         }
@@ -79,8 +86,8 @@ class ResumePage extends StatelessWidget {
 
       grouped.forEach((date, transactions) {
         transactions.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a.paymentDay);
-          DateTime dateTimeB = DateTime.parse(b.paymentDay);
+          DateTime dateTimeA = DateTime.parse(a.paymentDay!);
+          DateTime dateTimeB = DateTime.parse(b.paymentDay!);
           return dateTimeB.compareTo(dateTimeA);
         });
       });
@@ -98,13 +105,13 @@ class ResumePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Mês buttons em uma lista horizontal
-              SizedBox(
-                height: 16.h,
+              // Lista de meses com visual melhorado
+              Container(
+                height: 40.h,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: getAllMonths().length,
-                  separatorBuilder: (context, index) => SizedBox(width: 10.w),
+                  separatorBuilder: (context, index) => SizedBox(width: 8.w),
                   itemBuilder: (context, index) {
                     final month = getAllMonths()[index];
                     return Obx(
@@ -116,15 +123,31 @@ class ResumePage extends StatelessWidget {
                             selectedMonth.value = month;
                           }
                         },
-                        child: Text(
-                          month.split('/')[0].capitalize!,
-                          style: TextStyle(fontSize: 12.sp),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            month,
+                            style: TextStyle(
+                              color: selectedMonth.value == month ? DefaultColors.white : DefaultColors.grey,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
               ),
+              SizedBox(height: 20.h),
 
               // Lista de transações
               Obx(() {
@@ -134,7 +157,6 @@ class ResumePage extends StatelessWidget {
 
                 final groupedTransactions = groupTransactionsByDate(
                   transactionController.transaction,
-                  selectedMonth.value,
                 );
 
                 if (groupedTransactions.isEmpty) {
@@ -226,7 +248,7 @@ class ResumePage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        formatValue(transaction.value), // <-- aqui formata com o padrão brasileiro
+                                        formatValue(transaction.value),
                                         style: TextStyle(
                                           color: DefaultColors.black,
                                           fontSize: 14.sp,
