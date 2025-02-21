@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -41,7 +43,7 @@ class CardsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Meses ScrollView
-            Container(
+            SizedBox(
               height: 40.h,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -119,13 +121,13 @@ class TransactionSection extends StatelessWidget {
   final int selectedMonth;
 
   const TransactionSection({
-    Key? key,
+    super.key,
     required this.controller,
     required this.type,
     required this.title,
     required this.color,
     required this.selectedMonth,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +182,10 @@ class TransactionCard extends StatelessWidget {
   final NumberFormat formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
   TransactionCard({
-    Key? key,
+    super.key,
     required this.transaction,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

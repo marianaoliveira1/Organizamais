@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/page/initial/widget/fixed_accounts.dart';
 import 'package:organizamais/page/initial/widget/title_card.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/fixed_accounts_controller.dart';
 

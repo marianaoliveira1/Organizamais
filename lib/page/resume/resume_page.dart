@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -108,7 +110,7 @@ class ResumePage extends StatelessWidget {
           child: Column(
             children: [
               // Lista de meses com visual melhorado
-              Container(
+              SizedBox(
                 height: 40.h,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,

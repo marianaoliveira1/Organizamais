@@ -5,8 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 
-import '../../../utils/color.dart';
-
 class SelectIconPage extends StatefulWidget {
   final Function(String, String) onIconSelected;
 
