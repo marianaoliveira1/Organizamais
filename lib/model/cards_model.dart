@@ -2,7 +2,7 @@
 class CardsModel {
   final String? id;
   final String name;
-  final double limit;
+  final double? limit;
   final String? iconPath;
   final String? bankName;
   final String? userId;
@@ -10,7 +10,7 @@ class CardsModel {
   CardsModel({
     this.id,
     required this.name,
-    required this.limit,
+    this.limit,
     this.iconPath,
     this.bankName,
     this.userId,

@@ -112,38 +112,38 @@ class _AddCardPageState extends State<AddCardPage> {
             SizedBox(
               height: 16.h,
             ),
-            DefaultTitleTransaction(title: "Limite do cartão"),
-            TextField(
-              controller: limitController,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: theme.primaryColor,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Limtie do cartão',
-                hintStyle: TextStyle(
-                  color: theme.primaryColor.withOpacity(0.5),
-                  fontSize: 14.sp,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    8.r,
-                  ),
-                  borderSide: BorderSide(
-                    color: theme.primaryColor.withOpacity(0.5),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    8.r,
-                  ),
-                  borderSide: BorderSide(
-                    color: theme.primaryColor.withOpacity(0.5),
-                  ),
-                ),
-              ),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
+            // DefaultTitleTransaction(title: "Limite do cartão"),
+            // TextField(
+            //   controller: limitController,
+            //   style: TextStyle(
+            //     fontSize: 14.sp,
+            //     color: theme.primaryColor,
+            //   ),
+            //   decoration: InputDecoration(
+            //     hintText: 'Limtie do cartão',
+            //     hintStyle: TextStyle(
+            //       color: theme.primaryColor.withOpacity(0.5),
+            //       fontSize: 14.sp,
+            //     ),
+            //     border: OutlineInputBorder(
+            //       borderRadius: BorderRadius.circular(
+            //         8.r,
+            //       ),
+            //       borderSide: BorderSide(
+            //         color: theme.primaryColor.withOpacity(0.5),
+            //       ),
+            //     ),
+            //     focusedBorder: OutlineInputBorder(
+            //       borderRadius: BorderRadius.circular(
+            //         8.r,
+            //       ),
+            //       borderSide: BorderSide(
+            //         color: theme.primaryColor.withOpacity(0.5),
+            //       ),
+            //     ),
+            //   ),
+            //   keyboardType: TextInputType.numberWithOptions(decimal: true),
+            // ),
             SizedBox(height: 16),
             InkWell(
               onTap: () {
@@ -221,7 +221,7 @@ class _AddCardPageState extends State<AddCardPage> {
                 ),
               ),
               onTap: () {
-                if (nameController.text.isEmpty || limitController.text.isEmpty || selectedIconPath == null) {
+                if (nameController.text.isEmpty || selectedIconPath == null) {
                   Get.snackbar('Erro', 'Preencha todos os campos', snackPosition: SnackPosition.BOTTOM);
                   return;
                 }
@@ -229,7 +229,6 @@ class _AddCardPageState extends State<AddCardPage> {
                 final cardData = CardsModel(
                   id: widget.isEditing ? widget.card!.id : null,
                   name: nameController.text,
-                  limit: double.tryParse(limitController.text) ?? 0.0,
                   iconPath: selectedIconPath,
                   bankName: selectedBankName,
                   userId: widget.isEditing ? widget.card!.userId : null,

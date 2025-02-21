@@ -159,7 +159,7 @@ class PaymentTypeField extends StatelessWidget {
         hintText: "Selecione o tipo de pagamento",
         hintStyle: TextStyle(
           fontSize: 16.sp,
-          color: theme.primaryColor,
+          color: DefaultColors.grey,
           fontWeight: FontWeight.w500,
         ),
         border: InputBorder.none,
