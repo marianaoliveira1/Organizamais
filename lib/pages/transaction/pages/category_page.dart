@@ -131,10 +131,16 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 23,
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
-    'color': DefaultColors.navy, // Tecnologia e entretenimento
+    'color': DefaultColors.brightRed, // Tecnologia e entretenimento
   },
   {
     'id': 24,
+    'name': 'Farmacia',
+    'icon': 'assets/icon-category/farmacia.png',
+    'color': DefaultColors.orangeDark, // Categoria genérica e neutra
+  },
+  {
+    'id': 25,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey, // Categoria genérica e neutra
