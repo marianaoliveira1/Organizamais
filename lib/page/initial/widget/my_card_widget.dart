@@ -18,10 +18,14 @@ class MyCardsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       decoration: BoxDecoration(
-        color: DefaultColors.white,
-        borderRadius: BorderRadius.circular(24.r),
+        color: theme.cardColor,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 2.h,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -91,7 +95,7 @@ class MyCardsWidget extends StatelessWidget {
                             child: Text(
                               card.name,
                               style: TextStyle(
-                                color: DefaultColors.black,
+                                color: theme.primaryColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),

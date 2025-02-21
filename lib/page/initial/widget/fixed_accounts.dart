@@ -29,9 +29,11 @@ class FixedAccounts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       decoration: BoxDecoration(
-        color: DefaultColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
@@ -89,7 +91,7 @@ class FixedAccounts extends StatelessWidget {
                               Text(
                                 fixedAccount.title,
                                 style: TextStyle(
-                                  color: DefaultColors.black,
+                                  color: theme.primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14.sp,
                                 ),
@@ -112,7 +114,7 @@ class FixedAccounts extends StatelessWidget {
                           Text(
                             "R\$ ${fixedAccount.value}",
                             style: TextStyle(
-                              color: DefaultColors.black,
+                              color: theme.primaryColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 14.sp,
                             ),
@@ -141,7 +143,7 @@ class FixedAccounts extends StatelessWidget {
             child: Text(
               "R\$ ${_calculateTotal()}",
               style: TextStyle(
-                color: DefaultColors.black,
+                color: theme.primaryColor,
                 fontWeight: FontWeight.w500,
                 fontSize: 14.sp,
               ),

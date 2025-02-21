@@ -17,9 +17,11 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(FixedAccountsController());
 
+    final theme = Theme.of(context);
+
     return Container(
       decoration: BoxDecoration(
-        color: DefaultColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
       ),
       padding: EdgeInsets.symmetric(
