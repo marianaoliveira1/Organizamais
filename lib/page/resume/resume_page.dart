@@ -95,8 +95,10 @@ class ResumePage extends StatelessWidget {
       return grouped;
     }
 
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.symmetric(
           vertical: 20.w,
@@ -126,7 +128,8 @@ class ResumePage extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           decoration: BoxDecoration(
-                            color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
+                            // Sem background: removemos a cor de fundo
+                            color: Colors.transparent,
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
                               color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
@@ -136,7 +139,7 @@ class ResumePage extends StatelessWidget {
                           child: Text(
                             month,
                             style: TextStyle(
-                              color: selectedMonth.value == month ? DefaultColors.white : DefaultColors.grey,
+                              color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                             ),
@@ -147,6 +150,7 @@ class ResumePage extends StatelessWidget {
                   },
                 ),
               ),
+
               SizedBox(height: 20.h),
 
               // Lista de transações
@@ -200,7 +204,7 @@ class ResumePage extends StatelessWidget {
 
                             return Container(
                               decoration: BoxDecoration(
-                                color: DefaultColors.white,
+                                color: theme.cardColor,
                                 borderRadius: BorderRadius.circular(24.r),
                               ),
                               padding: EdgeInsets.symmetric(
@@ -226,7 +230,7 @@ class ResumePage extends StatelessWidget {
                                           Text(
                                             transaction.title,
                                             style: TextStyle(
-                                              color: DefaultColors.black,
+                                              color: theme.primaryColor,
                                               fontSize: 14.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -250,7 +254,7 @@ class ResumePage extends StatelessWidget {
                                       Text(
                                         formatValue(transaction.value),
                                         style: TextStyle(
-                                          color: DefaultColors.black,
+                                          color: theme.primaryColor,
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w500,
                                         ),

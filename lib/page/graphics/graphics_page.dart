@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/page/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
@@ -13,6 +13,7 @@ class GraphicsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final TransactionController transactionController = Get.put(TransactionController());
     final selectedMonth = ''.obs;
 
@@ -50,13 +51,13 @@ class GraphicsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: DefaultColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
           children: [
             // Lista de meses
-            Container(
+            SizedBox(
               height: 40.h,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
@@ -76,7 +77,7 @@ class GraphicsPage extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         decoration: BoxDecoration(
-                          color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.white,
+                          color: Colors.transparent, // Removido background
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
@@ -86,7 +87,7 @@ class GraphicsPage extends StatelessWidget {
                         child: Text(
                           month,
                           style: TextStyle(
-                            color: selectedMonth.value == month ? DefaultColors.white : DefaultColors.grey,
+                            color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
                           ),
@@ -97,6 +98,7 @@ class GraphicsPage extends StatelessWidget {
                 },
               ),
             ),
+
             SizedBox(height: 20.h),
 
             // Gráficos
@@ -151,7 +153,7 @@ class GraphicsPage extends StatelessWidget {
                             PieChartData(
                               sectionsSpace: 0,
                               centerSpaceRadius: 26,
-                              centerSpaceColor: DefaultColors.backgroundLight,
+                              centerSpaceColor: theme.scaffoldBackgroundColor,
                               sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
                             ),
                           ),
@@ -182,7 +184,7 @@ class GraphicsPage extends StatelessWidget {
                                           item['chart']?.title ?? '',
                                           style: TextStyle(
                                             fontSize: 12.sp,
-                                            color: DefaultColors.black,
+                                            color: theme.primaryColor,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -211,14 +213,14 @@ class GraphicsPage extends StatelessWidget {
                               width: 45.w,
                               height: 45.h,
                               decoration: BoxDecoration(
-                                color: DefaultColors.white,
+                                color: theme.primaryColor,
                                 shape: BoxShape.circle,
                               ),
                               child: PieChart(
                                 PieChartData(
                                   sectionsSpace: 0,
                                   centerSpaceRadius: 15,
-                                  centerSpaceColor: DefaultColors.backgroundLight,
+                                  centerSpaceColor: theme.primaryColor,
                                   startDegreeOffset: -90,
                                   sections: [
                                     PieChartSectionData(
@@ -229,7 +231,7 @@ class GraphicsPage extends StatelessWidget {
                                     ),
                                     PieChartSectionData(
                                       value: totalValue - (item['chart']?.value ?? 0),
-                                      color: DefaultColors.backgroundLight,
+                                      color: theme.primaryColor,
                                       radius: 15,
                                       showTitle: false,
                                     ),
@@ -247,14 +249,14 @@ class GraphicsPage extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                      color: theme.primaryColor,
                                     ),
                                   ),
                                   Text(
                                     "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(0)}%",
                                     style: TextStyle(
                                       fontSize: 12.sp,
-                                      color: Colors.black54,
+                                      color: DefaultColors.grey,
                                     ),
                                   ),
                                 ],
@@ -265,7 +267,7 @@ class GraphicsPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                color: theme.primaryColor,
                               ),
                             ),
                           ],

@@ -77,11 +77,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: DefaultColors.white,
+        backgroundColor: theme.cardColor,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(
@@ -117,7 +119,7 @@ class _HomePageState extends State<HomePage> {
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: DefaultColors.black,
+        selectedItemColor: theme.primaryColor,
         unselectedItemColor: DefaultColors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,
