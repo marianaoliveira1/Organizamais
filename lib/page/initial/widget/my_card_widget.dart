@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 
-import 'package:organizamais/utils/color.dart';
-
 import '../../../controller/card_controller.dart';
 import '../pages/add_card_page.dart';
 
@@ -87,19 +85,20 @@ class MyCardsWidget extends StatelessWidget {
                           if (card.iconPath != null)
                             Image.asset(
                               card.iconPath!,
-                              width: 40,
-                              height: 40,
+                              width: 40.w,
+                              height: 40.h,
                             ),
-                          SizedBox(width: 8),
+                          SizedBox(
+                            width: 10.w,
+                          ),
                           Expanded(
                             child: Text(
                               card.name,
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 16.sp,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
