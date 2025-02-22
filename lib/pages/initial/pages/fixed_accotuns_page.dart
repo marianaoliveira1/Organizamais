@@ -14,7 +14,10 @@ import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
 
 class FixedAccotunsPage extends StatefulWidget {
-  const FixedAccotunsPage({super.key});
+  final bool isEditing;
+  final FixedAccountModel? fixedAccount;
+
+  const FixedAccotunsPage({super.key, required this.isEditing, this.fixedAccount});
 
   @override
   State<FixedAccotunsPage> createState() => _FixedAccotunsPageState();
@@ -29,7 +32,9 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final FixedAccountsController fixedAccountsController = Get.put(FixedAccountsController());
+    final FixedAccountsController fixedAccountsController = Get.put(
+      FixedAccountsController(),
+    );
 
     final theme = Theme.of(context);
 
@@ -150,13 +155,15 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      if (categoryId != null) {
+                      if (categoryId != null && widget.isEditing) {
                         fixedAccountsController.addFixedAccount(FixedAccountModel(
+                          id: widget.isEditing ? widget.fixedAccount!.id : null,
                           title: titleController.text,
                           value: valueController.text,
                           category: categoryId ?? 0,
                           paymentDay: dayOfTheMonthController.text,
                           paymentType: paymentTypeController.text,
+                          userId: widget.isEditing ? widget.fixedAccount!.id : null,
                         ));
                       }
                     },
@@ -168,7 +175,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                       ),
                     ),
                     child: Text(
-                      "Salvar",
+                      widget.isEditing ? "Editar" : "Salvar",
                       style: TextStyle(
                         color: theme.cardColor,
                         fontSize: 14.sp,
