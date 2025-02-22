@@ -319,14 +319,14 @@ class _TransactionPageState extends State<TransactionPage> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                     decoration: BoxDecoration(
-                      color: theme.cardColor,
+                      color: theme.primaryColor,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Center(
                       child: Text(
                         "Salvar",
                         style: TextStyle(
-                          color: theme.primaryColor,
+                          color: theme.cardColor,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
