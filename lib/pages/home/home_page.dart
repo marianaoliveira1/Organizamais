@@ -89,13 +89,13 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(
               Iconsax.home,
             ),
-            label: "Inicio",
+            label: "",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Iconsax.graph,
             ),
-            label: "Gráficos",
+            label: "",
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -108,13 +108,13 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(
               Iconsax.arrow_swap_horizontal,
             ),
-            label: "Resumo",
+            label: "",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Iconsax.card,
             ),
-            label: "Cartões",
+            label: "",
           ),
         ],
         currentIndex: _selectedIndex,

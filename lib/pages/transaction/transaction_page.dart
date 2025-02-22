@@ -122,7 +122,7 @@ class _TransactionPageState extends State<TransactionPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.cardColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +158,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                     ),
                     style: TextStyle(
-                      color: theme.primaryColor,
+                      color: DefaultColors.white,
                       fontSize: 30.sp,
                       fontWeight: FontWeight.bold,
                     ),
