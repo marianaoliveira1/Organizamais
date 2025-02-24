@@ -199,8 +199,11 @@ class _TransactionPageState extends State<TransactionPage> {
                         DefaultTitleTransaction(
                           title: "Categoria",
                         ),
+                        // Onde você usa o DefaultButtonSelectCategory, mude para:
+                        // Onde você usa o DefaultButtonSelectCategory, mude para:
                         DefaultButtonSelectCategory(
                           selectedCategory: categoryId,
+                          transactionType: _selectedType,
                           onTap: (category) {
                             setState(() {
                               categoryId = category;

@@ -8,6 +8,7 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';
 
+import '../../../model/transaction_model.dart';
 import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/payment_type.dart';
@@ -118,13 +119,15 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
             DefaultTitleTransaction(
               title: "Categoria",
             ),
+            // Onde você usa o DefaultButtonSelectCategory, mude para:
             DefaultButtonSelectCategory(
+              selectedCategory: categoryId,
+              transactionType: TransactionType.despesa,
               onTap: (category) {
                 setState(() {
                   categoryId = category;
                 });
               },
-              selectedCategory: categoryId,
             ),
             SizedBox(
               height: 10.h,

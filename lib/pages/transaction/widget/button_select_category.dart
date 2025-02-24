@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
 import '../pages/category_page.dart';
 
@@ -11,10 +12,12 @@ class DefaultButtonSelectCategory extends StatelessWidget {
     super.key,
     required this.onTap,
     required this.selectedCategory,
+    this.transactionType,
   });
 
   final Function(int?) onTap;
   final int? selectedCategory;
+  final TransactionType? transactionType;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,9 @@ class DefaultButtonSelectCategory extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        var categoryId = await Get.to(() => const Category());
+        var categoryId = await Get.to(() => Category(
+              transactionType: transactionType,
+            ));
         onTap(categoryId as int?);
       },
       child: Container(

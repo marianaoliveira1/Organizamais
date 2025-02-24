@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../../model/transaction_model.dart';
+
 final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 1,
@@ -194,11 +196,18 @@ Map<String, dynamic>? findCategoryById(int? id) {
 }
 
 class Category extends StatelessWidget {
-  const Category({super.key});
+  final TransactionType? transactionType;
+
+  const Category({
+    super.key,
+    this.transactionType,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Escolher lista baseada no tipo, se não especificado usa expenses como padrão
+    final categoriesList = transactionType == TransactionType.receita ? categories_income : categories_expenses;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -213,9 +222,9 @@ class Category extends StatelessWidget {
           vertical: 20.h,
           horizontal: 20.w,
         ),
-        itemCount: categories_expenses.length,
+        itemCount: categoriesList.length,
         itemBuilder: (context, index) {
-          final category = categories_expenses[index];
+          final category = categoriesList[index];
           return Container(
             margin: EdgeInsets.only(
               bottom: 10.h,
