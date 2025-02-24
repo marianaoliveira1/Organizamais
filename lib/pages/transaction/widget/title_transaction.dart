@@ -24,9 +24,6 @@ class DefaultTitleTransaction extends StatelessWidget {
             color: DefaultColors.grey,
           ),
         ),
-        SizedBox(
-          height: 15.h,
-        )
       ],
     );
   }

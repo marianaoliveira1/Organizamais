@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../../model/fixed_account_model.dart';
 
 import '../../../model/transaction_model.dart';
-import '../../transaction/transaction_page.dart';
+
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/payment_type.dart';
 import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
+import '../widget/text_filed_value_fixed_accotuns.dart';
 
 class FixedAccotunsPage extends StatefulWidget {
   final FixedAccountModel? fixedAccount;
@@ -40,9 +40,9 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.cardColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: theme.cardColor,
         title: Text(
           "Contas fixas",
           style: TextStyle(
@@ -57,69 +57,39 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
           horizontal: 20.h,
         ),
         child: Column(
+          spacing: 10.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DefaultTitleTransaction(
               title: "Titulo",
             ),
-            DefaultTextFieldTransaction(
-              hintText: 'ex: Aluguel',
-              controller: titleController,
-              keyboardType: TextInputType.text,
-            ),
-            SizedBox(
-              height: 10.h,
+            Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: DefaultTextFieldTransaction(
+                hintText: 'ex: Aluguel',
+                controller: titleController,
+                keyboardType: TextInputType.text,
+              ),
             ),
             DefaultTitleTransaction(
               title: "Valor",
             ),
-            TextField(
-              controller: valueController,
-              cursorColor: theme.primaryColor,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: theme.primaryColor,
+            Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                CurrencyInputFormatter(),
-              ],
-              decoration: InputDecoration(
-                fillColor: theme.primaryColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    12.r,
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.attach_money,
-                ),
-                prefixIconColor: DefaultColors.grey,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    12.r,
-                  ),
-                  borderSide: BorderSide(
-                    color: theme.primaryColor.withOpacity(.5),
-                  ),
-                ),
-                focusColor: theme.primaryColor,
-                hintText: "0,00",
-                hintStyle: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: theme.primaryColor.withOpacity(0.5),
-                ),
+              child: TextFieldValueFixedAccotuns(
+                valueController: valueController,
+                theme: theme,
               ),
-            ),
-            SizedBox(
-              height: 10.h,
             ),
             DefaultTitleTransaction(
               title: "Categoria",
             ),
-            // Onde você usa o DefaultButtonSelectCategory, mude para:
             DefaultButtonSelectCategory(
               selectedCategory: categoryId,
               transactionType: TransactionType.despesa,
@@ -129,19 +99,19 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                 });
               },
             ),
-            SizedBox(
-              height: 10.h,
-            ),
             DefaultTitleTransaction(
               title: "Dia do pagamento ",
             ),
-            DefaultTextFieldTransaction(
-              hintText: 'ex: 5',
-              controller: dayOfTheMonthController,
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(
-              height: 10.h,
+            Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: DefaultTextFieldTransaction(
+                hintText: 'ex: 5',
+                controller: dayOfTheMonthController,
+                keyboardType: TextInputType.number,
+              ),
             ),
             DefaultTitleTransaction(
               title: "Tipo de pagamento",

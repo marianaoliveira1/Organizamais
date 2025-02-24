@@ -216,13 +216,10 @@ class GraphicsPage extends StatelessWidget {
                         padding: EdgeInsets.only(bottom: 20.h),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              radius: 24,
-                              child: Image.asset(
-                                item['icon'] ?? '',
-                                width: 24.w,
-                                height: 24.h,
-                              ),
+                            Image.asset(
+                              item['icon'] ?? '',
+                              width: 24.w,
+                              height: 24.h,
                             ),
                             SizedBox(width: 15.w),
                             Expanded(
