@@ -125,6 +125,7 @@ class _TransactionPageState extends State<TransactionPage> {
       backgroundColor: theme.cardColor,
       body: SingleChildScrollView(
         child: Column(
+          spacing: 10.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -132,7 +133,7 @@ class _TransactionPageState extends State<TransactionPage> {
               color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
               child: Column(
                 children: [
-                  SizedBox(height: 26.h),
+                  SizedBox(height: 20.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -170,9 +171,11 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 4.h),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.h,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -190,17 +193,15 @@ class _TransactionPageState extends State<TransactionPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 10.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.h),
                     child: Column(
+                      spacing: 10.h,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         DefaultTitleTransaction(
                           title: "Categoria",
                         ),
-                        // Onde você usa o DefaultButtonSelectCategory, mude para:
-                        // Onde você usa o DefaultButtonSelectCategory, mude para:
                         DefaultButtonSelectCategory(
                           selectedCategory: categoryId,
                           transactionType: _selectedType,
@@ -213,14 +214,18 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.h),
                   Divider(),
-                  SizedBox(height: 10.h),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
+                    ),
                     child: Column(
+                      spacing: 10.h,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(
+                          height: 2.h,
+                        ),
                         if (_selectedType == TransactionType.receita)
                           DefaultTitleTransaction(
                             title: "Recebi em",
@@ -235,11 +240,9 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.h),
                   Divider(),
                 ],
               ),
-            SizedBox(height: 10.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.h),
               child: Column(
@@ -253,7 +256,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     readOnly: true,
                     style: TextStyle(
                       fontSize: 16.sp,
-                      color: theme.primaryColor.withOpacity(.5),
+                      color: theme.primaryColor,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
@@ -274,7 +277,6 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            SizedBox(height: 10.h),
             Divider(),
             SizedBox(height: 10.h),
             Row(

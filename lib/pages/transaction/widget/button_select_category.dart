@@ -37,13 +37,6 @@ class DefaultButtonSelectCategory extends StatelessWidget {
           vertical: 10.h,
           horizontal: 5.w,
         ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: theme.primaryColor,
-            width: 1.w,
-          ),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
         child: Row(
           children: [
             if (selectedCategoryData != null)
