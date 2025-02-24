@@ -10,14 +10,14 @@ import '../../../model/fixed_account_model.dart';
 
 import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
+import '../../transaction/widget/payment_type.dart';
 import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
 
 class FixedAccotunsPage extends StatefulWidget {
-  final bool isEditing;
   final FixedAccountModel? fixedAccount;
 
-  const FixedAccotunsPage({super.key, required this.isEditing, this.fixedAccount});
+  const FixedAccotunsPage({super.key, this.fixedAccount});
 
   @override
   State<FixedAccotunsPage> createState() => _FixedAccotunsPageState();
@@ -143,10 +143,8 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
             DefaultTitleTransaction(
               title: "Tipo de pagamento",
             ),
-            DefaultTextFieldTransaction(
-              hintText: 'ex: Pix',
+            PaymentTypeField(
               controller: paymentTypeController,
-              keyboardType: TextInputType.text,
             ),
             Spacer(),
             Row(
@@ -155,15 +153,13 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      if (categoryId != null && widget.isEditing) {
+                      if (categoryId != null) {
                         fixedAccountsController.addFixedAccount(FixedAccountModel(
-                          id: widget.isEditing ? widget.fixedAccount!.id : null,
                           title: titleController.text,
                           value: valueController.text,
                           category: categoryId ?? 0,
                           paymentDay: dayOfTheMonthController.text,
                           paymentType: paymentTypeController.text,
-                          userId: widget.isEditing ? widget.fixedAccount!.id : null,
                         ));
                       }
                     },
@@ -175,7 +171,7 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                       ),
                     ),
                     child: Text(
-                      widget.isEditing ? "Editar" : "Salvar",
+                      "Salvar",
                       style: TextStyle(
                         color: theme.cardColor,
                         fontSize: 14.sp,

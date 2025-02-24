@@ -20,7 +20,7 @@ class PaymentTypeField extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: theme.primaryColor,
+      backgroundColor: theme.cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(20.r),
@@ -73,7 +73,7 @@ class PaymentTypeField extends StatelessWidget {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
-                                color: theme.cardColor,
+                                color: theme.scaffoldBackgroundColor,
                               ),
                               padding: EdgeInsets.symmetric(
                                 vertical: 4.h,
@@ -191,7 +191,10 @@ class PaymentOption extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16), color: theme.cardColor, // Substitua por DefaultColors.backgroundLight
+        borderRadius: BorderRadius.circular(
+          16.r,
+        ),
+        color: theme.scaffoldBackgroundColor, // Substitua por DefaultColors.backgroundLight
       ),
       padding: const EdgeInsets.symmetric(
         vertical: 4,

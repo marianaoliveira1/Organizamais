@@ -94,7 +94,6 @@ class FixedAccounts extends StatelessWidget {
                     onTap: () {
                       Get.to(
                         () => FixedAccotunsPage(
-                          isEditing: true,
                           fixedAccount: fixedAccount,
                         ),
                       );
