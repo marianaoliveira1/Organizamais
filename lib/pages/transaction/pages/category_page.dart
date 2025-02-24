@@ -152,7 +152,7 @@ final List<Map<String, dynamic>> categories_expenses = [
 final List<Map<String, dynamic>> categories_income = [
   {
     'id': 25,
-    'name': 'Renda',
+    'name': 'Salário',
     'icon': 'assets/icon-category/mooney.png',
     'color': Colors.green
   },
@@ -161,6 +161,30 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Poupança',
     'icon': 'assets/icon-category/renda.png',
     'color': Colors.blue
+  },
+  {
+    'id': 27,
+    'name': 'Bonificação',
+    'icon': 'assets/icon-category/bonus.png',
+    'color': Colors.blue
+  },
+  {
+    'id': 28,
+    'name': 'Renda extra',
+    'icon': 'assets/icon-category/income.png',
+    'color': Colors.blue
+  },
+  {
+    'id': 29,
+    'name': 'Transfrencia bancária',
+    'icon': 'assets/icon-category/transfer.png',
+    'color': Colors.blue
+  },
+  {
+    'id': 30,
+    'name': 'Outros',
+    'icon': 'assets/icon-category/outros.png',
+    'color': DefaultColors.grey, // Categoria genérica e neutra
   },
 ];
 
