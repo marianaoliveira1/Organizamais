@@ -23,6 +23,8 @@ class DefaultButtonSelectCategory extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedCategoryData = findCategoryById(selectedCategory);
 
+    final theme = Theme.of(context);
+
     return InkWell(
       onTap: () async {
         var categoryId = await Get.to(() => Category(
@@ -31,14 +33,24 @@ class DefaultButtonSelectCategory extends StatelessWidget {
         onTap(categoryId as int?);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(),
+        padding: EdgeInsets.symmetric(
+          vertical: 10.h,
+          horizontal: 5.w,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: theme.primaryColor,
+            width: 1.w,
+          ),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
         child: Row(
           children: [
             if (selectedCategoryData != null)
               Image.asset(
                 selectedCategoryData['icon'],
-                height: 28.h,
-                width: 28.w,
+                height: 30.h,
+                width: 30.w,
               )
             else
               Icon(
@@ -49,8 +61,8 @@ class DefaultButtonSelectCategory extends StatelessWidget {
             Text(
               selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
               style: TextStyle(
-                color: DefaultColors.grey,
-                fontSize: 16.sp,
+                color: theme.primaryColor,
+                fontSize: 17.sp,
               ),
             ),
           ],
