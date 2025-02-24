@@ -8,6 +8,8 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
+import 'widgtes/transaction_section.dart';
+
 class CardsPage extends StatelessWidget {
   CardsPage({super.key});
 
@@ -36,8 +38,8 @@ class CardsPage extends StatelessWidget {
     final theme = Theme.of(context);
     final TransactionController transactionController = Get.put(TransactionController());
 
-    // Variável observável para o mês selecionado (0-based index)
-    final selectedMonth = 0.obs;
+    // Variável observável para o mês selecionado, iniciando no mês atual
+    final selectedMonth = (DateTime.now().month - 1).obs;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -106,123 +108,6 @@ class CardsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TransactionSection extends StatelessWidget {
-  final TransactionController controller;
-  final TransactionType type;
-  final String title;
-  final Color color;
-  final int selectedMonth;
-
-  const TransactionSection({
-    super.key,
-    required this.controller,
-    required this.type,
-    required this.title,
-    required this.color,
-    required this.selectedMonth,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      // Filtra as transações por tipo e mês
-      var transactions = controller.transaction.where((t) {
-        bool matchesType = t.type == type;
-        DateTime transactionDate = DateTime.parse(t.paymentDay ?? '');
-        bool matchesMonth = transactionDate.month == (selectedMonth + 1);
-        return matchesType && matchesMonth;
-      }).toList();
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.bold,
-              color: DefaultColors.grey,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          transactions.isEmpty
-              ? Text(
-                  'Nenhuma transação registrada neste mês.',
-                  style: TextStyle(color: Colors.grey),
-                )
-              : Column(
-                  children: transactions
-                      .map((t) => Padding(
-                            padding: EdgeInsets.only(bottom: 10.h),
-                            child: TransactionCard(
-                              transaction: t,
-                              color: color,
-                            ),
-                          ))
-                      .toList(),
-                ),
-        ],
-      );
-    });
-  }
-}
-
-class TransactionCard extends StatelessWidget {
-  final TransactionModel transaction;
-  final Color color;
-  final NumberFormat formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
-
-  TransactionCard({
-    super.key,
-    required this.transaction,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Corrige o parse removendo separadores de milhar e trocando vírgula por ponto
-    double valueDouble = double.tryParse(
-          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
-        ) ??
-        0.0;
-    String formattedValue = formatter.format(valueDouble);
-
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(24.r),
-      ),
-      padding: EdgeInsets.symmetric(
-        vertical: 16.h,
-        horizontal: 12.w,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            transaction.title,
-            style: TextStyle(
-              color: theme.primaryColor,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            formattedValue,
-            style: TextStyle(
-              color: theme.primaryColor,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

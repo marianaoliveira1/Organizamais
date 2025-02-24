@@ -17,8 +17,8 @@ class GraphicsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final TransactionController transactionController = Get.put(TransactionController());
-    final selectedMonth = ''.obs;
 
+    // Lista de meses
     List<String> getAllMonths() {
       final months = [
         'Janeiro',
@@ -36,6 +36,9 @@ class GraphicsPage extends StatelessWidget {
       ];
       return months;
     }
+
+    // Inicializa com o mês atual
+    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();

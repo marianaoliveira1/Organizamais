@@ -16,13 +16,8 @@ class ResumePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TransactionController transactionController = Get.put(TransactionController());
-    final selectedMonth = ''.obs;
 
-    final NumberFormat formatter = NumberFormat.currency(
-      locale: "pt_BR",
-      symbol: "R\$",
-    );
-
+    // Lista de meses
     List<String> getAllMonths() {
       final months = [
         'Janeiro',
@@ -40,6 +35,14 @@ class ResumePage extends StatelessWidget {
       ];
       return months;
     }
+
+    // Inicializa com o mês atual
+    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
+
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: "pt_BR",
+      symbol: "R\$",
+    );
 
     String getRelativeDate(String dateStr) {
       DateTime date = DateTime.parse(dateStr);
@@ -109,7 +112,7 @@ class ResumePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Lista de meses com visual melhorado
+              SizedBox(height: 20.h),
               SizedBox(
                 height: 40.h,
                 child: ListView.separated(
@@ -152,8 +155,6 @@ class ResumePage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20.h),
-
               // Lista de transações
               Obx(() {
                 if (transactionController.transaction.isEmpty) {
@@ -165,11 +166,13 @@ class ResumePage extends StatelessWidget {
                 );
 
                 if (groupedTransactions.isEmpty) {
-                  return Text(
-                    "Nenhuma transação encontrada para este período",
-                    style: TextStyle(
-                      color: DefaultColors.grey,
-                      fontSize: 14.sp,
+                  return Center(
+                    child: Text(
+                      "Nenhuma transação encontrada para este período",
+                      style: TextStyle(
+                        color: DefaultColors.grey,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   );
                 }
