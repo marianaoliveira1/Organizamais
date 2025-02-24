@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../controller/card_controller.dart';
 import '../../../utils/color.dart';
+import 'payment_option.dart';
 
 class PaymentTypeField extends StatelessWidget {
   final TextEditingController controller;
@@ -72,7 +73,9 @@ class PaymentTypeField extends StatelessWidget {
 
                             return Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
+                                borderRadius: BorderRadius.circular(
+                                  16.r,
+                                ),
                                 color: theme.scaffoldBackgroundColor,
                               ),
                               padding: EdgeInsets.symmetric(
@@ -166,60 +169,10 @@ class PaymentTypeField extends StatelessWidget {
         prefixIcon: Icon(
           Icons.payment,
           color: DefaultColors.grey,
+          size: 24.w,
         ),
       ),
       onTap: () => _showPaymentOptions(context),
-    );
-  }
-}
-
-class PaymentOption extends StatelessWidget {
-  final String title;
-  final String assetPath;
-  final TextEditingController controller;
-
-  const PaymentOption({
-    super.key,
-    required this.title,
-    required this.assetPath,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-          16.r,
-        ),
-        color: theme.scaffoldBackgroundColor, // Substitua por DefaultColors.backgroundLight
-      ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 4,
-        horizontal: 10,
-      ),
-      margin: const EdgeInsets.only(bottom: 14),
-      child: ListTile(
-        leading: Image.asset(
-          assetPath,
-          width: 22,
-          height: 22,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            color: theme.primaryColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        onTap: () {
-          controller.text = title;
-          Navigator.pop(context);
-        },
-      ),
     );
   }
 }

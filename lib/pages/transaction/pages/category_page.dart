@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -232,9 +232,13 @@ class Category extends StatelessWidget {
             ),
             child: ListTile(
               leading: CircleAvatar(
-                backgroundColor: DefaultColors.grey,
+                backgroundColor: DefaultColors.grey.withOpacity(
+                  .3,
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(
+                    8.h,
+                  ),
                   child: Image.asset(
                     category['icon'],
                     height: 26.h,
