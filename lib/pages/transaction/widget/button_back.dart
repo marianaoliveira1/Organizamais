@@ -18,8 +18,11 @@ class ButtonBackTransaction extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: theme.cardColor,
           borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(
+            color: theme.primaryColor,
+            width: 1.w,
+          ),
         ),
         child: Center(
           child: Text(
