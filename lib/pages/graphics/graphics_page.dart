@@ -146,6 +146,7 @@ class GraphicsPage extends StatelessWidget {
                       color: DefaultColors.grey,
                       fontSize: 14.sp,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 );
               }

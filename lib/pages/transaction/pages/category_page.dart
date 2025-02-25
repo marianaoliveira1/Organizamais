@@ -113,7 +113,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 20,
-    'name': 'Roupas',
+    'name': 'Vestuario',
     'icon': 'assets/icon-category/roupas.png',
     'color': DefaultColors.pink, // Moda e estilo
   },
@@ -143,6 +143,36 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 25,
+    'name': 'Academia',
+    'icon': 'assets/icon-category/academia.png',
+    'color': DefaultColors.cyan, // Categoria genérica e neutra
+  },
+  {
+    'id': 26,
+    'name': 'Conta de água',
+    'icon': 'assets/icon-category/agua.png',
+    'color': DefaultColors.lightBlue, // Categoria genérica e neutra
+  },
+  {
+    'id': 27,
+    'name': 'Energia',
+    'icon': 'assets/icon-category/energia.png',
+    'color': DefaultColors.yellow, // Categoria genérica e neutra
+  },
+  {
+    'id': 28,
+    'name': 'Combustivel',
+    'icon': 'assets/icon-category/combustivel.png',
+    'color': DefaultColors.brown, // Categoria genérica e neutra
+  },
+  {
+    'id': 29,
+    'name': 'Mercado',
+    'icon': 'assets/icon-category/mercado.png',
+    'color': DefaultColors.deepOrange, // Categoria genérica e neutra
+  },
+  {
+    'id': 30,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey, // Categoria genérica e neutra
