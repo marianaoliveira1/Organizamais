@@ -25,8 +25,6 @@ class DefaultColors {
   static const gold = Color(0xFFFFE082); // Finanças e Investimentos
   static const navy = Color(0xFF546E7A);
   static const orangeDark = Color(0xFFFFAB91);
-
-  // Cores específicas para novas categorias
   static const cyan = Color(0xFF00ACC1); // Academia
   static const lightBlue = Color(0xFF4FC3F7); // Conta de Água
   static const yellow = Color(0xFFFFEB3B); // Energia
