@@ -42,7 +42,7 @@ class AppPages {
     GetPage(name: Routes.RESUME, page: () => ResumePage()),
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
-    GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccotunsPage()),
+    GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccountsPage()),
     // GetPage(name: Routes.BANK, page: () => BankSearchPage()),
     // GetPage(name: Routes.CREDITCARD, page: () => CreditCardPage()),
   ];

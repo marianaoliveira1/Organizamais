@@ -44,7 +44,13 @@ class CurrencyInputFormatter extends TextInputFormatter {
 }
 
 class TransactionPage extends StatefulWidget {
-  const TransactionPage({super.key});
+  const TransactionPage({
+    super.key,
+    this.transaction,
+    this.overrideTransactionSalvar,
+  });
+  final TransactionModel? transaction;
+  final Function(TransactionModel transaction)? overrideTransactionSalvar;
 
   @override
   _TransactionPageState createState() => _TransactionPageState();
@@ -111,6 +117,20 @@ class _TransactionPageState extends State<TransactionPage> {
         _selectedDate = date;
       });
       dayOfTheMonthController.text = _getFormattedDate(date);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.transaction != null) {
+      titleController.text = widget.transaction!.title;
+      valuecontroller.text = widget.transaction!.value;
+      _selectedType = widget.transaction!.type;
+      categoryId = widget.transaction!.category;
+      _selectedDate = DateTime.parse(widget.transaction!.paymentDay ?? '');
+      dayOfTheMonthController.text = _getFormattedDate(_selectedDate!);
+      paymentTypeController.text = widget.transaction!.paymentType ?? '';
     }
   }
 
@@ -285,6 +305,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 ButtonBackTransaction(),
                 InkWell(
                   onTap: () async {
+                    // !
+                    final TransactionController transactionController = Get.find<TransactionController>();
+
                     if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
                       Get.snackbar(
                         'Erro',
@@ -296,12 +319,9 @@ class _TransactionPageState extends State<TransactionPage> {
                       return;
                     }
 
-                    final TransactionController transactionController = Get.find<TransactionController>();
-                    String valueText = valuecontroller.text.replaceAll('R\$', '').trim();
-
-                    final TransactionModel newTransaction = TransactionModel(
+                    final TransactionModel transaction = TransactionModel(
                       title: titleController.text,
-                      value: valueText,
+                      value: valuecontroller.text.replaceAll('R\$', '').trim(),
                       type: _selectedType,
                       category: categoryId,
                       paymentDay: _selectedDate!.toString().split(' ')[0],
@@ -309,7 +329,15 @@ class _TransactionPageState extends State<TransactionPage> {
                     );
 
                     try {
-                      await transactionController.addTransaction(newTransaction);
+                      if (widget.overrideTransactionSalvar != null) {
+                        await widget.overrideTransactionSalvar!(transaction.copyWith(
+                          id: widget.transaction!.id,
+                        ));
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      await transactionController.addTransaction(transaction);
                       Navigator.pop(context);
                     } catch (e) {
                       Get.snackbar(

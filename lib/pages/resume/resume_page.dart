@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../transaction/pages/category_page.dart';
@@ -206,73 +207,86 @@ class ResumePage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final transaction = transactions[index];
 
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: theme.cardColor,
+                            return Material(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(24.r),
+                              child: InkWell(
                                 borderRadius: BorderRadius.circular(24.r),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 16.h,
-                                horizontal: 12.w,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Image.asset(
-                                    categories_expenses.firstWhere(
-                                      (element) => element['id'] == transaction.category,
-                                    )['icon'],
-                                    width: 28.w,
-                                    height: 28.h,
+                                onTap: () => {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TransactionPage(
+                                        transaction: transaction,
+                                        overrideTransactionSalvar: (transaction) => {
+                                          transactionController.updateTransaction(transaction)
+                                        },
+                                      )
+                                    ),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Image.asset(
+                                        categories_expenses.firstWhere(
+                                          (element) => element['id'] == transaction.category,
+                                        )['icon'],
+                                        width: 28.w,
+                                        height: 28.h,
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                transaction.title,
+                                                style: TextStyle(
+                                                  color: theme.primaryColor,
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                categories_expenses.firstWhere(
+                                                  (element) => element['id'] == transaction.category,
+                                                )['name'],
+                                                style: TextStyle(
+                                                  color: DefaultColors.greyLight,
+                                                  fontSize: 12.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            transaction.title,
+                                            formatValue(transaction.value),
                                             style: TextStyle(
                                               color: theme.primaryColor,
                                               fontSize: 14.sp,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                           Text(
-                                            categories_expenses.firstWhere(
-                                              (element) => element['id'] == transaction.category,
-                                            )['name'],
+                                            transaction.paymentType.toString(),
                                             style: TextStyle(
-                                              color: DefaultColors.greyLight,
-                                              fontSize: 12.sp,
+                                              color: Colors.grey[600],
+                                              fontSize: 14.sp,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        formatValue(transaction.value),
-                                        style: TextStyle(
-                                          color: theme.primaryColor,
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Text(
-                                        transaction.paymentType.toString(),
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 14.sp,
-                                        ),
-                                      ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             );
                           },

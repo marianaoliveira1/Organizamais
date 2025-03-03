@@ -66,65 +66,94 @@ class FixedAccounts extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final fixedAccount = fixedAccounts[index];
-                  return GestureDetector(
-                    onLongPress: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('Confirmar exclusão'),
-                          content: Text('Tem certeza que deseja excluir o cartão ${fixedAccount.title}?'),
-                          actions: [
-                            TextButton(
-                              child: Text('Cancelar'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: Text('Excluir'),
-                              onPressed: () {
-                                fixedAccountsController.deleteFixedAccount(fixedAccount.id!);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    onTap: () {
-                      Get.to(
-                        () => FixedAccotunsPage(
-                          fixedAccount: fixedAccount,
-                        ),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+                  return Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(24.r),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24.r),
+                      onLongPress: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Confirmar exclusão'),
+                            content: Text('Tem certeza que deseja excluir o cartão ${fixedAccount.title}?'),
+                            actions: [
+                              TextButton(
+                                child: Text('Cancelar'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text('Excluir'),
+                                onPressed: () {
+                                  fixedAccountsController.deleteFixedAccount(fixedAccount.id!);
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      onTap: () {
+                        Get.to(
+                          () => FixedAccountsPage(
+                            fixedAccount: fixedAccount,
+                            onSave: (fixedAccount) => fixedAccountsController.updateFixedAccount(fixedAccount),
+                          ),
+                        );
+                      },
+                      child: Ink(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(
-                                12.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: DefaultColors.grey.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(50.r),
-                              ),
-                              child: Image.asset(
-                                categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                                width: 24.w,
-                                height: 24.h,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10.w,
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(
+                                    12.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: DefaultColors.grey.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(50.r),
+                                  ),
+                                  child: Image.asset(
+                                    categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                                    width: 24.w,
+                                    height: 24.h,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10.w,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fixedAccount.title,
+                                      style: TextStyle(
+                                        color: theme.primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Dia ${fixedAccount.paymentDay} de cada mês",
+                                      style: TextStyle(
+                                        color: DefaultColors.grey,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  fixedAccount.title,
+                                  "R\$ ${fixedAccount.value}",
                                   style: TextStyle(
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -132,7 +161,7 @@ class FixedAccounts extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "Dia ${fixedAccount.paymentDay} de cada mês",
+                                  "${fixedAccount.paymentType}",
                                   style: TextStyle(
                                     color: DefaultColors.grey,
                                     fontSize: 12.sp,
@@ -140,31 +169,10 @@ class FixedAccounts extends StatelessWidget {
                                   ),
                                 ),
                               ],
-                            ),
+                            )
                           ],
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              "R\$ ${fixedAccount.value}",
-                              style: TextStyle(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                            Text(
-                              "${fixedAccount.paymentType}",
-                              style: TextStyle(
-                                color: DefaultColors.grey,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
+                      ),
                     ),
                   );
                 },

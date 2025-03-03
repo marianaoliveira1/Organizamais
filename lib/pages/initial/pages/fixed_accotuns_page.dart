@@ -4,32 +4,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
-
 import '../../../model/fixed_account_model.dart';
-
 import '../../../model/transaction_model.dart';
-
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/payment_type.dart';
 import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
 import '../widget/text_filed_value_fixed_accotuns.dart';
 
-class FixedAccotunsPage extends StatefulWidget {
+class FixedAccountsPage extends StatefulWidget {
   final FixedAccountModel? fixedAccount;
+  final Function(FixedAccountModel fixedAccount)? onSave;
 
-  const FixedAccotunsPage({super.key, this.fixedAccount});
+  const FixedAccountsPage({super.key, this.fixedAccount, this.onSave});
 
   @override
-  State<FixedAccotunsPage> createState() => _FixedAccotunsPageState();
+  State<FixedAccountsPage> createState() => _FixedAccountsPageState();
 }
 
-class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
+class _FixedAccountsPageState extends State<FixedAccountsPage> {
   int? categoryId;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.fixedAccount != null) {
+      titleController.text = widget.fixedAccount!.title;
+      valueController.text = widget.fixedAccount!.value;
+      dayOfTheMonthController.text = widget.fixedAccount!.paymentDay;
+      paymentTypeController.text = widget.fixedAccount!.paymentType ?? '';
+      categoryId = widget.fixedAccount!.category;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,16 +135,26 @@ class _FixedAccotunsPageState extends State<FixedAccotunsPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      if (categoryId != null) {
-                        fixedAccountsController.addFixedAccount(FixedAccountModel(
+                      if (widget.onSave != null) {
+                        widget.onSave!(FixedAccountModel(
+                          id: widget.fixedAccount!.id,
                           title: titleController.text,
                           value: valueController.text,
-                          category: categoryId ?? 0,
+                          category: categoryId?? 0,
                           paymentDay: dayOfTheMonthController.text,
                           paymentType: paymentTypeController.text,
                         ));
+                        Navigator.pop(context);
+                        return;
                       }
+                      Navigator.pop(context);
+                      fixedAccountsController.addFixedAccount(FixedAccountModel(
+                        title: titleController.text,
+                        value: valueController.text,
+                        category: categoryId ?? 0,
+                        paymentDay: dayOfTheMonthController.text,
+                        paymentType: paymentTypeController.text,
+                      ));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.primaryColor,
