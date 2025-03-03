@@ -45,68 +45,70 @@ class CardsPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Meses ScrollView
-            SizedBox(
-              height: 40.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: months.length,
-                itemBuilder: (context, index) {
-                  return Obx(() => Padding(
-                        padding: EdgeInsets.only(right: 8.w),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                              side: BorderSide(
-                                color: selectedMonth.value == index ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Meses ScrollView
+              SizedBox(
+                height: 40.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: months.length,
+                  itemBuilder: (context, index) {
+                    return Obx(() => Padding(
+                          padding: EdgeInsets.only(right: 8.w),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.r),
+                                side: BorderSide(
+                                  color: selectedMonth.value == index ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => selectedMonth.value = index,
+                            child: Text(
+                              months[index],
+                              style: TextStyle(
+                                color: selectedMonth.value == index ? theme.primaryColor : DefaultColors.grey,
+                                fontSize: 12.sp,
                               ),
                             ),
                           ),
-                          onPressed: () => selectedMonth.value = index,
-                          child: Text(
-                            months[index],
-                            style: TextStyle(
-                              color: selectedMonth.value == index ? theme.primaryColor : DefaultColors.grey,
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                        ),
-                      ));
-                },
+                        ));
+                  },
+                ),
               ),
-            ),
-            SizedBox(height: 20.h),
-            Expanded(
-              child: Obx(() => SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TransactionSection(
-                          controller: transactionController,
-                          type: TransactionType.receita,
-                          title: 'Entradas',
-                          color: Colors.green,
-                          selectedMonth: selectedMonth.value,
-                        ),
-                        SizedBox(height: 20.h),
-                        TransactionSection(
-                          controller: transactionController,
-                          type: TransactionType.despesa,
-                          title: 'Saídas',
-                          color: Colors.red,
-                          selectedMonth: selectedMonth.value,
-                        ),
-                      ],
-                    ),
-                  )),
-            ),
-          ],
+              SizedBox(height: 20.h),
+              Expanded(
+                child: Obx(() => SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TransactionSection(
+                            controller: transactionController,
+                            type: TransactionType.receita,
+                            title: 'Entradas',
+                            color: Colors.green,
+                            selectedMonth: selectedMonth.value,
+                          ),
+                          SizedBox(height: 20.h),
+                          TransactionSection(
+                            controller: transactionController,
+                            type: TransactionType.despesa,
+                            title: 'Saídas',
+                            color: Colors.red,
+                            selectedMonth: selectedMonth.value,
+                          ),
+                        ],
+                      ),
+                    )),
+              ),
+            ],
+          ),
         ),
       ),
     );

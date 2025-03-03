@@ -22,18 +22,20 @@ class InitialPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.w,
-                horizontal: 20.h,
-              ),
-              child: Column(
-                spacing: 20.h,
-                children: [
-                  FinanceSummaryWidget(),
-                  DefaultWidgetFixedAccounts(),
-                  CreditCardSection(),
-                ],
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 20.w,
+                  horizontal: 20.h,
+                ),
+                child: Column(
+                  spacing: 20.h,
+                  children: [
+                    FinanceSummaryWidget(),
+                    DefaultWidgetFixedAccounts(),
+                    CreditCardSection(),
+                  ],
+                ),
               ),
             ),
           ],
