@@ -201,12 +201,6 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/academia.png',
     'color': DefaultColors.cyan,
   },
-  {
-    'id': 30,
-    'name': 'Outros',
-    'icon': 'assets/icon-category/outros.png',
-    'color': DefaultColors.grey,
-  },
 
   {
     'id': 35,
@@ -305,17 +299,15 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/toll.png',
     'color': DefaultColors.darkGrey,
   },
+  {
+    'id': 30,
+    'name': 'Outros',
+    'icon': 'assets/icon-category/outros.png',
+    'color': DefaultColors.grey,
+  },
 ];
 
 final List<Map<String, dynamic>> categories_income = [
-  // Categorias relacionadas a CASA
-  {
-    'id': 56,
-    'name': 'Aluguel',
-    'icon': 'assets/icon-category/rent.png',
-    'color': DefaultColors.emerald,
-  },
-
   // Outras categorias de receitas
   {
     'id': 50,
@@ -347,36 +339,31 @@ final List<Map<String, dynamic>> categories_income = [
     'icon': 'assets/icon-category/transfer.png',
     'color': Colors.blue,
   },
+
+  {
+    'id': 58,
+    'name': 'Freelance',
+    'icon': 'assets/icon-category/freelancer.png',
+    'color': DefaultColors.teal,
+  },
+  {
+    'id': 59,
+    'name': 'Indenização',
+    'icon': 'assets/icon-category/indenização.png',
+    'color': DefaultColors.lavender,
+  },
+  {
+    'id': 60,
+    'name': 'Prêmios',
+    'icon': 'assets/icon-category/premios.png',
+    'color': DefaultColors.peach,
+  },
   {
     'id': 55,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey,
   },
-  {
-    'id': 57,
-    'name': 'Dividendos',
-    'icon': 'assets/icon-category/dividends.png',
-    'color': DefaultColors.gold,
-  },
-  {
-    'id': 58,
-    'name': 'Freelance',
-    'icon': 'assets/icon-category/freelance.png',
-    'color': DefaultColors.teal,
-  },
-  {
-    'id': 59,
-    'name': 'Indenização',
-    'icon': 'assets/icon-category/compensation.png',
-    'color': DefaultColors.lavender,
-  },
-  {
-    'id': 60,
-    'name': 'Prêmios',
-    'icon': 'assets/icon-category/award.png',
-    'color': DefaultColors.peach,
-  }
 ];
 
 final List<Map<String, dynamic>> all_categories = [
