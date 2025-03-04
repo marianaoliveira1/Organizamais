@@ -9,213 +9,307 @@ import 'package:organizamais/utils/color.dart';
 import '../../../model/transaction_model.dart';
 
 final List<Map<String, dynamic>> categories_expenses = [
-  {
-    'id': 1,
-    'name': 'Alimentação',
-    'icon': 'assets/icon-category/food.png',
-    'color': DefaultColors.orange, // Comida geralmente remete a tons quentes
-  },
-  {
-    'id': 2,
-    'name': 'Assinaturas e serviços',
-    'icon': 'assets/icon-category/cartao.png',
-    'color': DefaultColors.navy, // Um tom mais sério, remetendo a tecnologia
-  },
-  {
-    'id': 3,
-    'name': 'Bares',
-    'icon': 'assets/icon-category/wine.png',
-    'color': DefaultColors.purple, // Um tom mais sofisticado e noturno
-  },
-  {
-    'id': 4,
-    'name': 'Restaurantes',
-    'icon': 'assets/icon-category/restaurante.png',
-    'color': DefaultColors.orange, // Mesma lógica de alimentação
-  },
+  // Categorias relacionadas a CASA
   {
     'id': 5,
     'name': 'Moradia',
     'icon': 'assets/icon-category/home.png',
-    'color': DefaultColors.blue, // Estabilidade e segurança
-  },
-  {
-    'id': 6,
-    'name': 'Compras',
-    'icon': 'assets/icon-category/shopping.png',
-    'color': DefaultColors.teal, // Uma cor vibrante que remete a consumo
-  },
-  {
-    'id': 7,
-    'name': 'Cuidados pessoais',
-    'icon': 'assets/icon-category/skincare.png',
-    'color': DefaultColors.pink, // Associado a bem-estar e beleza
-  },
-  {
-    'id': 9,
-    'name': 'Educação',
-    'icon': 'assets/icon-category/education.png',
-    'color': DefaultColors.purple, // Conhecimento e criatividade
-  },
-  {
-    'id': 10,
-    'name': 'Família e filhos',
-    'icon': 'assets/icon-category/family.png',
-    'color': DefaultColors.green, // Crescimento e harmonia
-  },
-  {
-    'id': 12,
-    'name': 'Lazer e hobbies',
-    'icon': 'assets/icon-category/lazer.png',
-    'color': DefaultColors.teal, // Algo mais descontraído e versátil
-  },
-  {
-    'id': 13,
-    'name': 'Pets',
-    'icon': 'assets/icon-category/dog.png',
-    'color': DefaultColors.orange, // Cor vibrante e amigável
-  },
-  {
-    'id': 14,
-    'name': 'Presentes e doações',
-    'icon': 'assets/icon-category/gift.png',
-    'color': DefaultColors.red, // Paixão e generosidade
-  },
-  {
-    'id': 15,
-    'name': 'Saúde',
-    'icon': 'assets/icon-category/saude.png',
-    'color': DefaultColors.brightRed, // Urgência e vitalidade
-  },
-  {
-    'id': 16,
-    'name': 'Trabalho',
-    'icon': 'assets/icon-category/work.png',
-    'color': DefaultColors.darkBlue, // Profissionalismo e seriedade
-  },
-  {
-    'id': 17,
-    'name': 'Transporte',
-    'icon': 'assets/icon-category/car.png',
-    'color': DefaultColors.darkGrey, // Remete a asfalto e veículos
-  },
-  {
-    'id': 18,
-    'name': 'Viagem',
-    'icon': 'assets/icon-category/aviao.png',
-    'color': DefaultColors.blue, // Céu, liberdade e aventura
+    'color': DefaultColors.blue,
   },
   {
     'id': 19,
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
-    'color': DefaultColors.grey, // Algo mais neutro e técnico
+    'color': DefaultColors.grey,
   },
   {
-    'id': 20,
-    'name': 'Vestuario',
-    'icon': 'assets/icon-category/roupas.png',
-    'color': DefaultColors.pink, // Moda e estilo
+    'id': 26,
+    'name': 'Contas (água, luz, gás)',
+    'icon': 'assets/icon-category/contas.png',
+    'color': DefaultColors.lightBlue,
   },
+  // {
+  //   'id': 27,
+  //   'name': 'Aluguel/Prestação da Casa',
+  //   'icon': 'assets/icon-category/energia.png',
+  //   'color': DefaultColors.yellow,
+  // },
   {
-    'id': 21,
-    'name': 'Delivery',
-    'icon': 'assets/icon-category/delivery-bike.png',
-    'color': DefaultColors.orange, // Remete a comida rápida
+    'id': 29,
+    'name': 'Mercado',
+    'icon': 'assets/icon-category/mercado.png',
+    'color': DefaultColors.deepOrange,
+  },
+
+  // Categorias relacionadas a CARRO
+  {
+    'id': 17,
+    'name': 'Transporte',
+    'icon': 'assets/icon-category/car.png',
+    'color': DefaultColors.darkGrey,
   },
   {
     'id': 22,
     'name': 'Uber',
     'icon': 'assets/icon-category/uber.png',
-    'color': DefaultColors.darkGrey, // Tecnologia e mobilidade
-  },
-  {
-    'id': 23,
-    'name': 'Streaming',
-    'icon': 'assets/icon-category/streaming.png',
-    'color': DefaultColors.brightRed, // Tecnologia e entretenimento
-  },
-  {
-    'id': 24,
-    'name': 'Farmacia',
-    'icon': 'assets/icon-category/farmacia.png',
-    'color': DefaultColors.orangeDark, // Categoria genérica e neutra
-  },
-  {
-    'id': 25,
-    'name': 'Academia',
-    'icon': 'assets/icon-category/academia.png',
-    'color': DefaultColors.cyan, // Categoria genérica e neutra
-  },
-  {
-    'id': 26,
-    'name': 'Conta de água',
-    'icon': 'assets/icon-category/agua.png',
-    'color': DefaultColors.lightBlue, // Categoria genérica e neutra
-  },
-  {
-    'id': 27,
-    'name': 'Energia',
-    'icon': 'assets/icon-category/energia.png',
-    'color': DefaultColors.yellow, // Categoria genérica e neutra
+    'color': DefaultColors.darkGrey,
   },
   {
     'id': 28,
     'name': 'Combustivel',
     'icon': 'assets/icon-category/combustivel.png',
-    'color': DefaultColors.brown, // Categoria genérica e neutra
+    'color': DefaultColors.brown,
+  },
+
+  {
+    'id': 32,
+    'name': 'Seguro do Carro',
+    'icon': 'assets/icon-category/seguros.png',
+    'color': DefaultColors.darkBlue,
   },
   {
-    'id': 29,
-    'name': 'Mercado',
-    'icon': 'assets/icon-category/mercado.png',
-    'color': DefaultColors.deepOrange, // Categoria genérica e neutra
+    'id': 33,
+    'name': 'Multas',
+    'icon': 'assets/icon-category/multas.png',
+    'color': DefaultColors.brightRed,
+  },
+
+  // Outras categorias
+  {
+    'id': 1,
+    'name': 'Alimentação',
+    'icon': 'assets/icon-category/food.png',
+    'color': DefaultColors.orange,
+  },
+  {
+    'id': 31,
+    'name': 'Lanches',
+    'icon': 'assets/icon-category/lanches.png',
+    'color': DefaultColors.darkGrey,
+  },
+  {
+    'id': 2,
+    'name': 'Assinaturas e serviços',
+    'icon': 'assets/icon-category/cartao.png',
+    'color': DefaultColors.navy,
+  },
+  {
+    'id': 3,
+    'name': 'Bares',
+    'icon': 'assets/icon-category/wine.png',
+    'color': DefaultColors.purple,
+  },
+  {
+    'id': 4,
+    'name': 'Restaurantes',
+    'icon': 'assets/icon-category/restaurante.png',
+    'color': DefaultColors.orange,
+  },
+  {
+    'id': 6,
+    'name': 'Compras',
+    'icon': 'assets/icon-category/shopping.png',
+    'color': DefaultColors.teal,
+  },
+  {
+    'id': 7,
+    'name': 'Cuidados pessoais',
+    'icon': 'assets/icon-category/skincare.png',
+    'color': DefaultColors.pink,
+  },
+  {
+    'id': 9,
+    'name': 'Educação',
+    'icon': 'assets/icon-category/education.png',
+    'color': DefaultColors.purple,
+  },
+  {
+    'id': 10,
+    'name': 'Família e filhos',
+    'icon': 'assets/icon-category/family.png',
+    'color': DefaultColors.green,
+  },
+  {
+    'id': 12,
+    'name': 'Lazer e hobbies',
+    'icon': 'assets/icon-category/lazer.png',
+    'color': DefaultColors.teal,
+  },
+  {
+    'id': 13,
+    'name': 'Pets',
+    'icon': 'assets/icon-category/dog.png',
+    'color': DefaultColors.orange,
+  },
+  {
+    'id': 14,
+    'name': 'Presentes e doações',
+    'icon': 'assets/icon-category/gift.png',
+    'color': DefaultColors.red,
+  },
+  {
+    'id': 15,
+    'name': 'Saúde',
+    'icon': 'assets/icon-category/saude.png',
+    'color': DefaultColors.brightRed,
+  },
+  {
+    'id': 16,
+    'name': 'Trabalho',
+    'icon': 'assets/icon-category/work.png',
+    'color': DefaultColors.darkBlue,
+  },
+  {
+    'id': 18,
+    'name': 'Viagem',
+    'icon': 'assets/icon-category/aviao.png',
+    'color': DefaultColors.blue,
+  },
+  {
+    'id': 20,
+    'name': 'Vestuario',
+    'icon': 'assets/icon-category/roupas.png',
+    'color': DefaultColors.pink,
+  },
+  {
+    'id': 21,
+    'name': 'Delivery',
+    'icon': 'assets/icon-category/delivery-bike.png',
+    'color': DefaultColors.orange,
+  },
+  {
+    'id': 23,
+    'name': 'Streaming',
+    'icon': 'assets/icon-category/streaming.png',
+    'color': DefaultColors.brightRed,
+  },
+  {
+    'id': 24,
+    'name': 'Farmacia',
+    'icon': 'assets/icon-category/farmacia.png',
+    'color': DefaultColors.orangeDark,
+  },
+  {
+    'id': 25,
+    'name': 'Academia',
+    'icon': 'assets/icon-category/academia.png',
+    'color': DefaultColors.cyan,
   },
   {
     'id': 30,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
-    'color': DefaultColors.grey, // Categoria genérica e neutra
+    'color': DefaultColors.grey,
   },
+  // {
+  //   'id': 34,
+  //   'name': 'Investimentos',
+  //   'icon': 'assets/icon-category/investment.png',
+  //   'color': DefaultColors.emerald,
+  // },
+  {
+    'id': 35,
+    'name': 'Impostos',
+    'icon': 'assets/icon-category/impostos.png',
+    'color': DefaultColors.navy,
+  },
+  // {
+  //   'id': 36,
+  //   'name': 'Seguro de Vida',
+  //   'icon': 'assets/icon-category/life-insurance.png',
+  //   'color': DefaultColors.lavender,
+  // },
+  {
+    'id': 37,
+    'name': 'Financiamento',
+    'icon': 'assets/icon-category/financiamentos.png',
+    'color': DefaultColors.turquoise,
+  },
+  {
+    'id': 38,
+    'name': 'Empréstimos',
+    'icon': 'assets/icon-category/emprestimos.png',
+    'color': DefaultColors.indigo,
+  },
+
+  {
+    'id': 40,
+    'name': 'Consultoria',
+    'icon': 'assets/icon-category/consulting.png',
+    'color': DefaultColors.darkBlue,
+  }
 ];
 
 final List<Map<String, dynamic>> categories_income = [
+  // Categorias relacionadas a CASA
+  {
+    'id': 56,
+    'name': 'Aluguel',
+    'icon': 'assets/icon-category/rent.png',
+    'color': DefaultColors.emerald,
+  },
+
+  // Outras categorias de receitas
   {
     'id': 50,
     'name': 'Salário',
     'icon': 'assets/icon-category/mooney.png',
-    'color': Colors.green
+    'color': Colors.green,
   },
   {
     'id': 51,
     'name': 'Poupança',
     'icon': 'assets/icon-category/renda.png',
-    'color': Colors.blue
+    'color': Colors.blue,
   },
   {
     'id': 52,
     'name': 'Bonificação',
     'icon': 'assets/icon-category/bonus.png',
-    'color': Colors.blue
+    'color': Colors.blue,
   },
   {
     'id': 53,
     'name': 'Renda extra',
     'icon': 'assets/icon-category/income.png',
-    'color': Colors.blue
+    'color': Colors.blue,
   },
   {
     'id': 54,
     'name': 'Transfrencia bancária',
     'icon': 'assets/icon-category/transfer.png',
-    'color': Colors.blue
+    'color': Colors.blue,
   },
   {
     'id': 55,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
-    'color': DefaultColors.grey, // Categoria genérica e neutra
+    'color': DefaultColors.grey,
   },
+  {
+    'id': 57,
+    'name': 'Dividendos',
+    'icon': 'assets/icon-category/dividends.png',
+    'color': DefaultColors.gold,
+  },
+  {
+    'id': 58,
+    'name': 'Freelance',
+    'icon': 'assets/icon-category/freelance.png',
+    'color': DefaultColors.teal,
+  },
+  {
+    'id': 59,
+    'name': 'Indenização',
+    'icon': 'assets/icon-category/compensation.png',
+    'color': DefaultColors.lavender,
+  },
+  {
+    'id': 60,
+    'name': 'Prêmios',
+    'icon': 'assets/icon-category/award.png',
+    'color': DefaultColors.peach,
+  }
 ];
 
 final List<Map<String, dynamic>> all_categories = [
