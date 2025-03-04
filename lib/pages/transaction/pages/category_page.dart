@@ -24,7 +24,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 26,
-    'name': 'Contas (água, luz, gás)',
+    'name': 'Contas (água, luz, gás, internet)',
     'icon': 'assets/icon-category/contas.png',
     'color': DefaultColors.lightBlue,
   },
@@ -113,7 +113,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 34,
-    'name': 'Roupas de Calçados',
+    'name': 'Roupas de acessórios',
     'icon': 'assets/icon-category/roupas-e-calcados.png',
     'color': DefaultColors.emerald,
   },
@@ -250,7 +250,61 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Hoteis',
     'icon': 'assets/icon-category/hoteis.png',
     'color': DefaultColors.darkBlue,
-  }
+  },
+  {
+    'id': 63,
+    'name': 'Alimentação em Viagens',
+    'icon': 'assets/icon-category/travel-food.png',
+    'color': DefaultColors.blue,
+  },
+  {
+    'id': 64,
+    'name': 'Passeios',
+    'icon': 'assets/icon-category/tour.png',
+    'color': DefaultColors.orange,
+  },
+  {
+    'id': 65,
+    'name': 'Coisas para Casa',
+    'icon': 'assets/icon-category/home-stuff.png',
+    'color': DefaultColors.brown,
+  },
+  {
+    'id': 66,
+    'name': 'Emergência',
+    'icon': 'assets/icon-category/emergency.png',
+    'color': DefaultColors.brightRed,
+  },
+  {
+    'id': 67,
+    'name': 'Aplicativos',
+    'icon': 'assets/icon-category/apps.png',
+    'color': DefaultColors.purple,
+  },
+  {
+    'id': 68,
+    'name': 'Jogos Online',
+    'icon': 'assets/icon-category/gaming.png',
+    'color': DefaultColors.yellow,
+  },
+  {
+    'id': 69,
+    'name': 'Consultas e Tratamentos',
+    'icon': 'assets/icon-category/medical.png',
+    'color': DefaultColors.green,
+  },
+  {
+    'id': 70,
+    'name': 'Bem-estar (Spa, Terapia)',
+    'icon': 'assets/icon-category/spa.png',
+    'color': DefaultColors.lavender,
+  },
+  {
+    'id': 71,
+    'name': 'Estacionamento e Pedágios',
+    'icon': 'assets/icon-category/toll.png',
+    'color': DefaultColors.darkGrey,
+  },
 ];
 
 final List<Map<String, dynamic>> categories_income = [

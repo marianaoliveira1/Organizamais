@@ -152,117 +152,119 @@ class GraphicsPage extends StatelessWidget {
                   );
                 }
 
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 180.h,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: PieChart(
-                              PieChartData(
-                                sectionsSpace: 0,
-                                centerSpaceRadius: 26,
-                                centerSpaceColor: theme.scaffoldBackgroundColor,
-                                sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 180.h,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: PieChart(
+                                PieChartData(
+                                  sectionsSpace: 0,
+                                  centerSpaceRadius: 26,
+                                  centerSpaceColor: theme.scaffoldBackgroundColor,
+                                  sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 26.w),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (var item in data)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 4.h),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 10.w,
-                                          height: 10.h,
-                                          decoration: BoxDecoration(
-                                            color: item['chart']?.color,
-                                            borderRadius: BorderRadius.circular(2.r),
-                                          ),
-                                        ),
-                                        SizedBox(width: 8.w),
-                                        Expanded(
-                                          child: Text(
-                                            item['chart']?.title ?? '',
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: theme.primaryColor,
-                                              fontWeight: FontWeight.w500,
+                            SizedBox(width: 26.w),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  for (var item in data)
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 4.h),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 10.w,
+                                            height: 10.h,
+                                            decoration: BoxDecoration(
+                                              color: item['chart']?.color,
+                                              borderRadius: BorderRadius.circular(2.r),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          SizedBox(width: 8.w),
+                                          Expanded(
+                                            child: Text(
+                                              item['chart']?.title ?? '',
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                color: theme.primaryColor,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          var item = data[index];
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 20.h),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  item['icon'] ?? '',
+                                  width: 30.w,
+                                  height: 30.h,
+                                ),
+                                SizedBox(width: 15.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['chart']?.title ?? '',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(0)}%",
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: DefaultColors.grey,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                Text(
+                                  "R\$${item['chart']?.value.toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                    SizedBox(height: 20.h),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        var item = data[index];
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 20.h),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                item['icon'] ?? '',
-                                width: 30.w,
-                                height: 30.h,
-                              ),
-                              SizedBox(width: 15.w),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['chart']?.title ?? '',
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(0)}%",
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: DefaultColors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                "R\$${item['chart']?.value.toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: theme.primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               }),
             ],
