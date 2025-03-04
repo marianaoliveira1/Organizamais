@@ -112,6 +112,12 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.teal,
   },
   {
+    'id': 34,
+    'name': 'Roupas de Calçados',
+    'icon': 'assets/icon-category/roupas-e-calcados.png',
+    'color': DefaultColors.emerald,
+  },
+  {
     'id': 7,
     'name': 'Cuidados pessoais',
     'icon': 'assets/icon-category/skincare.png',
@@ -201,24 +207,19 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey,
   },
-  // {
-  //   'id': 34,
-  //   'name': 'Investimentos',
-  //   'icon': 'assets/icon-category/investment.png',
-  //   'color': DefaultColors.emerald,
-  // },
+
   {
     'id': 35,
     'name': 'Impostos',
     'icon': 'assets/icon-category/impostos.png',
     'color': DefaultColors.navy,
   },
-  // {
-  //   'id': 36,
-  //   'name': 'Seguro de Vida',
-  //   'icon': 'assets/icon-category/life-insurance.png',
-  //   'color': DefaultColors.lavender,
-  // },
+  {
+    'id': 36,
+    'name': 'Plano de Saúde/Seguro de vida',
+    'icon': 'assets/icon-category/planodesaude.png',
+    'color': DefaultColors.lavender,
+  },
   {
     'id': 37,
     'name': 'Financiamento',
@@ -232,10 +233,22 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.indigo,
   },
 
+  // {
+  //   'id': 40,
+  //   'name': 'Consultoria',
+  //   'icon': 'assets/icon-category/consulting.png',
+  //   'color': DefaultColors.darkBlue,
+  // },
   {
-    'id': 40,
-    'name': 'Consultoria',
-    'icon': 'assets/icon-category/consulting.png',
+    'id': 61,
+    'name': 'Passagens',
+    'icon': 'assets/icon-category/passagens.png',
+    'color': DefaultColors.darkBlue,
+  },
+  {
+    'id': 62,
+    'name': 'Hoteis',
+    'icon': 'assets/icon-category/hoteis.png',
     'color': DefaultColors.darkBlue,
   }
 ];

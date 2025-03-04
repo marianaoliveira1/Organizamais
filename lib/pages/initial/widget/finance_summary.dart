@@ -26,29 +26,47 @@ class FinanceSummaryWidget extends StatelessWidget {
     // Verifica se hoje é o primeiro dia do mês
     final bool isFirstDay = DateTime.now().day == 1;
 
+    // Pega o mês e o ano atuais
+    final int currentMonth = DateTime.now().month;
+    final int currentYear = DateTime.now().year;
+
     return Obx(() {
       // Se for o primeiro dia, os valores serão zerados.
       double totalReceita = isFirstDay
           ? 0
-          : transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(
-                0,
-                (sum, t) =>
-                    sum +
-                    double.parse(
-                      t.value.replaceAll('.', '').replaceAll(',', '.'),
-                    ),
-              );
+          : transactionController.transaction.where((t) {
+              // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
+              if (t.paymentDay != null) {
+                DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+                return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+              }
+              return false; // Caso paymentDay seja nulo
+            }).fold(
+              0,
+              (sum, t) =>
+                  sum +
+                  double.parse(
+                    t.value.replaceAll('.', '').replaceAll(',', '.'),
+                  ),
+            );
 
       double totalDespesas = isFirstDay
           ? 0
-          : transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(
-                0,
-                (sum, t) =>
-                    sum +
-                    double.parse(
-                      t.value.replaceAll('.', '').replaceAll(',', '.'),
-                    ),
-              );
+          : transactionController.transaction.where((t) {
+              // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
+              if (t.paymentDay != null) {
+                DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+                return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+              }
+              return false; // Caso paymentDay seja nulo
+            }).fold(
+              0,
+              (sum, t) =>
+                  sum +
+                  double.parse(
+                    t.value.replaceAll('.', '').replaceAll(',', '.'),
+                  ),
+            );
 
       double total = totalReceita - totalDespesas;
 
