@@ -208,7 +208,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            Divider(),
+            Divider(
+              color: DefaultColors.grey,
+            ),
             if (_selectedType != TransactionType.transferencia)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +236,9 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  Divider(),
+                  Divider(
+                    color: DefaultColors.grey,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 20.h,
@@ -260,7 +264,9 @@ class _TransactionPageState extends State<TransactionPage> {
                       ],
                     ),
                   ),
-                  Divider(),
+                  Divider(
+                    color: DefaultColors.grey,
+                  ),
                 ],
               ),
             Padding(
@@ -297,7 +303,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            Divider(),
+            Divider(
+              color: DefaultColors.grey,
+            ),
             SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

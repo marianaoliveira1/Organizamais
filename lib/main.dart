@@ -47,6 +47,13 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: DefaultColors.backgroundLight,
           primaryColor: DefaultColors.black,
           cardColor: DefaultColors.white,
+          colorScheme: ColorScheme.light(
+            primary: DefaultColors.green,
+            onPrimary: DefaultColors.white,
+            secondary: DefaultColors.white,
+            surface: DefaultColors.white,
+          ),
+          dialogBackgroundColor: DefaultColors.green,
         ),
         darkTheme: ThemeData(
           brightness: Brightness.dark,
