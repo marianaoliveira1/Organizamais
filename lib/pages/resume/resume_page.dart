@@ -226,7 +226,10 @@ class ResumePage extends StatelessWidget {
                                     ),
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 12.h,
+                                      horizontal: 16.w,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -234,8 +237,8 @@ class ResumePage extends StatelessWidget {
                                           categories_expenses.firstWhere(
                                             (element) => element['id'] == transaction.category,
                                           )['icon'],
-                                          width: 28.w,
-                                          height: 28.h,
+                                          width: 24.w,
+                                          height: 24.h,
                                         ),
                                         Expanded(
                                           child: Padding(
@@ -256,8 +259,8 @@ class ResumePage extends StatelessWidget {
                                                     (element) => element['id'] == transaction.category,
                                                   )['name'],
                                                   style: TextStyle(
-                                                    color: DefaultColors.greyLight,
-                                                    fontSize: 12.sp,
+                                                    color: DefaultColors.grey20,
+                                                    fontSize: 11.sp,
                                                   ),
                                                 ),
                                               ],
@@ -278,8 +281,8 @@ class ResumePage extends StatelessWidget {
                                             Text(
                                               transaction.paymentType.toString(),
                                               style: TextStyle(
-                                                color: Colors.grey[600],
-                                                fontSize: 14.sp,
+                                                color: DefaultColors.grey20,
+                                                fontSize: 11.sp,
                                               ),
                                             ),
                                           ],

@@ -111,7 +111,7 @@ class FixedAccounts extends StatelessWidget {
                               children: [
                                 Container(
                                   padding: EdgeInsets.all(
-                                    12.h,
+                                    6.h,
                                   ),
                                   decoration: BoxDecoration(
                                     color: DefaultColors.grey.withOpacity(0.1),
@@ -119,8 +119,8 @@ class FixedAccounts extends StatelessWidget {
                                   ),
                                   child: Image.asset(
                                     categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                                    width: 24.w,
-                                    height: 24.h,
+                                    width: 40.w,
+                                    height: 40.h,
                                   ),
                                 ),
                                 SizedBox(
