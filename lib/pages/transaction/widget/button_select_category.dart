@@ -23,8 +23,6 @@ class DefaultButtonSelectCategory extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedCategoryData = findCategoryById(selectedCategory);
 
-    final theme = Theme.of(context);
-
     return InkWell(
       onTap: () async {
         var categoryId = await Get.to(() => Category(

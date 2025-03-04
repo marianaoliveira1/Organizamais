@@ -181,37 +181,37 @@ final List<Map<String, dynamic>> categories_expenses = [
 
 final List<Map<String, dynamic>> categories_income = [
   {
-    'id': 25,
+    'id': 50,
     'name': 'Salário',
     'icon': 'assets/icon-category/mooney.png',
     'color': Colors.green
   },
   {
-    'id': 26,
+    'id': 51,
     'name': 'Poupança',
     'icon': 'assets/icon-category/renda.png',
     'color': Colors.blue
   },
   {
-    'id': 27,
+    'id': 52,
     'name': 'Bonificação',
     'icon': 'assets/icon-category/bonus.png',
     'color': Colors.blue
   },
   {
-    'id': 28,
+    'id': 53,
     'name': 'Renda extra',
     'icon': 'assets/icon-category/income.png',
     'color': Colors.blue
   },
   {
-    'id': 29,
+    'id': 54,
     'name': 'Transfrencia bancária',
     'icon': 'assets/icon-category/transfer.png',
     'color': Colors.blue
   },
   {
-    'id': 30,
+    'id': 55,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey, // Categoria genérica e neutra
@@ -296,7 +296,7 @@ class Category extends StatelessWidget {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: DefaultColors.grey.withOpacity(
-                  .3,
+                  .1,
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(
