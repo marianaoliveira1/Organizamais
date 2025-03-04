@@ -85,8 +85,8 @@ class MyCardsWidget extends StatelessWidget {
                           if (card.iconPath != null)
                             Image.asset(
                               card.iconPath!,
-                              width: 40.w,
-                              height: 40.h,
+                              width: 30.w,
+                              height: 30.h,
                             ),
                           SizedBox(
                             width: 10.w,

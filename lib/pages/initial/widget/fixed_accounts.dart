@@ -119,8 +119,8 @@ class FixedAccounts extends StatelessWidget {
                                   ),
                                   child: Image.asset(
                                     categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                                    width: 40.w,
-                                    height: 40.h,
+                                    width: 30.w,
+                                    height: 30.h,
                                   ),
                                 ),
                                 SizedBox(

@@ -223,8 +223,8 @@ class GraphicsPage extends StatelessWidget {
                             children: [
                               Image.asset(
                                 item['icon'] ?? '',
-                                width: 24.w,
-                                height: 24.h,
+                                width: 30.w,
+                                height: 30.h,
                               ),
                               SizedBox(width: 15.w),
                               Expanded(

@@ -237,8 +237,8 @@ class ResumePage extends StatelessWidget {
                                           categories_expenses.firstWhere(
                                             (element) => element['id'] == transaction.category,
                                           )['icon'],
-                                          width: 24.w,
-                                          height: 24.h,
+                                          width: 30.w,
+                                          height: 30.h,
                                         ),
                                         Expanded(
                                           child: Padding(
