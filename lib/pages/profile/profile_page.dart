@@ -18,60 +18,66 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 20.h,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Icon(
                 Iconsax.profile_circle,
                 size: 50.sp,
                 color: DefaultColors.grey20,
               ),
-              SizedBox(height: 20.h),
-              Obx(() {
-                final user = authController.firebaseUser.value;
-                if (user == null) {
-                  return const Text("Usuário não encontrado", style: TextStyle(fontSize: 18));
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text(
-                    //   "Nome",
-                    //   style: TextStyle(
-                    //     fontSize: 12.sp,
-                    //     color: DefaultColors.grey20,
-                    //   ),
-                    // ),
-                    // Text(
-                    //   user.displayName ?? "Usuário",
-                    //   style: TextStyle(
-                    //     fontSize: 22.sp,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      "Email",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: DefaultColors.grey20,
-                      ),
+            ),
+            SizedBox(height: 20.h),
+            Obx(() {
+              final user = authController.firebaseUser.value;
+              if (user == null) {
+                return const Text("Usuário não encontrado", style: TextStyle(fontSize: 18));
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Nome",
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: DefaultColors.grey20,
                     ),
-                    Text(
-                      user.email ?? "Email não disponível", // Email do usuário
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.grey,
-                      ),
+                  ),
+                  Text(
+                    user.displayName ?? "Usuário",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
                     ),
-                  ],
-                );
-              }),
-            ],
-          ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Text(
+                    "Email",
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: DefaultColors.grey20,
+                    ),
+                  ),
+                  Text(
+                    user.email ?? "Email não disponível", // Email do usuário
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ],
         ),
       ),
     );
