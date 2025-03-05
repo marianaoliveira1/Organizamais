@@ -58,102 +58,102 @@ class GraphicsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            children: [
-              // Lista de meses
-              SizedBox(
-                height: 40.h,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: getAllMonths().length,
-                  separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                  itemBuilder: (context, index) {
-                    final month = getAllMonths()[index];
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              children: [
+                // Lista de meses
+                SizedBox(
+                  height: 40.h,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: getAllMonths().length,
+                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                    itemBuilder: (context, index) {
+                      final month = getAllMonths()[index];
 
-                    return Obx(
-                      () => GestureDetector(
-                        onTap: () {
-                          if (selectedMonth.value == month) {
-                            selectedMonth.value = '';
-                          } else {
-                            selectedMonth.value = month;
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+                      return Obx(
+                        () => GestureDetector(
+                          onTap: () {
+                            if (selectedMonth.value == month) {
+                              selectedMonth.value = '';
+                            } else {
+                              selectedMonth.value = month;
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(20.r),
+                              border: Border.all(
+                                color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+                              ),
                             ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            month,
-                            style: TextStyle(
-                              color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
+                            alignment: Alignment.center,
+                            child: Text(
+                              month,
+                              style: TextStyle(
+                                color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Gráficos
+                Obx(() {
+                  var filteredTransactions = getFilteredTransactions();
+                  var categories = filteredTransactions.map((e) => e.category).toSet().toList();
+
+                  var data = categories
+                      .map(
+                        (e) => {
+                          "chart": PieChartSectionData(
+                            value: filteredTransactions.where((element) => element.category == e).fold(
+                              0,
+                              (previousValue, element) {
+                                // Remove os pontos e troca vírgula por ponto para corrigir o parse
+                                return (previousValue ?? 0) + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
+                              },
+                            ),
+                            color: findCategoryById(e)?['color'],
+                            title: '${findCategoryById(e)?['name']}',
+                            radius: 50,
+                            showTitle: false,
+                          ),
+                          "icon": findCategoryById(e)?['icon'],
+                        },
+                      )
+                      .toList();
+
+                  double totalValue = data.fold(
+                    0,
+                    (previousValue, element) => previousValue + (element['chart']?.value ?? 0),
+                  );
+
+                  if (data.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Nenhuma despesa encontrada${selectedMonth.value.isNotEmpty ? ' para $selectedMonth' : ''}",
+                        style: TextStyle(
+                          color: DefaultColors.grey,
+                          fontSize: 14.sp,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     );
-                  },
-                ),
-              ),
+                  }
 
-              SizedBox(height: 20.h),
-
-              // Gráficos
-              Obx(() {
-                var filteredTransactions = getFilteredTransactions();
-                var categories = filteredTransactions.map((e) => e.category).toSet().toList();
-
-                var data = categories
-                    .map(
-                      (e) => {
-                        "chart": PieChartSectionData(
-                          value: filteredTransactions.where((element) => element.category == e).fold(
-                            0,
-                            (previousValue, element) {
-                              // Remove os pontos e troca vírgula por ponto para corrigir o parse
-                              return (previousValue ?? 0) + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
-                            },
-                          ),
-                          color: findCategoryById(e)?['color'],
-                          title: '${findCategoryById(e)?['name']}',
-                          radius: 50,
-                          showTitle: false,
-                        ),
-                        "icon": findCategoryById(e)?['icon'],
-                      },
-                    )
-                    .toList();
-
-                double totalValue = data.fold(
-                  0,
-                  (previousValue, element) => previousValue + (element['chart']?.value ?? 0),
-                );
-
-                if (data.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "Nenhuma despesa encontrada${selectedMonth.value.isNotEmpty ? ' para $selectedMonth' : ''}",
-                      style: TextStyle(
-                        color: DefaultColors.grey,
-                        fontSize: 14.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-
-                return SingleChildScrollView(
-                  child: Column(
+                  return Column(
                     children: [
                       SizedBox(
                         height: 180.h,
@@ -264,10 +264,10 @@ class GraphicsPage extends StatelessWidget {
                         },
                       ),
                     ],
-                  ),
-                );
-              }),
-            ],
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),

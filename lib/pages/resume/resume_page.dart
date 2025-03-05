@@ -145,6 +145,7 @@ class ResumePage extends StatelessWidget {
                       String date = groupedTransactions.keys.elementAt(index);
                       List transactions = groupedTransactions[date]!;
                       return Column(
+                        spacing: 14.h,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -155,7 +156,6 @@ class ResumePage extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: 12.h),
                           ...transactions.map((transaction) {
                             final category = categories_expenses.firstWhereOrNull(
                               (element) => element['id'] == transaction.category,

@@ -99,7 +99,9 @@ class FixedAccounts extends StatelessWidget {
                         Get.to(
                           () => FixedAccountsPage(
                             fixedAccount: fixedAccount,
-                            onSave: (fixedAccount) => fixedAccountsController.updateFixedAccount(fixedAccount),
+                            onSave: (fixedAccount) => fixedAccountsController.updateFixedAccount(
+                              fixedAccount,
+                            ),
                           ),
                         );
                       },
@@ -153,7 +155,7 @@ class FixedAccounts extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  "R\$ ${fixedAccount.value}",
+                                  fixedAccount.value,
                                   style: TextStyle(
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.bold,
