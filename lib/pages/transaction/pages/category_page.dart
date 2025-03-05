@@ -41,8 +41,8 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 22,
-    'name': 'Uber',
-    'icon': 'assets/icon-category/uber.png',
+    'name': 'Uber/99',
+    'icon': 'assets/icon-category/taxi.png',
     'color': DefaultColors.purple,
   },
   {
@@ -221,26 +221,26 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 62,
-    'name': 'Hotéis',
+    'name': 'Hospedagens',
     'icon': 'assets/icon-category/hoteis.png',
     'color': DefaultColors.gold,
   },
   {
     'id': 63,
     'name': 'Alimentação em Viagens',
-    'icon': 'assets/icon-category/travel-food.png',
+    'icon': 'assets/icon-category/alimentacaoemviagens.png',
     'color': DefaultColors.orangeDark,
   },
   {
     'id': 64,
     'name': 'Passeios',
-    'icon': 'assets/icon-category/tour.png',
+    'icon': 'assets/icon-category/passeios.png',
     'color': DefaultColors.vibrantYellow,
   },
   {
     'id': 65,
     'name': 'Coisas para Casa',
-    'icon': 'assets/icon-category/home-stuff.png',
+    'icon': 'assets/icon-category/coisasparacasa.png',
     'color': DefaultColors.vibrantGreen,
   },
   {
@@ -252,13 +252,13 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 67,
     'name': 'Aplicativos',
-    'icon': 'assets/icon-category/apps.png',
+    'icon': 'assets/icon-category/app.png',
     'color': DefaultColors.navy,
   },
   {
     'id': 68,
     'name': 'Jogos Online',
-    'icon': 'assets/icon-category/gaming.png',
+    'icon': 'assets/icon-category/jogosonline.png',
     'color': DefaultColors.purple,
   },
   {
