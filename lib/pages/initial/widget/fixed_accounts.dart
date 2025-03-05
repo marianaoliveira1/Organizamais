@@ -1,13 +1,10 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
-
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
-
 import '../../../model/fixed_account_model.dart';
 import '../pages/fixed_accotuns_page.dart';
 
@@ -19,14 +16,42 @@ class FixedAccounts extends StatelessWidget {
     required this.fixedAccounts,
   });
 
-  String _calculateTotal() {
-    double total = 0;
-    for (var account in fixedAccounts) {
-      String valueString = account.value.replaceAll('R\$', '').replaceAll('.', '').replaceAll(',', '.');
-      total += double.tryParse(valueString) ?? 0;
+  String _formatCurrency(String value) {
+    // Remove 'R$' and replace comma with dot for decimal
+    String cleanValue = value.replaceAll('R\$', '').trim();
+
+    // If the value uses '.' as thousand separator and ',' as decimal
+    if (cleanValue.contains('.') && cleanValue.contains(',')) {
+      // Remove thousand separator
+      cleanValue = cleanValue.replaceAll('.', '').replaceAll(',', '.');
+    }
+    // If the value uses ',' as decimal separator
+    else if (cleanValue.contains(',')) {
+      cleanValue = cleanValue.replaceAll(',', '.');
     }
 
-    return total.toStringAsFixed(2).replaceAll('.', ',');
+    // Parse the clean value
+    double parsedValue = double.tryParse(cleanValue) ?? 0;
+
+    // Use NumberFormat to format as Brazilian Real
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
+
+    return formatter.format(parsedValue);
+  }
+
+  double _calculateTotalNumeric() {
+    return fixedAccounts.fold(0.0, (total, account) {
+      // Use the same cleaning logic as in _formatCurrency
+      String cleanValue = account.value.replaceAll('R\$', '').trim();
+
+      if (cleanValue.contains('.') && cleanValue.contains(',')) {
+        cleanValue = cleanValue.replaceAll('.', '').replaceAll(',', '.');
+      } else if (cleanValue.contains(',')) {
+        cleanValue = cleanValue.replaceAll(',', '.');
+      }
+
+      return total + (double.tryParse(cleanValue) ?? 0);
+    });
   }
 
   @override
@@ -61,9 +86,7 @@ class FixedAccounts extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: fixedAccounts.length,
-                separatorBuilder: (context, index) => SizedBox(
-                  height: 14.h,
-                ),
+                separatorBuilder: (context, index) => SizedBox(height: 14.h),
                 itemBuilder: (context, index) {
                   final fixedAccount = fixedAccounts[index];
                   return Material(
@@ -80,9 +103,7 @@ class FixedAccounts extends StatelessWidget {
                             actions: [
                               TextButton(
                                 child: Text('Cancelar'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
+                                onPressed: () => Navigator.of(context).pop(),
                               ),
                               TextButton(
                                 child: Text('Excluir'),
@@ -109,53 +130,55 @@ class FixedAccounts extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(
-                                    6.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: DefaultColors.grey.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(50.r),
-                                  ),
-                                  child: Image.asset(
-                                    categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                                    width: 30.w,
-                                    height: 30.h,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 10.w,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      fixedAccount.title,
-                                      style: TextStyle(
-                                        color: theme.primaryColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14.sp,
-                                      ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(10.h),
+                                    decoration: BoxDecoration(
+                                      color: DefaultColors.grey.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(50.r),
                                     ),
-                                    Text(
-                                      "Dia ${fixedAccount.paymentDay} de cada mês",
-                                      style: TextStyle(
-                                        color: DefaultColors.grey,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    child: Image.asset(
+                                      categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
+                                      width: 28.w,
+                                      height: 28.h,
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          fixedAccount.title,
+                                          style: TextStyle(
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                        Text(
+                                          "Dia ${fixedAccount.paymentDay} de cada mês",
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  fixedAccount.value,
+                                  _formatCurrency(fixedAccount.value),
                                   style: TextStyle(
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -181,13 +204,11 @@ class FixedAccounts extends StatelessWidget {
               );
             },
           ),
-          SizedBox(
-            height: 12.h,
-          ),
+          SizedBox(height: 12.h),
           Padding(
-            padding: EdgeInsets.only(top: 10.h),
+            padding: EdgeInsets.only(top: 10.h, right: 10.h),
             child: Text(
-              "R\$ ${_calculateTotal()}",
+              _formatCurrency(_calculateTotalNumeric().toString()),
               style: TextStyle(
                 color: theme.primaryColor,
                 fontWeight: FontWeight.w500,

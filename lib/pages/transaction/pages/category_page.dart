@@ -9,7 +9,6 @@ import 'package:organizamais/utils/color.dart';
 import '../../../model/transaction_model.dart';
 
 final List<Map<String, dynamic>> categories_expenses = [
-  // Categorias relacionadas a CASA
   {
     'id': 5,
     'name': 'Moradia',
@@ -20,7 +19,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 19,
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
-    'color': DefaultColors.grey,
+    'color': DefaultColors.orangeDark,
   },
   {
     'id': 26,
@@ -28,39 +27,30 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/contas.png',
     'color': DefaultColors.lightBlue,
   },
-  // {
-  //   'id': 27,
-  //   'name': 'Aluguel/Prestação da Casa',
-  //   'icon': 'assets/icon-category/energia.png',
-  //   'color': DefaultColors.yellow,
-  // },
   {
     'id': 29,
     'name': 'Mercado',
     'icon': 'assets/icon-category/mercado.png',
-    'color': DefaultColors.deepOrange,
+    'color': DefaultColors.vibrantGreen,
   },
-
-  // Categorias relacionadas a CARRO
   {
     'id': 17,
     'name': 'Transporte',
     'icon': 'assets/icon-category/car.png',
-    'color': DefaultColors.darkGrey,
+    'color': DefaultColors.vibrantRed,
   },
   {
     'id': 22,
     'name': 'Uber',
     'icon': 'assets/icon-category/uber.png',
-    'color': DefaultColors.darkGrey,
+    'color': DefaultColors.purple,
   },
   {
     'id': 28,
-    'name': 'Combustivel',
+    'name': 'Combustível',
     'icon': 'assets/icon-category/combustivel.png',
-    'color': DefaultColors.brown,
+    'color': DefaultColors.vibrantOrange,
   },
-
   {
     'id': 32,
     'name': 'Seguro do Carro',
@@ -73,19 +63,17 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/multas.png',
     'color': DefaultColors.brightRed,
   },
-
-  // Outras categorias
   {
     'id': 1,
     'name': 'Alimentação',
     'icon': 'assets/icon-category/food.png',
-    'color': DefaultColors.orange,
+    'color': DefaultColors.pastelGreen,
   },
   {
     'id': 31,
     'name': 'Lanches',
     'icon': 'assets/icon-category/lanches.png',
-    'color': DefaultColors.darkGrey,
+    'color': DefaultColors.vibrantYellow,
   },
   {
     'id': 2,
@@ -103,79 +91,79 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 4,
     'name': 'Restaurantes',
     'icon': 'assets/icon-category/restaurante.png',
-    'color': DefaultColors.orange,
+    'color': DefaultColors.vibrantRed,
   },
   {
     'id': 6,
     'name': 'Compras',
     'icon': 'assets/icon-category/shopping.png',
-    'color': DefaultColors.teal,
+    'color': DefaultColors.pastelPink,
   },
   {
     'id': 34,
-    'name': 'Roupas de acessórios',
+    'name': 'Roupas e acessórios',
     'icon': 'assets/icon-category/roupas-e-calcados.png',
-    'color': DefaultColors.emerald,
+    'color': DefaultColors.lavender,
   },
   {
     'id': 7,
     'name': 'Cuidados pessoais',
     'icon': 'assets/icon-category/skincare.png',
-    'color': DefaultColors.pink,
+    'color': DefaultColors.teal,
   },
   {
     'id': 9,
     'name': 'Educação',
     'icon': 'assets/icon-category/education.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.darkBlue,
   },
   {
     'id': 10,
     'name': 'Família e filhos',
     'icon': 'assets/icon-category/family.png',
-    'color': DefaultColors.green,
+    'color': DefaultColors.pastelGreen,
   },
   {
     'id': 12,
     'name': 'Lazer e hobbies',
     'icon': 'assets/icon-category/lazer.png',
-    'color': DefaultColors.teal,
+    'color': DefaultColors.vibrantYellow,
   },
   {
     'id': 13,
     'name': 'Pets',
     'icon': 'assets/icon-category/dog.png',
-    'color': DefaultColors.orange,
+    'color': DefaultColors.emerald,
   },
   {
     'id': 14,
     'name': 'Presentes e doações',
     'icon': 'assets/icon-category/gift.png',
-    'color': DefaultColors.red,
+    'color': DefaultColors.brightRed,
   },
   {
     'id': 15,
     'name': 'Saúde',
     'icon': 'assets/icon-category/saude.png',
-    'color': DefaultColors.brightRed,
+    'color': DefaultColors.vibrantTeal,
   },
   {
     'id': 16,
     'name': 'Trabalho',
     'icon': 'assets/icon-category/work.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.navy,
   },
   {
     'id': 18,
     'name': 'Viagem',
     'icon': 'assets/icon-category/aviao.png',
-    'color': DefaultColors.blue,
+    'color': DefaultColors.lightBlue,
   },
   {
     'id': 20,
-    'name': 'Vestuario',
+    'name': 'Vestuário',
     'icon': 'assets/icon-category/roupas.png',
-    'color': DefaultColors.pink,
+    'color': DefaultColors.plum,
   },
   {
     'id': 21,
@@ -187,81 +175,73 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 23,
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
-    'color': DefaultColors.brightRed,
+    'color': DefaultColors.purple,
   },
   {
     'id': 24,
-    'name': 'Farmacia',
+    'name': 'Farmácia',
     'icon': 'assets/icon-category/farmacia.png',
-    'color': DefaultColors.orangeDark,
+    'color': DefaultColors.pastelGreen,
   },
   {
     'id': 25,
     'name': 'Academia',
     'icon': 'assets/icon-category/academia.png',
-    'color': DefaultColors.cyan,
+    'color': DefaultColors.vibrantRed,
   },
-
   {
     'id': 35,
     'name': 'Impostos',
     'icon': 'assets/icon-category/impostos.png',
-    'color': DefaultColors.navy,
+    'color': DefaultColors.grey,
   },
   {
     'id': 36,
     'name': 'Plano de Saúde/Seguro de vida',
     'icon': 'assets/icon-category/planodesaude.png',
-    'color': DefaultColors.lavender,
+    'color': DefaultColors.darkBlue,
   },
   {
     'id': 37,
     'name': 'Financiamento',
     'icon': 'assets/icon-category/financiamentos.png',
-    'color': DefaultColors.turquoise,
+    'color': DefaultColors.darkBlue,
   },
   {
     'id': 38,
     'name': 'Empréstimos',
     'icon': 'assets/icon-category/emprestimos.png',
-    'color': DefaultColors.indigo,
+    'color': DefaultColors.emerald,
   },
-
-  // {
-  //   'id': 40,
-  //   'name': 'Consultoria',
-  //   'icon': 'assets/icon-category/consulting.png',
-  //   'color': DefaultColors.darkBlue,
-  // },
   {
     'id': 61,
     'name': 'Passagens',
     'icon': 'assets/icon-category/passagens.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.lightBlue,
   },
   {
     'id': 62,
-    'name': 'Hoteis',
+    'name': 'Hotéis',
     'icon': 'assets/icon-category/hoteis.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.gold,
   },
   {
     'id': 63,
     'name': 'Alimentação em Viagens',
     'icon': 'assets/icon-category/travel-food.png',
-    'color': DefaultColors.blue,
+    'color': DefaultColors.orangeDark,
   },
   {
     'id': 64,
     'name': 'Passeios',
     'icon': 'assets/icon-category/tour.png',
-    'color': DefaultColors.orange,
+    'color': DefaultColors.vibrantYellow,
   },
   {
     'id': 65,
     'name': 'Coisas para Casa',
     'icon': 'assets/icon-category/home-stuff.png',
-    'color': DefaultColors.brown,
+    'color': DefaultColors.vibrantGreen,
   },
   {
     'id': 66,
@@ -273,42 +253,23 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 67,
     'name': 'Aplicativos',
     'icon': 'assets/icon-category/apps.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.navy,
   },
   {
     'id': 68,
     'name': 'Jogos Online',
     'icon': 'assets/icon-category/gaming.png',
-    'color': DefaultColors.yellow,
-  },
-  {
-    'id': 69,
-    'name': 'Consultas e Tratamentos',
-    'icon': 'assets/icon-category/medical.png',
-    'color': DefaultColors.green,
-  },
-  {
-    'id': 70,
-    'name': 'Bem-estar (Spa, Terapia)',
-    'icon': 'assets/icon-category/spa.png',
-    'color': DefaultColors.lavender,
-  },
-  {
-    'id': 71,
-    'name': 'Estacionamento e Pedágios',
-    'icon': 'assets/icon-category/toll.png',
-    'color': DefaultColors.darkGrey,
+    'color': DefaultColors.purple,
   },
   {
     'id': 30,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
-    'color': DefaultColors.grey,
+    'color': DefaultColors.darkGrey,
   },
 ];
 
 final List<Map<String, dynamic>> categories_income = [
-  // Outras categorias de receitas
   {
     'id': 50,
     'name': 'Salário',
@@ -339,7 +300,6 @@ final List<Map<String, dynamic>> categories_income = [
     'icon': 'assets/icon-category/transfer.png',
     'color': Colors.blue,
   },
-
   {
     'id': 58,
     'name': 'Freelance',
