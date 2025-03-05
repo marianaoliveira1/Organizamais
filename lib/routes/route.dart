@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:get/get.dart';
+import 'package:organizamais/pages/profile/profile_page.dart';
 
 import '../pages/cards/cards_page.dart';
 import '../pages/graphics/graphics_page.dart';
@@ -27,7 +28,7 @@ class Routes {
   static const TRANSACTION = '/transaction';
   static const CATEGORY = '/category';
   static const FIXED_ACCOUNTS = '/fixed-accounts';
-  static const BANK = '/bank';
+  static const PROFILE = '/profile';
   static const CREDITCARD = '/credit-card';
 }
 
@@ -43,8 +44,7 @@ class AppPages {
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => Category()),
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => FixedAccountsPage()),
-    // GetPage(name: Routes.BANK, page: () => BankSearchPage()),
-    // GetPage(name: Routes.CREDITCARD, page: () => CreditCardPage()),
+    GetPage(name: Routes.PROFILE, page: () => ProfilePage()),
   ];
 
   static const INITIAL = Routes.LOGIN;

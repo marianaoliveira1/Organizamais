@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/pages/initial/widget/finance_summary.dart';
 
+import '../../controller/auth_controller.dart';
 import '../../controller/fixed_accounts_controller.dart';
 
 import 'widget/credit_card_selection.dart';
@@ -16,26 +17,46 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     final theme = Theme.of(context);
+    final authController = Get.put(AuthController());
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text("Perfil"),
+              onTap: () {
+                Get.toNamed("/profile");
+              },
+            ),
+            Spacer(),
+            ListTile(
+              title: Text("Sair"),
+              onTap: () {
+                authController.logout();
+              },
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 20.w,
-                  horizontal: 20.h,
-                ),
-                child: Column(
-                  spacing: 20.h,
-                  children: [
-                    FinanceSummaryWidget(),
-                    DefaultWidgetFixedAccounts(),
-                    CreditCardSection(),
-                  ],
-                ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.h,
+              ),
+              child: Column(
+                spacing: 20.h,
+                children: [
+                  FinanceSummaryWidget(),
+                  DefaultWidgetFixedAccounts(),
+                  CreditCardSection(),
+                ],
               ),
             ),
           ],

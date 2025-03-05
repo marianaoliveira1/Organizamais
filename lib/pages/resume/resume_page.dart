@@ -166,9 +166,16 @@ class ResumePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(24.r),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(24.r),
-                                onTap: () => Get.to(() => TransactionPage(transaction: transaction)),
+                                onTap: () => Get.to(
+                                  () => TransactionPage(
+                                    transaction: transaction,
+                                  ),
+                                ),
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12.h,
+                                    horizontal: 16.w,
+                                  ),
                                   child: Row(
                                     children: [
                                       Image.asset(
