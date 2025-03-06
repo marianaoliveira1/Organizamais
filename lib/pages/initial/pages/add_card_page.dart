@@ -78,6 +78,9 @@ class _AddCardPageState extends State<AddCardPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DefaultTitleTransaction(title: "Nome do cartão"),
+            SizedBox(
+              height: 10.h,
+            ),
             TextField(
               controller: nameController,
               style: TextStyle(
@@ -110,7 +113,7 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
             ),
             SizedBox(
-              height: 16.h,
+              height: 10.h,
             ),
             // DefaultTitleTransaction(title: "Limite do cartão"),
             // TextField(
@@ -163,11 +166,17 @@ class _AddCardPageState extends State<AddCardPage> {
                           children: [
                             Image.asset(
                               selectedIconPath!,
-                              width: 24.w,
-                              height: 24.h,
+                              width: 40.w,
+                              height: 40.h,
                             ),
                             SizedBox(width: 8.w),
-                            Text(selectedBankName ?? ''),
+                            Text(
+                              selectedBankName ?? '',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: theme.primaryColor,
+                              ),
+                            ),
                           ],
                         )
                       : Row(children: [
