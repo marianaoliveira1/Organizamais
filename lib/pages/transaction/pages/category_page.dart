@@ -85,7 +85,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 3,
     'name': 'Bares',
     'icon': 'assets/icon-category/wine.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.peach,
   },
   {
     'id': 4,

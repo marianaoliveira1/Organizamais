@@ -178,27 +178,25 @@ class _ResumeContent extends StatelessWidget {
                     height: 30.h,
                   ),
                   SizedBox(width: 16.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(transaction.title,
-                            style: TextStyle(
-                              color: theme.primaryColor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            softWrap: true, // Permite a quebra de linha
-                            overflow: TextOverflow.visible),
-                        Text(
-                          category?['name'] ?? 'Categoria não encontrada',
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(transaction.title,
                           style: TextStyle(
-                            color: DefaultColors.grey20,
-                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
                           ),
+                          softWrap: true, // Permite a quebra de linha
+                          overflow: TextOverflow.visible),
+                      Text(
+                        category?['name'] ?? 'Categoria não encontrada',
+                        style: TextStyle(
+                          color: DefaultColors.grey20,
+                          fontSize: 11.sp,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

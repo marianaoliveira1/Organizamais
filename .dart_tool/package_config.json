@@ -8,6 +8,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "ansicolor",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/ansicolor-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "archive",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/archive-4.0.3",
       "packageUri": "lib/",
@@ -84,6 +90,12 @@
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "csslib",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/csslib-1.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "cupertino_icons",
@@ -176,6 +188,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "flutter_native_splash",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_native_splash-2.4.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "flutter_screenutil",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_screenutil-5.9.3",
       "packageUri": "lib/",
@@ -246,6 +264,12 @@
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/google_sign_in_web-0.12.4+3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "html",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/html-0.15.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
     },
     {
       "name": "http",
@@ -446,6 +470,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "universal_io",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/universal_io-2.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "uuid",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/uuid-4.5.1",
       "packageUri": "lib/",
@@ -494,7 +524,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-03-05T15:29:55.990059Z",
+  "generated": "2025-03-06T14:41:35.079510Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///home/mariana/snap/flutter/common/flutter",
