@@ -8,6 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/pages/cards/cards_page.dart';
 import 'package:organizamais/pages/graphics/graphics_page.dart';
 import 'package:organizamais/pages/initial/initial_page.dart';
+import 'package:organizamais/pages/profile/profile_page.dart';
 
 import 'package:organizamais/pages/resume/resume_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     GraphicsPage(),
     Container(),
     ResumePage(),
-    CardsPage(),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) async {
@@ -112,7 +113,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.card,
+              Iconsax.profile_circle,
             ),
             label: "",
           ),
