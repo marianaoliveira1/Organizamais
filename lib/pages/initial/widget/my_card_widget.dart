@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controller/card_controller.dart';
+import '../../../utils/color.dart';
 import '../pages/add_card_page.dart';
 
 class MyCardsWidget extends StatelessWidget {
@@ -31,10 +32,15 @@ class MyCardsWidget extends StatelessWidget {
         children: [
           Obx(() {
             if (cardController.card.isEmpty) {
-              return Container(
-                height: 150,
-                alignment: Alignment.center,
-                child: Text('Nenhum cartão adicionado'),
+              return Center(
+                child: Text(
+                  'Nenhum cartão adicionado',
+                  style: TextStyle(
+                    color: DefaultColors.grey20,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               );
             }
             return ListView.separated(
@@ -72,10 +78,12 @@ class MyCardsWidget extends StatelessWidget {
                     );
                   },
                   onTap: () {
-                    Get.to(() => AddCardPage(
-                          isEditing: true,
-                          card: card,
-                        ));
+                    Get.to(
+                      () => AddCardPage(
+                        isEditing: true,
+                        card: card,
+                      ),
+                    );
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

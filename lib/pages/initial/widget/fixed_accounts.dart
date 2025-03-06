@@ -71,13 +71,13 @@ class FixedAccounts extends StatelessWidget {
           Obx(
             () {
               if (fixedAccounts.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                return Center(
                   child: Text(
                     "Nenhuma conta fixa cadastrada",
                     style: TextStyle(
-                      color: DefaultColors.grey,
+                      color: DefaultColors.grey20,
                       fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 );
@@ -205,17 +205,21 @@ class FixedAccounts extends StatelessWidget {
             },
           ),
           SizedBox(height: 12.h),
-          Padding(
-            padding: EdgeInsets.only(top: 10.h, right: 10.h),
-            child: Text(
-              _formatCurrency(_calculateTotalNumeric().toString()),
-              style: TextStyle(
-                color: theme.primaryColor,
-                fontWeight: FontWeight.w500,
-                fontSize: 14.sp,
-              ),
-            ),
-          ),
+          fixedAccounts.isEmpty
+              ? Container()
+              : Padding(
+                  padding: EdgeInsets.only(top: 10.h, right: 10.h),
+                  child: Text(
+                    _formatCurrency(
+                      _calculateTotalNumeric().toString(),
+                    ),
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ),
         ],
       ),
     );
