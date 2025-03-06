@@ -156,9 +156,8 @@ class FixedAccounts extends StatelessWidget {
                                             color: theme.primaryColor,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14.sp,
-                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          maxLines: 1,
+                                          softWrap: true,
                                         ),
                                         Text(
                                           "Dia ${fixedAccount.paymentDay} de cada mês",

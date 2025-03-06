@@ -137,7 +137,6 @@ class _ResumeContent extends StatelessWidget {
         ),
         SizedBox(height: 14.h),
         ...transactions.map((transaction) => _buildTransactionItem(context, transaction)),
-        SizedBox(height: 14.h),
       ],
     );
   }
@@ -148,80 +147,88 @@ class _ResumeContent extends StatelessWidget {
     );
     final theme = Theme.of(context);
 
-    return Material(
-      color: theme.cardColor,
-      borderRadius: BorderRadius.circular(24.r),
-      child: InkWell(
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      child: Material(
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
-        onLongPress: () => _showDeleteConfirmationDialog(
-          context,
-          transaction,
-        ),
-        onTap: () => Get.to(
-          () => TransactionPage(
-            transaction: transaction,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24.r),
+          onLongPress: () => _showDeleteConfirmationDialog(
+            context,
+            transaction,
           ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 12.h,
-            horizontal: 16.w,
+          onTap: () => Get.to(
+            () => TransactionPage(
+              transaction: transaction,
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    category?['icon'] ?? 'assets/icon-category/default.png',
-                    width: 30.w,
-                    height: 30.h,
-                  ),
-                  SizedBox(width: 16.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(transaction.title,
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 12.h,
+              horizontal: 16.w,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      category?['icon'] ?? 'assets/icon-category/default.png',
+                      width: 30.w,
+                      height: 30.h,
+                    ),
+                    SizedBox(width: 16.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 150.w,
+                          child: Text(
+                            transaction.title,
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            softWrap: true, // Permite a quebra de linha
+                            overflow: TextOverflow.visible,
                           ),
-                          softWrap: true, // Permite a quebra de linha
-                          overflow: TextOverflow.visible),
-                      Text(
-                        category?['name'] ?? 'Categoria não encontrada',
-                        style: TextStyle(
-                          color: DefaultColors.grey20,
-                          fontSize: 11.sp,
                         ),
+                        Text(
+                          category?['name'] ?? 'Categoria não encontrada',
+                          style: TextStyle(
+                            color: DefaultColors.grey20,
+                            fontSize: 11.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      _formatValue(transaction.value),
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    _formatValue(transaction.value),
-                    style: TextStyle(
-                      color: theme.primaryColor,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
                     ),
-                  ),
-                  Text(
-                    transaction.paymentType,
-                    style: TextStyle(
-                      color: DefaultColors.grey20,
-                      fontSize: 11.sp,
+                    Text(
+                      transaction.paymentType,
+                      style: TextStyle(
+                        color: DefaultColors.grey20,
+                        fontSize: 11.sp,
+                      ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
