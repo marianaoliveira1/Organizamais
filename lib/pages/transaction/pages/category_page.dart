@@ -76,6 +76,12 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.vibrantYellow,
   },
   {
+    'id': 69,
+    'name': 'Padaria',
+    'icon': 'assets/icon-category/padaria.png',
+    'color': DefaultColors.greyLight,
+  },
+  {
     'id': 2,
     'name': 'Assinaturas e serviços',
     'icon': 'assets/icon-category/cartao.png',

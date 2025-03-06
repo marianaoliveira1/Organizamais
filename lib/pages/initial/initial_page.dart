@@ -24,24 +24,8 @@ class InitialPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text("Perfil"),
-              onTap: () {
-                Get.toNamed("/profile");
-              },
-            ),
-            Spacer(),
-            ListTile(
-              title: Text("Sair"),
-              onTap: () {
-                authController.logout();
-              },
-            ),
-          ],
-        ),
+      drawer: DefaultDrawer(
+        authController: authController,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -61,6 +45,50 @@ class InitialPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DefaultDrawer extends StatelessWidget {
+  const DefaultDrawer({
+    super.key,
+    required this.authController,
+  });
+
+  final AuthController authController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          ListTile(
+            title: Text("Perfil"),
+            onTap: () {
+              Get.toNamed("/profile");
+            },
+          ),
+          ListTile(
+            title: Text("Mues cartões"),
+            onTap: () {
+              Get.toNamed("/profile");
+            },
+          ),
+          ListTile(
+            title: Text("Minhas contas fixas"),
+            onTap: () {
+              Get.toNamed("/profile");
+            },
+          ),
+          Spacer(),
+          ListTile(
+            title: Text("Sair"),
+            onTap: () {
+              authController.logout();
+            },
+          ),
+        ],
       ),
     );
   }
