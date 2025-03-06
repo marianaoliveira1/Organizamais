@@ -166,6 +166,29 @@ class ResumePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(24.r),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(24.r),
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Confirmar exclusão'),
+                                      content: Text('Tem certeza que deseja excluir o cartão ${transaction.title}?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Cancelar'),
+                                          onPressed: () => Navigator.of(context).pop(),
+                                        ),
+                                        TextButton(
+                                          child: Text('Excluir'),
+                                          onPressed: () {
+                                            transactionController.deleteTransaction(transaction.id!);
+
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                                 onTap: () => Get.to(
                                   () => TransactionPage(
                                     transaction: transaction,
