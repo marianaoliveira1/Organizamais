@@ -161,6 +161,9 @@ class _ResumeContent extends StatelessWidget {
           onTap: () => Get.to(
             () => TransactionPage(
               transaction: transaction,
+              overrideTransactionSalvar: (transaction) {
+                _transactionController.updateTransaction(transaction);
+              },
             ),
           ),
           child: Padding(
