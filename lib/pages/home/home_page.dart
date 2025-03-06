@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:organizamais/pages/cards/cards_page.dart';
+
 import 'package:organizamais/pages/graphics/graphics_page.dart';
 import 'package:organizamais/pages/initial/initial_page.dart';
 import 'package:organizamais/pages/profile/profile_page.dart';

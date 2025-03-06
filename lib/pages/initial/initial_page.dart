@@ -17,33 +17,28 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     final theme = Theme.of(context);
-    final authController = Get.put(AuthController());
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-      ),
-      drawer: DefaultDrawer(
-        authController: authController,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.h,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.h,
+                ),
+                child: Column(
+                  spacing: 20.h,
+                  children: [
+                    FinanceSummaryWidget(),
+                    DefaultWidgetFixedAccounts(),
+                    CreditCardSection(),
+                  ],
+                ),
               ),
-              child: Column(
-                spacing: 20.h,
-                children: [
-                  FinanceSummaryWidget(),
-                  DefaultWidgetFixedAccounts(),
-                  CreditCardSection(),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

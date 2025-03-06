@@ -118,7 +118,7 @@ class FixedAccounts extends StatelessWidget {
                       },
                       onTap: () {
                         Get.to(
-                          () => FixedAccountsPage(
+                          () => AddFixedAccountsFormPage(
                             fixedAccount: fixedAccount,
                             onSave: (fixedAccount) => fixedAccountsController.updateFixedAccount(
                               fixedAccount,

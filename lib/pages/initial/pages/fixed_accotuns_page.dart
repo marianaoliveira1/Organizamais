@@ -12,17 +12,17 @@ import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
 import '../widget/text_filed_value_fixed_accotuns.dart';
 
-class FixedAccountsPage extends StatefulWidget {
+class AddFixedAccountsFormPage extends StatefulWidget {
   final FixedAccountModel? fixedAccount;
   final Function(FixedAccountModel fixedAccount)? onSave;
 
-  const FixedAccountsPage({super.key, this.fixedAccount, this.onSave});
+  const AddFixedAccountsFormPage({super.key, this.fixedAccount, this.onSave});
 
   @override
-  State<FixedAccountsPage> createState() => _FixedAccountsPageState();
+  State<AddFixedAccountsFormPage> createState() => _AddFixedAccountsFormPageState();
 }
 
-class _FixedAccountsPageState extends State<FixedAccountsPage> {
+class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
   int? categoryId;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
@@ -140,7 +140,7 @@ class _FixedAccountsPageState extends State<FixedAccountsPage> {
                           id: widget.fixedAccount!.id,
                           title: titleController.text,
                           value: valueController.text,
-                          category: categoryId?? 0,
+                          category: categoryId ?? 0,
                           paymentDay: dayOfTheMonthController.text,
                           paymentType: paymentTypeController.text,
                         ));
