@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
@@ -17,6 +18,13 @@ class GraphicsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final TransactionController transactionController = Get.put(TransactionController());
+
+    // Formatador de moeda brasileira
+    final currencyFormatter = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: 'R\$',
+      decimalDigits: 2,
+    );
 
     // Lista de meses
     List<String> getAllMonths() {
@@ -218,8 +226,13 @@ class GraphicsPage extends StatelessWidget {
                         itemCount: data.length,
                         itemBuilder: (context, index) {
                           var item = data[index];
+                          var valor = item['chart']?.value ?? 0;
                           return Padding(
-                            padding: EdgeInsets.only(bottom: 20.h, left: 10.w, right: 10.w),
+                            padding: EdgeInsets.only(
+                              bottom: 20.h,
+                              left: 5.w,
+                              right: 5.w,
+                            ),
                             child: Row(
                               children: [
                                 Image.asset(
@@ -251,7 +264,7 @@ class GraphicsPage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "R\$${item['chart']?.value.toStringAsFixed(2)}",
+                                  currencyFormatter.format(valor),
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w500,
