@@ -92,13 +92,6 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Foto de perfil
-
-              // Seção de Informações Pessoais
-              _buildSectionTitle('Informações Pessoais'),
-              SizedBox(height: 15.h),
-
-              // Nome do usuário
               Obx(() {
                 final user = authController.firebaseUser.value;
                 return _buildInfoItem(
