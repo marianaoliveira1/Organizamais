@@ -186,7 +186,7 @@ class _ResumeContent extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 150.w,
+                          width: 120.w,
                           child: Text(
                             transaction.title,
                             style: TextStyle(
@@ -221,11 +221,18 @@ class _ResumeContent extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Text(
-                      transaction.paymentType,
-                      style: TextStyle(
-                        color: DefaultColors.grey20,
-                        fontSize: 11.sp,
+                    SizedBox(
+                      width: 120.w,
+                      child: Text(
+                        transaction.paymentType,
+                        style: TextStyle(
+                          color: DefaultColors.grey20,
+                          fontSize: 11.sp,
+                        ),
+                        textAlign: TextAlign.end,
+                        maxLines: 2,
+                        softWrap: true, // Permite a quebra de linha
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
