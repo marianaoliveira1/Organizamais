@@ -194,8 +194,9 @@ class _ResumeContent extends StatelessWidget {
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                             ),
-                            softWrap: true, // Permite a quebra de linha
-                            overflow: TextOverflow.visible,
+                            maxLines: 2,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Text(
@@ -231,7 +232,7 @@ class _ResumeContent extends StatelessWidget {
                         ),
                         textAlign: TextAlign.end,
                         maxLines: 2,
-                        softWrap: true, // Permite a quebra de linha
+                        softWrap: true,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
