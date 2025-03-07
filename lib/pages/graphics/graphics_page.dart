@@ -151,17 +151,17 @@ class GraphicsPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     );
-                  }
+                  } // Gráfico de pizza
 
                   return Column(
                     children: [
-                      SizedBox(
-                        height: 180.h,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 1,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: SizedBox(
+                              height: 180.h,
                               child: PieChart(
                                 PieChartData(
                                   sectionsSpace: 0,
@@ -171,45 +171,45 @@ class GraphicsPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 26.w),
-                            Expanded(
-                              flex: 1,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for (var item in data)
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 4.h),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 10.w,
-                                            height: 10.h,
-                                            decoration: BoxDecoration(
-                                              color: item['chart']?.color,
-                                              borderRadius: BorderRadius.circular(2.r),
+                          ),
+                          SizedBox(width: 26.w),
+                          Expanded(
+                            flex: 1,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var item in data)
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 10.w,
+                                          height: 10.h,
+                                          decoration: BoxDecoration(
+                                            color: item['chart']?.color,
+                                            borderRadius: BorderRadius.circular(2.r),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Expanded(
+                                          child: Text(
+                                            item['chart']?.title ?? '',
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: theme.primaryColor,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
-                                          SizedBox(width: 8.w),
-                                          Expanded(
-                                            child: Text(
-                                              item['chart']?.title ?? '',
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
-                                                color: theme.primaryColor,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 20.h),
                       ListView.builder(
