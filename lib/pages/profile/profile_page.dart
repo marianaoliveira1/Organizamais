@@ -93,15 +93,6 @@ class ProfilePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Foto de perfil
-              Center(
-                child: Icon(
-                  Iconsax.profile_circle,
-                  size: 50.sp,
-                  color: DefaultColors.grey20,
-                ),
-              ),
-
-              SizedBox(height: 30.h),
 
               // Seção de Informações Pessoais
               _buildSectionTitle('Informações Pessoais'),

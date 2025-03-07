@@ -199,11 +199,17 @@ class _ResumeContent extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Text(
-                          category?['name'] ?? 'Categoria não encontrada',
-                          style: TextStyle(
-                            color: DefaultColors.grey20,
-                            fontSize: 11.sp,
+                        SizedBox(
+                          width: 120.w,
+                          child: Text(
+                            category?['name'] ?? 'Categoria não encontrada',
+                            style: TextStyle(
+                              color: DefaultColors.grey20,
+                              fontSize: 11.sp,
+                            ),
+                            maxLines: 2,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

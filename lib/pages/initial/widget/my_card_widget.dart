@@ -105,8 +105,11 @@ class MyCardsWidget extends StatelessWidget {
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16.sp,
+                                fontSize: 14.sp,
                               ),
+                              maxLines: 2,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

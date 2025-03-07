@@ -150,14 +150,19 @@ class FixedAccounts extends StatelessWidget {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          fixedAccount.title,
-                                          style: TextStyle(
-                                            color: theme.primaryColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14.sp,
+                                        SizedBox(
+                                          width: 110.w,
+                                          child: Text(
+                                            fixedAccount.title,
+                                            style: TextStyle(
+                                              color: theme.primaryColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14.sp,
+                                            ),
+                                            maxLines: 2,
+                                            softWrap: true,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          softWrap: true,
                                         ),
                                         Text(
                                           "Dia ${fixedAccount.paymentDay} de cada mês",
@@ -184,12 +189,19 @@ class FixedAccounts extends StatelessWidget {
                                     fontSize: 14.sp,
                                   ),
                                 ),
-                                Text(
-                                  "${fixedAccount.paymentType}",
-                                  style: TextStyle(
-                                    color: DefaultColors.grey,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
+                                SizedBox(
+                                  width: 105.w,
+                                  child: Text(
+                                    "${fixedAccount.paymentType}",
+                                    style: TextStyle(
+                                      color: DefaultColors.grey,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                    maxLines: 2,
+                                    softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
