@@ -84,140 +84,201 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 16.w,
-          vertical: 20.h,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Icon(
-                Iconsax.profile_circle,
-                size: 50.sp,
-                color: DefaultColors.grey20,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Foto de perfil
+              Center(
+                child: Icon(
+                  Iconsax.profile_circle,
+                  size: 50.sp,
+                  color: DefaultColors.grey20,
+                ),
               ),
-            ),
-            SizedBox(height: 20.h),
-            Obx(() {
-              final user = authController.firebaseUser.value;
-              if (user == null) {
-                return const Text("Usuário não encontrado", style: TextStyle(fontSize: 18));
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Nome",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: DefaultColors.grey20,
-                    ),
-                  ),
-                  Text(
-                    user.displayName ?? "Usuário",
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "Email",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: DefaultColors.grey20,
-                    ),
-                  ),
-                  Text(
-                    user.email ?? "Email não disponível", // Email do usuário
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              );
-            }),
-            SizedBox(height: 30.h),
-            _buildOptionButton(
-              context,
-              'Meus Cartões',
-              Iconsax.card,
-              () {
-                // Navegar para a página de cartões
-                Get.to(
-                  () => CardsPage(),
+
+              SizedBox(height: 30.h),
+
+              // Seção de Informações Pessoais
+              _buildSectionTitle('Informações Pessoais'),
+              SizedBox(height: 15.h),
+
+              // Nome do usuário
+              Obx(() {
+                final user = authController.firebaseUser.value;
+                return _buildInfoItem(
+                  context: context,
+                  icon: Icons.person_outline,
+                  title: 'Nome',
+                  value: user?.displayName ?? "Usuário",
                 );
-              },
-            ),
-            SizedBox(height: 15.h),
-            _buildOptionButton(
-              context,
-              'Minhas Contas Fixas',
-              Iconsax.receipt_1,
-              () {
-                Get.to(() => FixedAccountsPage());
-              },
-            ),
-            Spacer(), // Empurra o botão de sair para o final da tela
-            _buildLogoutButton(context, _showLogoutConfirmation),
-            SizedBox(height: 20.h),
-          ],
+              }),
+              _buildDivider(),
+
+              // Email do usuário
+              Obx(() {
+                final user = authController.firebaseUser.value;
+                return _buildInfoItem(
+                  context: context,
+                  icon: Icons.email_outlined,
+                  title: 'Email',
+                  value: user?.email ?? "Email não disponível",
+                );
+              }),
+
+              SizedBox(height: 30.h),
+
+              // Seção de Configurações
+              _buildSectionTitle('Configurações'),
+              SizedBox(height: 15.h),
+
+              // Meus Cartões
+              _buildSettingItem(
+                context: context,
+                icon: Iconsax.card,
+                title: 'Meus Cartões',
+                onTap: () {
+                  Get.to(() => CardsPage());
+                },
+              ),
+              _buildDivider(),
+
+              // Minhas Contas Fixas
+              _buildSettingItem(
+                context: context,
+                icon: Iconsax.receipt_1,
+                title: 'Minhas Contas Fixas',
+                onTap: () {
+                  Get.to(() => FixedAccountsPage());
+                },
+              ),
+
+              SizedBox(height: 30.h),
+
+              // Botão Sair
+              _buildLogoutButton(context, _showLogoutConfirmation),
+              SizedBox(height: 20.h),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildOptionButton(BuildContext context, String title, IconData icon, VoidCallback onTap) {
-    final theme = Theme.of(context);
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: Colors.grey.shade600,
+      ),
+    );
+  }
 
+  Widget _buildInfoItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12.h),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 24.sp,
+            color: DefaultColors.grey20,
+          ),
+          SizedBox(width: 15.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+          // const Spacer(),
+          // Icon(
+          //   Icons.arrow_forward_ios,
+          //   size: 16.sp,
+          //   color: Colors.grey.shade400,
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: theme.primaryColor,
-              size: 24.sp,
+            Container(
+              width: 40.w,
+              height: 40.h,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 22.sp,
+                color: Colors.black87,
+              ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 15.w),
             Text(
               title,
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
                 color: theme.primaryColor,
               ),
             ),
             const Spacer(),
             Icon(
-              Iconsax.arrow_right_3,
-              color: DefaultColors.grey20,
-              size: 20.sp,
+              Icons.arrow_forward_ios,
+              size: 16.sp,
+              color: Colors.grey.shade400,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      color: Colors.grey.shade200,
+      thickness: 1,
     );
   }
 

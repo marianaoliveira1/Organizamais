@@ -211,7 +211,7 @@ class GraphicsPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 24.h),
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -219,7 +219,7 @@ class GraphicsPage extends StatelessWidget {
                         itemBuilder: (context, index) {
                           var item = data[index];
                           return Padding(
-                            padding: EdgeInsets.only(bottom: 20.h),
+                            padding: EdgeInsets.only(bottom: 20.h, left: 10.w, right: 10.w),
                             child: Row(
                               children: [
                                 Image.asset(
