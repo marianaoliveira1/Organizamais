@@ -13,265 +13,265 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 5,
     'name': 'Moradia',
     'icon': 'assets/icon-category/home.png',
-    'color': DefaultColors.blue,
+    'color': DefaultColors.blue, // Azul para casa/lar
   },
   {
     'id': 19,
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
-    'color': DefaultColors.orangeDark,
+    'color': DefaultColors.titanium, // Cor metálica para ferramentas
   },
   {
     'id': 26,
     'name': 'Contas (água, luz, gás, internet)',
     'icon': 'assets/icon-category/contas.png',
-    'color': DefaultColors.lightBlue,
+    'color': DefaultColors.skyBlue, // Azul claro para utilidades
   },
   {
     'id': 29,
     'name': 'Mercado',
     'icon': 'assets/icon-category/mercado.png',
-    'color': DefaultColors.vibrantGreen,
+    'color': DefaultColors.vibrantGreen, // Verde para mercado/alimentos
   },
   {
     'id': 17,
     'name': 'Transporte',
     'icon': 'assets/icon-category/car.png',
-    'color': DefaultColors.vibrantRed,
+    'color': DefaultColors.indigo, // Azul-roxo para transporte
   },
   {
     'id': 22,
     'name': 'Uber/99',
     'icon': 'assets/icon-category/taxi.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.deepPurple, // Roxo escuro para apps de transporte
   },
   {
     'id': 28,
     'name': 'Combustível',
     'icon': 'assets/icon-category/combustivel.png',
-    'color': DefaultColors.vibrantOrange,
+    'color': DefaultColors.amber, // Âmbar como combustível
   },
   {
     'id': 32,
     'name': 'Seguro do Carro',
     'icon': 'assets/icon-category/seguros.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.blueGrey, // Azul acinzentado para seguro
   },
   {
     'id': 33,
     'name': 'Multas',
     'icon': 'assets/icon-category/multas.png',
-    'color': DefaultColors.brightRed,
+    'color': DefaultColors.redDark, // Vermelho escuro para multas
   },
   {
     'id': 1,
     'name': 'Alimentação',
     'icon': 'assets/icon-category/food.png',
-    'color': DefaultColors.pastelGreen,
+    'color': DefaultColors.emeraldBright, // Verde esmeralda para alimentos
   },
   {
     'id': 31,
     'name': 'Lanches',
     'icon': 'assets/icon-category/lanches.png',
-    'color': DefaultColors.vibrantYellow,
+    'color': DefaultColors.vibrantYellow, // Amarelo para lanches
   },
   {
     'id': 69,
     'name': 'Padaria',
     'icon': 'assets/icon-category/padaria.png',
-    'color': DefaultColors.greyLight,
+    'color': DefaultColors.sandyBeige, // Bege como pão
   },
   {
     'id': 2,
     'name': 'Assinaturas e serviços',
     'icon': 'assets/icon-category/cartao.png',
-    'color': DefaultColors.navy,
+    'color': DefaultColors.navy, // Azul marinho para serviços/negócios
   },
   {
     'id': 3,
     'name': 'Bares',
     'icon': 'assets/icon-category/wine.png',
-    'color': DefaultColors.peach,
+    'color': DefaultColors.burgundy, // Cor de vinho
   },
   {
     'id': 4,
     'name': 'Restaurantes',
     'icon': 'assets/icon-category/restaurante.png',
-    'color': DefaultColors.vibrantRed,
+    'color': DefaultColors.scarlet, // Vermelho intenso para restaurantes
   },
   {
     'id': 6,
     'name': 'Compras',
     'icon': 'assets/icon-category/shopping.png',
-    'color': DefaultColors.pastelPink,
+    'color': DefaultColors.hotPink, // Rosa para compras
   },
   {
     'id': 34,
     'name': 'Roupas e acessórios',
     'icon': 'assets/icon-category/roupas-e-calcados.png',
-    'color': DefaultColors.lavender,
+    'color': DefaultColors.lavender, // Lavanda para moda
   },
   {
     'id': 7,
     'name': 'Cuidados pessoais',
     'icon': 'assets/icon-category/skincare.png',
-    'color': DefaultColors.teal,
+    'color': DefaultColors.pastelPurple, // Roxo suave para cuidados pessoais
   },
   {
     'id': 9,
     'name': 'Educação',
     'icon': 'assets/icon-category/education.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.deepPurpleDark, // Roxo profundo para educação
   },
   {
     'id': 10,
     'name': 'Família e filhos',
     'icon': 'assets/icon-category/family.png',
-    'color': DefaultColors.pastelGreen,
+    'color': DefaultColors.pastelGreen, // Verde suave para família
   },
   {
     'id': 12,
     'name': 'Lazer e hobbies',
     'icon': 'assets/icon-category/lazer.png',
-    'color': DefaultColors.vibrantYellow,
+    'color': DefaultColors.tangerine, // Tangerina para lazer
   },
   {
     'id': 13,
     'name': 'Pets',
     'icon': 'assets/icon-category/dog.png',
-    'color': DefaultColors.emerald,
+    'color': DefaultColors.emerald, // Verde esmeralda para pets
   },
   {
     'id': 14,
     'name': 'Presentes e doações',
     'icon': 'assets/icon-category/gift.png',
-    'color': DefaultColors.brightRed,
+    'color': DefaultColors.vibrantPink, // Rosa vibrante para presentes
   },
   {
     'id': 15,
     'name': 'Saúde',
     'icon': 'assets/icon-category/saude.png',
-    'color': DefaultColors.vibrantTeal,
+    'color': DefaultColors.vibrantTeal, // Verde-azulado para saúde
   },
   {
     'id': 16,
     'name': 'Trabalho',
     'icon': 'assets/icon-category/work.png',
-    'color': DefaultColors.navy,
+    'color': DefaultColors.indigoDark, // Índigo escuro para trabalho
   },
   {
     'id': 18,
     'name': 'Viagem',
     'icon': 'assets/icon-category/aviao.png',
-    'color': DefaultColors.lightBlue,
+    'color': DefaultColors.oceanBlue, // Azul oceano para viagens
   },
   {
     'id': 20,
     'name': 'Vestuário',
     'icon': 'assets/icon-category/roupas.png',
-    'color': DefaultColors.plum,
+    'color': DefaultColors.plum, // Ameixa para vestuário
   },
   {
     'id': 21,
     'name': 'Delivery',
     'icon': 'assets/icon-category/delivery-bike.png',
-    'color': DefaultColors.orange,
+    'color': DefaultColors.orangeDark, // Laranja escuro para delivery
   },
   {
     'id': 23,
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.electricPurple, // Roxo elétrico para streaming
   },
   {
     'id': 24,
     'name': 'Farmácia',
     'icon': 'assets/icon-category/farmacia.png',
-    'color': DefaultColors.pastelGreen,
+    'color': DefaultColors.pastelRed, // Vermelho pastel para farmácia
   },
   {
     'id': 25,
     'name': 'Academia',
     'icon': 'assets/icon-category/academia.png',
-    'color': DefaultColors.vibrantRed,
+    'color': DefaultColors.lightGreen, // Verde claro para academia
   },
   {
     'id': 35,
     'name': 'Impostos',
     'icon': 'assets/icon-category/impostos.png',
-    'color': DefaultColors.grey,
+    'color': DefaultColors.grey, // Cinza para impostos
   },
   {
     'id': 36,
     'name': 'Plano de Saúde/Seguro de vida',
     'icon': 'assets/icon-category/planodesaude.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.teal, // Verde-azulado médio para plano de saúde
   },
   {
     'id': 37,
     'name': 'Financiamento',
     'icon': 'assets/icon-category/financiamentos.png',
-    'color': DefaultColors.darkBlue,
+    'color': DefaultColors.sapphire, // Safira para finanças
   },
   {
     'id': 38,
     'name': 'Empréstimos',
     'icon': 'assets/icon-category/emprestimos.png',
-    'color': DefaultColors.emerald,
+    'color': DefaultColors.greenDark, // Verde escuro para empréstimos
   },
   {
     'id': 61,
     'name': 'Passagens',
     'icon': 'assets/icon-category/passagens.png',
-    'color': DefaultColors.lightBlue,
+    'color': DefaultColors.lightBlue, // Azul claro para passagens
   },
   {
     'id': 62,
     'name': 'Hospedagens',
     'icon': 'assets/icon-category/hoteis.png',
-    'color': DefaultColors.gold,
+    'color': DefaultColors.gold, // Dourado para hospedagens de luxo
   },
   {
     'id': 63,
     'name': 'Alimentação em Viagens',
     'icon': 'assets/icon-category/alimentacaoemviagens.png',
-    'color': DefaultColors.orangeDark,
+    'color': DefaultColors.coral, // Coral para alimentação em viagens
   },
   {
     'id': 64,
     'name': 'Passeios',
     'icon': 'assets/icon-category/passeios.png',
-    'color': DefaultColors.vibrantYellow,
+    'color': DefaultColors.sunflowerYellow, // Amarelo girassol para passeios
   },
   {
     'id': 65,
     'name': 'Coisas para Casa',
     'icon': 'assets/icon-category/coisasparacasa.png',
-    'color': DefaultColors.vibrantGreen,
+    'color': DefaultColors.pastelBlue, // Azul pastel para itens domésticos
   },
   {
     'id': 66,
     'name': 'Emergência',
     'icon': 'assets/icon-category/emergency.png',
-    'color': DefaultColors.brightRed,
+    'color': DefaultColors.brightRed, // Vermelho brilhante para emergências
   },
   {
     'id': 67,
     'name': 'Aplicativos',
     'icon': 'assets/icon-category/app.png',
-    'color': DefaultColors.navy,
+    'color': DefaultColors.ultramarineBlue, // Azul ultramarino para apps
   },
   {
     'id': 68,
     'name': 'Jogos Online',
     'icon': 'assets/icon-category/jogosonline.png',
-    'color': DefaultColors.purple,
+    'color': DefaultColors.neonGreen, // Verde neon para jogos online
   },
   {
     'id': 30,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
-    'color': DefaultColors.darkGrey,
+    'color': DefaultColors.darkGrey, // Cinza escuro para outros
   },
 ];
 

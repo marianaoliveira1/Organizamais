@@ -65,4 +65,78 @@ class DefaultColors {
   static const pastelTeal = Color(0xFFB2DFDB);
   static const pastelCyan = Color(0xFFB2EBF2);
   static const pastelLime = Color(0xFFF0F4C3);
+
+  // Cores adicionais para garantir 70 cores distintas
+  static const amber = Color(0xFFFFC107);
+  static const amberDark = Color(0xFFFFB300);
+  static const amberLight = Color(0xFFFFECB3);
+
+  static const blueGrey = Color(0xFF607D8B);
+  static const blueGreyDark = Color(0xFF455A64);
+  static const blueGreyLight = Color(0xFFCFD8DC);
+
+  static const deepPurple = Color(0xFF673AB7);
+  static const deepPurpleDark = Color(0xFF512DA8);
+  static const deepPurpleLight = Color(0xFFD1C4E9);
+
+  static const lightGreen = Color(0xFF8BC34A);
+  static const lightGreenDark = Color(0xFF689F38);
+  static const lightGreenLight = Color(0xFFDCEDC8);
+
+  static const lime = Color(0xFFCDDC39);
+  static const limeDark = Color(0xFFAFB42B);
+  static const limeLight = Color(0xFFF0F4C3);
+
+  static const indigoDark = Color(0xFF303F9F);
+  static const indigoLight = Color(0xFFC5CAE9);
+
+  static const greenDark = Color(0xFF388E3C);
+  static const greenLight = Color(0xFFA5D6A7);
+
+  static const redDark = Color(0xFFD32F2F);
+  static const redLight = Color(0xFFEF9A9A);
+
+  static const brownDark = Color(0xFF5D4037);
+  static const brownLight = Color(0xFFD7CCC8);
+
+  // Cores metálicas
+  static const silver = Color(0xFFC0C0C0);
+  static const bronze = Color(0xFFCD7F32);
+  static const platinum = Color(0xFFE5E4E2);
+  static const titanium = Color(0xFF878681);
+
+  // Cores de jóias
+  static const ruby = Color(0xFFE0115F);
+  static const sapphire = Color(0xFF0F52BA);
+  static const amethyst = Color(0xFF9966CC);
+  static const topaz = Color(0xFFFFC87C);
+  static const emeraldBright = Color(0xFF50C878);
+
+  // Cores especiais
+  static const magenta = Color(0xFFFF00FF);
+  static const hotPink = Color(0xFFFF69B4);
+  static const deepCerise = Color(0xFFDA3287);
+  static const electricPurple = Color(0xFFBF00FF);
+  static const ultramarineBlue = Color(0xFF4166F5);
+  static const cobalt = Color(0xFF0047AB);
+  static const jungleGreen = Color(0xFF29AB87);
+  static const neonGreen = Color(0xFF39FF14);
+  static const chartreuse = Color(0xFF7FFF00);
+  static const sunflowerYellow = Color(0xFFFFDA03);
+  static const tangerine = Color(0xFFF28500);
+  static const scarlet = Color(0xFFFF2400);
+  static const crimson = Color(0xFFDC143C);
+  static const burgundy = Color(0xFF800020);
+
+  // Cores naturais
+  static const forestGreen = Color(0xFF228B22);
+  static const skyBlue = Color(0xFF87CEEB);
+  static const seaGreen = Color(0xFF2E8B57);
+  static const oceanBlue = Color(0xFF4F42B5);
+  static const sandyBeige = Color(0xFFF5F5DC);
+  static const clayBrown = Color(0xFFB87333);
+  static const oliveGreen = Color(0xFF808000);
+  static const slateGrey = Color(0xFF708090);
+  static const earthBrown = Color(0xFF6B4226);
+  static const rosyPink = Color(0xFFFF66CC);
 }

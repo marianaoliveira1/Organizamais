@@ -245,12 +245,18 @@ class GraphicsPage extends StatelessWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        item['chart']?.title ?? '',
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: theme.primaryColor,
+                                      SizedBox(
+                                        width: 130.w,
+                                        child: Text(
+                                          item['chart']?.title ?? '',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: theme.primaryColor,
+                                          ),
+                                          textAlign: TextAlign.start,
+                                          softWrap: true,
+                                          overflow: TextOverflow.clip,
                                         ),
                                       ),
                                       Text(
