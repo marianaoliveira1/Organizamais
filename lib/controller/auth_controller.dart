@@ -88,7 +88,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar("Erro ao entrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
-      // isLoading(false);
+      Navigator.pop(Get.context!);
       _hideLoadingDialog();
     }
   }
