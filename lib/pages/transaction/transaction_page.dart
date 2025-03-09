@@ -105,12 +105,32 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
+  String _formatDate(DateTime date) {
+    return DateFormat('dd/MM/yyyy', 'pt_BR').format(date);
+  }
+
   Future<void> _selectDate() async {
     final DateTime? date = await showDatePicker(
       context: context,
+      locale: const Locale("pt", "BR"),
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Theme.of(context).primaryColor,
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).primaryColor,
+            ),
+            dialogBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF66BB6A),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (date != null) {
       setState(() {
@@ -274,9 +294,7 @@ class _TransactionPageState extends State<TransactionPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DefaultTitleTransaction(
-                    title: "Data",
-                  ),
+                  DefaultTitleTransaction(title: "Data"),
                   TextField(
                     controller: dayOfTheMonthController,
                     readOnly: true,
@@ -294,7 +312,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                       prefixIcon: Icon(
                         Icons.calendar_month,
-                        color: theme.primaryColor.withOpacity(.5),
+                        color: theme.primaryColor,
                       ),
                       border: InputBorder.none,
                     ),
