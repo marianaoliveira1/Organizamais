@@ -19,9 +19,16 @@ class AuthController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    firebaseUser.bindStream(_auth.authStateChanges());
+    firebaseUser.bindStream(_auth.userChanges());
     ever(firebaseUser, _setInitialScreen);
     ever(firebaseUser, _loadOtherComponents);
+  }
+
+  updateDisplayName(String displayName) async {
+    await firebaseUser.value?.updateProfile(displayName: displayName);
+    Get.snackbar("Sucesso", "Nome atualizado com sucesso: $displayName");
+    await firebaseUser.value?.reload();
+
   }
 
   _loadOtherComponents(User? user) {
@@ -35,9 +42,15 @@ class AuthController extends GetxController {
 
   _setInitialScreen(User? user) {
     if (user == null) {
+      // only if not already on route
+      if (Get.currentRoute != Routes.LOGIN) {
+        Get.offAllNamed(Routes.LOGIN);
+      }
       Get.offAllNamed(Routes.LOGIN);
     } else {
-      Get.offAllNamed(Routes.HOME);
+      if (Get.currentRoute!= Routes.HOME) {
+        Get.offAllNamed(Routes.HOME);
+      }
     }
   }
 
@@ -123,25 +136,10 @@ class AuthController extends GetxController {
         "email": email,
         "uid": userCredential.user!.uid,
       });
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar(
-        "Erro ao cadastrar",
-        _getAuthErrorMessage(e),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        "Erro inesperado",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoading(false);
       _hideLoadingDialog();
+    } catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar("Erro ao cadastrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -151,31 +149,15 @@ class AuthController extends GetxController {
       _showLoadingDialog();
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar(
-        "Falha no login",
-        _getAuthErrorMessage(e),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        "Erro inesperado",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoading(false);
       _hideLoadingDialog();
-    }
+    } catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar("Erro ao entrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } 
   }
 
   Future<void> loginWithGoogle() async {
     try {
-      isLoading(true);
       _showLoadingDialog();
 
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -199,34 +181,11 @@ class AuthController extends GetxController {
           "uid": userCredential.user!.uid,
         });
       }
-
-      Get.snackbar(
-        "Sucesso",
-        "Login com Google realizado com sucesso!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar(
-        "Erro no login com Google",
-        _getAuthErrorMessage(e),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        "Erro no login com Google",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoading(false);
       _hideLoadingDialog();
-    }
+    } catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar("Erro ao entrar com Google", e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } 
   }
 
   Future<void> logout() async {

@@ -1,5 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -16,6 +18,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final AuthController authController = Get.find<AuthController>();
+
 
     void _showLogoutConfirmation() {
       Get.bottomSheet(
@@ -80,6 +83,8 @@ class ProfilePage extends StatelessWidget {
       );
     }
 
+
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -94,10 +99,39 @@ class ProfilePage extends StatelessWidget {
             children: [
               Obx(() {
                 final user = authController.firebaseUser.value;
+                print(authController.firebaseUser.value);
                 return _buildInfoItem(
                   context: context,
                   icon: Icons.person_outline,
                   title: 'Nome',
+                  onTap: () {
+                    final controller = TextEditingController(text: user?.displayName);
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Editar Nome'),
+                        content: TextField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            hintText: 'Digite o novo nome',
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              authController.updateDisplayName(controller.text);
+                              Get.back();
+                            },
+                            child: Text('Salvar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                   value: user?.displayName ?? "Usuário",
                 );
               }),
@@ -169,45 +203,52 @@ class ProfilePage extends StatelessWidget {
     required IconData icon,
     required String title,
     required String value,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 24.sp,
-            color: DefaultColors.grey20,
-          ),
-          SizedBox(width: 15.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          child: Row(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: Colors.grey.shade500,
-                ),
+              Icon(
+                icon,
+                size: 24.sp,
+                color: DefaultColors.grey20,
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: theme.primaryColor,
-                ),
+              SizedBox(width: 15.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                ],
               ),
+              // const Spacer(),
+              // Icon(
+              //   Icons.arrow_forward_ios,
+              //   size: 16.sp,
+              //   color: Colors.grey.shade400,
+              // ),
             ],
           ),
-          // const Spacer(),
-          // Icon(
-          //   Icons.arrow_forward_ios,
-          //   size: 16.sp,
-          //   color: Colors.grey.shade400,
-          // ),
-        ],
+        ),
       ),
     );
   }
