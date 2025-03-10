@@ -113,21 +113,27 @@ class _TransactionPageState extends State<TransactionPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       builder: (context, child) {
+        final theme = Theme.of(context);
         return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Theme.of(context).primaryColor,
+          data: ThemeData(
+            primaryColor: theme.primaryColor, // Cor principal do app
             colorScheme: ColorScheme.light(
-              primary: Theme.of(context).primaryColor,
+              primary: theme.primaryColor, // Botões de ação ("OK" e "Cancelar")
+              onPrimary: theme.cardColor, // Texto dentro dos botões
+              onSurface: DefaultColors.brownDark, // Cor do título "Selecione a data" e da data selecionada
             ),
-            dialogBackgroundColor: Colors.white,
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF66BB6A),
+            dialogBackgroundColor: theme.primaryColor, // Fundo do calendário
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: theme.primaryColor, // Botões "OK" e "Cancelar"
+              ),
             ),
           ),
           child: child!,
         );
       },
     );
+
     if (date != null) {
       setState(() {
         _selectedDate = date;

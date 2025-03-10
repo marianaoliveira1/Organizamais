@@ -53,7 +53,7 @@ class DefaultButtonSelectCategory extends StatelessWidget {
             Text(
               selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
               style: TextStyle(
-                color: theme.primaryColor,
+                color: selectedCategoryData != null ? theme.primaryColor : DefaultColors.grey20,
                 fontSize: 17.sp,
               ),
             ),
