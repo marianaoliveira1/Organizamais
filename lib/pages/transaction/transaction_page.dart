@@ -105,10 +105,6 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy', 'pt_BR').format(date);
-  }
-
   Future<void> _selectDate() async {
     final DateTime? date = await showDatePicker(
       context: context,
