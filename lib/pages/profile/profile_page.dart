@@ -19,7 +19,6 @@ class ProfilePage extends StatelessWidget {
     final theme = Theme.of(context);
     final AuthController authController = Get.find<AuthController>();
 
-
     void _showLogoutConfirmation() {
       Get.bottomSheet(
         Container(
@@ -71,7 +70,7 @@ class ProfilePage extends StatelessWidget {
                       'Sim',
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.white,
+                        color: theme.cardColor,
                       ),
                     ),
                   ),
@@ -82,8 +81,6 @@ class ProfilePage extends StatelessWidget {
         ),
       );
     }
-
-
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

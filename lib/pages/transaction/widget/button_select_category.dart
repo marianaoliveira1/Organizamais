@@ -21,6 +21,7 @@ class DefaultButtonSelectCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final selectedCategoryData = findCategoryById(selectedCategory);
 
     return InkWell(
@@ -46,13 +47,13 @@ class DefaultButtonSelectCategory extends StatelessWidget {
             else
               Icon(
                 Iconsax.textalign_justifycenter,
-                color: DefaultColors.grey,
+                color: theme.primaryColor,
               ),
             SizedBox(width: 10.w),
             Text(
               selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
               style: TextStyle(
-                color: DefaultColors.grey,
+                color: theme.primaryColor,
                 fontSize: 17.sp,
               ),
             ),

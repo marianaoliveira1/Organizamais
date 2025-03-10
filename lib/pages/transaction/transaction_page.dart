@@ -308,7 +308,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                       prefixIcon: Icon(
                         Icons.calendar_month,
-                        color: theme.primaryColor,
+                        color: DefaultColors.grey20,
                       ),
                       border: InputBorder.none,
                     ),
