@@ -108,7 +108,10 @@ class _ResumeContent extends StatelessWidget {
         return const DefaultTextNotTransaction();
       }
 
-      final groupedTransactions = _groupTransactionsByDate(_transactionController.transaction);
+      // Ordena as transações da mais recente para a mais antiga
+      final sortedTransactions = _transactionController.transaction.toList()..sort((a, b) => DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!)));
+
+      final groupedTransactions = _groupTransactionsByDate(sortedTransactions);
 
       return ListView.builder(
         shrinkWrap: true,
@@ -145,6 +148,7 @@ class _ResumeContent extends StatelessWidget {
     final category = categories_expenses.firstWhereOrNull(
       (element) => element['id'] == transaction.category,
     );
+
     final theme = Theme.of(context);
 
     return Container(
@@ -290,16 +294,30 @@ class _ResumeContent extends StatelessWidget {
       grouped.putIfAbsent(relativeDate, () => []).add(transaction);
     }
 
-    // Sort transactions by date (newest first)
-    grouped.forEach(
-      (_, transactions) => transactions.sort(
-        (a, b) => DateTime.parse(b.paymentDay!).compareTo(
-          DateTime.parse(a.paymentDay!),
-        ),
-      ),
-    );
+    // Ordena as datas das transações (mais recente primeiro)
+    final sortedKeys = grouped.keys.toList()
+      ..sort((a, b) {
+        DateTime dateA = _parseRelativeDate(a);
+        DateTime dateB = _parseRelativeDate(b);
+        return dateB.compareTo(dateA);
+      });
 
-    return grouped;
+    Map<String, List<dynamic>> sortedGrouped = {};
+    for (var key in sortedKeys) {
+      sortedGrouped[key] = grouped[key]!;
+    }
+
+    return sortedGrouped;
+  }
+
+  DateTime _parseRelativeDate(String relativeDate) {
+    if (relativeDate == 'Hoje') {
+      return DateTime.now();
+    } else if (relativeDate == 'Ontem') {
+      return DateTime.now().subtract(const Duration(days: 1));
+    } else {
+      return DateFormat('dd/MM/yyyy').parse(relativeDate);
+    }
   }
 
   String _getRelativeDate(String dateStr) {
@@ -308,11 +326,10 @@ class _ResumeContent extends StatelessWidget {
 
     if (DateUtils.isSameDay(date, now)) return 'Hoje';
     if (DateUtils.isSameDay(
-      date,
-      now.subtract(
-        const Duration(days: 1),
-      ),
-    )) return 'Ontem';
+        date,
+        now.subtract(
+          const Duration(days: 1),
+        ))) return 'Ontem';
     return DateFormat('dd/MM/yyyy').format(date);
   }
 

@@ -1,5 +1,6 @@
 // ignore_for_file: unused_element
 
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -88,13 +89,13 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.home,
+              IconsaxBold.home,
             ),
             label: "Inicio",
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.graph,
+              IconsaxBold.graph,
             ),
             label: "Graficos",
           ),
@@ -107,13 +108,13 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.arrow_swap_horizontal,
+              IconsaxBold.arrow_swap_horizontal,
             ),
             label: "Transações",
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Iconsax.profile_circle,
+              IconsaxBold.user,
             ),
             label: "Perfil",
           ),
