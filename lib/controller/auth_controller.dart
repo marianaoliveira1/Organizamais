@@ -123,14 +123,6 @@ class AuthController extends GetxController {
         "email": email,
         "uid": userCredential.user!.uid,
       });
-
-      Get.snackbar(
-        "Sucesso",
-        "Conta criada com sucesso!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         "Erro ao cadastrar",
@@ -159,14 +151,6 @@ class AuthController extends GetxController {
       _showLoadingDialog();
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-
-      Get.snackbar(
-        "Sucesso",
-        "Login realizado com sucesso!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         "Falha no login",
@@ -216,11 +200,29 @@ class AuthController extends GetxController {
         });
       }
 
-      Get.snackbar("Sucesso", "Login com Google realizado com sucesso!", backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Sucesso",
+        "Login com Google realizado com sucesso!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Erro no login com Google", _getAuthErrorMessage(e), backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro no login com Google",
+        _getAuthErrorMessage(e),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
-      Get.snackbar("Erro no login com Google", e.toString(), backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro no login com Google",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading(false);
       _hideLoadingDialog();

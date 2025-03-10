@@ -90,13 +90,13 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(
               Iconsax.home,
             ),
-            label: "",
+            label: "Inicio",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Iconsax.graph,
             ),
-            label: "",
+            label: "Graficos",
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -109,13 +109,13 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(
               Iconsax.arrow_swap_horizontal,
             ),
-            label: "",
+            label: "Transações",
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Iconsax.profile_circle,
             ),
-            label: "",
+            label: "Perfil",
           ),
         ],
         currentIndex: _selectedIndex,
