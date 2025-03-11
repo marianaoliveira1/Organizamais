@@ -120,8 +120,10 @@ class _TransactionPageState extends State<TransactionPage> {
             colorScheme: ColorScheme.light(
               primary: theme.primaryColor, // Botões de ação ("OK" e "Cancelar")
               onPrimary: theme.cardColor, // Texto dentro dos botões
-              onSurface: DefaultColors.brownDark, // Cor do título "Selecione a data" e da data selecionada
+              surface: theme.scaffoldBackgroundColor,
+              onSurface: theme.primaryColor, // Cor do título "Selecione a data" e da data selecionada
             ),
+
             dialogBackgroundColor: theme.primaryColor, // Fundo do calendário
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
