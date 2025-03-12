@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +30,6 @@ class AuthController extends GetxController {
     await firebaseUser.value?.updateProfile(displayName: displayName);
     Get.snackbar("Sucesso", "Nome atualizado com sucesso: $displayName");
     await firebaseUser.value?.reload();
-
   }
 
   _loadOtherComponents(User? user) {
@@ -48,7 +49,7 @@ class AuthController extends GetxController {
       }
       Get.offAllNamed(Routes.LOGIN);
     } else {
-      if (Get.currentRoute!= Routes.HOME) {
+      if (Get.currentRoute != Routes.HOME) {
         Get.offAllNamed(Routes.HOME);
       }
     }
@@ -64,26 +65,6 @@ class AuthController extends GetxController {
   void _hideLoadingDialog() {
     if (Get.isDialogOpen!) {
       Get.back();
-    }
-
-    String _handleAuthError(dynamic error) {
-      String errorMessage = error.toString();
-
-      if (errorMessage.contains('user-not-found')) {
-        return 'Usuário não encontrado. Verifique seu e-mail.';
-      } else if (errorMessage.contains('wrong-password')) {
-        return 'Senha incorreta. Tente novamente.';
-      } else if (errorMessage.contains('email-already-in-use')) {
-        return 'E-mail já está em uso. Tente outro.';
-      } else if (errorMessage.contains('invalid-email')) {
-        return 'E-mail inválido. Por favor, verifique.';
-      } else if (errorMessage.contains('weak-password')) {
-        return 'Senha muito fraca. Use uma senha mais forte.';
-      } else if (errorMessage.contains('network-request-failed')) {
-        return 'Erro de conexão. Verifique sua internet.';
-      } else {
-        return 'Erro inesperado: $errorMessage';
-      }
     }
   }
 
@@ -153,7 +134,7 @@ class AuthController extends GetxController {
     } catch (e) {
       _hideLoadingDialog();
       Get.snackbar("Erro ao entrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
-    } 
+    }
   }
 
   Future<void> loginWithGoogle() async {
@@ -185,7 +166,7 @@ class AuthController extends GetxController {
     } catch (e) {
       _hideLoadingDialog();
       Get.snackbar("Erro ao entrar com Google", e.toString(), snackPosition: SnackPosition.BOTTOM);
-    } 
+    }
   }
 
   Future<void> logout() async {

@@ -161,7 +161,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 18,
-    'name': 'Viagem',
+    'name': 'Academia',
     'icon': 'assets/icon-category/aviao.png',
     'color': DefaultColors.oceanBlue, // Azul oceano para viagens
   },
