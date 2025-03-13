@@ -125,28 +125,41 @@ class GraphicsPage extends StatelessWidget {
                   var data = categories
                       .map(
                         (e) => {
-                          "chart": PieChartSectionData(
-                            value: filteredTransactions.where((element) => element.category == e).fold(
-                              0,
-                              (previousValue, element) {
-                                // Remove os pontos e troca vírgula por ponto para corrigir o parse
-                                return (previousValue ?? 0) + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
-                              },
-                            ),
-                            color: findCategoryById(e)?['color'],
-                            title: '${findCategoryById(e)?['name']}',
-                            radius: 50,
-                            showTitle: false,
+                          "category": e,
+                          "value": filteredTransactions.where((element) => element.category == e).fold<double>(
+                            0.0, // Use 0.0 para definir explicitamente o tipo como double
+                            (previousValue, element) {
+                              // Remove os pontos e troca vírgula por ponto para corrigir o parse
+                              return previousValue + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
+                            },
                           ),
+                          "name": findCategoryById(e)?['name'],
+                          "color": findCategoryById(e)?['color'],
                           "icon": findCategoryById(e)?['icon'],
                         },
                       )
                       .toList();
 
+                  // Ordenar os dados por valor (decrescente)
+                  data.sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
+
                   double totalValue = data.fold(
-                    0,
-                    (previousValue, element) => previousValue + (element['chart']?.value ?? 0),
+                    0.0,
+                    (previousValue, element) => previousValue + (element['value'] as double),
                   );
+
+                  // Criar as seções do gráfico após a ordenação
+                  var chartData = data
+                      .map(
+                        (e) => PieChartSectionData(
+                          value: e['value'] as double,
+                          color: e['color'] as Color,
+                          title: '${e['name']}',
+                          radius: 50,
+                          showTitle: false,
+                        ),
+                      )
+                      .toList();
 
                   if (data.isEmpty) {
                     return Center(
@@ -175,7 +188,7 @@ class GraphicsPage extends StatelessWidget {
                                   sectionsSpace: 0,
                                   centerSpaceRadius: 26,
                                   centerSpaceColor: theme.scaffoldBackgroundColor,
-                                  sections: data.map((e) => e['chart']).toList().cast<PieChartSectionData>(),
+                                  sections: chartData,
                                 ),
                               ),
                             ),
@@ -196,14 +209,14 @@ class GraphicsPage extends StatelessWidget {
                                           width: 10.w,
                                           height: 10.h,
                                           decoration: BoxDecoration(
-                                            color: item['chart']?.color,
+                                            color: item['color'] as Color,
                                             borderRadius: BorderRadius.circular(2.r),
                                           ),
                                         ),
                                         SizedBox(width: 8.w),
                                         Expanded(
                                           child: Text(
-                                            item['chart']?.title ?? '',
+                                            item['name'] as String,
                                             style: TextStyle(
                                               fontSize: 12.sp,
                                               color: theme.primaryColor,
@@ -226,7 +239,9 @@ class GraphicsPage extends StatelessWidget {
                         itemCount: data.length,
                         itemBuilder: (context, index) {
                           var item = data[index];
-                          var valor = item['chart']?.value ?? 0;
+                          var valor = item['value'] as double;
+                          var percentual = (valor / totalValue * 100);
+
                           return Padding(
                             padding: EdgeInsets.only(
                               bottom: 20.h,
@@ -236,7 +251,7 @@ class GraphicsPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 Image.asset(
-                                  item['icon'] ?? '',
+                                  item['icon'] as String,
                                   width: 30.w,
                                   height: 30.h,
                                 ),
@@ -248,7 +263,7 @@ class GraphicsPage extends StatelessWidget {
                                       SizedBox(
                                         width: 130.w,
                                         child: Text(
-                                          item['chart']?.title ?? '',
+                                          item['name'] as String,
                                           style: TextStyle(
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w500,
@@ -260,7 +275,7 @@ class GraphicsPage extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        "${((item['chart']?.value ?? 0) / totalValue * 100).toStringAsFixed(0)}%",
+                                        "${percentual.toStringAsFixed(0)}%",
                                         style: TextStyle(
                                           fontSize: 12.sp,
                                           color: DefaultColors.grey,
