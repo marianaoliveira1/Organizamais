@@ -116,15 +116,30 @@ class TransactionListGraphic extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 2,
-                        child: Text(
-                          currencyFormatter.format(transactionValue),
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                            color: theme.primaryColor,
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.end,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              currencyFormatter.format(transactionValue),
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w500,
+                                color: theme.primaryColor,
+                                letterSpacing: -0.5,
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                            SizedBox(
+                              height: 6.h,
+                            ),
+                            Text(
+                              transaction.paymentType!,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

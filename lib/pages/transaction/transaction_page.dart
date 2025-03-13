@@ -123,7 +123,6 @@ class _TransactionPageState extends State<TransactionPage> {
               surface: theme.scaffoldBackgroundColor,
               onSurface: theme.primaryColor, // Cor do título "Selecione a data" e da data selecionada
             ),
-
             dialogBackgroundColor: theme.primaryColor, // Fundo do calendário
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -335,7 +334,6 @@ class _TransactionPageState extends State<TransactionPage> {
                 ButtonBackTransaction(),
                 InkWell(
                   onTap: () async {
-                    // !
                     final TransactionController transactionController = Get.find<TransactionController>();
 
                     if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
