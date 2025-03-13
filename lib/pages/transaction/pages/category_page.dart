@@ -363,10 +363,10 @@ Map<String, dynamic>? findCategoryById(int? id) {
   return null;
 }
 
-class Category extends StatelessWidget {
+class CategoryPage extends StatelessWidget {
   final TransactionType? transactionType;
 
-  const Category({
+  const CategoryPage({
     super.key,
     this.transactionType,
   });

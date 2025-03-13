@@ -26,7 +26,7 @@ class DefaultButtonSelectCategory extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        var categoryId = await Get.to(() => Category(
+        var categoryId = await Get.to(() => CategoryPage(
               transactionType: transactionType,
             ));
         onTap(categoryId as int?);
