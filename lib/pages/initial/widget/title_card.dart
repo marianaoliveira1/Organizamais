@@ -25,14 +25,14 @@ class DefaultTitleCard extends StatelessWidget {
           style: TextStyle(
             color: DefaultColors.grey,
             fontWeight: FontWeight.w500,
-            fontSize: 12.sp,
+            fontSize: 11.sp,
           ),
         ),
         GestureDetector(
           onTap: onTap,
           child: Icon(
             Icons.add,
-            size: 16.sp,
+            size: 14.sp,
             color: DefaultColors.grey,
           ),
         ),
