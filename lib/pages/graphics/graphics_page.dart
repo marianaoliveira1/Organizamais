@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 
 import 'widgtes/graphics_section.dart';
-import 'widgtes/month_selector.dart';
+import 'widgtes/month_selector_graphic.dart';
 
 class GraphicsPage extends StatelessWidget {
   const GraphicsPage({super.key});
@@ -30,7 +30,7 @@ class GraphicsPage extends StatelessWidget {
             padding: EdgeInsets.all(20.w),
             child: Column(
               children: [
-                MonthSelector(selectedMonth: selectedMonth, selectedCategoryId: selectedCategoryId, theme: theme),
+                MonthSelectorGraphic(selectedMonth: selectedMonth, selectedCategoryId: selectedCategoryId, theme: theme),
                 SizedBox(height: 20.h),
                 GraphicsSection(
                   transactionController: transactionController,

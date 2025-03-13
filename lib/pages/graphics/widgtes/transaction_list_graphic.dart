@@ -7,7 +7,7 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
-class TransactionList extends StatelessWidget {
+class TransactionListGraphic extends StatelessWidget {
   final RxnInt selectedCategoryId;
   final int categoryId;
   final NumberFormat currencyFormatter;
@@ -17,7 +17,7 @@ class TransactionList extends StatelessWidget {
   final RxString selectedMonth;
   final List<TransactionModel> Function(TransactionController, RxString) getFilteredTransactions;
 
-  const TransactionList({
+  const TransactionListGraphic({
     super.key,
     required this.selectedCategoryId,
     required this.categoryId,

@@ -6,12 +6,12 @@ import 'package:organizamais/utils/color.dart';
 
 import '../graphics_page.dart';
 
-class MonthSelector extends StatelessWidget {
+class MonthSelectorGraphic extends StatelessWidget {
   final RxString selectedMonth;
   final RxnInt selectedCategoryId;
   final ThemeData theme;
 
-  const MonthSelector({
+  const MonthSelectorGraphic({
     super.key,
     required this.selectedMonth,
     required this.selectedCategoryId,

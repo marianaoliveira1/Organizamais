@@ -120,7 +120,7 @@ class CategoryList extends StatelessWidget {
                 ),
               ),
             ),
-            TransactionList(
+            TransactionListGraphic(
               selectedCategoryId: selectedCategoryId,
               categoryId: categoryId,
               currencyFormatter: currencyFormatter,
