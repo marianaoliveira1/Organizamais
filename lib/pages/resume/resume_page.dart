@@ -145,10 +145,7 @@ class _ResumeContent extends StatelessWidget {
   }
 
   Widget _buildTransactionItem(BuildContext context, dynamic transaction) {
-    final category = categories_expenses.firstWhereOrNull(
-      (element) => element['id'] == transaction.category,
-    );
-
+    final category = findCategoryById(transaction.category);
     final theme = Theme.of(context);
 
     return Container(
