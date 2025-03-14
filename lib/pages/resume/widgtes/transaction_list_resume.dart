@@ -1,3 +1,5 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -97,10 +99,11 @@ class TransactionsList extends StatelessWidget {
 
     if (DateUtils.isSameDay(date, now)) return 'Hoje';
     if (DateUtils.isSameDay(
-        date,
-        now.subtract(
-          const Duration(days: 1),
-        ))) return 'Ontem';
+      date,
+      now.subtract(
+        const Duration(days: 1),
+      ),
+    )) return 'Ontem';
     return DateFormat('dd/MM/yyyy').format(date);
   }
 }

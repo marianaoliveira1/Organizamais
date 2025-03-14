@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -40,7 +42,11 @@ class MonthSelectorGraphic extends StatelessWidget {
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(
-                    color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
+                    color: selectedMonth.value == month
+                        ? DefaultColors.green
+                        : DefaultColors.grey.withOpacity(
+                            0.3,
+                          ),
                   ),
                 ),
                 alignment: Alignment.center,

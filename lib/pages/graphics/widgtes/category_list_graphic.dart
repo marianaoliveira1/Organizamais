@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -64,7 +66,11 @@ class CategoryList extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
                   decoration: BoxDecoration(
-                    color: selectedCategoryId.value == categoryId ? (item['color'] as Color).withOpacity(0.1) : Colors.transparent,
+                    color: selectedCategoryId.value == categoryId
+                        ? (item['color'] as Color).withOpacity(
+                            0.1,
+                          )
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
