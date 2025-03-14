@@ -143,11 +143,13 @@ class FixedAccounts extends StatelessWidget {
                                     ),
                                     child: Image.asset(
                                       categories_expenses.firstWhere((element) => element['id'] == fixedAccount.category)['icon'],
-                                      width: 20.w,
-                                      height: 20.h,
+                                      width: 22.w,
+                                      height: 22.h,
                                     ),
                                   ),
-                                  SizedBox(width: 10.w),
+                                  SizedBox(
+                                    width: 10.w,
+                                  ),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +161,7 @@ class FixedAccounts extends StatelessWidget {
                                             style: TextStyle(
                                               color: theme.primaryColor,
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 13.sp,
+                                              fontSize: 14.sp,
                                             ),
                                             maxLines: 2,
                                             softWrap: true,
@@ -170,7 +172,7 @@ class FixedAccounts extends StatelessWidget {
                                           "Dia ${fixedAccount.paymentDay} de cada mês",
                                           style: TextStyle(
                                             color: DefaultColors.grey20,
-                                            fontSize: 11.sp,
+                                            fontSize: 12.sp,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -188,7 +190,7 @@ class FixedAccounts extends StatelessWidget {
                                   style: TextStyle(
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13.sp,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                                 SizedBox(
@@ -197,7 +199,7 @@ class FixedAccounts extends StatelessWidget {
                                     "${fixedAccount.paymentType}",
                                     style: TextStyle(
                                       color: DefaultColors.grey20,
-                                      fontSize: 11.sp,
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w500,
                                     ),
                                     textAlign: TextAlign.end,
