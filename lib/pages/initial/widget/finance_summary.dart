@@ -32,7 +32,7 @@ class FinanceSummaryWidget extends StatelessWidget {
 
     return Obx(() {
       // Se for o primeiro dia, os valores serão zerados.
-      double totalReceita = isFirstDay
+      num totalReceita = isFirstDay
           ? 0
           : transactionController.transaction.where((t) {
               // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
@@ -50,7 +50,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                   ),
             );
 
-      double totalDespesas = isFirstDay
+      num totalDespesas = isFirstDay
           ? 0
           : transactionController.transaction.where((t) {
               // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
@@ -68,7 +68,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                   ),
             );
 
-      double total = totalReceita - totalDespesas;
+      num total = totalReceita - totalDespesas;
 
       return Container(
         padding: EdgeInsets.symmetric(
