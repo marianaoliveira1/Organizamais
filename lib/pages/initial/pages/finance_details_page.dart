@@ -1,5 +1,3 @@
-// ignore_for_file: use_super_parameters
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,7 +7,9 @@ import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
-  const FinanceDetailsPage({Key? key}) : super(key: key);
+  const FinanceDetailsPage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +24,10 @@ class FinanceDetailsPage extends StatelessWidget {
     final int currentMonth = DateTime.now().month;
     final int currentYear = DateTime.now().year;
 
-    // Nome do mês atual
-    final String currentMonthName = DateFormat('MMMM', 'pt_BR').format(DateTime.now());
-
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          "Detalhes Financeiros - $currentMonthName",
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: theme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
       ),
       body: Obx(() {
         // Filtra transações de receita para o mês atual
@@ -55,100 +48,17 @@ class FinanceDetailsPage extends StatelessWidget {
           return false;
         }).toList();
 
-        // Calcula totais
-        num totalReceitas = receivedTransactions.fold(
-          0,
-          (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
-        );
-
-        num totalDespesas = expenseTransactions.fold(
-          0,
-          (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
-        );
-
-        num saldoTotal = totalReceitas - totalDespesas;
-
         return SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Card de resumo
-              Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Resumo do Mês",
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildSummaryItem(
-                          "Total Receitas",
-                          formatter.format(totalReceitas),
-                          DefaultColors.green,
-                        ),
-                        _buildSummaryItem(
-                          "Total Despesas",
-                          formatter.format(totalDespesas),
-                          DefaultColors.red,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    Divider(),
-                    SizedBox(height: 8.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Saldo",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          formatter.format(saldoTotal),
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: saldoTotal >= 0 ? DefaultColors.green : DefaultColors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 24.h),
-
-              // Seção de receitas
               Text(
                 "Receitas",
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: DefaultColors.green,
+                  color: theme.primaryColor,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -162,19 +72,17 @@ class FinanceDetailsPage extends StatelessWidget {
                         final transaction = receivedTransactions[index];
                         final paymentDate = DateTime.parse(transaction.paymentDay!);
                         final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
+                        final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
 
-                        return _buildTransactionCard(
-                          transaction.title,
-                          formatter.format(double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'))),
-                          formattedDate,
-                          DefaultColors.green,
-                          transaction.paymentType ?? "Não especificado",
-                          transaction.category ?? 0,
+                        return TransactionCard(
+                          title: transaction.title,
+                          value: formatter.format(value),
+                          date: formattedDate,
+                          paymentType: transaction.paymentType ?? "Não especificado",
+                          categoryId: transaction.category ?? 0,
                         );
                       },
                     ),
-
-              SizedBox(height: 24.h),
 
               // Seção de despesas
               Text(
@@ -182,7 +90,7 @@ class FinanceDetailsPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: DefaultColors.red,
+                  color: theme.primaryColor,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -196,14 +104,14 @@ class FinanceDetailsPage extends StatelessWidget {
                         final transaction = expenseTransactions[index];
                         final paymentDate = DateTime.parse(transaction.paymentDay!);
                         final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
+                        final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
 
-                        return _buildTransactionCard(
-                          transaction.title,
-                          formatter.format(double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'))),
-                          formattedDate,
-                          DefaultColors.red,
-                          transaction.paymentType ?? "Não especificado",
-                          transaction.category ?? 0,
+                        return TransactionCard(
+                          title: transaction.title,
+                          value: formatter.format(value),
+                          date: formattedDate,
+                          paymentType: transaction.paymentType ?? "Não especificado",
+                          categoryId: transaction.category ?? 0,
                         );
                       },
                     ),
@@ -211,30 +119,6 @@ class FinanceDetailsPage extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-
-  Widget _buildSummaryItem(String title, String value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.grey[600],
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 
@@ -262,96 +146,101 @@ class FinanceDetailsPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildTransactionCard(
-    String title,
-    String value,
-    String date,
-    Color color,
-    String paymentType,
-    int categoryId,
-  ) {
-    // Lista de possíveis ícones baseados na categoria
-    // Você pode expandir isso ou relacionar com suas categorias existentes
-    final List<IconData> categoryIcons = [
-      Icons.home,
-      Icons.fastfood,
-      Icons.shopping_cart,
-      Icons.directions_car,
-      Icons.medical_services,
-      Icons.school,
-      Icons.celebration,
-      Icons.sports,
-      Icons.work,
-      Icons.attach_money,
-    ];
+class TransactionCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String date;
 
-    final IconData icon = categoryId < categoryIcons.length ? categoryIcons[categoryId] : Icons.receipt_long;
+  final String paymentType;
+  final int categoryId;
 
-    return Card(
-      margin: EdgeInsets.only(bottom: 8.h),
-      elevation: 2,
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(
-            icon,
-            color: color,
-          ),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16.sp,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 4.h),
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 12.sp,
-                  color: Colors.grey[600],
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  date,
+  const TransactionCard({
+    Key? key,
+    required this.title,
+    required this.value,
+    required this.date,
+    required this.paymentType,
+    required this.categoryId,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.w,
+        vertical: 16.h,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 150.w,
+                child: Text(
+                  title,
                   style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey[600],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.sp,
+                    color: theme.primaryColor,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(width: 12.w),
-                Icon(
-                  Icons.payment,
-                  size: 12.sp,
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.sp,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                date,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   color: Colors.grey[600],
                 ),
-                SizedBox(width: 4.w),
-                Text(
+              ),
+              SizedBox(
+                width: 150.w,
+                child: Text(
                   paymentType,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.grey[600],
                   ),
+                  textAlign: TextAlign.end,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-          ],
-        ),
-        trailing: Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16.sp,
-            color: color,
+              ),
+            ],
           ),
-        ),
+          // ListTile(
+          //   contentPadding: EdgeInsets.symmetric(
+          //     horizontal: 16.w,
+          //     vertical: 8.h,
+          //   ),
+          //   title:
+          //   subtitle:
+          // ),
+        ],
       ),
     );
   }
