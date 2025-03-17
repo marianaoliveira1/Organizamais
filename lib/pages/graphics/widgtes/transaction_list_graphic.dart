@@ -89,13 +89,14 @@ class TransactionListGraphic extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 140.w,
+                            child: Text(
                               transaction.title,
                               style: TextStyle(
                                 fontSize: 13.sp,
@@ -105,46 +106,53 @@ class TransactionListGraphic extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(
-                              height: 6.h,
+                          ),
+                          SizedBox(
+                            height: 6.h,
+                          ),
+                          Text(
+                            formattedDate,
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: DefaultColors.grey,
                             ),
-                            Text(
-                              formattedDate,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: DefaultColors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              currencyFormatter.format(transactionValue),
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w500,
-                                color: theme.primaryColor,
-                                letterSpacing: -0.5,
-                              ),
-                              textAlign: TextAlign.end,
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            currencyFormatter.format(transactionValue),
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                              color: theme.primaryColor,
+                              letterSpacing: -0.5,
                             ),
-                            SizedBox(
-                              height: 6.h,
-                            ),
-                            Text(
+                            textAlign: TextAlign.end,
+                          ),
+                          SizedBox(
+                            height: 6.h,
+                          ),
+                          SizedBox(
+                            width: 100.w,
+                            child: Text(
                               transaction.paymentType!,
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

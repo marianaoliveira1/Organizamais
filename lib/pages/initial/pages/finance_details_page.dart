@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
-import 'package:organizamais/utils/color.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({

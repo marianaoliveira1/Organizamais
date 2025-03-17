@@ -109,18 +109,23 @@ class CategoryList extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Text(
-                        currencyFormatter.format(valor),
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: theme.primaryColor,
-                        ),
-                      ),
-                      Icon(
-                        selectedCategoryId.value == categoryId ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: DefaultColors.grey,
-                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            currencyFormatter.format(valor),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                          Icon(
+                            selectedCategoryId.value == categoryId ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            color: DefaultColors.grey,
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
