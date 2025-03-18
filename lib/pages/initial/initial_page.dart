@@ -45,8 +45,6 @@ class InitialPage extends StatelessWidget {
               Obx(() {
                 final user = authController.firebaseUser.value;
                 return InfoItem(
-                  icon: Icons.email_outlined,
-                  title: 'Email',
                   value: user?.email ?? "Email não disponível",
                 );
               }),
