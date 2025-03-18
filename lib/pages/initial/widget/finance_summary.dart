@@ -111,7 +111,7 @@ class FinanceSummaryWidget extends StatelessWidget {
               Text(
                 formatter.format(total),
                 style: TextStyle(
-                  fontSize: 30.sp,
+                  fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,
                 ),

@@ -53,8 +53,8 @@ class TransactionItem extends StatelessWidget {
                   children: [
                     Image.asset(
                       category?['icon'] ?? 'assets/icon-category/default.png',
-                      width: 30.w,
-                      height: 30.h,
+                      width: 28.w,
+                      height: 28.h,
                     ),
                     SizedBox(width: 16.w),
                     Column(
@@ -66,7 +66,7 @@ class TransactionItem extends StatelessWidget {
                             transaction.title,
                             style: TextStyle(
                               color: theme.primaryColor,
-                              fontSize: 14.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 2,
@@ -80,7 +80,7 @@ class TransactionItem extends StatelessWidget {
                             category?['name'] ?? 'Categoria não encontrada',
                             style: TextStyle(
                               color: DefaultColors.grey20,
-                              fontSize: 11.sp,
+                              fontSize: 10.sp,
                             ),
                             maxLines: 2,
                             softWrap: true,
@@ -99,7 +99,7 @@ class TransactionItem extends StatelessWidget {
                       _formatValue(transaction.value),
                       style: TextStyle(
                         color: theme.primaryColor,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -109,7 +109,7 @@ class TransactionItem extends StatelessWidget {
                         transaction.paymentType,
                         style: TextStyle(
                           color: DefaultColors.grey20,
-                          fontSize: 11.sp,
+                          fontSize: 10.sp,
                         ),
                         textAlign: TextAlign.end,
                         maxLines: 2,

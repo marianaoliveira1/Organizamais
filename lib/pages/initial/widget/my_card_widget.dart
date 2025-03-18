@@ -93,8 +93,8 @@ class MyCardsWidget extends StatelessWidget {
                           if (card.iconPath != null)
                             Image.asset(
                               card.iconPath!,
-                              width: 40.w,
-                              height: 40.h,
+                              width: 36.w,
+                              height: 36.h,
                             ),
                           SizedBox(
                             width: 10.w,
@@ -105,7 +105,7 @@ class MyCardsWidget extends StatelessWidget {
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
+                                fontSize: 12.sp,
                               ),
                               maxLines: 2,
                               softWrap: true,
