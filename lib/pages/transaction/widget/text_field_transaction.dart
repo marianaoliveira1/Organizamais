@@ -60,10 +60,10 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
       ),
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
-        _MaxNumberInputFormatter(31), // Restringe a 31
-      ],
+      // inputFormatters: [
+      //   FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
+      //   _MaxNumberInputFormatter(31), // Restringe a 31
+      // ],
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -92,23 +92,5 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
         ),
       ),
     );
-  }
-}
-
-// Formatter para limitar o número máximo
-class _MaxNumberInputFormatter extends TextInputFormatter {
-  final int max;
-
-  _MaxNumberInputFormatter(this.max);
-
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) return newValue;
-
-    final int? value = int.tryParse(newValue.text);
-    if (value == null || value > max) {
-      return oldValue; // Retorna o valor anterior se for inválido
-    }
-    return newValue;
   }
 }

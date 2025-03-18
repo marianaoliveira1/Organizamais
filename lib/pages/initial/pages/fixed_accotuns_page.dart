@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
@@ -117,10 +118,44 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 color: theme.scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: DefaultTextFieldTransaction(
-                hintText: 'ex: 5',
+              child: TextField(
                 controller: dayOfTheMonthController,
+                cursorColor: theme.primaryColor,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: theme.primaryColor,
+                ),
                 keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
+                  _MaxNumberInputFormatter(31), // Restringe a 31
+                ],
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(
+                      12.r,
+                    ),
+                    borderSide: BorderSide(
+                      color: theme.primaryColor.withOpacity(.5),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(
+                      12.r,
+                    ),
+                    borderSide: BorderSide(
+                      color: theme.primaryColor.withOpacity(.5),
+                    ),
+                  ),
+                  focusColor: theme.primaryColor,
+                  hintText: 'ex: 5',
+                  hintStyle: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: theme.primaryColor.withOpacity(.5),
+                  ),
+                ),
               ),
             ),
             DefaultTitleTransaction(
@@ -178,5 +213,23 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
         ),
       ),
     );
+  }
+}
+
+// Formatter para limitar o número máximo
+class _MaxNumberInputFormatter extends TextInputFormatter {
+  final int max;
+
+  _MaxNumberInputFormatter(this.max);
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+
+    final int? value = int.tryParse(newValue.text);
+    if (value == null || value > max) {
+      return oldValue; // Retorna o valor anterior se for inválido
+    }
+    return newValue;
   }
 }
