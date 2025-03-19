@@ -60,10 +60,6 @@ class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransactio
       ),
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
-      // inputFormatters: [
-      //   FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
-      //   _MaxNumberInputFormatter(31), // Restringe a 31
-      // ],
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(

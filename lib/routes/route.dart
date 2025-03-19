@@ -5,6 +5,7 @@ import 'package:organizamais/pages/profile/pages/fixed_accounts_page.dart';
 import 'package:organizamais/pages/profile/profile_page.dart';
 
 import '../pages/cards/cards_page.dart';
+import '../pages/goals/pages/add_goal_page.dart';
 import '../pages/graphics/graphics_page.dart';
 import '../pages/home/home_page.dart';
 
@@ -31,6 +32,7 @@ class Routes {
   static const FIXED_ACCOUNTS = '/fixed-accounts';
   static const FIXED_ACCOUNTS_PAGE = '/fixed-accounts-page';
   static const PROFILE = '/profile';
+  static const ADDGOALPAGE = '/add-goal';
 }
 
 class AppPages {
@@ -47,6 +49,7 @@ class AppPages {
     GetPage(name: Routes.FIXED_ACCOUNTS, page: () => AddFixedAccountsFormPage()),
     GetPage(name: Routes.PROFILE, page: () => ProfilePage()),
     GetPage(name: Routes.FIXED_ACCOUNTS_PAGE, page: () => const FixedAccountsPage()),
+    // GetPage(name: Routes.ADDGOALPAGE, page: () => AddGoalPage()),
   ];
 
   static const INITIAL = Routes.LOGIN;

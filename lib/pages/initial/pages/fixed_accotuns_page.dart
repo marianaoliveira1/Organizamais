@@ -170,6 +170,19 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      // Verificação se todos os campos estão preenchidos
+                      if (titleController.text.isEmpty || valueController.text.isEmpty || dayOfTheMonthController.text.isEmpty || paymentTypeController.text.isEmpty || categoryId == null) {
+                        // Mostrar mensagem de erro se algum campo estiver vazio
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Por favor, preencha todos os campos"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      // Se todos os campos estiverem preenchidos, continua com o salvamento
                       if (widget.onSave != null) {
                         widget.onSave!(FixedAccountModel(
                           id: widget.fixedAccount!.id,
