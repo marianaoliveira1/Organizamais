@@ -114,9 +114,9 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              IconsaxBold.user,
+              IconsaxBold.wallet,
             ),
-            label: "Perfil",
+            label: "Metas",
           ),
         ],
         currentIndex: _selectedIndex,
