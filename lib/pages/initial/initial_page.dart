@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:organizamais/pages/profile/profile_page.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../controller/fixed_accounts_controller.dart';
@@ -11,7 +12,7 @@ import '../profile/pages/fixed_accounts_page.dart';
 import 'widget/credit_card_selection.dart';
 
 import 'widget/finance_summary.dart';
-import 'widget/info_item.dart';
+
 import 'widget/logout_button.dart';
 import 'widget/logout_confirmation_dialog.dart';
 import 'widget/setting_item.dart';
@@ -42,13 +43,21 @@ class InitialPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(() {
-                final user = authController.firebaseUser.value;
-                return InfoItem(
-                  value: user?.email ?? "Email não disponível",
-                );
-              }),
-              SizedBox(height: 30.h),
+              // Obx(() {
+              //   final user = authController.firebaseUser.value;
+              //   return InfoItem(
+              //     value: user?.email ?? "Email não disponível",
+              //   );
+              // }),
+              SizedBox(
+                height: 20.h,
+              ),
+              SettingItem(
+                icon: Iconsax.user,
+                title: 'Perfil',
+                onTap: () => Get.to(() => const ProfilePage()),
+              ),
+              _buildDivider(),
               SettingItem(
                 icon: Iconsax.card,
                 title: 'Meus Cartões',

@@ -21,9 +21,18 @@ class SettingItem extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Row(
           children: [
-            Icon(icon, size: 22.sp),
+            Icon(
+              icon,
+              size: 18.sp,
+            ),
             SizedBox(width: 15.w),
-            Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
