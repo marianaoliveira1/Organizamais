@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-
 import 'package:intl/intl.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/goal_controller.dart';
 import '../../../model/goal_model.dart';
@@ -70,6 +68,10 @@ class GoalDetailsPage extends StatelessWidget {
             final currentDate = DateTime.now();
             final formattedDate = "${currentDate.day}, ${_getMonthName(currentDate.month)}. ${currentDate.year}";
 
+            // Format values in Brazilian Real standard
+            final String formattedCurrentValue = _formatCurrencyBRL(currentGoal.currentValue);
+            final String formattedTargetValue = _formatCurrencyBRL(numericValue);
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,7 +107,7 @@ class GoalDetailsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "R\$ ${currentGoal.currentValue.toStringAsFixed(2).replaceAll('.', ',')}",
+                      "R\$ $formattedCurrentValue",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -113,7 +115,7 @@ class GoalDetailsPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "R\$ ${numericValue.toStringAsFixed(2).replaceAll('.', ',')}",
+                      "R\$ $formattedTargetValue",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -205,9 +207,43 @@ class GoalDetailsPage extends StatelessWidget {
     return months[month - 1];
   }
 
+  // Helper method to format currency in Brazilian Real standard
+  String _formatCurrencyBRL(double value) {
+    // Convert to string with 2 decimal places
+    String stringValue = value.toStringAsFixed(2);
+
+    // Replace dot with comma for decimal separator
+    stringValue = stringValue.replaceAll('.', ',');
+
+    // Add thousand separators
+    List<String> parts = stringValue.split(',');
+    String integerPart = parts[0];
+    String decimalPart = parts.length > 1 ? parts[1] : '00';
+
+    // Add thousands separator (.) for values over 999
+    if (integerPart.length > 3) {
+      String result = '';
+      int count = 0;
+
+      for (int i = integerPart.length - 1; i >= 0; i--) {
+        result = integerPart[i] + result;
+        count++;
+
+        if (count % 3 == 0 && i > 0) {
+          result = '.' + result;
+        }
+      }
+
+      integerPart = result;
+    }
+
+    return "$integerPart,$decimalPart";
+  }
+
   void _showAddValueBottomSheet(BuildContext context, ValueNotifier<GoalModel> goal) {
     double valueToAdd = 0;
     DateTime selectedDate = DateTime.now();
+    TextEditingController valueController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -238,6 +274,7 @@ class GoalDetailsPage extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   TextField(
+                    controller: valueController,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -245,6 +282,7 @@ class GoalDetailsPage extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       hintText: 'Valor a adicionar',
+                      prefixText: 'R\$ ',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
@@ -254,7 +292,8 @@ class GoalDetailsPage extends StatelessWidget {
                       ),
                     ),
                     onChanged: (value) {
-                      String cleanValue = value.replaceAll(',', '.');
+                      // Permite entrada no formato brasileiro (com vírgula)
+                      String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
                       valueToAdd = double.tryParse(cleanValue) ?? 0;
                     },
                   ),
@@ -321,6 +360,7 @@ class GoalDetailsPage extends StatelessWidget {
   void _showRemoveValueBottomSheet(BuildContext context, ValueNotifier<GoalModel> goal) {
     double valueToRemove = 0;
     DateTime selectedDate = DateTime.now();
+    TextEditingController valueController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -351,6 +391,7 @@ class GoalDetailsPage extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   TextField(
+                    controller: valueController,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -358,13 +399,18 @@ class GoalDetailsPage extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       hintText: 'Valor a retirar',
+                      prefixText: 'R\$ ',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
                     ),
                     onChanged: (value) {
-                      String cleanValue = value.replaceAll(',', '.');
+                      // Permite entrada no formato brasileiro (com vírgula)
+                      String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
                       valueToRemove = double.tryParse(cleanValue) ?? 0;
                     },
                   ),
@@ -394,13 +440,6 @@ class GoalDetailsPage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      child: Text(
-                        'Salvar',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                        ),
-                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
@@ -417,6 +456,13 @@ class GoalDetailsPage extends StatelessWidget {
                         goal.value = updatedGoal;
                         Navigator.pop(context);
                       },
+                      child: Text(
+                        'Salvar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                        ),
+                      ),
                     ),
                   ),
                 ],

@@ -14,25 +14,22 @@ class TransactionController extends GetxController {
 
   List<TransactionModel> get transaction {
     var fakeTransactionsFromFixed = [];
-    final today = DateTime.now();
-    final todayDay = today.day; // Obtém o dia atual
 
     for (final e in fixedAccountsController.fixedAccounts) {
+      final today = DateTime.now();
+
       for (var i = 0; i < 12; i++) {
         final todayWithRightDay = DateTime(today.year, today.month - 6 + i, int.parse(e.paymentDay));
 
-        // Só adiciona se o dia for igual ao dia atual
-        if (todayWithRightDay.day == todayDay) {
-          fakeTransactionsFromFixed.add(TransactionModel(
-            id: e.id,
-            value: e.value.split('\$')[1],
-            type: TransactionType.despesa,
-            paymentDay: todayWithRightDay.toString(),
-            title: "Conta fixa: ${e.title}",
-            paymentType: e.paymentType,
-            category: e.category,
-          ));
-        }
+        fakeTransactionsFromFixed.add(TransactionModel(
+          id: e.id,
+          value: e.value.split('\$')[1],
+          type: TransactionType.despesa,
+          paymentDay: todayWithRightDay.toString(),
+          title: "Conta fixa: ${e.title}",
+          paymentType: e.paymentType,
+          category: e.category,
+        ));
       }
     }
 

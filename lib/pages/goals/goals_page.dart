@@ -88,6 +88,10 @@ class GoalsPage extends StatelessWidget {
                     final currentDate = DateTime.now();
                     final formattedDate = "${currentDate.day}, ${_getMonthName(currentDate.month)}. ${currentDate.year}";
 
+                    // Format values in Brazilian Real standard
+                    final String formattedCurrentValue = _formatCurrencyBRL(goal.currentValue);
+                    final String formattedTargetValue = _formatCurrencyBRL(numericValue);
+
                     return InkWell(
                       onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
                       child: Container(
@@ -150,7 +154,7 @@ class GoalsPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "R\$ ${goal.currentValue.toStringAsFixed(2).replaceAll('.', ',')}",
+                                    "R\$ $formattedCurrentValue",
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.bold,
@@ -158,7 +162,7 @@ class GoalsPage extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    "R\$ ${numericValue.toStringAsFixed(2).replaceAll('.', ',')}",
+                                    "R\$ $formattedTargetValue",
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.bold,
@@ -209,100 +213,37 @@ class GoalsPage extends StatelessWidget {
     ];
     return months[month - 1];
   }
+
+  // Helper method to format currency in Brazilian Real standard
+  String _formatCurrencyBRL(double value) {
+    // Convert to string with 2 decimal places
+    String stringValue = value.toStringAsFixed(2);
+
+    // Replace dot with comma for decimal separator
+    stringValue = stringValue.replaceAll('.', ',');
+
+    // Add thousand separators
+    List<String> parts = stringValue.split(',');
+    String integerPart = parts[0];
+    String decimalPart = parts.length > 1 ? parts[1] : '00';
+
+    // Add thousands separator (.) for values over 999
+    if (integerPart.length > 3) {
+      String result = '';
+      int count = 0;
+
+      for (int i = integerPart.length - 1; i >= 0; i--) {
+        result = integerPart[i] + result;
+        count++;
+
+        if (count % 3 == 0 && i > 0) {
+          result = '.' + result;
+        }
+      }
+
+      integerPart = result;
+    }
+
+    return "$integerPart,$decimalPart";
+  }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:get/get.dart';
-// import 'package:intl/intl.dart';
-
-// import '../../controller/goal_controller.dart';
-// import '../../model/goal_model.dart';
-// import '../transaction/pages/category_page.dart';
-// import 'pages/add_goal_page.dart';
-// import 'pages/details_goals_page.dart';
-
-// class GoalsPage extends StatelessWidget {
-//   final GoalController goalController = Get.put(GoalController());
-
-//   GoalsPage({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-//     goalController.startGoalStream();
-
-//     return Scaffold(
-//       backgroundColor: theme.scaffoldBackgroundColor,
-//       body: Padding(
-//         padding: EdgeInsets.symmetric(
-//           vertical: 20.w,
-//           horizontal: 20.h,
-//         ),
-//         child: Obx(() {
-//           if (goalController.goal.isEmpty) {
-//             return Center(
-//               child: Text(
-//                 'Nenhuma meta encontrada.',
-//                 style: TextStyle(
-//                   color: theme.primaryColor,
-//                   fontSize: 14.sp,
-//                   fontWeight: FontWeight.w500,
-//                 ),
-//               ),
-//             );
-//           }
-//           return ListView.builder(
-//             itemCount: goalController.goal.length,
-//             itemBuilder: (context, index) {
-//               final GoalModel goal = goalController.goal[index];
-//               final String cleanedValue = goal.value.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.');
-//               final double numericValue = double.tryParse(cleanedValue) ?? 0.0;
-//               final double progress = goal.currentValue / numericValue;
-//               final category = findCategoryById(goal.categoryId);
-
-//               return Container(
-//                 decoration: BoxDecoration(
-//                   color: theme.cardColor,
-//                   borderRadius: BorderRadius.circular(24.r),
-//                 ),
-//                 child: ListTile(
-//                   leading: category != null
-//                       ? Image.asset(
-//                           category['icon'],
-//                           height: 30.h,
-//                           width: 30.h,
-//                         )
-//                       : Icon(
-//                           Icons.category,
-//                         ),
-//                   title: Text(
-//                     goal.name,
-//                     style: TextStyle(
-//                       fontSize: 14.sp,
-//                       fontWeight: FontWeight.w500,
-//                       color: theme.primaryColor,
-//                     ),
-//                   ),
-//                   subtitle: Text(
-//                     '${NumberFormat.currency(locale: 'pt_BR').format(goal.currentValue)} / ${NumberFormat.currency(locale: 'pt_BR').format(
-//                       numericValue,
-//                     )}',
-//                   ),
-//                   trailing: CircularProgressIndicator(value: progress),
-//                   onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
-//                 ),
-//               );
-//             },
-//           );
-//         }),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: () => Get.to(() => AddGoalPage()),
-//         child: Icon(Icons.add),
-//       ),
-//     );
-//   }
-// }
