@@ -239,9 +239,9 @@ class GraphicsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Despesas Diárias - ${selectedMonth.value}",
+                          "Despesas Diárias",
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
                             color: theme.primaryColor,
                           ),
@@ -267,7 +267,7 @@ class GraphicsPage extends StatelessWidget {
                                     child: Text(
                                       currencyFormatter.format(value),
                                       style: TextStyle(
-                                        fontSize: 10.sp,
+                                        fontSize: 8.sp,
                                         color: DefaultColors.grey,
                                       ),
                                     ),
@@ -341,42 +341,7 @@ class GraphicsPage extends StatelessWidget {
                           ],
                         ),
 
-                        SizedBox(height: 16.h),
-
                         // Lista de transações diárias
-                        Container(
-                          height: 120.h,
-                          child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: dates.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      dateFormatter.format(dates[index]),
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      currencyFormatter.format(values[index]),
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
                       ],
                     ),
                   );
@@ -472,235 +437,19 @@ class GraphicsPage extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            WidgetListCategoryGraphics(
+                              data: data,
+                              totalValue: totalValue,
+                              selectedCategoryId: selectedCategoryId,
+                              theme: theme,
+                              currencyFormatter: currencyFormatter,
+                              dateFormatter: dateFormatter,
+                            ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 24.h),
 
                       // Lista de categorias com ícones coloridos
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: data.length,
-                        itemBuilder: (context, index) {
-                          var item = data[index];
-                          var categoryId = item['category'] as int;
-                          var valor = item['value'] as double;
-                          var percentual = (valor / totalValue * 100);
-                          var categoryColor = item['color'] as Color;
-
-                          return Column(
-                            children: [
-                              // Item da categoria
-                              GestureDetector(
-                                onTap: () {
-                                  if (selectedCategoryId.value == categoryId) {
-                                    selectedCategoryId.value = null;
-                                  } else {
-                                    selectedCategoryId.value = categoryId;
-                                  }
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 10.h,
-                                    left: 5.w,
-                                    right: 5.w,
-                                  ),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-                                    decoration: BoxDecoration(
-                                      color: selectedCategoryId.value == categoryId ? categoryColor.withOpacity(0.1) : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        // Ícone colorido com a cor da categoria
-                                        Container(
-                                          width: 30.w,
-                                          height: 30.h,
-                                          decoration: BoxDecoration(
-                                            color: categoryColor,
-                                            borderRadius: BorderRadius.circular(8.r),
-                                          ),
-                                          child: Center(
-                                            child: Image.asset(
-                                              item['icon'] as String,
-                                              width: 20.w,
-                                              height: 20.h,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 15.w),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                width: 130.w,
-                                                child: Text(
-                                                  item['name'] as String,
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: theme.primaryColor,
-                                                  ),
-                                                  textAlign: TextAlign.start,
-                                                  softWrap: true,
-                                                  overflow: TextOverflow.clip,
-                                                ),
-                                              ),
-                                              Text(
-                                                "${percentual.toStringAsFixed(0)}%",
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  color: DefaultColors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Text(
-                                          currencyFormatter.format(valor),
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: theme.primaryColor,
-                                          ),
-                                        ),
-                                        Icon(
-                                          selectedCategoryId.value == categoryId ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                          color: DefaultColors.grey,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // Lista de transações da categoria expandida
-                              Obx(() {
-                                if (selectedCategoryId.value != categoryId) {
-                                  return const SizedBox();
-                                }
-
-                                var categoryTransactions = getTransactionsByCategory(categoryId);
-                                categoryTransactions.sort((a, b) {
-                                  if (a.paymentDay == null || b.paymentDay == null) return 0;
-                                  return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
-                                });
-
-                                return Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 14.h,
-                                    vertical: 14.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.cardColor,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Detalhes das Transações",
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: theme.primaryColor,
-                                        ),
-                                      ),
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: categoryTransactions.length,
-                                        separatorBuilder: (context, index) => Divider(
-                                          color: DefaultColors.grey20.withOpacity(.5),
-                                          height: 1,
-                                        ),
-                                        itemBuilder: (context, index) {
-                                          var transaction = categoryTransactions[index];
-                                          var transactionValue = double.parse(
-                                            transaction.value.replaceAll('.', '').replaceAll(',', '.'),
-                                          );
-
-                                          String formattedDate = transaction.paymentDay != null
-                                              ? dateFormatter.format(
-                                                  DateTime.parse(transaction.paymentDay!),
-                                                )
-                                              : "Data não informada";
-
-                                          return Padding(
-                                            padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  flex: 3,
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        transaction.title,
-                                                        style: TextStyle(
-                                                          fontSize: 13.sp,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: theme.primaryColor,
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                      SizedBox(
-                                                        height: 6.h,
-                                                      ),
-                                                      Text(
-                                                        formattedDate,
-                                                        style: TextStyle(
-                                                          fontSize: 11.sp,
-                                                          color: DefaultColors.grey,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    currencyFormatter.format(transactionValue),
-                                                    style: TextStyle(
-                                                      fontSize: 13.sp,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: theme.primaryColor,
-                                                      letterSpacing: -0.5,
-                                                    ),
-                                                    textAlign: TextAlign.end,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      if (categoryTransactions.isEmpty)
-                                        Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(vertical: 10.h),
-                                            child: Text(
-                                              "Nenhuma transação encontrada",
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
-                                                color: DefaultColors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
-                          );
-                        },
-                      ),
                     ],
                   );
                 }),
@@ -709,6 +458,309 @@ class GraphicsPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class WidgetListCategoryGraphics extends StatelessWidget {
+  const WidgetListCategoryGraphics({
+    super.key,
+    required this.data,
+    required this.totalValue,
+    required this.selectedCategoryId,
+    required this.theme,
+    required this.currencyFormatter,
+    required this.dateFormatter,
+  });
+
+  final List<Map<String, dynamic>> data;
+  final double totalValue;
+  final RxnInt selectedCategoryId;
+  final ThemeData theme;
+  final NumberFormat currencyFormatter;
+  final DateFormat dateFormatter;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final TransactionController transactionController = Get.put(TransactionController());
+
+    // Formatador de moeda brasileira
+    final currencyFormatter = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: 'R\$',
+      decimalDigits: 2,
+    );
+
+    // Formatador de data
+    final dateFormatter = DateFormat('dd/MM/yyyy');
+
+    // Variável observável para controlar a categoria selecionada
+    final selectedCategoryId = RxnInt(null);
+
+    // Lista de meses
+    List<String> getAllMonths() {
+      final months = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ];
+      return months;
+    }
+
+    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
+
+    List<TransactionModel> getFilteredTransactions() {
+      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+
+      if (selectedMonth.value.isNotEmpty) {
+        return despesas.where((transaction) {
+          if (transaction.paymentDay == null) return false;
+          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+          String monthName = getAllMonths()[transactionDate.month - 1];
+          return monthName == selectedMonth.value;
+        }).toList();
+      }
+
+      return despesas;
+    }
+
+    List<TransactionModel> getTransactionsByCategory(int categoryId) {
+      var filteredTransactions = getFilteredTransactions();
+      return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        var item = data[index];
+        var categoryId = item['category'] as int;
+        var valor = item['value'] as double;
+        var percentual = (valor / totalValue * 100);
+        var categoryColor = item['color'] as Color;
+
+        return Column(
+          children: [
+            // Item da categoria
+            GestureDetector(
+              onTap: () {
+                if (selectedCategoryId.value == categoryId) {
+                  selectedCategoryId.value = null;
+                } else {
+                  selectedCategoryId.value = categoryId;
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: 10.h,
+                  left: 5.w,
+                  right: 5.w,
+                ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  decoration: BoxDecoration(
+                    color: selectedCategoryId.value == categoryId ? categoryColor.withOpacity(0.1) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    children: [
+                      // Ícone colorido com a cor da categoria
+                      Container(
+                        width: 30.w,
+                        height: 30.h,
+                        decoration: BoxDecoration(
+                          color: categoryColor,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            item['icon'] as String,
+                            width: 20.w,
+                            height: 20.h,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 130.w,
+                              child: Text(
+                                item['name'] as String,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.primaryColor,
+                                ),
+                                textAlign: TextAlign.start,
+                                softWrap: true,
+                                overflow: TextOverflow.clip,
+                              ),
+                            ),
+                            Text(
+                              "${percentual.toStringAsFixed(0)}%",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        currencyFormatter.format(valor),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                      Icon(
+                        selectedCategoryId.value == categoryId ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        color: DefaultColors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Lista de transações da categoria expandida
+            Obx(() {
+              if (selectedCategoryId.value != categoryId) {
+                return const SizedBox();
+              }
+
+              var categoryTransactions = getTransactionsByCategory(categoryId);
+              categoryTransactions.sort((a, b) {
+                if (a.paymentDay == null || b.paymentDay == null) return 0;
+                return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
+              });
+
+              return Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 14.h,
+                  vertical: 14.h,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Detalhes das Transações",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: categoryTransactions.length,
+                      separatorBuilder: (context, index) => Divider(
+                        color: DefaultColors.grey20.withOpacity(.5),
+                        height: 1,
+                      ),
+                      itemBuilder: (context, index) {
+                        var transaction = categoryTransactions[index];
+                        var transactionValue = double.parse(
+                          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                        );
+
+                        String formattedDate = transaction.paymentDay != null
+                            ? dateFormatter.format(
+                                DateTime.parse(transaction.paymentDay!),
+                              )
+                            : "Data não informada";
+
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      transaction.title,
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.primaryColor,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(
+                                      height: 6.h,
+                                    ),
+                                    Text(
+                                      formattedDate,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: DefaultColors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  currencyFormatter.format(transactionValue),
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.primaryColor,
+                                    letterSpacing: -0.5,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    if (categoryTransactions.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                          child: Text(
+                            "Nenhuma transação encontrada",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
   }
 }
