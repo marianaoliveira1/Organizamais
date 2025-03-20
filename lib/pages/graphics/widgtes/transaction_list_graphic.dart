@@ -59,9 +59,9 @@ class TransactionListGraphic extends StatelessWidget {
             Text(
               "Detalhes das Transações",
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
-                color: theme.primaryColor,
+                color: DefaultColors.grey20,
               ),
             ),
             ListView.separated(
@@ -99,7 +99,7 @@ class TransactionListGraphic extends StatelessWidget {
                             child: Text(
                               transaction.title,
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w500,
                                 color: theme.primaryColor,
                               ),
@@ -129,7 +129,7 @@ class TransactionListGraphic extends StatelessWidget {
                           Text(
                             currencyFormatter.format(transactionValue),
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                               letterSpacing: -0.5,
