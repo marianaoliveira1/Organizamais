@@ -27,11 +27,11 @@ class DateSectionResume extends StatelessWidget {
           date,
           style: TextStyle(
             color: DefaultColors.grey,
-            fontSize: 12.sp,
+            fontSize: 10.sp,
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: 14.h),
+        SizedBox(height: 4.h),
         ...transactions.map(
           (transaction) => TransactionItem(
             transaction: transaction,

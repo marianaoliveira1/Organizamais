@@ -45,11 +45,9 @@ class AuthController extends GetxController {
 
   _setInitialScreen(User? user) {
     if (user == null) {
-      // only if not already on route
       if (Get.currentRoute != Routes.LOGIN) {
         Get.offAllNamed(Routes.LOGIN);
       }
-      Get.offAllNamed(Routes.LOGIN);
     } else {
       if (Get.currentRoute != Routes.HOME) {
         Get.offAllNamed(Routes.HOME);
@@ -70,7 +68,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // Função para tratar os erros do Firebase Auth e retornar mensagens amigáveis
   String _getAuthErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -103,10 +100,12 @@ class AuthController extends GetxController {
       isLoading(true);
       _showLoadingDialog();
 
-      // Verificar se o e-mail já está em uso antes de tentar registrar
       var methods = await _auth.fetchSignInMethodsForEmail(email);
       if (methods.isNotEmpty) {
-        throw FirebaseAuthException(code: 'email-already-in-use', message: 'Este e-mail já está em uso por outra conta.');
+        throw FirebaseAuthException(
+          code: 'email-already-in-use',
+          message: 'Este e-mail já está em uso por outra conta.',
+        );
       }
 
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -119,10 +118,24 @@ class AuthController extends GetxController {
         "email": email,
         "uid": userCredential.user!.uid,
       });
+
       _hideLoadingDialog();
+    } on FirebaseAuthException catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar(
+        "Erro ao cadastrar",
+        _getAuthErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
       _hideLoadingDialog();
-      Get.snackbar("Erro ao cadastrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro ao cadastrar",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -133,9 +146,22 @@ class AuthController extends GetxController {
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       _hideLoadingDialog();
+    } on FirebaseAuthException catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar(
+        "Erro ao entrar",
+        _getAuthErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
       _hideLoadingDialog();
-      Get.snackbar("Erro ao entrar", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro ao entrar",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -165,23 +191,47 @@ class AuthController extends GetxController {
         });
       }
       _hideLoadingDialog();
+    } on FirebaseAuthException catch (e) {
+      _hideLoadingDialog();
+      Get.snackbar(
+        "Erro ao entrar com Google",
+        _getAuthErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
       _hideLoadingDialog();
-      Get.snackbar("Erro ao entrar com Google", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro ao entrar com Google",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading(false);
     }
   }
 
   Future<void> logout() async {
     try {
       await _auth.signOut();
-      loadedOtherControllers = false; // Reiniciar para o próximo login
-      Get.snackbar("Logout", "Você saiu da sua conta", backgroundColor: Colors.blue, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      loadedOtherControllers = false;
+      Get.snackbar(
+        "Logout",
+        "Você saiu da sua conta",
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
-      Get.snackbar("Erro ao sair", e.toString(), backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro ao sair",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
-  // Método para recuperação de senha
   Future<void> resetPassword(String email) async {
     try {
       isLoading(true);
@@ -189,11 +239,29 @@ class AuthController extends GetxController {
 
       await _auth.sendPasswordResetEmail(email: email);
 
-      Get.snackbar("E-mail enviado", "Verifique sua caixa de entrada para redefinir sua senha", backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "E-mail enviado",
+        "Verifique sua caixa de entrada para redefinir sua senha",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Erro ao redefinir senha", _getAuthErrorMessage(e), backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro ao redefinir senha",
+        _getAuthErrorMessage(e),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
-      Get.snackbar("Erro inesperado", e.toString(), backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Erro inesperado",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading(false);
       _hideLoadingDialog();

@@ -25,7 +25,7 @@ class TransactionItem extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
@@ -44,7 +44,7 @@ class TransactionItem extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.h,
-              horizontal: 16.w,
+              horizontal: 12.w,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,16 +95,20 @@ class TransactionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      _formatValue(transaction.value),
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
+                    SizedBox(
+                      width: 120.w,
+                      child: Text(
+                        _formatValue(transaction.value),
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.end,
                       ),
                     ),
                     SizedBox(
-                      width: 120.w,
+                      width: 100.w,
                       child: Text(
                         transaction.paymentType,
                         style: TextStyle(
