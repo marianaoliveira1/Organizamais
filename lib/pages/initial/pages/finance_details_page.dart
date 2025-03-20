@@ -38,6 +38,13 @@ class FinanceDetailsPage extends StatelessWidget {
           return false;
         }).toList();
 
+        // Ordena por data mais recente primeiro
+        receivedTransactions.sort((a, b) {
+          DateTime dateA = DateTime.parse(a.paymentDay!);
+          DateTime dateB = DateTime.parse(b.paymentDay!);
+          return dateB.compareTo(dateA); // Ordenação decrescente (mais recente primeiro)
+        });
+
         // Filtra transações de despesa para o mês atual
         final expenseTransactions = transactionController.transaction.where((t) {
           if (t.paymentDay != null) {
@@ -47,6 +54,13 @@ class FinanceDetailsPage extends StatelessWidget {
           return false;
         }).toList();
 
+        // Ordena por data mais recente primeiro
+        expenseTransactions.sort((a, b) {
+          DateTime dateA = DateTime.parse(a.paymentDay!);
+          DateTime dateB = DateTime.parse(b.paymentDay!);
+          return dateB.compareTo(dateA); // Ordenação decrescente (mais recente primeiro)
+        });
+
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
           child: Column(
@@ -55,7 +69,7 @@ class FinanceDetailsPage extends StatelessWidget {
               Text(
                 "Receitas",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,
                 ),
@@ -87,7 +101,7 @@ class FinanceDetailsPage extends StatelessWidget {
               Text(
                 "Despesas",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,
                 ),
@@ -151,7 +165,6 @@ class TransactionCard extends StatelessWidget {
   final String title;
   final String value;
   final String date;
-
   final String paymentType;
   final int categoryId;
 
@@ -189,7 +202,7 @@ class TransactionCard extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                     color: theme.primaryColor,
                   ),
                   maxLines: 2,
@@ -200,7 +213,7 @@ class TransactionCard extends StatelessWidget {
                 value,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   color: theme.primaryColor,
                 ),
               ),
@@ -212,7 +225,7 @@ class TransactionCard extends StatelessWidget {
               Text(
                 date,
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 10.sp,
                   color: Colors.grey[600],
                 ),
               ),
@@ -221,7 +234,7 @@ class TransactionCard extends StatelessWidget {
                 child: Text(
                   paymentType,
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 10.sp,
                     color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.end,
@@ -231,14 +244,6 @@ class TransactionCard extends StatelessWidget {
               ),
             ],
           ),
-          // ListTile(
-          //   contentPadding: EdgeInsets.symmetric(
-          //     horizontal: 16.w,
-          //     vertical: 8.h,
-          //   ),
-          //   title:
-          //   subtitle:
-          // ),
         ],
       ),
     );

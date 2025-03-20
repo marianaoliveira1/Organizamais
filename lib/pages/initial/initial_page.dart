@@ -43,12 +43,6 @@ class InitialPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Obx(() {
-              //   final user = authController.firebaseUser.value;
-              //   return InfoItem(
-              //     value: user?.email ?? "Email não disponível",
-              //   );
-              // }),
               SizedBox(
                 height: 20.h,
               ),

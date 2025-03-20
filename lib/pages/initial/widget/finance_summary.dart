@@ -99,12 +99,6 @@ class FinanceSummaryWidget extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  // Adiciona um ícone para indicar que é clicável
-                  // Icon(
-                  //   Icons.arrow_forward_ios,
-                  //   size: 14.sp,
-                  //   color: DefaultColors.grey,
-                  // ),
                 ],
               ),
               SizedBox(height: 8.h),
