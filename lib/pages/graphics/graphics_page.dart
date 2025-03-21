@@ -77,29 +77,25 @@ class GraphicsPage extends StatelessWidget {
       return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
     }
 
-    // Função para gerar dados para o gráfico Sparkline
+    // Função para gerar dados para o gráfico Sparkline com todos os dias do mês
     Map<String, dynamic> getSparklineData() {
       var filteredTransactions = getFilteredTransactions();
 
-      // Se não houver transações, retornar dados vazios
-      if (filteredTransactions.isEmpty) {
-        return {
-          'data': <double>[],
-          'labels': <String>[],
-          'dates': <DateTime>[],
-          'values': <double>[],
-        };
+      // Determinar o mês e ano selecionados
+      int selectedMonthIndex = selectedMonth.value.isEmpty ? DateTime.now().month - 1 : getAllMonths().indexOf(selectedMonth.value);
+      int selectedYear = DateTime.now().year;
+
+      // Obter o número de dias no mês selecionado
+      int daysInMonth = DateTime(selectedYear, selectedMonthIndex + 1 + 1, 0).day;
+
+      // Criar um mapa para todos os dias do mês, inicializados com zero
+      Map<String, double> dailyTotals = {};
+      for (int i = 1; i <= daysInMonth; i++) {
+        String day = i.toString().padLeft(2, '0');
+        dailyTotals[day] = 0;
       }
 
-      // Ordenar as transações por data
-      filteredTransactions.sort((a, b) {
-        if (a.paymentDay == null || b.paymentDay == null) return 0;
-        return DateTime.parse(a.paymentDay!).compareTo(DateTime.parse(b.paymentDay!));
-      });
-
-      // Agrupar transações por dia
-      Map<String, double> dailyTotals = {};
-
+      // Preencher com dados reais das transações
       for (var transaction in filteredTransactions) {
         if (transaction.paymentDay != null) {
           DateTime date = DateTime.parse(transaction.paymentDay!);
@@ -108,8 +104,6 @@ class GraphicsPage extends StatelessWidget {
 
           if (dailyTotals.containsKey(dayKey)) {
             dailyTotals[dayKey] = dailyTotals[dayKey]! + value;
-          } else {
-            dailyTotals[dayKey] = value;
           }
         }
       }
@@ -127,17 +121,9 @@ class GraphicsPage extends StatelessWidget {
         sparklineData.add(dailyTotals[day]!);
         labels.add(day);
 
-        // Recuperar a data completa da primeira transação neste dia
-        for (var transaction in filteredTransactions) {
-          if (transaction.paymentDay != null) {
-            DateTime date = DateTime.parse(transaction.paymentDay!);
-            if (dayFormatter.format(date) == day) {
-              dates.add(date);
-              values.add(dailyTotals[day]!);
-              break;
-            }
-          }
-        }
+        // Criar uma data completa para cada dia
+        dates.add(DateTime(selectedYear, selectedMonthIndex + 1, int.parse(day)));
+        values.add(dailyTotals[day]!);
       }
 
       return {
@@ -204,7 +190,7 @@ class GraphicsPage extends StatelessWidget {
 
                 SizedBox(height: 20.h),
 
-                // Gráfico de linha Sparkline redesenhado com dias na horizontal
+                // Gráfico de linha Sparkline redesenhado com todos os dias na horizontal
                 Obx(() {
                   var sparklineData = getSparklineData();
                   List<double> data = sparklineData['data'];
@@ -241,7 +227,7 @@ class GraphicsPage extends StatelessWidget {
                         Text(
                           "Despesas Diárias",
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w600,
                             color: theme.primaryColor,
                           ),
@@ -311,7 +297,7 @@ class GraphicsPage extends StatelessWidget {
 
                                   SizedBox(height: 8.h),
 
-                                  // Dias na parte inferior (horizontal)
+                                  // Todos os dias do mês na parte inferior (horizontal)
                                   Container(
                                     height: 20.h,
                                     child: SingleChildScrollView(
@@ -321,7 +307,7 @@ class GraphicsPage extends StatelessWidget {
                                         children: List.generate(
                                           labels.length,
                                           (index) => Container(
-                                            width: 40.w,
+                                            width: 30.w,
                                             alignment: Alignment.center,
                                             child: Text(
                                               labels[index],
@@ -340,14 +326,12 @@ class GraphicsPage extends StatelessWidget {
                             ),
                           ],
                         ),
-
-                        // Lista de transações diárias
                       ],
                     ),
                   );
                 }),
 
-                // Gráficos de categorias (modificado)
+                // Gráficos de categorias (modificado para mostrar ícones)
                 Obx(() {
                   var filteredTransactions = getFilteredTransactions();
                   var categories = filteredTransactions.map((e) => e.category).where((e) => e != null).toSet().toList().cast<int>();
@@ -378,7 +362,7 @@ class GraphicsPage extends StatelessWidget {
                     (previousValue, element) => previousValue + (element['value'] as double),
                   );
 
-                  // Criar as seções do gráfico após a ordenação
+                  // Criar as seções do gráfico com ícones no centro
                   var chartData = data
                       .map(
                         (e) => PieChartSectionData(
@@ -387,6 +371,11 @@ class GraphicsPage extends StatelessWidget {
                           title: '',
                           radius: 50,
                           showTitle: false,
+                          badgeWidget: _IconBadge(
+                            icon: e['icon'] as String,
+                            color: e['color'] as Color,
+                          ),
+                          badgePositionPercentageOffset: 0.9,
                         ),
                       )
                       .toList();
@@ -448,14 +437,43 @@ class GraphicsPage extends StatelessWidget {
                           ],
                         ),
                       ),
-
-                      // Lista de categorias com ícones coloridos
                     ],
                   );
                 }),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// Nova classe para exibir ícones no gráfico de pizza
+class _IconBadge extends StatelessWidget {
+  final String icon;
+  final Color color;
+
+  const _IconBadge({
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Image.asset(
+          icon,
+          width: 14,
+          height: 14,
+          color: Colors.white,
         ),
       ),
     );
@@ -482,63 +500,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final TransactionController transactionController = Get.put(TransactionController());
-
-    // Formatador de moeda brasileira
-    final currencyFormatter = NumberFormat.currency(
-      locale: 'pt_BR',
-      symbol: 'R\$',
-      decimalDigits: 2,
-    );
-
-    // Formatador de data
-    final dateFormatter = DateFormat('dd/MM/yyyy');
-
-    // Variável observável para controlar a categoria selecionada
-    final selectedCategoryId = RxnInt(null);
-
-    // Lista de meses
-    List<String> getAllMonths() {
-      final months = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
-      ];
-      return months;
-    }
-
-    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
-
-    List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
-
-      if (selectedMonth.value.isNotEmpty) {
-        return despesas.where((transaction) {
-          if (transaction.paymentDay == null) return false;
-          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth.value;
-        }).toList();
-      }
-
-      return despesas;
-    }
-
-    List<TransactionModel> getTransactionsByCategory(int categoryId) {
-      var filteredTransactions = getFilteredTransactions();
-      return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
-    }
-
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -549,6 +510,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         var valor = item['value'] as double;
         var percentual = (valor / totalValue * 100);
         var categoryColor = item['color'] as Color;
+        var categoryIcon = item['icon'] as String;
 
         return Column(
           children: [
@@ -585,7 +547,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         ),
                         child: Center(
                           child: Image.asset(
-                            item['icon'] as String,
+                            categoryIcon,
                             width: 20.w,
                             height: 20.h,
                             color: Colors.white,
@@ -671,7 +633,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                     Text(
                       "Detalhes das Transações",
                       style: TextStyle(
-                        fontSize: 8.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
                         color: theme.primaryColor,
                       ),
@@ -777,5 +739,46 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         );
       },
     );
+  }
+
+  // Reimplementação da função getTransactionsByCategory para uso na classe WidgetListCategoryGraphics
+  List<TransactionModel> getTransactionsByCategory(int categoryId) {
+    final TransactionController transactionController = Get.find<TransactionController>();
+    List<String> getAllMonths() {
+      final months = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ];
+      return months;
+    }
+
+    final selectedMonth = Get.find<RxString>() ?? getAllMonths()[DateTime.now().month - 1].obs;
+
+    List<TransactionModel> getFilteredTransactions() {
+      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+
+      if (selectedMonth.value.isNotEmpty) {
+        return despesas.where((transaction) {
+          if (transaction.paymentDay == null) return false;
+          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+          String monthName = getAllMonths()[transactionDate.month - 1];
+          return monthName == selectedMonth.value;
+        }).toList();
+      }
+      return despesas;
+    }
+
+    var filteredTransactions = getFilteredTransactions();
+    return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
   }
 }
