@@ -190,7 +190,7 @@ class GraphicsPage extends StatelessWidget {
 
                 SizedBox(height: 20.h),
 
-                // Gráfico de linha Sparkline redesenhado com todos os dias na horizontal
+                // Gráfico de linha Sparkline com smoothing
                 Obx(() {
                   var sparklineData = getSparklineData();
                   List<double> data = sparklineData['data'];
@@ -268,16 +268,18 @@ class GraphicsPage extends StatelessWidget {
                             Expanded(
                               child: Column(
                                 children: [
-                                  // Gráfico Sparkline
+                                  // Gráfico Sparkline com smoothing habilitado
                                   SizedBox(
                                     height: 120.h,
                                     child: Sparkline(
                                       data: data,
                                       lineWidth: 3.0,
                                       lineColor: DefaultColors.green,
-                                      pointsMode: PointsMode.all,
-                                      pointSize: 5.0,
-                                      pointColor: DefaultColors.green,
+                                      enableThreshold: false,
+                                      sharpCorners: false, // Desativa cantos afiados para um efeito mais suave
+                                      kLine: [
+                                        2.0
+                                      ], // Aumenta o fator de suavização
                                       fillMode: FillMode.below,
                                       fillGradient: LinearGradient(
                                         begin: Alignment.topCenter,
@@ -292,12 +294,15 @@ class GraphicsPage extends StatelessWidget {
                                       gridLineAmount: 4,
                                       gridLineLabelPrecision: 0,
                                       max: data.isNotEmpty ? data.reduce((a, b) => a > b ? a : b) * 1.2 : 100,
+                                      averageLine: false,
+                                      useCubicSmoothing: true, // Usa suavização cúbica
+                                      cubicSmoothingFactor: 0.2, // Fator de suavização cúbica
                                     ),
                                   ),
 
                                   SizedBox(height: 8.h),
 
-                                  // Todos os dias do mês na parte inferior (horizontal)
+                                  // ALTERAÇÃO: Mostra todos os dias do mês de 1 até o último dia
                                   Container(
                                     height: 20.h,
                                     child: SingleChildScrollView(
@@ -310,7 +315,7 @@ class GraphicsPage extends StatelessWidget {
                                             width: 30.w,
                                             alignment: Alignment.center,
                                             child: Text(
-                                              labels[index],
+                                              (index + 1).toString(), // Aqui mostramos o número do dia (começando em 1)
                                               style: TextStyle(
                                                 fontSize: 10.sp,
                                                 color: DefaultColors.grey,
@@ -331,7 +336,7 @@ class GraphicsPage extends StatelessWidget {
                   );
                 }),
 
-                // Gráficos de categorias (modificado para mostrar ícones)
+                // Gráficos de categorias (modificado para adicionar ícones)
                 Obx(() {
                   var filteredTransactions = getFilteredTransactions();
                   var categories = filteredTransactions.map((e) => e.category).where((e) => e != null).toSet().toList().cast<int>();
@@ -349,7 +354,7 @@ class GraphicsPage extends StatelessWidget {
                           ),
                           "name": findCategoryById(e)?['name'],
                           "color": findCategoryById(e)?['color'],
-                          "icon": findCategoryById(e)?['icon'],
+                          "icon": findCategoryById(e)?['icon'], // Adicionado para acessar o ícone
                         },
                       )
                       .toList();
@@ -362,19 +367,15 @@ class GraphicsPage extends StatelessWidget {
                     (previousValue, element) => previousValue + (element['value'] as double),
                   );
 
-                  // Criar as seções do gráfico com ícones no centro
+                  // Criar as seções do gráfico sem ícones (apenas cores)
                   var chartData = data
                       .map(
                         (e) => PieChartSectionData(
                           value: e['value'] as double,
                           color: e['color'] as Color,
-                          title: '',
+                          title: '', // Sem título
                           radius: 50,
                           showTitle: false,
-                          badgeWidget: _IconBadge(
-                            icon: e['icon'] as String,
-                            color: e['color'] as Color,
-                          ),
                           badgePositionPercentageOffset: 0.9,
                         ),
                       )
@@ -449,37 +450,6 @@ class GraphicsPage extends StatelessWidget {
   }
 }
 
-// Nova classe para exibir ícones no gráfico de pizza
-class _IconBadge extends StatelessWidget {
-  final String icon;
-  final Color color;
-
-  const _IconBadge({
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Image.asset(
-          icon,
-          width: 14,
-          height: 14,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
 class WidgetListCategoryGraphics extends StatelessWidget {
   const WidgetListCategoryGraphics({
     super.key,
@@ -510,11 +480,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         var valor = item['value'] as double;
         var percentual = (valor / totalValue * 100);
         var categoryColor = item['color'] as Color;
-        var categoryIcon = item['icon'] as String;
+        var categoryIcon = item['icon'] as IconData?; // Obtém o ícone da categoria
 
         return Column(
           children: [
-            // Item da categoria
+            // Item da categoria - Adicionado ícone
             GestureDetector(
               onTap: () {
                 if (selectedCategoryId.value == categoryId) {
@@ -537,7 +507,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      // Ícone colorido com a cor da categoria
+                      // ALTERAÇÃO: Adiciona ícone da categoria
                       Container(
                         width: 30.w,
                         height: 30.h,
@@ -546,11 +516,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Center(
-                          child: Image.asset(
-                            categoryIcon,
-                            width: 20.w,
-                            height: 20.h,
+                          child: Icon(
+                            categoryIcon ?? Icons.category, // Usa o ícone da categoria ou um ícone padrão
                             color: Colors.white,
+                            size: 18.sp,
                           ),
                         ),
                       ),
