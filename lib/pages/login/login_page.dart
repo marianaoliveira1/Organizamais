@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../widgtes/default_button.dart';
@@ -67,6 +68,13 @@ class LoginPage extends StatelessWidget {
             DefaultContinueCom(),
             SizedBox(
               height: 20.h,
+            ),
+            UnityBannerAd(
+              placementId: 'Banner_Android',
+              onLoad: (placementId) => print('Banner loaded: $placementId'),
+              onClick: (placementId) => print('Banner clicked: $placementId'),
+              onShown: (placementId) => print('Banner shown: $placementId'),
+              onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
             ),
             ButtonLoginWithGoogle(
               text: "Entrar com Google",

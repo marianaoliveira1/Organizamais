@@ -64,6 +64,10 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController valuecontroller = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
+  final TextEditingController installmentsController = TextEditingController();
+  
+  bool _isInstallment = false;
+  int _installments = 1;
 
   @override
   void dispose() {
@@ -71,6 +75,7 @@ class _TransactionPageState extends State<TransactionPage> {
     titleController.dispose();
     dayOfTheMonthController.dispose();
     paymentTypeController.dispose();
+    installmentsController.dispose();
     super.dispose();
   }
 
@@ -290,6 +295,121 @@ class _TransactionPageState extends State<TransactionPage> {
                   Divider(
                     color: DefaultColors.grey,
                   ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DefaultTitleTransaction(
+                          title: "Forma de pagamento",
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile<bool>(
+                                title: Text(
+                                  "À vista",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                value: false,
+                                groupValue: _isInstallment,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isInstallment = value!;
+                                    _installments = 1;
+                                    installmentsController.text = "1";
+                                  });
+                                },
+                                activeColor: theme.primaryColor,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile<bool>(
+                                title: Text(
+                                  "A prazo",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                value: true,
+                                groupValue: _isInstallment,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isInstallment = value!;
+                                    if (_installments < 2) {
+                                      _installments = 2;
+                                      installmentsController.text = "2";
+                                    }
+                                  });
+                                },
+                                activeColor: theme.primaryColor,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_isInstallment)
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Número de parcelas",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                DropdownButtonFormField<int>(
+                                  value: _installments,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      borderSide: BorderSide(color: DefaultColors.grey),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                  ),
+                                  items: List.generate(11, (index) => index + 2)
+                                      .map((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(
+                                        value.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? newValue) {
+                                    if (newValue != null) {
+                                      setState(() {
+                                        _installments = newValue;
+                                        installmentsController.text = newValue.toString();
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    color: DefaultColors.grey,
+                  ),
                 ],
               ),
             Padding(
@@ -327,75 +447,82 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
+            
             SizedBox(height: 10.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ButtonBackTransaction(),
-                InkWell(
-                  onTap: () async {
-                    final TransactionController transactionController = Get.find<TransactionController>();
-
-                    if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
-                      Get.snackbar(
-                        'Erro',
-                        'Preencha todos os campos obrigatórios',
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-
-                    final TransactionModel transaction = TransactionModel(
-                      title: titleController.text,
-                      value: valuecontroller.text.replaceAll('R\$', '').trim(),
-                      type: _selectedType,
-                      category: categoryId,
-                      paymentDay: _selectedDate!.toString().split(' ')[0],
-                      paymentType: paymentTypeController.text,
-                    );
-
-                    try {
-                      if (widget.overrideTransactionSalvar != null) {
-                        await widget.overrideTransactionSalvar!(transaction.copyWith(
-                          id: widget.transaction!.id,
-                        ));
-                        Navigator.pop(context);
-                        return;
-                      }
-
-                      await transactionController.addTransaction(transaction);
-                      Navigator.pop(context);
-                    } catch (e) {
-                      Get.snackbar(
-                        'Erro',
-                        'Erro ao salvar a transação: ${e.toString()}',
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Salvar",
-                        style: TextStyle(
-                          color: theme.cardColor,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(child: ButtonBackTransaction()),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final TransactionController transactionController = Get.find<TransactionController>();
+                    
+                        if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
+                          Get.snackbar(
+                            'Erro',
+                            'Preencha todos os campos obrigatórios',
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+                    
+                        final TransactionModel transaction = TransactionModel(
+                          title: titleController.text,
+                          value: valuecontroller.text.replaceAll('R\$', '').trim(),
+                          type: _selectedType,
+                          category: categoryId,
+                          paymentDay: _selectedDate!.toString().split(' ')[0],
+                          paymentType: paymentTypeController.text,
+                        );
+                    
+                        try {
+                          if (widget.overrideTransactionSalvar != null) {
+                            await widget.overrideTransactionSalvar!(transaction.copyWith(
+                              id: widget.transaction!.id,
+                            ));
+                            Navigator.pop(context);
+                            return;
+                          }
+                    
+                          await transactionController.addTransaction(transaction, isInstallment: _isInstallment, installments: _installments);
+                          Navigator.pop(context);
+                        } catch (e) {
+                          Get.snackbar(
+                            'Erro',
+                            'Erro ao salvar a transação: ${e.toString()}',
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Salvar",
+                            style: TextStyle(
+                              color: theme.cardColor,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

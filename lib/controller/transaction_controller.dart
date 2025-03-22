@@ -62,11 +62,28 @@ class TransactionController extends GetxController {
     });
   }
 
-  Future<void> addTransaction(TransactionModel transaction) async {
-    var transactionWithUserId = transaction.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
-    await FirebaseFirestore.instance.collection('transactions').add(
-          transactionWithUserId.toMap(),
+  Future<void> addTransaction(TransactionModel transaction, {bool isInstallment = false, int installments = 1}) async {
+    if (isInstallment) {
+      for (var i = 0; i < installments; i++) {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+        final newPaymentDay = DateTime(paymentDate.year, paymentDate.month + i, paymentDate.day).toString();
+        var transactionWithUserId = transaction.copyWith(
+          userId: Get.find<AuthController>().firebaseUser.value?.uid,
+          value: (double.parse(transaction.value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.')) / installments).toString(),
+          paymentDay: newPaymentDay,
+          title: '${transaction.title} - Parcela ${i + 1}',
         );
+        print(transactionWithUserId.toMap());
+        FirebaseFirestore.instance.collection('transactions').add(
+              transactionWithUserId.toMap(),
+            );
+      }
+    } else {
+      var transactionWithUserId = transaction.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
+      await FirebaseFirestore.instance.collection('transactions').add(
+            transactionWithUserId.toMap(),
+          );
+    }
     Get.snackbar('Sucesso', 'Transação adicionada com sucesso');
   }
 

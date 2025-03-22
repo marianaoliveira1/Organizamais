@@ -11,6 +11,7 @@ import 'package:organizamais/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:organizamais/utils/color.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import 'controller/auth_controller.dart';
 import 'controller/card_controller.dart';
@@ -19,6 +20,17 @@ import 'routes/route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  UnityAds.init(
+    gameId: '5819004',
+    onComplete: () => print('Initialization Complete'),
+    onFailed: (error, message) {
+      error.printError();
+      message.printError();
+      error.printInfo();
+      message.printInfo();
+      print('Initialization Failed: $error. $message');
+    },
+  );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   initializeDateFormatting('pt_BR', null);
