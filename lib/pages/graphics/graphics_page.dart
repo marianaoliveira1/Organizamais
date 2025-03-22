@@ -302,29 +302,44 @@ class GraphicsPage extends StatelessWidget {
 
                                   SizedBox(height: 8.h),
 
-                                  // ALTERAÇÃO: Mostra todos os dias do mês de 1 até o último dia
-                                  Container(
-                                    height: 20.h,
-                                    child: SingleChildScrollView(
+                                  // Mostra todos os dias do mês de 1 até o último dia
+                                  SizedBox(
+                                    height: 1.h,
+                                    child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      itemCount: labels.length,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          width: 30.w,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            labels[index],
+                                            style: TextStyle(
+                                              fontSize: 0.sp,
+                                              color: DefaultColors.grey,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+
+                                  Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: List.generate(
                                           labels.length,
-                                          (index) => Container(
-                                            width: 30.w,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              (index + 1).toString(), // Aqui mostramos o número do dia (começando em 1)
-                                              style: TextStyle(
-                                                fontSize: 10.sp,
-                                                color: DefaultColors.grey,
-                                              ),
+                                          (index) => Text(
+                                            labels[index],
+                                            style: TextStyle(
+                                              fontSize: 5.sp,
+                                              color: DefaultColors.grey,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -480,7 +495,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         var valor = item['value'] as double;
         var percentual = (valor / totalValue * 100);
         var categoryColor = item['color'] as Color;
-        var categoryIcon = item['icon'] as IconData?; // Obtém o ícone da categoria
+        var categoryIcon = item['icon'] as String?; // Obtém o ícone da categoria
 
         return Column(
           children: [
@@ -516,10 +531,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Center(
-                          child: Icon(
-                            categoryIcon ?? Icons.category, // Usa o ícone da categoria ou um ícone padrão
-                            color: Colors.white,
-                            size: 18.sp,
+                          child: Image.asset(
+                            categoryIcon ?? 'assets/icons/category.png',
+                            width: 20.w,
+                            height: 20.h,
                           ),
                         ),
                       ),
@@ -731,7 +746,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       return months;
     }
 
-    final selectedMonth = Get.find<RxString>() ?? getAllMonths()[DateTime.now().month - 1].obs;
+    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
