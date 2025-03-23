@@ -67,9 +67,12 @@ class TransactionController extends GetxController {
       for (var i = 0; i < installments; i++) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
         final newPaymentDay = DateTime(paymentDate.year, paymentDate.month + i, paymentDate.day).toString();
+        final value = double.parse(transaction.value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.'));
+        final localizedValue = value / installments;
+        final localizedValueString = localizedValue.toStringAsFixed(2).replaceAll('.', ',');
         var transactionWithUserId = transaction.copyWith(
           userId: Get.find<AuthController>().firebaseUser.value?.uid,
-          value: (double.parse(transaction.value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.')) / installments).toString(),
+          value: localizedValueString,
           paymentDay: newPaymentDay,
           title: '${transaction.title} - Parcela ${i + 1}',
         );
