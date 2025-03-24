@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:chart_sparkline/chart_sparkline.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/pages/graphics/graphics_page2.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -454,6 +455,10 @@ class GraphicsPage extends StatelessWidget {
                     ],
                   );
                 }),
+
+                GraphicsPage2(
+                  selectedMonth: selectedMonth,
+                )
               ],
             ),
           ),
