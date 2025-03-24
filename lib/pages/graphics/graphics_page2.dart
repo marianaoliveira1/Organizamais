@@ -317,18 +317,18 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                         height: 30.h,
                         decoration: BoxDecoration(
                           color: paymentTypeColor,
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Center(
-                          child: Text(
-                            _getPaymentTypeInitial(paymentType),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
+                            // child: Text(
+                            //   _getPaymentTypeInitial(paymentType),
+                            //   style: TextStyle(
+                            //     color: Colors.white,
+                            //     fontWeight: FontWeight.bold,
+                            //     fontSize: 14.sp,
+                            //   ),
+                            // ),
                             ),
-                          ),
-                        ),
                       ),
                       SizedBox(width: 15.w),
                       Expanded(
