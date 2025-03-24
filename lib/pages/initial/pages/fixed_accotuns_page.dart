@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/utils/color.dart';
 import '../../../model/fixed_account_model.dart';
 import '../../../model/transaction_model.dart';
 import '../../transaction/widget/button_select_category.dart';
@@ -129,7 +130,7 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
-                  _MaxNumberInputFormatter(31), // Restringe a 31
+                  _MaxNumberInputFormatter(28), // Restringe a 31
                 ],
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -156,6 +157,13 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                     color: theme.primaryColor.withOpacity(.5),
                   ),
                 ),
+              ),
+            ),
+            Text(
+              "Máximo permitido: até 28, pois alguns meses têm no máximo 28 dias. Se for um número maior, a cobrança ocorrerá no dia 28.",
+              style: TextStyle(
+                color: DefaultColors.grey20,
+                fontSize: 9.sp,
               ),
             ),
             DefaultTitleTransaction(

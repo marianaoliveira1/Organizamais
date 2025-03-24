@@ -65,7 +65,7 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
   final TextEditingController installmentsController = TextEditingController();
-  
+
   bool _isInstallment = false;
   int _installments = 1;
 
@@ -379,8 +379,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                     ),
                                     contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                                   ),
-                                  items: List.generate(11, (index) => index + 2)
-                                      .map((int value) {
+                                  items: List.generate(11, (index) => index + 2).map((int value) {
                                     return DropdownMenuItem<int>(
                                       value: value,
                                       child: Text(
@@ -447,7 +446,6 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
-            
             SizedBox(height: 10.h),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -460,7 +458,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     child: InkWell(
                       onTap: () async {
                         final TransactionController transactionController = Get.find<TransactionController>();
-                    
+
                         if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
                           Get.snackbar(
                             'Erro',
@@ -471,7 +469,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           );
                           return;
                         }
-                    
+
                         final TransactionModel transaction = TransactionModel(
                           title: titleController.text,
                           value: valuecontroller.text.replaceAll('R\$', '').trim(),
@@ -480,7 +478,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           paymentDay: _selectedDate!.toString().split(' ')[0],
                           paymentType: paymentTypeController.text,
                         );
-                    
+
                         try {
                           if (widget.overrideTransactionSalvar != null) {
                             await widget.overrideTransactionSalvar!(transaction.copyWith(
@@ -489,7 +487,7 @@ class _TransactionPageState extends State<TransactionPage> {
                             Navigator.pop(context);
                             return;
                           }
-                    
+
                           await transactionController.addTransaction(transaction, isInstallment: _isInstallment, installments: _installments);
                           Navigator.pop(context);
                         } catch (e) {
