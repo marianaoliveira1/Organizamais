@@ -195,8 +195,6 @@ class GraphicsPage extends StatelessWidget {
                   var sparklineData = getSparklineData();
                   List<double> data = sparklineData['data'];
                   List<String> labels = sparklineData['labels'];
-                  List<DateTime> dates = sparklineData['dates'];
-                  List<double> values = sparklineData['values'];
 
                   if (data.isEmpty) {
                     return Container(
