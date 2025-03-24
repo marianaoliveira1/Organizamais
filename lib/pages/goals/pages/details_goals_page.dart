@@ -356,6 +356,7 @@ class GoalDetailsPage extends StatelessWidget {
       },
     );
   }
+  //teste
 
   void _showRemoveValueBottomSheet(BuildContext context, ValueNotifier<GoalModel> goal) {
     double valueToRemove = 0;
