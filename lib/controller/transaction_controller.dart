@@ -74,7 +74,7 @@ class TransactionController extends GetxController {
           userId: Get.find<AuthController>().firebaseUser.value?.uid,
           value: localizedValueString,
           paymentDay: newPaymentDay,
-          title: '${transaction.title} - Parcela ${i + 1}',
+          title: 'Parcela ${i + 1}: ${transaction.title}',
         );
         print(transactionWithUserId.toMap());
         FirebaseFirestore.instance.collection('transactions').add(
