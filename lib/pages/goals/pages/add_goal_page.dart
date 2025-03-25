@@ -180,8 +180,12 @@ class _AddGoalPageState extends State<AddGoalPage> {
                 final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
                 final goal = GoalModel(
                   name: nameController.text,
-                  value: NumberFormat.currency(locale: 'pt_BR').format(value), // Formata para Real Brasileiro
-                  date: DateFormat('dd/MM/yyyy').format(selectedDate),
+                  value: NumberFormat.currency(locale: 'pt_BR').format(
+                    value,
+                  ), // Formata para Real Brasileiro
+                  date: DateFormat('dd/MM/yyyy').format(
+                    selectedDate,
+                  ),
                   categoryId: categoryId ?? 0,
                   currentValue: 0,
                 );

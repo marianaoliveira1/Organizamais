@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../controller/fixed_accounts_controller.dart';
+import '../../controller/transaction_controller.dart';
 import '../cards/cards_page.dart';
 import '../profile/pages/fixed_accounts_page.dart';
 import '../profile/profile_page.dart';
@@ -24,6 +25,15 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     final theme = Theme.of(context);
+    final TransactionController _transactionController = Get.find<TransactionController>();
+    final currentMonth = DateTime.now().month;
+    final currentYear = DateTime.now().year;
+
+    final parcelamentos = _transactionController.transaction.where((t) => t.title.contains('Parcela') ?? false).where((t) {
+      if (t.paymentDay == null) return false;
+      final date = DateTime.parse(t.paymentDay!);
+      return date.month == currentMonth && date.year == currentYear;
+    }).toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
