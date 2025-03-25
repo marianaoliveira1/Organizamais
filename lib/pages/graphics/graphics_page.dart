@@ -605,134 +605,136 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             ),
 
             // Lista de transações da categoria expandida
-            Obx(() {
-              if (selectedCategoryId.value != categoryId) {
-                return const SizedBox();
-              }
+            Obx(
+              () {
+                if (selectedCategoryId.value != categoryId) {
+                  return const SizedBox();
+                }
 
-              var categoryTransactions = getTransactionsByCategory(categoryId);
-              categoryTransactions.sort((a, b) {
-                if (a.paymentDay == null || b.paymentDay == null) return 0;
-                return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
-              });
+                var categoryTransactions = getTransactionsByCategory(categoryId);
+                categoryTransactions.sort((a, b) {
+                  if (a.paymentDay == null || b.paymentDay == null) return 0;
+                  return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
+                });
 
-              return Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 14.h,
-                  vertical: 14.h,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Detalhes das Transações",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: theme.primaryColor,
+                return Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.h,
+                    vertical: 14.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Detalhes das Transações",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: theme.primaryColor,
+                        ),
                       ),
-                    ),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: categoryTransactions.length,
-                      separatorBuilder: (context, index) => Divider(
-                        color: DefaultColors.grey20.withOpacity(.5),
-                        height: 1,
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: categoryTransactions.length,
+                        separatorBuilder: (context, index) => Divider(
+                          color: DefaultColors.grey20.withOpacity(.5),
+                          height: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          var transaction = categoryTransactions[index];
+                          var transactionValue = double.parse(
+                            transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                          );
+
+                          String formattedDate = transaction.paymentDay != null
+                              ? dateFormatter.format(
+                                  DateTime.parse(transaction.paymentDay!),
+                                )
+                              : "Data não informada";
+
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      transaction.title,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.primaryColor,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(
+                                      height: 6.h,
+                                    ),
+                                    Text(
+                                      formattedDate,
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: DefaultColors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      currencyFormatter.format(transactionValue),
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.primaryColor,
+                                        letterSpacing: -0.5,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                    Text(
+                                      transaction.paymentType ?? 'N/A',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.primaryColor,
+                                        letterSpacing: -0.5,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                      itemBuilder: (context, index) {
-                        var transaction = categoryTransactions[index];
-                        var transactionValue = double.parse(
-                          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
-                        );
-
-                        String formattedDate = transaction.paymentDay != null
-                            ? dateFormatter.format(
-                                DateTime.parse(transaction.paymentDay!),
-                              )
-                            : "Data não informada";
-
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    transaction.title,
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.primaryColor,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: 6.h,
-                                  ),
-                                  Text(
-                                    formattedDate,
-                                    style: TextStyle(
-                                      fontSize: 10.sp,
-                                      color: DefaultColors.grey,
-                                    ),
-                                  ),
-                                ],
+                      if (categoryTransactions.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10.h),
+                            child: Text(
+                              "Nenhuma transação encontrada",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: DefaultColors.grey,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    currencyFormatter.format(transactionValue),
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.primaryColor,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                  Text(
-                                    transaction.paymentType ?? 'N/A',
-                                    style: TextStyle(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.primaryColor,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    if (categoryTransactions.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                          child: Text(
-                            "Nenhuma transação encontrada",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: DefaultColors.grey,
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              );
-            }),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         );
       },

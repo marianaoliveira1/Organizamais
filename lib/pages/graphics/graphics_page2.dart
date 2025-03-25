@@ -362,16 +362,18 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              paymentType,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                color: theme.primaryColor,
+                            SizedBox(
+                              width: 105.w,
+                              child: Text(
+                                paymentType,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.primaryColor,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              textAlign: TextAlign.start,
-                              softWrap: true,
-                              overflow: TextOverflow.clip,
                             ),
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
@@ -386,12 +388,16 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            currencyFormatter.format(valor),
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: theme.primaryColor,
+                          SizedBox(
+                            width: 130.w,
+                            child: Text(
+                              currencyFormatter.format(valor),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: theme.primaryColor,
+                              ),
+                              textAlign: TextAlign.end,
                             ),
                           ),
                           Icon(
