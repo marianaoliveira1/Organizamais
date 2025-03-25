@@ -137,7 +137,7 @@ class ParcelamentosCard extends StatelessWidget {
         ),
         color: theme.cardColor,
       ),
-      padding: EdgeInsets.all(8.h),
+      padding: EdgeInsets.all(12.h),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 2.h,
@@ -178,69 +178,114 @@ class ParcelamentosCard extends StatelessWidget {
                 );
               }
 
-              return Column(
-                children: parcelamentos.map((parcela) {
-                  // Extrai informações da parcela do título
-                  final regex = RegExp(r'Parcela (\d+) de (\d+): (.+)');
-                  final match = regex.firstMatch(parcela.title ?? '');
-                  final parcelaAtual = match?.group(1) ?? '?';
-                  final totalParcelas = match?.group(2) ?? '?';
-                  final tituloOriginal = match?.group(3) ?? parcela.title;
+              // Calcular o valor total das parcelas
+              final totalParcelasValue = parcelamentos.fold(0.0, (sum, parcela) {
+                final valueString = parcela.value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.');
+                return sum + double.parse(valueString);
+              });
 
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      bottom: 12.h,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              tituloOriginal ?? 'Sem título',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
-                                color: theme.primaryColor,
-                              ),
-                            ),
-                            if (parcela.paymentDay != null)
-                              Text(
-                                'Vence em ${DateFormat('dd/MM/yyyy').format(DateTime.parse(parcela.paymentDay!))}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11.sp,
-                                  color: DefaultColors.grey20,
+              return Column(
+                children: [
+                  ...parcelamentos.map((parcela) {
+                    // Extrai informações da parcela do título
+                    final regex = RegExp(r'Parcela (\d+) de (\d+): (.+)');
+                    final match = regex.firstMatch(parcela.title ?? '');
+                    final parcelaAtual = match?.group(1) ?? '?';
+                    final totalParcelas = match?.group(2) ?? '?';
+                    final tituloOriginal = match?.group(3) ?? parcela.title;
+
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 150.w,
+                                child: Text(
+                                  '$tituloOriginal ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'R\$ ${parcela.value}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
-                                color: theme.primaryColor,
+                              if (parcela.paymentDay != null)
+                                SizedBox(
+                                  width: 150.w,
+                                  child: Text(
+                                    DateFormat('dd/MM/yyyy').format(DateTime.parse(parcela.paymentDay!)),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11.sp,
+                                      color: DefaultColors.grey20,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: 130.w,
+                                child: Text(
+                                  'R\$ ${parcela.value}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
                               ),
-                            ),
-                            Text(
-                              parcela.paymentType ?? '',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 11.sp,
-                                color: DefaultColors.grey20,
+                              SizedBox(
+                                width: 100.w,
+                                child: Text(
+                                  parcela.paymentType ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11.sp,
+                                    color: DefaultColors.grey20,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+
+                  SizedBox(
+                    height: 8.h,
+                  ),
+                  // Total das parcelas
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'R\$ ${totalParcelasValue.toStringAsFixed(2).replaceAll('.', ',')}',
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 11.sp,
+                          ),
                         ),
                       ],
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               );
             }),
           ],
