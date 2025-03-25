@@ -78,7 +78,7 @@ class FixedAccounts extends StatelessWidget {
                     "Nenhuma conta fixa cadastrada",
                     style: TextStyle(
                       color: DefaultColors.grey20,
-                      fontSize: 14.sp,
+                      fontSize: 10.sp,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

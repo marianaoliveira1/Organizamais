@@ -202,7 +202,7 @@ class GraphicsPage extends StatelessWidget {
                       margin: EdgeInsets.only(bottom: 20.h),
                       child: Center(
                         child: Text(
-                          "Nenhuma despesa encontrada${selectedMonth.value.isNotEmpty ? ' para $selectedMonth' : ''}",
+                          "",
                           style: TextStyle(
                             color: DefaultColors.grey,
                             fontSize: 14.sp,
@@ -223,13 +223,8 @@ class GraphicsPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Despesas Diárias",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: theme.primaryColor,
-                          ),
+                        DefaultTextGraphic(
+                          text: "Despesas diárias",
                         ),
                         SizedBox(height: 16.h),
                         Row(
@@ -398,10 +393,10 @@ class GraphicsPage extends StatelessWidget {
                   if (data.isEmpty) {
                     return Center(
                       child: Text(
-                        "Nenhuma despesa encontrada${selectedMonth.value.isNotEmpty ? ' para $selectedMonth' : ''}",
+                        "Nenhuma despesa registrada para exibir o gráfico.",
                         style: TextStyle(
                           color: DefaultColors.grey,
-                          fontSize: 14.sp,
+                          fontSize: 12.sp,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -419,13 +414,8 @@ class GraphicsPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Despesas por Categoria",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: theme.primaryColor,
-                              ),
+                            DefaultTextGraphic(
+                              text: "Despesas por Categoria",
                             ),
                             SizedBox(height: 16.h),
                             Center(
@@ -463,6 +453,27 @@ class GraphicsPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class DefaultTextGraphic extends StatelessWidget {
+  final String text;
+  const DefaultTextGraphic({
+    super.key,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: theme.primaryColor,
       ),
     );
   }

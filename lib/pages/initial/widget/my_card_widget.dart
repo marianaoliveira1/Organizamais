@@ -37,7 +37,7 @@ class MyCardsWidget extends StatelessWidget {
                   'Nenhum cartão adicionado',
                   style: TextStyle(
                     color: DefaultColors.grey20,
-                    fontSize: 14.sp,
+                    fontSize: 10.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

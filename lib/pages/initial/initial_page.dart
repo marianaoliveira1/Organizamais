@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 import 'package:organizamais/pages/profile/profile_page.dart';
+import 'package:organizamais/utils/color.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../controller/fixed_accounts_controller.dart';
 
+import '../../controller/transaction_controller.dart';
+import '../../model/transaction_model.dart';
 import '../cards/cards_page.dart';
 import '../profile/pages/fixed_accounts_page.dart';
 import 'widget/credit_card_selection.dart';
@@ -94,6 +98,7 @@ class InitialPage extends StatelessWidget {
                     FinanceSummaryWidget(),
                     DefaultWidgetFixedAccounts(),
                     CreditCardSection(),
+                    ParcelamentosCard(),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -111,6 +116,136 @@ class InitialPage extends StatelessWidget {
     return Divider(
       color: Colors.grey.shade200,
       thickness: 1,
+    );
+  }
+}
+
+class ParcelamentosCard extends StatelessWidget {
+  final TransactionController _transactionController = Get.find<TransactionController>();
+
+  ParcelamentosCard({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          24.r,
+        ),
+        color: theme.cardColor,
+      ),
+      padding: EdgeInsets.all(8.h),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 2.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Parcelamentos do Mês',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.grey20,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Obx(() {
+              final currentMonth = DateTime.now().month;
+              final currentYear = DateTime.now().year;
+
+              // Filtra transações que são parcelamentos (título contém "Parcela")
+              final parcelamentos = _transactionController.transaction.where((t) => t.title?.contains('Parcela') ?? false).where((t) {
+                if (t.paymentDay == null) return false;
+                final date = DateTime.parse(t.paymentDay!);
+                return date.month == currentMonth && date.year == currentYear;
+              }).toList();
+
+              if (parcelamentos.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Text(
+                    'Nenhum parcelamento este mês',
+                    style: TextStyle(
+                      color: DefaultColors.grey20,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: parcelamentos.map((parcela) {
+                  // Extrai informações da parcela do título
+                  final regex = RegExp(r'Parcela (\d+) de (\d+): (.+)');
+                  final match = regex.firstMatch(parcela.title ?? '');
+                  final parcelaAtual = match?.group(1) ?? '?';
+                  final totalParcelas = match?.group(2) ?? '?';
+                  final tituloOriginal = match?.group(3) ?? parcela.title;
+
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: 12.h,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tituloOriginal ?? 'Sem título',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                            if (parcela.paymentDay != null)
+                              Text(
+                                'Vence em ${DateFormat('dd/MM/yyyy').format(DateTime.parse(parcela.paymentDay!))}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11.sp,
+                                  color: DefaultColors.grey20,
+                                ),
+                              ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'R\$ ${parcela.value}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                            Text(
+                              parcela.paymentType ?? '',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            }),
+          ],
+        ),
+      ),
     );
   }
 }

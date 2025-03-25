@@ -8,6 +8,8 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
+import 'graphics_page.dart';
+
 class GraphicsPage2 extends StatelessWidget {
   const GraphicsPage2({super.key, required this.selectedMonth});
   final RxString selectedMonth;
@@ -176,7 +178,7 @@ class GraphicsPage2 extends StatelessWidget {
           if (data.isEmpty) {
             return Center(
               child: Text(
-                "Nenhuma despesa encontrada${selectedMonth.value.isNotEmpty ? ' para $selectedMonth' : ''}",
+                "",
                 style: TextStyle(
                   color: DefaultColors.grey,
                   fontSize: 14.sp,
@@ -197,13 +199,8 @@ class GraphicsPage2 extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Despesas por Tipo de Pagamento",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: theme.primaryColor,
-                      ),
+                    DefaultTextGraphic(
+                      text: "Despesas por Tipo de Pagamento",
                     ),
                     SizedBox(height: 16.h),
                     Center(

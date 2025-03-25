@@ -160,12 +160,6 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.indigoDark, // Índigo escuro para trabalho
   },
   {
-    'id': 18,
-    'name': 'Academia',
-    'icon': 'assets/icon-category/aviao.png',
-    'color': DefaultColors.oceanBlue, // Azul oceano para viagens
-  },
-  {
     'id': 20,
     'name': 'Vestuário',
     'icon': 'assets/icon-category/roupas.png',
