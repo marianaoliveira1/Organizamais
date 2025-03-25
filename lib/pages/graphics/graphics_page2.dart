@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:chart_sparkline/chart_sparkline.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
@@ -238,19 +237,50 @@ class GraphicsPage2 extends StatelessWidget {
     );
   }
 
+  static const List<Color> _customCardColors = [
+    DefaultColors.pastelBlue,
+    DefaultColors.pastelGreen,
+    DefaultColors.pastelPurple,
+    DefaultColors.pastelOrange,
+    DefaultColors.pastelPink,
+    DefaultColors.pastelTeal,
+    DefaultColors.pastelCyan,
+    DefaultColors.pastelLime,
+    DefaultColors.lavender,
+    DefaultColors.peach,
+    DefaultColors.mint,
+    DefaultColors.plum,
+    DefaultColors.turquoise,
+    DefaultColors.salmon,
+    DefaultColors.lightBlue,
+  ];
+
   // Função auxiliar para atribuir cores aos tipos de pagamento
   static Color _getPaymentTypeColor(String paymentType) {
     switch (paymentType.toLowerCase()) {
       case 'crédito':
-        return Colors.blue;
+        return DefaultColors.darkBlue; // Azul escuro (não está nos custom cards)
       case 'débito':
-        return Colors.green;
+        return DefaultColors.greenDark; // Verde escuro (não está nos custom cards)
       case 'dinheiro':
-        return Colors.orange;
+        return DefaultColors.orangeDark; // Laranja escuro (não está nos custom cards)
       case 'pix':
-        return Colors.purple;
+        return DefaultColors.deepPurple; // Roxo profundo (não está nos custom cards)
+      case 'boleto':
+        return DefaultColors.brown; // Marrom (não está nos custom cards)
+      case 'transferência':
+        return DefaultColors.blueGrey; // Azul-cinza (não está nos custom cards)
+      case 'cheque':
+        return DefaultColors.gold; // Dourado (não está nos custom cards)
+      case 'vale':
+        return DefaultColors.lime; // Lima (não está nos custom cards)
+      case 'criptomoeda':
+        return DefaultColors.slateGrey; // Cinza ardósia (não está nos custom cards)
+      case 'cupom':
+        return DefaultColors.hotPink; // Rosa forte (não está nos custom cards)
       default:
-        return Colors.grey;
+        int colorIndex = paymentType.hashCode.abs() % _customCardColors.length;
+        return _customCardColors[colorIndex];
     }
   }
 }

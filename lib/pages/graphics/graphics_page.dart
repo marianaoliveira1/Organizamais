@@ -458,7 +458,7 @@ class GraphicsPage extends StatelessWidget {
 
                 GraphicsPage2(
                   selectedMonth: selectedMonth,
-                )
+                ),
               ],
             ),
           ),
