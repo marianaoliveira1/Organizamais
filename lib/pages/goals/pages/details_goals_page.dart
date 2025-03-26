@@ -245,9 +245,12 @@ class GoalDetailsPage extends StatelessWidget {
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
 
+    final theme = Theme.of(context);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -282,13 +285,25 @@ class GoalDetailsPage extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       hintText: 'Valor a adicionar',
-                      prefixText: 'R\$ ',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(
+                          12.r,
+                        ),
+                        borderSide: BorderSide(
+                          color: theme.primaryColor.withOpacity(.5),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          12.r,
+                        ),
+                        borderSide: BorderSide(
+                          color: theme.primaryColor.withOpacity(.5),
+                        ),
                       ),
                     ),
                     onChanged: (value) {
@@ -362,11 +377,16 @@ class GoalDetailsPage extends StatelessWidget {
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
 
+    final theme = Theme.of(context);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.r),
+        ),
       ),
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -398,14 +418,26 @@ class GoalDetailsPage extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Valor a retirar',
-                      prefixText: 'R\$ ',
+                      hintText: 'R\$ Valor a retirar',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(
+                          12.r,
+                        ),
+                        borderSide: BorderSide(
+                          color: theme.primaryColor.withOpacity(.5),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          12.r,
+                        ),
+                        borderSide: BorderSide(
+                          color: theme.primaryColor.withOpacity(.5),
+                        ),
                       ),
                     ),
                     onChanged: (value) {
