@@ -24,21 +24,25 @@ class _AddGoalPageState extends State<AddGoalPage> {
   final GoalController goalController = Get.find();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
-  DateTime selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now(); // Use um nome diferente para evitar confusão
   int? categoryId;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && picked != _selectedDate) {
       setState(() {
-        selectedDate = picked;
+        _selectedDate = picked;
       });
     }
+  }
+
+  bool _isFormValid() {
+    return nameController.text.isNotEmpty && valueController.text.isNotEmpty && categoryId != null;
   }
 
   @override
@@ -94,6 +98,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   color: theme.primaryColor.withOpacity(.5),
                 ),
               ),
+              onChanged: (_) => setState(() {}), // Atualiza o estado ao mudar o texto
             ),
             DefaultTitleTransaction(
               title: "Valor",
@@ -136,6 +141,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   color: theme.primaryColor.withOpacity(0.5),
                 ),
               ),
+              onChanged: (_) => setState(() {}), // Atualiza o estado ao mudar o texto
             ),
             DefaultTitleTransaction(
               title: "Data",
@@ -153,7 +159,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   ),
                 ),
                 child: Text(
-                  "Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}",
+                  "Data: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
@@ -176,22 +182,24 @@ class _AddGoalPageState extends State<AddGoalPage> {
             ),
             Spacer(),
             InkWell(
-              onTap: () {
-                final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
-                final goal = GoalModel(
-                  name: nameController.text,
-                  value: NumberFormat.currency(locale: 'pt_BR').format(
-                    value,
-                  ), // Formata para Real Brasileiro
-                  date: DateFormat('dd/MM/yyyy').format(
-                    selectedDate,
-                  ),
-                  categoryId: categoryId ?? 0,
-                  currentValue: 0,
-                );
-                goalController.addGoal(goal);
-                Get.back();
-              },
+              onTap: _isFormValid()
+                  ? () {
+                      final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
+                      final goal = GoalModel(
+                        name: nameController.text,
+                        value: NumberFormat.currency(locale: 'pt_BR').format(
+                          value,
+                        ), // Formata para Real Brasileiro
+                        date: DateFormat('dd/MM/yyyy').format(
+                          _selectedDate, // Usando a variável _selectedDate
+                        ),
+                        categoryId: categoryId ?? 0,
+                        currentValue: 0,
+                      );
+                      goalController.addGoal(goal);
+                      Get.back();
+                    }
+                  : null, // Desabilita o botão se o formulário não for válido
               child: Container(
                 padding: EdgeInsets.all(
                   16.r,
@@ -199,7 +207,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: theme.primaryColor.withOpacity(.5),
+                    color: _isFormValid() ? theme.primaryColor.withOpacity(.5) : Colors.grey.withOpacity(.5),
                   ),
                 ),
                 child: Text(
@@ -207,7 +215,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
-                    color: theme.primaryColor,
+                    color: _isFormValid() ? theme.primaryColor : Colors.grey,
                   ),
                 ),
               ),
