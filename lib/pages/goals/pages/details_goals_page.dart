@@ -244,6 +244,7 @@ class GoalDetailsPage extends StatelessWidget {
     double valueToAdd = 0;
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
+    bool isFormValid = false; // Added form validation flag
 
     final theme = Theme.of(context);
 
@@ -257,6 +258,13 @@ class GoalDetailsPage extends StatelessWidget {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter modalSetState) {
+            // Function to validate form
+            void validateForm() {
+              modalSetState(() {
+                isFormValid = valueController.text.isNotEmpty && valueToAdd > 0;
+              });
+            }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 16.w,
@@ -290,17 +298,13 @@ class GoalDetailsPage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          12.r,
-                        ),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
                           color: theme.primaryColor.withOpacity(.5),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          12.r,
-                        ),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
                           color: theme.primaryColor.withOpacity(.5),
                         ),
@@ -310,6 +314,7 @@ class GoalDetailsPage extends StatelessWidget {
                       // Permite entrada no formato brasileiro (com vírgula)
                       String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
                       valueToAdd = double.tryParse(cleanValue) ?? 0;
+                      validateForm(); // Validate after change
                     },
                   ),
                   SizedBox(height: 16.h),
@@ -339,21 +344,24 @@ class GoalDetailsPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: isFormValid ? Colors.black : Colors.grey, // Change color based on validation
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12.h),
                       ),
-                      onPressed: () {
-                        if (goal.value == null) return;
-                        final updatedGoal = goal.value.copyWith(
-                          currentValue: goal.value.currentValue + valueToAdd,
-                        );
-                        goalController.updateGoal(updatedGoal);
-                        goal.value = updatedGoal;
-                        Navigator.pop(context);
-                      },
+                      onPressed: isFormValid
+                          ? () {
+                              // Only allow press when form is valid
+                              if (goal.value == null) return;
+                              final updatedGoal = goal.value.copyWith(
+                                currentValue: goal.value.currentValue + valueToAdd,
+                              );
+                              goalController.updateGoal(updatedGoal);
+                              goal.value = updatedGoal;
+                              Navigator.pop(context);
+                            }
+                          : null, // Disable button when not valid
                       child: Text(
                         'Salvar',
                         style: TextStyle(
@@ -376,6 +384,7 @@ class GoalDetailsPage extends StatelessWidget {
     double valueToRemove = 0;
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
+    bool isFormValid = false; // Added form validation flag
 
     final theme = Theme.of(context);
 
@@ -391,6 +400,13 @@ class GoalDetailsPage extends StatelessWidget {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter modalSetState) {
+            // Function to validate form
+            void validateForm() {
+              modalSetState(() {
+                isFormValid = valueController.text.isNotEmpty && valueToRemove > 0;
+              });
+            }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 16.w,
@@ -444,6 +460,7 @@ class GoalDetailsPage extends StatelessWidget {
                       // Permite entrada no formato brasileiro (com vírgula)
                       String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
                       valueToRemove = double.tryParse(cleanValue) ?? 0;
+                      validateForm(); // Validate after change
                     },
                   ),
                   SizedBox(height: 16.h),
@@ -473,21 +490,24 @@ class GoalDetailsPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: isFormValid ? Colors.black : Colors.grey, // Change color based on validation
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12.h),
                       ),
-                      onPressed: () {
-                        if (goal.value == null) return;
-                        final updatedGoal = goal.value.copyWith(
-                          currentValue: goal.value.currentValue - valueToRemove,
-                        );
-                        goalController.updateGoal(updatedGoal);
-                        goal.value = updatedGoal;
-                        Navigator.pop(context);
-                      },
+                      onPressed: isFormValid
+                          ? () {
+                              // Only allow press when form is valid
+                              if (goal.value == null) return;
+                              final updatedGoal = goal.value.copyWith(
+                                currentValue: goal.value.currentValue - valueToRemove,
+                              );
+                              goalController.updateGoal(updatedGoal);
+                              goal.value = updatedGoal;
+                              Navigator.pop(context);
+                            }
+                          : null, // Disable button when not valid
                       child: Text(
                         'Salvar',
                         style: TextStyle(
