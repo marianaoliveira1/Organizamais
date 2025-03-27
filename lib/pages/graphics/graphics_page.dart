@@ -449,11 +449,137 @@ class GraphicsPage extends StatelessWidget {
                 GraphicsPage2(
                   selectedMonth: selectedMonth,
                 ),
+
+                SizedBox(
+                  height: 30.h,
+                ),
+
+                IncomeExpensePieChart(
+                  income: 1500.0,
+                  expense: 750.0,
+                  incomeColor: Colors.green,
+                  expenseColor: Colors.red,
+                )
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class IncomeExpensePieChart extends StatelessWidget {
+  final double income;
+  final double expense;
+  final Color incomeColor;
+  final Color expenseColor;
+
+  const IncomeExpensePieChart({
+    super.key,
+    required this.income,
+    required this.expense,
+    this.incomeColor = Colors.green,
+    this.expenseColor = Colors.red,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final double total = income + expense;
+    final double incomePercent = total > 0 ? (income / total * 100) : 0;
+    final double expensePercent = total > 0 ? (expense / total * 100) : 0;
+
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 24.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 150.h,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 0,
+                centerSpaceRadius: 40,
+                startDegreeOffset: -90, // Começa no topo
+                sections: [
+                  PieChartSectionData(
+                    color: incomeColor,
+                    value: incomePercent,
+                    title: '${incomePercent.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    badgePositionPercentageOffset: 0.98,
+                  ),
+                  PieChartSectionData(
+                    color: expenseColor,
+                    value: expensePercent,
+                    title: '${expensePercent.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    badgePositionPercentageOffset: 0.98,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          // Legenda do gráfico
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildLegendItem(
+                color: incomeColor,
+                text: 'Receita',
+              ),
+              SizedBox(width: 16.w),
+              _buildLegendItem(
+                color: expenseColor,
+                text: 'Despesa',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem({
+    required Color color,
+    required String text,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 12.w,
+          height: 12.h,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: Colors.grey,
+          ),
+        ),
+      ],
     );
   }
 }
