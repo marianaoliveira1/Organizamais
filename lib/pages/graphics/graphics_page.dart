@@ -558,11 +558,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 130.w,
+                              width: 110.w,
                               child: Text(
                                 item['name'] as String,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -574,7 +574,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -587,7 +587,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           Text(
                             currencyFormatter.format(valor),
                             style: TextStyle(
-                              fontSize: 14.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                             ),
@@ -665,15 +665,18 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      transaction.title,
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: theme.primaryColor,
+                                    SizedBox(
+                                      width: 130.w,
+                                      child: Text(
+                                        transaction.title,
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.primaryColor,
+                                        ),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(
                                       height: 6.h,
@@ -700,15 +703,19 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       ),
                                       textAlign: TextAlign.end,
                                     ),
-                                    Text(
-                                      transaction.paymentType ?? 'N/A',
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: theme.primaryColor,
-                                        letterSpacing: -0.5,
+                                    SizedBox(
+                                      width: 120.w,
+                                      child: Text(
+                                        transaction.paymentType ?? 'N/A',
+                                        style: TextStyle(
+                                          fontSize: 10.sp,
+                                          color: DefaultColors.grey,
+                                          letterSpacing: -0.5,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.end,
                                       ),
-                                      textAlign: TextAlign.end,
                                     ),
                                   ],
                                 )
