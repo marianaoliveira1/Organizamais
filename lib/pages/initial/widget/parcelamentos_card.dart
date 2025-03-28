@@ -53,7 +53,7 @@ class ParcelamentosCard extends StatelessWidget {
             final currentYear = DateTime.now().year;
 
             // Filtra transações que são parcelamentos (título contém "Parcela")
-            final parcelamentos = _transactionController.transaction.where((t) => t.title.contains('Parcela') ?? false).where((t) {
+            final parcelamentos = _transactionController.transaction.where((t) => t.title.contains('Parcela')).where((t) {
               if (t.paymentDay == null) return false;
               final date = DateTime.parse(t.paymentDay!);
               return date.month == currentMonth && date.year == currentYear;

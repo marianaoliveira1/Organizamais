@@ -73,10 +73,6 @@ class GraphicsPage extends StatelessWidget {
     }
 
     // Obter transações para uma categoria específica
-    List<TransactionModel> getTransactionsByCategory(int categoryId) {
-      var filteredTransactions = getFilteredTransactions();
-      return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
-    }
 
     // Função para gerar dados para o gráfico Sparkline com todos os dias do mês
     Map<String, dynamic> getSparklineData() {
@@ -134,6 +130,10 @@ class GraphicsPage extends StatelessWidget {
         'values': values,
       };
     }
+
+    num totalReceita = transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+
+    num totalDespesas = transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -453,12 +453,9 @@ class GraphicsPage extends StatelessWidget {
                 SizedBox(
                   height: 30.h,
                 ),
-
-                IncomeExpensePieChart(
-                  income: 1500.0,
-                  expense: 750.0,
-                  incomeColor: Colors.green,
-                  expenseColor: Colors.red,
+                FinancePieChart(
+                  totalReceita: totalReceita,
+                  totalDespesas: totalDespesas,
                 )
               ],
             ),
@@ -469,115 +466,88 @@ class GraphicsPage extends StatelessWidget {
   }
 }
 
-class IncomeExpensePieChart extends StatelessWidget {
-  final double income;
-  final double expense;
-  final Color incomeColor;
-  final Color expenseColor;
+class FinancePieChart extends StatelessWidget {
+  final num totalReceita;
+  final num totalDespesas;
 
-  const IncomeExpensePieChart({
+  const FinancePieChart({
     super.key,
-    required this.income,
-    required this.expense,
-    this.incomeColor = Colors.green,
-    this.expenseColor = Colors.red,
+    required this.totalReceita,
+    required this.totalDespesas,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double total = income + expense;
-    final double incomePercent = total > 0 ? (income / total * 100) : 0;
-    final double expensePercent = total > 0 ? (expense / total * 100) : 0;
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: "pt_BR",
+      symbol: "R\$",
+    );
 
-    final theme = Theme.of(context);
+    num total = totalReceita + totalDespesas;
+    double receitaPercent = total == 0 ? 0 : (totalReceita / total) * 100;
+    double despesasPercent = total == 0 ? 0 : (totalDespesas / total) * 100;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 24.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 150.h,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 0,
-                centerSpaceRadius: 40,
-                startDegreeOffset: -90, // Começa no topo
-                sections: [
-                  PieChartSectionData(
-                    color: incomeColor,
-                    value: incomePercent,
-                    title: '${incomePercent.toStringAsFixed(1)}%',
-                    radius: 50,
-                    titleStyle: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    badgePositionPercentageOffset: 0.98,
+    return Column(
+      children: [
+        SizedBox(
+          height: 200,
+          child: PieChart(
+            PieChartData(
+              sections: [
+                PieChartSectionData(
+                  value: totalReceita.toDouble(),
+                  title: "${receitaPercent.toStringAsFixed(1)}%",
+                  color: DefaultColors.green,
+                  radius: 50,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  PieChartSectionData(
-                    color: expenseColor,
-                    value: expensePercent,
-                    title: '${expensePercent.toStringAsFixed(1)}%',
-                    radius: 50,
-                    titleStyle: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    badgePositionPercentageOffset: 0.98,
+                ),
+                PieChartSectionData(
+                  value: totalDespesas.toDouble(),
+                  title: "${despesasPercent.toStringAsFixed(1)}%",
+                  color: DefaultColors.red,
+                  radius: 50,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 8.h),
-          // Legenda do gráfico
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLegendItem(
-                color: incomeColor,
-                text: 'Receita',
-              ),
-              SizedBox(width: 16.w),
-              _buildLegendItem(
-                color: expenseColor,
-                text: 'Despesa',
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+        SizedBox(height: 16),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildLegend("Receita", DefaultColors.green, receitaPercent, totalReceita, formatter),
+            SizedBox(width: 24),
+            _buildLegend("Despesas", DefaultColors.red, despesasPercent, totalDespesas, formatter),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildLegendItem({
-    required Color color,
-    required String text,
-  }) {
+  Widget _buildLegend(String title, Color color, double percent, num value, NumberFormat formatter) {
     return Row(
       children: [
         Container(
-          width: 12.w,
-          height: 12.h,
+          width: 12,
+          height: 12,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
           ),
         ),
-        SizedBox(width: 4.w),
+        SizedBox(width: 8),
         Text(
-          text,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.grey,
-          ),
+          "$title: ${percent.toStringAsFixed(1)}% (${formatter.format(value)})",
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ],
     );

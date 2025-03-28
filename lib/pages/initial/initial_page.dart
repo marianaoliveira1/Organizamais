@@ -25,11 +25,11 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     final theme = Theme.of(context);
-    final TransactionController _transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController = Get.find<TransactionController>();
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
 
-    final parcelamentos = _transactionController.transaction.where((t) => t.title.contains('Parcela') ?? false).where((t) {
+    transactionController.transaction.where((t) => t.title.contains('Parcela')).where((t) {
       if (t.paymentDay == null) return false;
       final date = DateTime.parse(t.paymentDay!);
       return date.month == currentMonth && date.year == currentYear;
