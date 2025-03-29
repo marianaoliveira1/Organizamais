@@ -8,7 +8,6 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
-import 'graphics_page.dart';
 import 'widgtes/default_text_graphic.dart';
 
 class GraphicsPage2 extends StatelessWidget {

@@ -62,6 +62,10 @@ class FixedAccounts extends StatelessWidget {
     FixedAccountsController fixedAccountsController = Get.find<FixedAccountsController>();
 
     return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 10.h,
+        horizontal: 16.w,
+      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
@@ -219,7 +223,6 @@ class FixedAccounts extends StatelessWidget {
               );
             },
           ),
-          SizedBox(height: 12.h),
           fixedAccounts.isEmpty
               ? Container()
               : Padding(

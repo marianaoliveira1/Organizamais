@@ -169,13 +169,13 @@ class TransactionCard extends StatelessWidget {
   final int categoryId;
 
   const TransactionCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.date,
     required this.paymentType,
     required this.categoryId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

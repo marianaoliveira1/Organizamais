@@ -85,10 +85,7 @@ class GoalsPage extends StatelessWidget {
                     final double numericValue = double.tryParse(cleanedValue) ?? 0.0;
                     final double progress = goal.currentValue / numericValue;
                     final category = findCategoryById(goal.categoryId);
-                    final currentDate = DateTime.now();
-                    final formattedDate = "${currentDate.day}, ${_getMonthName(currentDate.month)}. ${currentDate.year}";
-
-                    // Format values in Brazilian Real standard
+                    final formattedDate = goal.date;
                     final String formattedCurrentValue = _formatCurrencyBRL(goal.currentValue);
                     final String formattedTargetValue = _formatCurrencyBRL(numericValue);
 
@@ -237,7 +234,7 @@ class GoalsPage extends StatelessWidget {
         count++;
 
         if (count % 3 == 0 && i > 0) {
-          result = '.' + result;
+          result = '.$result';
         }
       }
 

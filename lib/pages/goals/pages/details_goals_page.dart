@@ -57,10 +57,6 @@ class GoalDetailsPage extends StatelessWidget {
         child: ValueListenableBuilder<GoalModel>(
           valueListenable: goal,
           builder: (context, currentGoal, child) {
-            if (currentGoal == null) {
-              return Center(child: Text('Meta não encontrada.'));
-            }
-
             final String cleanedValue = currentGoal.value.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.');
             final double numericValue = double.tryParse(cleanedValue) ?? 0.0;
             final double progress = currentGoal.currentValue / numericValue;
@@ -230,7 +226,7 @@ class GoalDetailsPage extends StatelessWidget {
         count++;
 
         if (count % 3 == 0 && i > 0) {
-          result = '.' + result;
+          result = '.$result';
         }
       }
 
@@ -353,7 +349,6 @@ class GoalDetailsPage extends StatelessWidget {
                       onPressed: isFormValid
                           ? () {
                               // Only allow press when form is valid
-                              if (goal.value == null) return;
                               final updatedGoal = goal.value.copyWith(
                                 currentValue: goal.value.currentValue + valueToAdd,
                               );
@@ -499,7 +494,6 @@ class GoalDetailsPage extends StatelessWidget {
                       onPressed: isFormValid
                           ? () {
                               // Only allow press when form is valid
-                              if (goal.value == null) return;
                               final updatedGoal = goal.value.copyWith(
                                 currentValue: goal.value.currentValue - valueToRemove,
                               );

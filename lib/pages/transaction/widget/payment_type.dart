@@ -57,7 +57,14 @@ class PaymentTypeField extends StatelessWidget {
                           return Container(
                             height: 150,
                             alignment: Alignment.center,
-                            child: Text('Nenhum cartão adicionado'),
+                            child: Text(
+                              'Nenhum cartão adicionado',
+                              style: TextStyle(
+                                color: DefaultColors.grey20,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           );
                         }
                         return ListView.separated(

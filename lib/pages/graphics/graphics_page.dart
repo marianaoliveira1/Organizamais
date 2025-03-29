@@ -135,10 +135,48 @@ class GraphicsPage extends StatelessWidget {
       };
     }
 
-    num totalReceita = transactionController.transaction.where((t) => t.type == TransactionType.receita).fold(0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    final bool isFirstDay = DateTime.now().day == 1;
+    // Se for o primeiro dia, os valores serão zerados.
+    // Pega o mês e o ano atuais
+    final int currentMonth = DateTime.now().month;
+    final int currentYear = DateTime.now().year;
+    num totalReceita = isFirstDay
+        ? 0
+        : transactionController.transaction.where((t) {
+            // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
+            if (t.paymentDay != null) {
+              DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+              return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+            }
+            return false; // Caso paymentDay seja nulo
+          }).fold(
+            0,
+            (sum, t) =>
+                sum +
+                double.parse(
+                  t.value.replaceAll('.', '').replaceAll(',', '.'),
+                ),
+          );
 
-    num totalDespesas = transactionController.transaction.where((t) => t.type == TransactionType.despesa).fold(0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    num totalDespesas = isFirstDay
+        ? 0
+        : transactionController.transaction.where((t) {
+            // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
+            if (t.paymentDay != null) {
+              DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+              return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+            }
+            return false; // Caso paymentDay seja nulo
+          }).fold(
+            0,
+            (sum, t) =>
+                sum +
+                double.parse(
+                  t.value.replaceAll('.', '').replaceAll(',', '.'),
+                ),
+          );
 
+    num total = totalReceita - totalDespesas;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(

@@ -6,7 +6,7 @@ import 'package:organizamais/controller/auth_controller.dart';
 
 class EditNameDialog extends StatelessWidget {
   final AuthController authController;
-  const EditNameDialog({required this.authController});
+  const EditNameDialog({super.key, required this.authController});
 
   @override
   Widget build(BuildContext context) {

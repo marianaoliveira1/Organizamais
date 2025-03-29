@@ -8,6 +8,7 @@ class InfoItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const InfoItem({
+    super.key,
     // required this.icon,
     // required this.title,
     required this.value,

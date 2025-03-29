@@ -181,44 +181,50 @@ class _AddGoalPageState extends State<AddGoalPage> {
               transactionType: TransactionType.despesa,
             ),
             Spacer(),
-            InkWell(
-              onTap: _isFormValid()
-                  ? () {
-                      final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
-                      final goal = GoalModel(
-                        name: nameController.text,
-                        value: NumberFormat.currency(locale: 'pt_BR').format(
-                          value,
-                        ), // Formata para Real Brasileiro
-                        date: DateFormat('dd/MM/yyyy').format(
-                          _selectedDate, // Usando a variável _selectedDate
-                        ),
-                        categoryId: categoryId ?? 0,
-                        currentValue: 0,
-                      );
-                      goalController.addGoal(goal);
-                      Get.back();
-                    }
-                  : null, // Desabilita o botão se o formulário não for válido
-              child: Container(
-                padding: EdgeInsets.all(
-                  16.r,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: _isFormValid() ? theme.primaryColor.withOpacity(.5) : Colors.grey.withOpacity(.5),
+            Row(
+              children: [
+                Spacer(),
+                InkWell(
+                  onTap: _isFormValid()
+                      ? () {
+                          final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
+                          final goal = GoalModel(
+                            name: nameController.text,
+                            value: NumberFormat.currency(locale: 'pt_BR').format(
+                              value,
+                            ), // Formata para Real Brasileiro
+                            date: DateFormat('dd/MM/yyyy').format(
+                              _selectedDate, // Usando a variável _selectedDate
+                            ),
+                            categoryId: categoryId ?? 0,
+                            currentValue: 0,
+                          );
+                          goalController.addGoal(goal);
+                          Get.back();
+                        }
+                      : null, // Desabilita o botão se o formulário não for válido
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 32.w,
+                      vertical: 12.h,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: _isFormValid() ? theme.primaryColor.withOpacity(.5) : Colors.grey.withOpacity(.5),
+                      ),
+                    ),
+                    child: Text(
+                      "Salvar",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: _isFormValid() ? theme.primaryColor : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
-                child: Text(
-                  "Salvar",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: _isFormValid() ? theme.primaryColor : Colors.grey,
-                  ),
-                ),
-              ),
+              ],
             ),
           ],
         ),

@@ -23,32 +23,28 @@ class CreditCardSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Padding(
-        padding: EdgeInsets.all(
-          16.h,
+        padding: EdgeInsets.symmetric(
+          vertical: 10.h,
+          horizontal: 16.w,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DefaultTitleCard(
-                  text: "Meus Cartões",
-                  onTap: () {
-                    Get.to(
-                      () => AddCardPage(
-                        isEditing: false,
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(
-                  height: 8.h,
-                ),
-                MyCardsWidget(
-                  cardController: cardController,
-                ),
-              ],
+            DefaultTitleCard(
+              text: "Meus Cartões",
+              onTap: () {
+                Get.to(
+                  () => AddCardPage(
+                    isEditing: false,
+                  ),
+                );
+              },
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            MyCardsWidget(
+              cardController: cardController,
             ),
           ],
         ),

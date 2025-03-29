@@ -24,7 +24,8 @@ class MyCardsWidget extends StatelessWidget {
         color: theme.cardColor,
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: 2.h,
+        vertical: 10.h,
+        horizontal: 16.w,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,

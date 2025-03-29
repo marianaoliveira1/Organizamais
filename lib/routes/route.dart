@@ -5,7 +5,6 @@ import 'package:organizamais/pages/profile/pages/fixed_accounts_page.dart';
 import 'package:organizamais/pages/profile/profile_page.dart';
 
 import '../pages/cards/cards_page.dart';
-import '../pages/goals/pages/add_goal_page.dart';
 import '../pages/graphics/graphics_page.dart';
 import '../pages/home/home_page.dart';
 
