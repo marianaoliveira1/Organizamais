@@ -50,7 +50,7 @@ class FinancePieChart extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: totalReceita.toDouble(),
-                    title: "${receitaPercent.toStringAsFixed(1)}%",
+                    title: "",
                     color: DefaultColors.green,
                     radius: 50,
                     titleStyle: const TextStyle(
@@ -61,7 +61,7 @@ class FinancePieChart extends StatelessWidget {
                   ),
                   PieChartSectionData(
                     value: totalDespesas.toDouble(),
-                    title: "${despesasPercent.toStringAsFixed(1)}%",
+                    title: "",
                     color: DefaultColors.red,
                     radius: 50,
                     titleStyle: const TextStyle(
