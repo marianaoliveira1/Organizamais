@@ -23,9 +23,8 @@ class MyCardsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
       ),
-      padding: EdgeInsets.symmetric(
-        vertical: 10.h,
-        horizontal: 16.w,
+      padding: EdgeInsets.all(
+        1.h,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,

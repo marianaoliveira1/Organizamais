@@ -62,13 +62,12 @@ class FixedAccounts extends StatelessWidget {
     FixedAccountsController fixedAccountsController = Get.find<FixedAccountsController>();
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 10.h,
-        horizontal: 16.w,
-      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
+      ),
+      padding: EdgeInsets.all(
+        1.h,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -99,7 +98,6 @@ class FixedAccounts extends StatelessWidget {
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(24.r),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(24.r),
                       onLongPress: () {
                         showDialog(
                           context: context,
