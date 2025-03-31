@@ -53,22 +53,12 @@ class FinancePieChart extends StatelessWidget {
                     title: "",
                     color: DefaultColors.green,
                     radius: 50,
-                    titleStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
                   ),
                   PieChartSectionData(
                     value: totalDespesas.toDouble(),
                     title: "",
                     color: DefaultColors.red,
                     radius: 50,
-                    titleStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
                   ),
                 ],
               ),
