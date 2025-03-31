@@ -69,13 +69,13 @@ class LoginPage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
-            UnityBannerAd(
-              placementId: 'Banner_Android',
-              onLoad: (placementId) => print('Banner loaded: $placementId'),
-              onClick: (placementId) => print('Banner clicked: $placementId'),
-              onShown: (placementId) => print('Banner shown: $placementId'),
-              onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
-            ),
+            // UnityBannerAd(
+            //   placementId: 'Banner_Android',
+            //   onLoad: (placementId) => print('Banner loaded: $placementId'),
+            //   onClick: (placementId) => print('Banner clicked: $placementId'),
+            //   onShown: (placementId) => print('Banner shown: $placementId'),
+            //   onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
+            // ),
             ButtonLoginWithGoogle(
               text: "Entrar com Google",
               onTap: () => authController.loginWithGoogle(),

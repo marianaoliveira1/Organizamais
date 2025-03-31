@@ -102,15 +102,33 @@ class FixedAccounts extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text('Confirmar exclusão'),
-                            content: Text('Tem certeza que deseja excluir o cartão ${fixedAccount.title}?'),
+                            backgroundColor: theme.cardColor,
+                            content: Text(
+                              'Tem certeza que deseja excluir o cartão ${fixedAccount.title}?',
+                              style: TextStyle(
+                                color: theme.primaryColor,
+                                fontSize: 13.sp,
+                              ),
+                            ),
                             actions: [
                               TextButton(
-                                child: Text('Cancelar'),
+                                child: Text(
+                                  'Cancelar',
+                                  style: TextStyle(
+                                    color: theme.primaryColor,
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                               TextButton(
-                                child: Text('Excluir'),
+                                child: Text(
+                                  'Excluir',
+                                  style: TextStyle(
+                                    color: DefaultColors.grey20,
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
                                 onPressed: () {
                                   fixedAccountsController.deleteFixedAccount(fixedAccount.id!);
                                   Navigator.of(context).pop();

@@ -57,17 +57,29 @@ class MyCardsWidget extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Confirmar exclusão'),
+                        backgroundColor: theme.cardColor,
                         content: Text('Tem certeza que deseja excluir o cartão ${card.name}?'),
                         actions: [
                           TextButton(
-                            child: Text('Cancelar'),
+                            child: Text(
+                              'Cancelar',
+                              style: TextStyle(
+                                color: theme.primaryColor,
+                                fontSize: 12.sp,
+                              ),
+                            ),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                           ),
                           TextButton(
-                            child: Text('Excluir'),
+                            child: Text(
+                              'Excluir',
+                              style: TextStyle(
+                                color: DefaultColors.grey20,
+                                fontSize: 12.sp,
+                              ),
+                            ),
                             onPressed: () {
                               cardController.deleteCard(card.id!);
                               Navigator.of(context).pop();

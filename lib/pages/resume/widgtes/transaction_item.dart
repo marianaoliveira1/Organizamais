@@ -132,18 +132,31 @@ class TransactionItem extends StatelessWidget {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, dynamic transaction) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar exclusão'),
+        backgroundColor: theme.cardColor,
         content: Text('Tem certeza que deseja excluir o cartão ${transaction.title}?'),
         actions: [
           TextButton(
-            child: const Text('Cancelar'),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 12.sp,
+              ),
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Excluir'),
+            child: Text(
+              'Excluir',
+              style: TextStyle(
+                color: DefaultColors.grey20,
+                fontSize: 12.sp,
+              ),
+            ),
             onPressed: () {
               final controller = Get.find<TransactionController>();
               controller.deleteTransaction(transaction.id!);

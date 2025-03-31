@@ -38,7 +38,7 @@ class ParcelamentosCard extends StatelessWidget {
       ),
       padding: EdgeInsets.symmetric(
         vertical: 10.h,
-        horizontal: 16.w,
+        horizontal: 14.w,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,8 +50,8 @@ class ParcelamentosCard extends StatelessWidget {
           SizedBox(height: 12.h),
           Padding(
             padding: EdgeInsets.symmetric(
-              vertical: 10.h,
-              horizontal: 16.w,
+              vertical: 1.h,
+              horizontal: 1.w,
             ),
             child: Obx(() {
               final currentMonth = DateTime.now().month;
@@ -113,7 +113,9 @@ class ParcelamentosCard extends StatelessWidget {
                               ),
                               if (parcela.paymentDay != null)
                                 Text(
-                                  DateFormat('dd/MM/yyyy').format(DateTime.parse(parcela.paymentDay!)),
+                                  DateFormat('dd/MM/yyyy').format(
+                                    DateTime.parse(parcela.paymentDay!),
+                                  ),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 11.sp,

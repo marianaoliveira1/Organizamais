@@ -1385,11 +1385,32 @@ class _CategoryPageState extends State<CategoryPage> {
             padding: EdgeInsets.all(16.w),
             child: TextField(
               controller: searchController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: theme.primaryColor,
+              ),
               decoration: InputDecoration(
-                hintText: 'Pesquisar categoria...',
+                hintText: 'Pesquisar categoria',
+                hintStyle: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: theme.primaryColor.withOpacity(0.5),
+                ),
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                ),
+                prefixIconColor: DefaultColors.grey,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor,
+                  ),
                 ),
                 filled: true,
                 fillColor: theme.cardColor,
