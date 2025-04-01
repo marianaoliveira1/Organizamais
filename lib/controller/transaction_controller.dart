@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,7 @@ class TransactionController extends GetxController {
   final _transaction = <TransactionModel>[].obs;
   FixedAccountsController get fixedAccountsController => Get.find<FixedAccountsController>();
 
-  RxList<TransactionModel> get transaction {
+  List<TransactionModel> get transaction {
     var fakeTransactionsFromFixed = <TransactionModel>[];
 
     for (final e in fixedAccountsController.fixedAccounts) {
@@ -36,7 +37,50 @@ class TransactionController extends GetxController {
     return [
       ..._transaction,
       ...fakeTransactionsFromFixed
-    ].obs; // Agora é um RxList!
+    ];
+  }
+
+  get isFirstDay {
+    final today = DateTime.now();
+    return today.day == 1;
+  }
+
+  get totalReceita {
+    final today = DateTime.now();
+    final currentMonth = today.month;
+    final currentYear = today.year;
+    return isFirstDay
+        ? 0
+        : transaction.where((t) {
+            if (t.paymentDay != null) {
+              DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+              return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+            }
+            return false; // Caso paymentDay seja nulo
+          }).fold<double>(
+            0,
+            (sum, t) =>
+                sum +
+                double.parse(
+                  t.value.replaceAll('.', '').replaceAll(',', '.'),
+                ),
+          );
+  }
+
+  get totalDespesas {
+    final today = DateTime.now();
+    final currentMonth = today.month;
+    final currentYear = today.year;
+    return transaction.where((t) {
+      if (t.paymentDay != null) {
+        DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
+        return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+      }
+      return false; // Caso paymentDay seja nulo
+    }).fold<double>(
+      0,
+      (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
+    );
   }
 
   void startTransactionStream() {

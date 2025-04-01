@@ -60,51 +60,21 @@ class FinanceSummaryWidget extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            Builder(
-              builder: (context) {
-                num totalReceita = isFirstDay
-                    ? 0
-                    : transactionController.transaction.where((t) {
-                        // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
-                        if (t.paymentDay != null) {
-                          DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
-                          return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
-                        }
-                        return false; // Caso paymentDay seja nulo
-                      }).fold(
-                        0,
-                        (sum, t) =>
-                            sum +
-                            double.parse(
-                              t.value.replaceAll('.', '').replaceAll(',', '.'),
-                            ),
-                      );
-
-                num totalDespesas = isFirstDay
-                    ? 0
-                    : transactionController.transaction.where((t) {
-                        // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
-                        if (t.paymentDay != null) {
-                          DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
-                          return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
-                        }
-                        return false; // Caso paymentDay seja nulo
-                      }).fold(
-                        0,
-                        (sum, t) =>
-                            sum +
-                            double.parse(
-                              t.value.replaceAll('.', '').replaceAll(',', '.'),
-                            ),
-                      );
-
-                num total = totalReceita - totalDespesas;
-
+            Obx(() {
+              print("Lista de transações atualizada! Tamanho: ${transactionController.transaction.length}");
+              return Column(
+                children: [
+                  Text("Total de transações: ${transactionController.transaction.length}"),
+                ],
+              );
+            }),
+            Obx(
+              () {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      formatter.format(total),
+                      formatter.format(transactionController.totalReceita - transactionController.totalDespesas),
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,
@@ -116,13 +86,13 @@ class FinanceSummaryWidget extends StatelessWidget {
                       children: [
                         CategoryValue(
                           title: "Receita",
-                          value: formatter.format(totalReceita),
+                          value: formatter.format(transactionController.totalReceita),
                           color: DefaultColors.green,
                         ),
                         SizedBox(width: 24.w),
                         CategoryValue(
                           title: "Despesas",
-                          value: formatter.format(totalDespesas),
+                          value: formatter.format(transactionController.totalDespesas),
                           color: DefaultColors.red,
                         ),
                       ],
