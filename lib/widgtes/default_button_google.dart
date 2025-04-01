@@ -18,7 +18,7 @@ class ButtonLoginWithGoogle extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        height: 50.h,
+        height: 40.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: DefaultColors.white,
@@ -31,7 +31,7 @@ class ButtonLoginWithGoogle extends StatelessWidget {
           children: [
             Image.asset(
               "assets/icon/google.png",
-              height: 40.h,
+              height: 36.h,
               width: 25.w,
             ),
             SizedBox(
@@ -41,7 +41,7 @@ class ButtonLoginWithGoogle extends StatelessWidget {
               text,
               style: TextStyle(
                 color: DefaultColors.black,
-                fontSize: 15.sp,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),

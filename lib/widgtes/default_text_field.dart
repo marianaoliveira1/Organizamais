@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:organizamais/utils/color.dart';
 
 class DefaultTextField extends StatelessWidget {
@@ -18,9 +19,19 @@ class DefaultTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: hintText == "Senha" ? true : false,
+      style: TextStyle(
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w500,
+        color: DefaultColors.black,
+      ),
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         hintText: hintText,
+        hintStyle: TextStyle(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w500,
+          color: DefaultColors.grey,
+        ),
         filled: true,
         fillColor: DefaultColors.white,
         border: OutlineInputBorder(
