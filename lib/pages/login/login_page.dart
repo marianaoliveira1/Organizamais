@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../widgtes/default_button.dart';
