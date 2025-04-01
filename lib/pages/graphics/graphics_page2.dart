@@ -276,8 +276,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                     children: [
                       // Ícone/Cor do tipo de pagamento
                       Container(
-                        width: 30.w,
-                        height: 30.h,
+                        width: 20,
+                        height: 20,
                         decoration: BoxDecoration(
                           color: paymentTypeColor,
                           borderRadius: BorderRadius.circular(12.r),
@@ -303,7 +303,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               child: Text(
                                 paymentType,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -314,7 +314,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -329,7 +329,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             child: Text(
                               currencyFormatter.format(valor),
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w500,
                                 color: theme.primaryColor,
                               ),

@@ -39,7 +39,7 @@ class FinancePieChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTextGraphic(text: "Grafico porcentagem de receita e despesas"),
+          DefaultTextGraphic(text: "Gráfico porcentagem de receita e despesas"),
           SizedBox(
             height: 16.h,
           ),
