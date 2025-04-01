@@ -62,16 +62,14 @@ class FinanceSummaryWidget extends StatelessWidget {
             SizedBox(height: 8.h),
             Obx(() {
               print("Lista de transações atualizada! Tamanho: ${transactionController.transaction.length}");
-
               return Column(
                 children: [
                   Text("Total de transações: ${transactionController.transaction.length}"),
                 ],
               );
             }),
-            Obx(
-              () {
-                // Se for o primeiro dia, os valores serão zerados.
+            Builder(
+              builder: (context) {
                 num totalReceita = isFirstDay
                     ? 0
                     : transactionController.transaction.where((t) {
