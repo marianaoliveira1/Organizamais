@@ -112,7 +112,7 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: isSelected ? Theme.of(context).primaryColor : DefaultColors.grey,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                     ),
                   ),
                 ),

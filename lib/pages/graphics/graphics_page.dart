@@ -538,7 +538,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                 FinancePieChart(
                   totalReceita: totalReceita,
                   totalDespesas: totalDespesas,
-                )
+                ),
               ],
             ),
           ),

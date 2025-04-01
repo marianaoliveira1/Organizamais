@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
-import 'package:organizamais/model/transaction_model.dart';
+
 import 'package:organizamais/utils/color.dart';
 
 import '../pages/finance_details_page.dart';
@@ -21,13 +21,6 @@ class FinanceSummaryWidget extends StatelessWidget {
       symbol: "R\$",
     );
     final theme = Theme.of(context);
-
-    // Verifica se hoje é o primeiro dia do mês
-    final bool isFirstDay = DateTime.now().day == 1;
-
-    // Pega o mês e o ano atuais
-    final int currentMonth = DateTime.now().month;
-    final int currentYear = DateTime.now().year;
 
     return GestureDetector(
       onTap: () {
