@@ -8,54 +8,120 @@ import 'package:organizamais/utils/color.dart';
 
 import 'resume_content.dart';
 
-class MonthSelectorResume extends StatelessWidget {
+class MonthSelectorResume extends StatefulWidget {
   final RxString selectedMonth;
+  final int initialMonth; // Mês inicial (0-11)
+  final bool centerCurrentMonth; // Centralizar o mês atual
 
   const MonthSelectorResume({
-    super.key,
+    Key? key,
     required this.selectedMonth,
-  });
+    this.initialMonth = 0,
+    this.centerCurrentMonth = false,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40.h,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: ResumeContent.getAllMonths().length,
-        separatorBuilder: (_, __) => SizedBox(width: 8.w),
-        itemBuilder: (context, index) => _buildMonthItem(context, ResumeContent.getAllMonths()[index]),
-      ),
+  State<MonthSelectorResume> createState() => _MonthSelectorResumeState();
+}
+
+class _MonthSelectorResumeState extends State<MonthSelectorResume> {
+  late ScrollController _scrollController;
+  final List<String> _months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+
+    // Centralizar o mês atual após a construção do widget
+    if (widget.centerCurrentMonth) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToMonth(widget.initialMonth);
+      });
+    }
+  }
+
+  void _scrollToMonth(int monthIndex) {
+    // Estimar a posição do mês para centralizar
+    // Isso depende do tamanho do seu item. Ajuste o valor 80.w conforme necessário
+    final double itemWidth = 80.w;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double offset = monthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+
+    // Limitar o scroll para não ir além dos limites
+    final double maxScroll = _scrollController.position.maxScrollExtent;
+    final double scrollPosition = offset.clamp(0.0, maxScroll);
+
+    _scrollController.animateTo(
+      scrollPosition,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 
-  Widget _buildMonthItem(BuildContext context, String month) {
-    return Obx(
-      () => GestureDetector(
-        onTap: () => selectedMonth.value = selectedMonth.value == month ? '' : month,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: selectedMonth.value == month
-                  ? DefaultColors.green
-                  : DefaultColors.grey.withOpacity(
-                      0.3,
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 30.h,
+      width: double.infinity,
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: _months.length,
+        itemBuilder: (context, index) {
+          return Obx(() {
+            final bool isSelected = widget.selectedMonth.value == _months[index];
+            return GestureDetector(
+              onTap: () {
+                widget.selectedMonth.value = _months[index];
+              },
+              child: Container(
+                margin: EdgeInsets.only(right: 8.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(
+                    color: isSelected
+                        ? DefaultColors.green
+                        : DefaultColors.grey.withOpacity(
+                            0.3,
+                          ),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    _months[index],
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: isSelected ? Theme.of(context).primaryColor : DefaultColors.grey,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            month,
-            style: TextStyle(
-              color: selectedMonth.value == month ? Theme.of(context).primaryColor : DefaultColors.grey,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+                  ),
+                ),
+              ),
+            );
+          });
+        },
       ),
     );
   }
