@@ -60,14 +60,6 @@ class FinanceSummaryWidget extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            Obx(() {
-              print("Lista de transações atualizada! Tamanho: ${transactionController.transaction.length}");
-              return Column(
-                children: [
-                  Text("Total de transações: ${transactionController.transaction.length}"),
-                ],
-              );
-            }),
             Obx(
               () {
                 return Column(
