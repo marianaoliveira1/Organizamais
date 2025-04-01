@@ -12,8 +12,8 @@ class TransactionController extends GetxController {
   final _transaction = <TransactionModel>[].obs;
   FixedAccountsController get fixedAccountsController => Get.find<FixedAccountsController>();
 
-  List<TransactionModel> get transaction {
-    var fakeTransactionsFromFixed = [];
+  RxList<TransactionModel> get transaction {
+    var fakeTransactionsFromFixed = <TransactionModel>[];
 
     for (final e in fixedAccountsController.fixedAccounts) {
       final today = DateTime.now();
@@ -36,7 +36,7 @@ class TransactionController extends GetxController {
     return [
       ..._transaction,
       ...fakeTransactionsFromFixed
-    ];
+    ].obs; // Agora é um RxList!
   }
 
   void startTransactionStream() {
