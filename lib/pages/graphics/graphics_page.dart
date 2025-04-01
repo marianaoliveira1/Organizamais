@@ -17,8 +17,50 @@ import 'widgtes/default_text_graphic.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 
-class GraphicsPage extends StatelessWidget {
+class GraphicsPage extends StatefulWidget {
   const GraphicsPage({super.key});
+
+  @override
+  State<GraphicsPage> createState() => _GraphicsPageState();
+}
+
+class _GraphicsPageState extends State<GraphicsPage> {
+  late ScrollController _monthScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _monthScrollController = ScrollController();
+
+    // Centralizar o mês atual após a construção do widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentMonth();
+    });
+  }
+
+  void _scrollToCurrentMonth() {
+    // Estimar a posição do mês atual para centralizar
+    final int currentMonthIndex = DateTime.now().month - 1;
+    final double itemWidth = 100.w; // Ajuste este valor conforme a largura real do seu item
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double offset = currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+
+    // Limitar o scroll para não ir além dos limites
+    final double maxScroll = _monthScrollController.position.maxScrollExtent;
+    final double scrollPosition = offset.clamp(0.0, maxScroll);
+
+    _monthScrollController.animateTo(
+      scrollPosition,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _monthScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +117,6 @@ class GraphicsPage extends StatelessWidget {
 
       return despesas;
     }
-
-    // Obter transações para uma categoria específica
 
     // Função para gerar dados para o gráfico Sparkline com todos os dias do mês
     Map<String, dynamic> getSparklineData() {
@@ -176,7 +216,6 @@ class GraphicsPage extends StatelessWidget {
                 ),
           );
 
-    num total = totalReceita - totalDespesas;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -187,8 +226,9 @@ class GraphicsPage extends StatelessWidget {
               children: [
                 // Lista de meses
                 SizedBox(
-                  height: 40.h,
+                  height: 30.h,
                   child: ListView.separated(
+                    controller: _monthScrollController,
                     scrollDirection: Axis.horizontal,
                     itemCount: getAllMonths().length,
                     separatorBuilder: (context, index) => SizedBox(width: 8.w),
@@ -220,7 +260,7 @@ class GraphicsPage extends StatelessWidget {
                               month,
                               style: TextStyle(
                                 color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
-                                fontSize: 14.sp,
+                                fontSize: 11.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

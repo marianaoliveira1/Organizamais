@@ -6,19 +6,17 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/utils/color.dart';
 
-import 'resume_content.dart';
-
 class MonthSelectorResume extends StatefulWidget {
   final RxString selectedMonth;
   final int initialMonth; // Mês inicial (0-11)
   final bool centerCurrentMonth; // Centralizar o mês atual
 
   const MonthSelectorResume({
-    Key? key,
+    super.key,
     required this.selectedMonth,
     this.initialMonth = 0,
     this.centerCurrentMonth = false,
-  }) : super(key: key);
+  });
 
   @override
   State<MonthSelectorResume> createState() => _MonthSelectorResumeState();
@@ -80,7 +78,7 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 30.h,
       width: double.infinity,
       child: ListView.builder(

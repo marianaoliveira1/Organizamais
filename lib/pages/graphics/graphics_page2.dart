@@ -28,7 +28,6 @@ class GraphicsPage2 extends StatelessWidget {
 
     // Formatador de data
     final dateFormatter = DateFormat('dd/MM/yyyy');
-    final dayFormatter = DateFormat('dd');
 
     // Variável observável para controlar o tipo de pagamento selecionado
     final selectedPaymentType = RxnString(null);
@@ -65,69 +64,6 @@ class GraphicsPage2 extends StatelessWidget {
       }
 
       return despesas;
-    }
-
-    // Obter transações para um tipo de pagamento específico
-    List<TransactionModel> getTransactionsByPaymentType(String paymentType) {
-      var filteredTransactions = getFilteredTransactions();
-      return filteredTransactions.where((transaction) => transaction.paymentType == paymentType).toList();
-    }
-
-    // Função para gerar dados para o gráfico Sparkline com todos os dias do mês
-    Map<String, dynamic> getSparklineData() {
-      var filteredTransactions = getFilteredTransactions();
-
-      // Determinar o mês e ano selecionados
-      int selectedMonthIndex = selectedMonth.value.isEmpty ? DateTime.now().month - 1 : getAllMonths().indexOf(selectedMonth.value);
-      int selectedYear = DateTime.now().year;
-
-      // Obter o número de dias no mês selecionado
-      int daysInMonth = DateTime(selectedYear, selectedMonthIndex + 1 + 1, 0).day;
-
-      // Criar um mapa para todos os dias do mês, inicializados com zero
-      Map<String, double> dailyTotals = {};
-      for (int i = 1; i <= daysInMonth; i++) {
-        String day = i.toString().padLeft(2, '0');
-        dailyTotals[day] = 0;
-      }
-
-      // Preencher com dados reais das transações
-      for (var transaction in filteredTransactions) {
-        if (transaction.paymentDay != null) {
-          DateTime date = DateTime.parse(transaction.paymentDay!);
-          String dayKey = dayFormatter.format(date);
-          double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
-
-          if (dailyTotals.containsKey(dayKey)) {
-            dailyTotals[dayKey] = dailyTotals[dayKey]! + value;
-          }
-        }
-      }
-
-      // Ordenar as chaves (dias) numericamente
-      List<String> sortedKeys = dailyTotals.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-
-      // Criar listas para o gráfico sparkline
-      List<double> sparklineData = [];
-      List<String> labels = [];
-      List<DateTime> dates = [];
-      List<double> values = [];
-
-      for (var day in sortedKeys) {
-        sparklineData.add(dailyTotals[day]!);
-        labels.add(day);
-
-        // Criar uma data completa para cada dia
-        dates.add(DateTime(selectedYear, selectedMonthIndex + 1, int.parse(day)));
-        values.add(dailyTotals[day]!);
-      }
-
-      return {
-        'data': sparklineData,
-        'labels': labels,
-        'dates': dates,
-        'values': values,
-      };
     }
 
     return Column(
@@ -541,9 +477,6 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   }
 
   // Função para obter a primeira letra do tipo de pagamento
-  String _getPaymentTypeInitial(String paymentType) {
-    return paymentType.substring(0, 1).toUpperCase();
-  }
 
   // Reimplementação da função getTransactionsByPaymentType para uso na classe WidgetListPaymentTypeGraphics
   List<TransactionModel> getTransactionsByPaymentType(String paymentType) {
