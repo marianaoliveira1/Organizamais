@@ -17,6 +17,8 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+.flutter-plugins
+.flutter-plugins-dependencies
 
 **/doc/api/
 **/ios/Flutter/.last_build_id
