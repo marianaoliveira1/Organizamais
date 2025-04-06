@@ -267,4 +267,40 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
     }
   }
+
+  // Add this method to your existing AuthController class
+
+  void deleteAccount() async {
+    try {
+      // Get the current user
+      final user = firebaseUser.value;
+      if (user != null) {
+        // Delete the user account
+        await user.delete();
+
+        // Clear any local storage/cache if needed
+        // ...
+
+        // Navigate to login or welcome screen
+        Get.offAllNamed('/login'); // Or whatever your login route is
+
+        Get.snackbar(
+          'Conta Deletada',
+          'Sua conta foi deletada com sucesso',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error deleting account: $e');
+      Get.snackbar(
+        'Erro',
+        'Não foi possível deletar sua conta. Tente fazer login novamente e repetir a operação.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
 }
