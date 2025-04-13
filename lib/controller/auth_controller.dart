@@ -192,6 +192,7 @@ class AuthController extends GetxController {
       }
       _hideLoadingDialog();
     } on FirebaseAuthException catch (e) {
+      print(e);
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao entrar com Google",
@@ -205,6 +206,7 @@ class AuthController extends GetxController {
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
+      print(e);
     } finally {
       isLoading(false);
     }

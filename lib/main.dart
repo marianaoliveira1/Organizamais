@@ -22,6 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   UnityAds.init(
     gameId: '5819004',
+    testMode: false,
     onComplete: () => print('Initialization Complete'),
     onFailed: (error, message) {
       error.printError();
