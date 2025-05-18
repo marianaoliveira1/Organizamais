@@ -12,7 +12,7 @@ import 'widgtes/default_text_graphic.dart';
 
 class GraphicsPage2 extends StatelessWidget {
   const GraphicsPage2({super.key, required this.selectedMonth});
-  final RxString selectedMonth;
+  final String selectedMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +54,12 @@ class GraphicsPage2 extends StatelessWidget {
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
 
-      if (selectedMonth.value.isNotEmpty) {
+      if (selectedMonth.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth.value;
+          return monthName == selectedMonth;
         }).toList();
       }
 

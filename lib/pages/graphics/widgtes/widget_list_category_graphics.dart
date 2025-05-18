@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/pages/graphics/graphics_page.dart';
 
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -14,6 +15,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   const WidgetListCategoryGraphics({
     super.key,
     required this.data,
+    required this.monthName,
     required this.totalValue,
     required this.selectedCategoryId,
     required this.theme,
@@ -23,6 +25,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
   final List<Map<String, dynamic>> data;
   final double totalValue;
+  final String monthName;
   final RxnInt selectedCategoryId;
   final ThemeData theme;
   final NumberFormat currencyFormatter;
@@ -142,7 +145,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   return const SizedBox();
                 }
 
-                var categoryTransactions = getTransactionsByCategory(categoryId);
+                var categoryTransactions = getTransactionsByCategoryAndMonth(categoryId, monthName);
                 categoryTransactions.sort((a, b) {
                   if (a.paymentDay == null || b.paymentDay == null) return 0;
                   return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
@@ -279,40 +282,23 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     );
   }
 
-  // Reimplementação da função getTransactionsByCategory para uso na classe WidgetListCategoryGraphics
-  List<TransactionModel> getTransactionsByCategory(int categoryId) {
+  List<TransactionModel> getTransactionsByCategoryAndMonth(int categoryId, String monthName) {
     final TransactionController transactionController = Get.find<TransactionController>();
-    List<String> getAllMonths() {
-      final months = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
-      ];
-      return months;
-    }
-
-    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
 
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
-      if (selectedMonth.value.isNotEmpty) {
+      if (monthName.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth.value;
+          String transactionMonthName = getAllMonths()[transactionDate.month - 1];
+          return transactionMonthName == monthName;
         }).toList();
       }
+
       return despesas;
     }
 

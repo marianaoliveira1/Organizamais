@@ -17,6 +17,24 @@ import 'widgtes/default_text_graphic.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 
+List<String> getAllMonths() {
+  final months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ];
+  return months;
+}
+
 class GraphicsPage extends StatefulWidget {
   const GraphicsPage({super.key});
 
@@ -26,6 +44,7 @@ class GraphicsPage extends StatefulWidget {
 
 class _GraphicsPageState extends State<GraphicsPage> {
   late ScrollController _monthScrollController;
+  String selectedMonth = getAllMonths()[DateTime.now().month - 1];
 
   @override
   void initState() {
@@ -41,9 +60,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
   void _scrollToCurrentMonth() {
     // Estimar a posição do mês atual para centralizar
     final int currentMonthIndex = DateTime.now().month - 1;
-    final double itemWidth = 100.w; // Ajuste este valor conforme a largura real do seu item
+    final double itemWidth =
+        100.w; // Ajuste este valor conforme a largura real do seu item
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double offset = currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+    final double offset =
+        currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
 
     // Limitar o scroll para não ir além dos limites
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
@@ -65,7 +86,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TransactionController transactionController = Get.put(TransactionController());
+    final TransactionController transactionController =
+        Get.put(TransactionController());
 
     // Formatador de moeda brasileira
     final currencyFormatter = NumberFormat.currency(
@@ -82,36 +104,24 @@ class _GraphicsPageState extends State<GraphicsPage> {
     final selectedCategoryId = RxnInt(null);
 
     // Lista de meses
-    List<String> getAllMonths() {
-      final months = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
-      ];
-      return months;
-    }
 
     // Inicializa com o mês atual
-    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
 
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
-      if (selectedMonth.value.isNotEmpty) {
+      if (selectedMonth.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth.value;
+          if (monthName == selectedMonth) {
+            print(monthName);
+            print(selectedMonth);
+          }
+          return monthName == selectedMonth;
         }).toList();
       }
 
@@ -123,11 +133,14 @@ class _GraphicsPageState extends State<GraphicsPage> {
       var filteredTransactions = getFilteredTransactions();
 
       // Determinar o mês e ano selecionados
-      int selectedMonthIndex = selectedMonth.value.isEmpty ? DateTime.now().month - 1 : getAllMonths().indexOf(selectedMonth.value);
+      int selectedMonthIndex = selectedMonth.isEmpty
+          ? DateTime.now().month - 1
+          : getAllMonths().indexOf(selectedMonth);
       int selectedYear = DateTime.now().year;
 
       // Obter o número de dias no mês selecionado
-      int daysInMonth = DateTime(selectedYear, selectedMonthIndex + 1 + 1, 0).day;
+      int daysInMonth =
+          DateTime(selectedYear, selectedMonthIndex + 1 + 1, 0).day;
 
       // Criar um mapa para todos os dias do mês, inicializados com zero
       Map<String, double> dailyTotals = {};
@@ -141,7 +154,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
         if (transaction.paymentDay != null) {
           DateTime date = DateTime.parse(transaction.paymentDay!);
           String dayKey = dayFormatter.format(date);
-          double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
+          double value = double.parse(
+              transaction.value.replaceAll('.', '').replaceAll(',', '.'));
 
           if (dailyTotals.containsKey(dayKey)) {
             dailyTotals[dayKey] = dailyTotals[dayKey]! + value;
@@ -150,7 +164,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
       }
 
       // Ordenar as chaves (dias) numericamente
-      List<String> sortedKeys = dailyTotals.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+      List<String> sortedKeys = dailyTotals.keys.toList()
+        ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
 
       // Criar listas para o gráfico sparkline
       List<double> sparklineData = [];
@@ -163,7 +178,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
         labels.add(day);
 
         // Criar uma data completa para cada dia
-        dates.add(DateTime(selectedYear, selectedMonthIndex + 1, int.parse(day)));
+        dates.add(
+            DateTime(selectedYear, selectedMonthIndex + 1, int.parse(day)));
         values.add(dailyTotals[day]!);
       }
 
@@ -185,8 +201,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
         : transactionController.transaction.where((t) {
             // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
             if (t.paymentDay != null) {
-              DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
-              return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+              DateTime paymentDate = DateTime.parse(
+                  t.paymentDay!); // Converte a string para DateTime
+              return t.type == TransactionType.receita &&
+                  paymentDate.month == currentMonth &&
+                  paymentDate.year == currentYear;
             }
             return false; // Caso paymentDay seja nulo
           }).fold(
@@ -203,8 +222,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
         : transactionController.transaction.where((t) {
             // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
             if (t.paymentDay != null) {
-              DateTime paymentDate = DateTime.parse(t.paymentDay!); // Converte a string para DateTime
-              return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+              DateTime paymentDate = DateTime.parse(
+                  t.paymentDay!); // Converte a string para DateTime
+              return t.type == TransactionType.despesa &&
+                  paymentDate.month == currentMonth &&
+                  paymentDate.year == currentYear;
             }
             return false; // Caso paymentDay seja nulo
           }).fold(
@@ -235,34 +257,38 @@ class _GraphicsPageState extends State<GraphicsPage> {
                     itemBuilder: (context, index) {
                       final month = getAllMonths()[index];
 
-                      return Obx(
-                        () => GestureDetector(
-                          onTap: () {
-                            if (selectedMonth.value == month) {
-                              selectedMonth.value = '';
-                            } else {
-                              selectedMonth.value = month;
-                            }
-                            // Resetar a categoria selecionada quando mudar de mês
-                            selectedCategoryId.value = null;
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20.r),
-                              border: Border.all(
-                                color: selectedMonth.value == month ? DefaultColors.green : DefaultColors.grey.withOpacity(0.3),
-                              ),
+                      return GestureDetector(
+                        onTap: () {
+                          if (selectedMonth == month) {
+                            selectedMonth = '';
+                          } else {
+                            setState(() {
+                              selectedMonth = month;
+                            });
+                          }
+                          // Resetar a categoria selecionada quando mudar de mês
+                          selectedCategoryId.value = null;
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: selectedMonth == month
+                                  ? DefaultColors.green
+                                  : DefaultColors.grey.withOpacity(0.3),
                             ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              month,
-                              style: TextStyle(
-                                color: selectedMonth.value == month ? theme.primaryColor : DefaultColors.grey,
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            month,
+                            style: TextStyle(
+                              color: selectedMonth == month
+                                  ? theme.primaryColor
+                                  : DefaultColors.grey,
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -318,14 +344,17 @@ class _GraphicsPageState extends State<GraphicsPage> {
                               children: List.generate(
                                 5,
                                 (index) {
-                                  double maxValue = data.isNotEmpty ? data.reduce((a, b) => a > b ? a : b) : 0;
+                                  double maxValue = data.isNotEmpty
+                                      ? data.reduce((a, b) => a > b ? a : b)
+                                      : 0;
                                   double stepValue = maxValue / 4;
                                   double value = maxValue - (stepValue * index);
 
                                   return Container(
                                     height: 24.h,
                                     alignment: Alignment.centerRight,
-                                    margin: EdgeInsets.only(bottom: index == 4 ? 0 : 4.h),
+                                    margin: EdgeInsets.only(
+                                        bottom: index == 4 ? 0 : 4.h),
                                     child: Text(
                                       currencyFormatter.format(value),
                                       style: TextStyle(
@@ -352,7 +381,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                       lineWidth: 3.0,
                                       lineColor: DefaultColors.green,
                                       enableThreshold: false,
-                                      sharpCorners: false, // Desativa cantos afiados para um efeito mais suave
+                                      sharpCorners:
+                                          false, // Desativa cantos afiados para um efeito mais suave
                                       kLine: [
                                         2.0
                                       ], // Aumenta o fator de suavização
@@ -366,13 +396,20 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                         ],
                                       ),
                                       enableGridLines: true,
-                                      gridLineColor: DefaultColors.grey.withOpacity(0.2),
+                                      gridLineColor:
+                                          DefaultColors.grey.withOpacity(0.2),
                                       gridLineAmount: 4,
                                       gridLineLabelPrecision: 0,
-                                      max: data.isNotEmpty ? data.reduce((a, b) => a > b ? a : b) * 1.2 : 100,
+                                      max: data.isNotEmpty
+                                          ? data.reduce(
+                                                  (a, b) => a > b ? a : b) *
+                                              1.2
+                                          : 100,
                                       averageLine: false,
-                                      useCubicSmoothing: true, // Usa suavização cúbica
-                                      cubicSmoothingFactor: 0.2, // Fator de suavização cúbica
+                                      useCubicSmoothing:
+                                          true, // Usa suavização cúbica
+                                      cubicSmoothingFactor:
+                                          0.2, // Fator de suavização cúbica
                                     ),
                                   ),
 
@@ -403,7 +440,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                   Column(
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
                                         children: List.generate(
                                           labels.length,
                                           (index) => Text(
@@ -430,32 +468,45 @@ class _GraphicsPageState extends State<GraphicsPage> {
                 // Gráficos de categorias (modificado para adicionar ícones)
                 Obx(() {
                   var filteredTransactions = getFilteredTransactions();
-                  var categories = filteredTransactions.map((e) => e.category).where((e) => e != null).toSet().toList().cast<int>();
+                  var categories = filteredTransactions
+                      .map((e) => e.category)
+                      .where((e) => e != null)
+                      .toSet()
+                      .toList()
+                      .cast<int>();
 
                   var data = categories
                       .map(
                         (e) => {
                           "category": e,
-                          "value": filteredTransactions.where((element) => element.category == e).fold<double>(
+                          "value": filteredTransactions
+                              .where((element) => element.category == e)
+                              .fold<double>(
                             0.0,
                             (previousValue, element) {
                               // Remove os pontos e troca vírgula por ponto para corrigir o parse
-                              return previousValue + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
+                              return previousValue +
+                                  double.parse(element.value
+                                      .replaceAll('.', '')
+                                      .replaceAll(',', '.'));
                             },
                           ),
                           "name": findCategoryById(e)?['name'],
                           "color": findCategoryById(e)?['color'],
-                          "icon": findCategoryById(e)?['icon'], // Adicionado para acessar o ícone
+                          "icon": findCategoryById(
+                              e)?['icon'], // Adicionado para acessar o ícone
                         },
                       )
                       .toList();
 
                   // Ordenar os dados por valor (decrescente)
-                  data.sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
+                  data.sort((a, b) =>
+                      (b['value'] as double).compareTo(a['value'] as double));
 
                   double totalValue = data.fold(
                     0.0,
-                    (previousValue, element) => previousValue + (element['value'] as double),
+                    (previousValue, element) =>
+                        previousValue + (element['value'] as double),
                   );
 
                   // Criar as seções do gráfico sem ícones (apenas cores)
@@ -520,6 +571,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                               theme: theme,
                               currencyFormatter: currencyFormatter,
                               dateFormatter: dateFormatter,
+                              monthName: selectedMonth,
                             ),
                           ],
                         ),
