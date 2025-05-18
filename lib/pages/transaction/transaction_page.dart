@@ -302,8 +302,12 @@ class _TransactionPageState extends State<TransactionPage> {
                         horizontal: 20.h,
                       ),
                       child: Column(
+                        spacing: 10.h,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                           SizedBox(
+                          height: 2.h,
+                        ),
                           DefaultTitleTransaction(
                             title: "Forma de pagamento",
                           ),
@@ -458,7 +462,7 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
-            SizedBox(height: 10.h),
+         
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

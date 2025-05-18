@@ -70,13 +70,14 @@ class PaymentTypeField extends StatelessWidget {
                         return ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: cardController.card.length * 2,
+                          itemCount: cardController.card.length,
+
                           separatorBuilder: (context, index) => SizedBox(
                             height: 0.h,
                           ),
                           itemBuilder: (context, index) {
-                            final card = cardController.card[index ~/ 2];
-                            final isCredit = index.isEven;
+                            final card = cardController.card[index ~/ 1];
+                      
 
                             return Container(
                               decoration: BoxDecoration(
@@ -101,7 +102,7 @@ class PaymentTypeField extends StatelessWidget {
                                       height: 22.h,
                                     ),
                                     title: Text(
-                                      "${card.name} ${isCredit ? 'crédito' : 'débito'}",
+                                      card.name,
                                       style: TextStyle(
                                         fontSize: 14.sp,
                                         color: theme.primaryColor,
