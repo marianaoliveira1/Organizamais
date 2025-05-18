@@ -7,11 +7,11 @@ import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 import '../../../utils/color.dart';
 import 'finance_legend.dart';
 
-class FinancePieChart extends StatelessWidget {
+class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
   final num totalReceita;
   final num totalDespesas;
 
-  const FinancePieChart({
+  const GraficoPorcengtagemReceitaEDespesa({
     super.key,
     required this.totalReceita,
     required this.totalDespesas,
