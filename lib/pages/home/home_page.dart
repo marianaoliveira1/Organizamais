@@ -15,8 +15,6 @@ import 'package:organizamais/pages/resume/resume_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
-import '../goals/goals_page.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -51,7 +49,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildOptionButton(String text, Color color, IconData icon, VoidCallback onTap) {
+  Widget _buildOptionButton(
+      String text, Color color, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import '../../controller/fixed_accounts_controller.dart';
 import '../../controller/transaction_controller.dart';
@@ -21,11 +22,14 @@ class InitialPage extends StatelessWidget {
     Get.put(FixedAccountsController());
 
     final theme = Theme.of(context);
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
 
-    transactionController.transaction.where((t) => t.title.contains('Parcela')).where((t) {
+    transactionController.transaction
+        .where((t) => t.title.contains('Parcela'))
+        .where((t) {
       if (t.paymentDay == null) return false;
       final date = DateTime.parse(t.paymentDay!);
       return date.month == currentMonth && date.year == currentYear;
@@ -48,6 +52,17 @@ class InitialPage extends StatelessWidget {
                 child: Column(
                   spacing: 20.h,
                   children: [
+                    UnityBannerAd(
+                      placementId: 'Banner_Android',
+                      onLoad: (placementId) =>
+                          print('Banner loaded: $placementId'),
+                      onClick: (placementId) =>
+                          print('Banner clicked: $placementId'),
+                      onShown: (placementId) =>
+                          print('Banner shown: $placementId'),
+                      onFailed: (placementId, error, message) => print(
+                          'Banner Ad $placementId failed: $error $message'),
+                    ),
                     const FinanceSummaryWidget(),
                     const DefaultWidgetFixedAccounts(),
                     CreditCardSection(),
