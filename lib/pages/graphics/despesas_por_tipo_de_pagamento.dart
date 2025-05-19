@@ -10,8 +10,8 @@ import 'package:organizamais/model/transaction_model.dart';
 
 import 'widgtes/default_text_graphic.dart';
 
-class GraphicsPage2 extends StatelessWidget {
-  const GraphicsPage2({super.key, required this.selectedMonth});
+class DespesasPorTipoDePagamento extends StatelessWidget {
+  const DespesasPorTipoDePagamento({super.key, required this.selectedMonth});
   final String selectedMonth;
 
   @override
@@ -159,6 +159,7 @@ class GraphicsPage2 extends StatelessWidget {
                       theme: theme,
                       currencyFormatter: currencyFormatter,
                       dateFormatter: dateFormatter,
+                      selectedMonth: selectedMonth,
                     ),
                   ],
                 ),
@@ -227,6 +228,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     required this.theme,
     required this.currencyFormatter,
     required this.dateFormatter,
+    required this.selectedMonth,
   });
 
   final List<Map<String, dynamic>> data;
@@ -235,7 +237,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   final ThemeData theme;
   final NumberFormat currencyFormatter;
   final DateFormat dateFormatter;
-
+  final String selectedMonth;
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -354,7 +356,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                 return const SizedBox();
               }
 
-              var paymentTypeTransactions = getTransactionsByPaymentType(paymentType);
+              var paymentTypeTransactions = getTransactionsByPaymentType(paymentType, selectedMonth);
               paymentTypeTransactions.sort((a, b) {
                 if (a.paymentDay == null || b.paymentDay == null) return 0;
                 return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
@@ -479,7 +481,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   // Função para obter a primeira letra do tipo de pagamento
 
   // Reimplementação da função getTransactionsByPaymentType para uso na classe WidgetListPaymentTypeGraphics
-  List<TransactionModel> getTransactionsByPaymentType(String paymentType) {
+  List<TransactionModel> getTransactionsByPaymentType(String paymentType, String selectedMonth) {
     final TransactionController transactionController = Get.find<TransactionController>();
     List<String> getAllMonths() {
       final months = [
@@ -499,17 +501,16 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       return months;
     }
 
-    final selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
 
-      if (selectedMonth.value.isNotEmpty) {
+      if (selectedMonth.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth.value;
+          return monthName == selectedMonth;
         }).toList();
       }
       return despesas;
