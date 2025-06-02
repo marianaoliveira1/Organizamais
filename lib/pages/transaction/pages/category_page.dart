@@ -158,14 +158,6 @@ final List<Map<String, dynamic>> categories_expenses = [
     'relations': ['entretenimento', 'assinaturas'],
   },
   {
-    'id': 72,
-    'name': 'Cigarro',
-    'icon': 'assets/icon-category/cigarette.png',
-    'color': DefaultColors.clayBrown,
-    'synonyms': ['tabaco', 'fumo'],
-    'relations': ['vício', 'saúde'],
-  },
-  {
     'id': 65,
     'name': 'Coisas para Casa',
     'icon': 'assets/icon-category/coisasparacasa.png',
@@ -531,14 +523,6 @@ final List<Map<String, dynamic>> categories_expenses = [
       'lazer',
       'tecnologia'
     ],
-  },
-  {
-    'id': 73,
-    'name': 'Jogos de Azar',
-    'icon': 'assets/icon-category/casino.png',
-    'color': DefaultColors.deepCerise,
-    'synonyms': ['aposta', 'cassino'],
-    'relations': ['entretenimento', 'vício'],
   },
   {
     'id': 12,
