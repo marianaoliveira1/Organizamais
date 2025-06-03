@@ -15,7 +15,8 @@ class FinanceSummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     final NumberFormat formatter = NumberFormat.currency(
       locale: "pt_BR",
       symbol: "R\$",
@@ -24,7 +25,6 @@ class FinanceSummaryWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Navega para a página de detalhes financeiros quando o widget for clicado
         Get.to(() => const FinanceDetailsPage());
       },
       child: Container(
@@ -59,7 +59,8 @@ class FinanceSummaryWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      formatter.format(transactionController.totalReceita - transactionController.totalDespesas),
+                      formatter.format(transactionController.totalReceita -
+                          transactionController.totalDespesas),
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,
@@ -71,13 +72,15 @@ class FinanceSummaryWidget extends StatelessWidget {
                       children: [
                         CategoryValue(
                           title: "Receita",
-                          value: formatter.format(transactionController.totalReceita),
+                          value: formatter
+                              .format(transactionController.totalReceita),
                           color: DefaultColors.green,
                         ),
                         SizedBox(width: 24.w),
                         CategoryValue(
                           title: "Despesas",
-                          value: formatter.format(transactionController.totalDespesas),
+                          value: formatter
+                              .format(transactionController.totalDespesas),
                           color: DefaultColors.red,
                         ),
                       ],

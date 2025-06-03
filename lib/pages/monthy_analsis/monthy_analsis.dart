@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:organizamais/utils/color.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
@@ -12,11 +14,23 @@ class MonthlyAnalysisPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Column(
-        children: [
-          FinanceSummaryCard(),
-          SportAnalysisChart(),
-        ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 20.h,
+            ),
+            child: Column(
+              children: [
+                FinanceSummaryCard(),
+                SizedBox(
+                  height: 50.h,
+                ),
+                SportAnalysisChart(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -33,6 +47,8 @@ class SportAnalysisChart extends StatelessWidget {
     60,
     130
   ];
+
+  SportAnalysisChart({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,105 +130,72 @@ class SportAnalysisChart extends StatelessWidget {
 }
 
 class FinanceSummaryCard extends StatelessWidget {
-  final double savedAmount = -284.54;
-  final double savedChange = -0.05;
-
-  final double spentAmount = -284.54;
-  final double spentChange = 0.039;
+  const FinanceSummaryCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildCard(
-          title: 'Saved',
-          amount: savedAmount,
-          change: savedChange,
-          subtitle: 'Economies from this account',
-          changeColor: Colors.red,
-          changeIcon: Iconsax.trend_down,
+      children: const [
+        FinanceCard(
+          title: 'Receita',
+          amount: -00,
         ),
-        _buildCard(
-          title: 'Spent',
-          amount: spentAmount,
-          change: spentChange,
-          subtitle: 'Expenses in this account',
-          changeColor: Colors.green,
-          changeIcon: Iconsax.trend_up,
+        FinanceCard(
+          title: 'Despesas',
+          amount: -284.54,
         ),
       ],
     );
   }
+}
 
-  Widget _buildCard({
-    required String title,
-    required double amount,
-    required double change,
-    required String subtitle,
-    required Color changeColor,
-    required IconData changeIcon,
-  }) {
+class FinanceCard extends StatelessWidget {
+  final String title;
+  final double amount;
+
+  const FinanceCard({
+    super.key,
+    required this.title,
+    required this.amount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      width: 160,
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(
+        vertical: 20.h,
+        horizontal: 16.w,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              )),
-          SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 8.h),
           Row(
             children: [
               Text(
-                '-\$${amount.toStringAsFixed(2)}',
+                '00',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
                 ),
               ),
-              SizedBox(width: 6),
-              Row(
-                children: [
-                  Text(
-                    '${(change.abs() * 100).toStringAsFixed(2)}%',
-                    style: TextStyle(
-                      color: changeColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                  SizedBox(width: 2),
-                  Icon(
-                    changeIcon,
-                    size: 16,
-                    color: changeColor,
-                  ),
-                ],
-              ),
             ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
           ),
         ],
       ),

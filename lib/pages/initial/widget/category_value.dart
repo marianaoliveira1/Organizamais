@@ -19,18 +19,15 @@ class CategoryValue extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Barrinha colorida à esquerda
         Container(
           height: 44.h,
           width: 2.w,
           color: color,
         ),
         SizedBox(width: 8.w),
-        // Título e valor
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título da categoria
             Text(
               title,
               style: TextStyle(
