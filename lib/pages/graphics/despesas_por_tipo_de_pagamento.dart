@@ -17,7 +17,8 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TransactionController transactionController = Get.put(TransactionController());
+    final TransactionController transactionController =
+        Get.put(TransactionController());
 
     // Formatador de moeda brasileira
     final currencyFormatter = NumberFormat.currency(
@@ -52,7 +53,9 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
     }
 
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
       if (selectedMonth.isNotEmpty) {
         return despesas.where((transaction) {
@@ -71,17 +74,27 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
         SizedBox(height: 20.h),
         Obx(() {
           var filteredTransactions = getFilteredTransactions();
-          var paymentTypes = filteredTransactions.map((e) => e.paymentType).where((e) => e != null).toSet().toList().cast<String>();
+          var paymentTypes = filteredTransactions
+              .map((e) => e.paymentType)
+              .where((e) => e != null)
+              .toSet()
+              .toList()
+              .cast<String>();
 
           var data = paymentTypes
               .map(
                 (paymentType) => {
                   "paymentType": paymentType,
-                  "value": filteredTransactions.where((element) => element.paymentType == paymentType).fold<double>(
+                  "value": filteredTransactions
+                      .where((element) => element.paymentType == paymentType)
+                      .fold<double>(
                     0.0,
                     (previousValue, element) {
                       // Remove os pontos e troca vírgula por ponto para corrigir o parse
-                      return previousValue + double.parse(element.value.replaceAll('.', '').replaceAll(',', '.'));
+                      return previousValue +
+                          double.parse(element.value
+                              .replaceAll('.', '')
+                              .replaceAll(',', '.'));
                     },
                   ),
                   "color": _getPaymentTypeColor(paymentType),
@@ -90,11 +103,13 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
               .toList();
 
           // Ordenar os dados por valor (decrescente)
-          data.sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
+          data.sort(
+              (a, b) => (b['value'] as double).compareTo(a['value'] as double));
 
           double totalValue = data.fold(
             0.0,
-            (previousValue, element) => previousValue + (element['value'] as double),
+            (previousValue, element) =>
+                previousValue + (element['value'] as double),
           );
 
           // Criar as seções do gráfico
@@ -193,13 +208,17 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
   static Color _getPaymentTypeColor(String paymentType) {
     switch (paymentType.toLowerCase()) {
       case 'crédito':
-        return DefaultColors.darkBlue; // Azul escuro (não está nos custom cards)
+        return DefaultColors
+            .darkBlue; // Azul escuro (não está nos custom cards)
       case 'débito':
-        return DefaultColors.greenDark; // Verde escuro (não está nos custom cards)
+        return DefaultColors
+            .greenDark; // Verde escuro (não está nos custom cards)
       case 'dinheiro':
-        return DefaultColors.orangeDark; // Laranja escuro (não está nos custom cards)
+        return DefaultColors
+            .orangeDark; // Laranja escuro (não está nos custom cards)
       case 'pix':
-        return DefaultColors.deepPurple; // Roxo profundo (não está nos custom cards)
+        return DefaultColors
+            .deepPurple; // Roxo profundo (não está nos custom cards)
       case 'boleto':
         return DefaultColors.brown; // Marrom (não está nos custom cards)
       case 'transferência':
@@ -209,7 +228,8 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
       case 'vale':
         return DefaultColors.lime; // Lima (não está nos custom cards)
       case 'criptomoeda':
-        return DefaultColors.slateGrey; // Cinza ardósia (não está nos custom cards)
+        return DefaultColors
+            .slateGrey; // Cinza ardósia (não está nos custom cards)
       case 'cupom':
         return DefaultColors.hotPink; // Rosa forte (não está nos custom cards)
       default:
@@ -269,9 +289,12 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                   right: 5.w,
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
                   decoration: BoxDecoration(
-                    color: selectedPaymentType.value == paymentType ? paymentTypeColor.withOpacity(0.1) : Colors.transparent,
+                    color: selectedPaymentType.value == paymentType
+                        ? paymentTypeColor.withOpacity(0.1)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
@@ -339,7 +362,9 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            selectedPaymentType.value == paymentType ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            selectedPaymentType.value == paymentType
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
                             color: DefaultColors.grey,
                           ),
                         ],
@@ -356,10 +381,12 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                 return const SizedBox();
               }
 
-              var paymentTypeTransactions = getTransactionsByPaymentType(paymentType, selectedMonth);
+              var paymentTypeTransactions =
+                  getTransactionsByPaymentType(paymentType, selectedMonth);
               paymentTypeTransactions.sort((a, b) {
                 if (a.paymentDay == null || b.paymentDay == null) return 0;
-                return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
+                return DateTime.parse(b.paymentDay!)
+                    .compareTo(DateTime.parse(a.paymentDay!));
               });
 
               return Container(
@@ -393,7 +420,9 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                       itemBuilder: (context, index) {
                         var transaction = paymentTypeTransactions[index];
                         var transactionValue = double.parse(
-                          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                          transaction.value
+                              .replaceAll('.', '')
+                              .replaceAll(',', '.'),
                         );
 
                         String formattedDate = transaction.paymentDay != null
@@ -481,8 +510,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   // Função para obter a primeira letra do tipo de pagamento
 
   // Reimplementação da função getTransactionsByPaymentType para uso na classe WidgetListPaymentTypeGraphics
-  List<TransactionModel> getTransactionsByPaymentType(String paymentType, String selectedMonth) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+  List<TransactionModel> getTransactionsByPaymentType(
+      String paymentType, String selectedMonth) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     List<String> getAllMonths() {
       final months = [
         'Janeiro',
@@ -501,9 +532,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       return months;
     }
 
-
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
       if (selectedMonth.isNotEmpty) {
         return despesas.where((transaction) {
@@ -517,6 +549,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     }
 
     var filteredTransactions = getFilteredTransactions();
-    return filteredTransactions.where((transaction) => transaction.paymentType == paymentType).toList();
+    return filteredTransactions
+        .where((transaction) => transaction.paymentType == paymentType)
+        .toList();
   }
 }

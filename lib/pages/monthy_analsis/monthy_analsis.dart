@@ -1,153 +1,220 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:organizamais/controller/transaction_controller.dart';
+// ignore_for_file: must_be_immutable
 
-import '../../model/transaction_model.dart';
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:iconsax/iconsax.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
-  final TransactionController controller = Get.find<TransactionController>();
-
-  MonthlyAnalysisPage({super.key});
-
-  Map<String, List<TransactionModel>> _groupTransactionsByMonth(
-      List<TransactionModel> transactions) {
-    final Map<String, List<TransactionModel>> grouped = {};
-
-    for (final t in transactions) {
-      if (t.paymentDay != null) {
-        final date = DateTime.parse(t.paymentDay!);
-        final key = DateFormat('yyyy-MM').format(date);
-        grouped.putIfAbsent(key, () => []).add(t);
-      }
-    }
-
-    return grouped;
-  }
-
-  Map<int, String> categoryNames = {
-    1: 'Alimentação',
-    2: 'Transporte',
-    3: 'Educação',
-    4: 'Lazer',
-    5: 'Casa',
-    6: 'Saúde',
-    // adicione mais conforme seu app
-  };
+  const MonthlyAnalysisPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final transactions = controller.transaction;
-    final grouped = _groupTransactionsByMonth(transactions);
-
-    final sortedKeys = grouped.keys.toList()..sort();
-
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Análise Mensal'),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          FinanceSummaryCard(),
+          SportAnalysisChart(),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: sortedKeys.length,
-        itemBuilder: (_, index) {
-          final key = sortedKeys[index];
-          final monthTransactions = grouped[key]!;
-          final receitas =
-              monthTransactions.where((t) => t.type == TransactionType.receita);
-          final despesas =
-              monthTransactions.where((t) => t.type == TransactionType.despesa);
+    );
+  }
+}
 
-          double totalReceita = receitas.fold(
-              0,
-              (sum, t) =>
-                  sum +
-                  double.parse(
-                      t.value.replaceAll('.', '').replaceAll(',', '.')));
-          double totalDespesa = despesas.fold(
-              0,
-              (sum, t) =>
-                  sum +
-                  double.parse(
-                      t.value.replaceAll('.', '').replaceAll(',', '.')));
+class SportAnalysisChart extends StatelessWidget {
+  final List<double> monthlyExpenses = [
+    100,
+    284.54,
+    200,
+    150,
+    240,
+    80,
+    60,
+    130
+  ];
 
-          final categoriaDespesas = <int, double>{};
+  @override
+  Widget build(BuildContext context) {
+    final maxValue = monthlyExpenses.reduce((a, b) => a > b ? a : b);
+    final maxIndex = monthlyExpenses.indexOf(maxValue);
 
-          for (final t in despesas) {
-            if (t.category != null) {
-              categoriaDespesas[t.category!] =
-                  (categoriaDespesas[t.category!] ?? 0) +
-                      double.parse(
-                          t.value.replaceAll('.', '').replaceAll(',', '.'));
-            }
-          }
-
-          return Card(
-            margin: const EdgeInsets.all(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    DateFormat.yMMMM('pt_BR').format(DateTime.parse('$key-01')),
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                      'Receita: R\$ ${totalReceita.toStringAsFixed(2).replaceAll('.', ',')}'),
-                  Text(
-                      'Despesa: R\$ ${totalDespesa.toStringAsFixed(2).replaceAll('.', ',')}'),
-                  const Divider(),
-                  ...categoriaDespesas.entries.map((entry) {
-                    final catId = entry.key;
-                    final valor = entry.value;
-                    final catName = categoryNames[catId] ?? 'Categoria $catId';
-
-                    double? valorAnterior;
-                    if (index > 0) {
-                      final mesAnteriorKey = sortedKeys[index - 1];
-                      final mesAnterior = grouped[mesAnteriorKey]!;
-                      final despesasAnterior = mesAnterior.where((t) =>
-                          t.type == TransactionType.despesa &&
-                          t.category == catId);
-
-                      valorAnterior = despesasAnterior.fold(
-                          0.0,
-                          (sum, t) =>
-                              sum! +
-                              double.parse(t.value
-                                  .replaceAll('.', '')
-                                  .replaceAll(',', '.')));
-                    }
-
-                    String? dica;
-                    if (valorAnterior != null && valor > valorAnterior) {
-                      dica = 'Você gastou mais com $catName este mês. '
-                          'Considere estratégias para economizar, como planejar compras ou evitar gastos impulsivos.';
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              '$catName: R\$ ${valor.toStringAsFixed(2).replaceAll('.', ',')}'),
-                          if (dica != null)
-                            Text(
-                              dica,
-                              style: const TextStyle(
-                                  color: Colors.red, fontSize: 12),
-                            ),
-                        ],
-                      ),
+    return AspectRatio(
+      aspectRatio: 1.7,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: BarChart(
+          BarChartData(
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, _) {
+                    const months = [
+                      'Jan',
+                      'Feb',
+                      'Mar',
+                      'Apr',
+                      'May',
+                      'Jun',
+                      'Jul',
+                      'Aug'
+                    ];
+                    if (value < 0 || value >= months.length) return SizedBox();
+                    return Text(
+                      months[value.toInt()],
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12),
                     );
-                  }),
-                ],
+                  },
+                ),
               ),
             ),
-          );
-        },
+            gridData: FlGridData(show: false),
+            barGroups: List.generate(monthlyExpenses.length, (index) {
+              final isMax = index == maxIndex;
+              return BarChartGroupData(
+                x: index,
+                barRods: [
+                  BarChartRodData(
+                    toY: monthlyExpenses[index],
+                    color: isMax ? Colors.red : Colors.pink[200],
+                    borderRadius: BorderRadius.circular(8),
+                    width: 16,
+                    rodStackItems: [],
+                    backDrawRodData: BackgroundBarChartRodData(show: false),
+                  ),
+                ],
+                showingTooltipIndicators: isMax ? [0] : [],
+              );
+            }),
+            barTouchData: BarTouchData(
+              enabled: true,
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  return BarTooltipItem(
+                    '-\$${rod.toY.toStringAsFixed(2)}',
+                    TextStyle(color: Colors.white),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FinanceSummaryCard extends StatelessWidget {
+  final double savedAmount = -284.54;
+  final double savedChange = -0.05;
+
+  final double spentAmount = -284.54;
+  final double spentChange = 0.039;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildCard(
+          title: 'Saved',
+          amount: savedAmount,
+          change: savedChange,
+          subtitle: 'Economies from this account',
+          changeColor: Colors.red,
+          changeIcon: Iconsax.trend_down,
+        ),
+        _buildCard(
+          title: 'Spent',
+          amount: spentAmount,
+          change: spentChange,
+          subtitle: 'Expenses in this account',
+          changeColor: Colors.green,
+          changeIcon: Iconsax.trend_up,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCard({
+    required String title,
+    required double amount,
+    required double change,
+    required String subtitle,
+    required Color changeColor,
+    required IconData changeIcon,
+  }) {
+    return Container(
+      width: 160,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              )),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                '-\$${amount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              SizedBox(width: 6),
+              Row(
+                children: [
+                  Text(
+                    '${(change.abs() * 100).toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: changeColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(width: 2),
+                  Icon(
+                    changeIcon,
+                    size: 16,
+                    color: changeColor,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

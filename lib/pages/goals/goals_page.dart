@@ -81,16 +81,22 @@ class GoalsPage extends StatelessWidget {
                   itemCount: goalController.goal.length,
                   itemBuilder: (context, index) {
                     final GoalModel goal = goalController.goal[index];
-                    final String cleanedValue = goal.value.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.');
-                    final double numericValue = double.tryParse(cleanedValue) ?? 0.0;
+                    final String cleanedValue = goal.value
+                        .replaceAll(RegExp(r'[^\d\.]'), '')
+                        .replaceAll(',', '.');
+                    final double numericValue =
+                        double.tryParse(cleanedValue) ?? 0.0;
                     final double progress = goal.currentValue / numericValue;
                     final category = findCategoryById(goal.categoryId);
                     final formattedDate = goal.date;
-                    final String formattedCurrentValue = _formatCurrencyBRL(goal.currentValue);
-                    final String formattedTargetValue = _formatCurrencyBRL(numericValue);
+                    final String formattedCurrentValue =
+                        _formatCurrencyBRL(goal.currentValue);
+                    final String formattedTargetValue =
+                        _formatCurrencyBRL(numericValue);
 
                     return InkWell(
-                      onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
+                      onTap: () =>
+                          Get.to(() => GoalDetailsPage(initialGoal: goal)),
                       child: Container(
                         margin: EdgeInsets.only(bottom: 16.h),
                         decoration: BoxDecoration(
@@ -103,7 +109,8 @@ class GoalsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -148,7 +155,8 @@ class GoalsPage extends StatelessWidget {
                               ),
                               SizedBox(height: 16.h),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "R\$ $formattedCurrentValue",
@@ -174,7 +182,8 @@ class GoalsPage extends StatelessWidget {
                                 child: LinearProgressIndicator(
                                   value: progress,
                                   backgroundColor: Colors.grey.shade300,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.green),
                                   minHeight: 6.h,
                                 ),
                               ),
@@ -191,24 +200,6 @@ class GoalsPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getMonthName(int month) {
-    final List<String> months = [
-      'jan',
-      'fev',
-      'mar',
-      'abr',
-      'mai',
-      'jun',
-      'jul',
-      'ago',
-      'set',
-      'out',
-      'nov',
-      'dez'
-    ];
-    return months[month - 1];
   }
 
   // Helper method to format currency in Brazilian Real standard

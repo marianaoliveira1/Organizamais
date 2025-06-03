@@ -9,7 +9,7 @@ import 'package:iconsax/iconsax.dart';
 
 import 'package:organizamais/pages/graphics/graphics_page.dart';
 import 'package:organizamais/pages/initial/initial_page.dart';
-import 'package:organizamais/pages/profile/profile_page.dart';
+import 'package:organizamais/pages/monthy_analsis/monthy_analsis.dart';
 
 import 'package:organizamais/pages/resume/resume_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     GraphicsPage(),
     Container(),
     ResumePage(),
-    ProfilePage(),
+    MonthlyAnalysisPage(),
   ];
 
   void _onItemTapped(int index) async {
@@ -115,9 +115,9 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              IconsaxBold.user,
+              IconsaxBold.status_up,
             ),
-            label: "Perfil",
+            label: "Analise",
           ),
         ],
         currentIndex: _selectedIndex,
