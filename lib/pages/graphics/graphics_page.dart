@@ -194,8 +194,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
     final bool isFirstDay = DateTime.now().day == 1;
     num totalReceita = isFirstDay
         ? 0
-        : transactionController.transaction
-        .where((t) {
+        : transactionController.transaction.where((t) {
             if (t.paymentDay != null) {
               DateTime paymentDate = DateTime.parse(
                   t.paymentDay!); // Converte a string para DateTime
@@ -204,8 +203,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                   getAllMonths()[paymentDate.month - 1] == selectedMonth;
             }
             return false;
-          })
-          .fold(
+          }).fold(
             0,
             (sum, t) =>
                 sum +
@@ -545,7 +543,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             DefaultTextGraphic(
-                              text: "Despesas por Categoria",
+                              text: "Despesas por categoria",
                             ),
                             SizedBox(height: 16.h),
                             Center(

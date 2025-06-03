@@ -3,8 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'package:organizamais/utils/color.dart';
+
+import '../../controller/transaction_controller.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
@@ -22,7 +26,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
             ),
             child: Column(
               children: [
-                FinanceSummaryCard(),
+                AnnualSummaryCards(),
                 SizedBox(
                   height: 50.h,
                 ),
@@ -198,6 +202,75 @@ class FinanceCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class AnnualSummaryCards extends StatelessWidget {
+  final controller = Get.find<TransactionController>();
+  final currencyFormat = NumberFormat.simpleCurrency(locale: 'pt_BR');
+
+  AnnualSummaryCards({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final receita = controller.totalReceitaAno;
+      final despesa = controller.totalDespesasAno;
+
+      return Column(
+        children: [
+          _buildCard(
+            title: 'Receita Anual',
+            value: currencyFormat.format(receita),
+            color: Colors.green.shade100,
+            textColor: Colors.green.shade900,
+            icon: Icons.trending_up,
+          ),
+          const SizedBox(height: 16),
+          _buildCard(
+            title: 'Despesa Anual',
+            value: currencyFormat.format(despesa),
+            color: Colors.red.shade100,
+            textColor: Colors.red.shade900,
+            icon: Icons.trending_down,
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildCard({
+    required String title,
+    required String value,
+    required Color color,
+    required Color textColor,
+    required IconData icon,
+  }) {
+    return Card(
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(icon, color: textColor, size: 32),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(color: textColor, fontSize: 16)),
+                Text(value,
+                    style: TextStyle(
+                        color: textColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
