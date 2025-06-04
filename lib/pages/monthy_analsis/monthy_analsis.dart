@@ -111,18 +111,13 @@ class FinancialSummaryCards extends StatelessWidget {
     required Color backgroundColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(
+        vertical: 20.h,
+        horizontal: 16.w,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,7 +411,6 @@ class MonthlyFinancialChart extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Resumo dos totais
-            _buildMonthlySummary(monthlyData),
           ],
         ),
       );
@@ -555,72 +549,6 @@ class MonthlyFinancialChart extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMonthlySummary(Map<int, Map<String, double>> monthlyData) {
-    final currentMonth = DateTime.now().month;
-    final currentData = monthlyData[currentMonth]!;
-    final saldoMensal = currentData['receitas']! - currentData['despesas']!;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Resumo do Mês Atual (${_getMonthName(currentMonth)})',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSummaryItem(
-                  'Receitas', currentData['receitas']!, Colors.green),
-              _buildSummaryItem(
-                  'Despesas', currentData['despesas']!, Colors.red),
-              _buildSummaryItem(
-                'Saldo',
-                saldoMensal,
-                saldoMensal >= 0 ? Colors.blue : Colors.orange,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryItem(String label, double value, Color color) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          _formatCurrency(value.abs()),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: color,
           ),
         ),
       ],
