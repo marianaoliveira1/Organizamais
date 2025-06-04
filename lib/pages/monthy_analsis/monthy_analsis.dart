@@ -469,7 +469,7 @@ class MonthlyFinancialChart extends StatelessWidget {
           BarChartRodData(
             toY: data['receitas']!,
             color: Colors.green,
-            width: 10,
+            width: 6,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(4),
               topRight: Radius.circular(4),
@@ -478,14 +478,14 @@ class MonthlyFinancialChart extends StatelessWidget {
           BarChartRodData(
             toY: data['despesas']!,
             color: Colors.red,
-            width: 10,
+            width: 6,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(4),
               topRight: Radius.circular(4),
             ),
           ),
         ],
-        barsSpace: 8,
+        barsSpace: 30,
       );
     }).toList();
   }
