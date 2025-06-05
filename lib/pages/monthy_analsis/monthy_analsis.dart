@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
@@ -25,10 +26,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
             child: Column(
               children: [
                 FinancialSummaryCards(),
-                SizedBox(
-                  height: 50.h,
-                ),
-                MonthlyFinancialChart()
+                MonthlyFinancialChart(),
               ],
             ),
           ),
@@ -39,7 +37,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
 }
 
 class FinancialSummaryCards extends StatelessWidget {
-  const FinancialSummaryCards({Key? key}) : super(key: key);
+  const FinancialSummaryCards({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +55,10 @@ class FinancialSummaryCards extends StatelessWidget {
           children: [
             Text(
               'Resumo Anual ${DateTime.now().year}',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: DefaultColors.grey,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 20),
@@ -70,24 +68,20 @@ class FinancialSummaryCards extends StatelessWidget {
               children: [
                 // Card de Receitas
                 Expanded(
-                  child: _buildFinancialCard(
+                  child: FinancialCard(
                     title: 'Receitas',
                     value: totalReceita,
                     icon: Icons.trending_up,
-                    color: Colors.green,
-                    backgroundColor: Colors.green.shade50,
                   ),
                 ),
                 const SizedBox(width: 12),
 
                 // Card de Despesas
                 Expanded(
-                  child: _buildFinancialCard(
+                  child: FinancialCard(
                     title: 'Despesas',
                     value: totalDespesas,
                     icon: Icons.trending_down,
-                    color: Colors.red,
-                    backgroundColor: Colors.red.shade50,
                   ),
                 ),
               ],
@@ -96,27 +90,36 @@ class FinancialSummaryCards extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Card de Saldo
-            _buildSaldoCard(saldo),
+            SaldoCard(saldo: saldo),
           ],
         ),
       );
     });
   }
+}
 
-  Widget _buildFinancialCard({
-    required String title,
-    required double value,
-    required IconData icon,
-    required Color color,
-    required Color backgroundColor,
-  }) {
+class FinancialCard extends StatelessWidget {
+  final String title;
+  final double value;
+  final IconData icon;
+
+  const FinancialCard({
+    Key? key,
+    required this.title,
+    required this.value,
+    required this.icon,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: 20.h,
-        horizontal: 16.w,
+        vertical: 10.h,
+        horizontal: 12.w,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
@@ -127,42 +130,29 @@ class FinancialSummaryCards extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: color,
                 size: 28,
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Anual',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 8.h),
           Text(
             title,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: DefaultColors.grey20,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             _formatCurrency(value),
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: theme.primaryColor,
             ),
           ),
         ],
@@ -170,7 +160,24 @@ class FinancialSummaryCards extends StatelessWidget {
     );
   }
 
-  Widget _buildSaldoCard(double saldo) {
+  String _formatCurrency(double value) {
+    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',').replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        )}';
+  }
+}
+
+class SaldoCard extends StatelessWidget {
+  final double saldo;
+
+  const SaldoCard({
+    Key? key,
+    required this.saldo,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     final isPositive = saldo >= 0;
     final color = isPositive ? Colors.blue : Colors.orange;
     final backgroundColor =
@@ -252,7 +259,6 @@ class FinancialSummaryCards extends StatelessWidget {
   }
 }
 
-// Widget para usar na sua tela principal
 class FinancialDashboard extends StatelessWidget {
   const FinancialDashboard({Key? key}) : super(key: key);
 
@@ -309,9 +315,9 @@ class MonthlyFinancialChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildLegendItem('Receitas', Colors.green),
+                ChartLegendItem(label: 'Receitas', color: Colors.green),
                 const SizedBox(width: 20),
-                _buildLegendItem('Despesas', Colors.red),
+                ChartLegendItem(label: 'Despesas', color: Colors.red),
               ],
             ),
             const SizedBox(height: 20),
@@ -409,8 +415,6 @@ class MonthlyFinancialChart extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-
-            // Resumo dos totais
           ],
         ),
       );
@@ -532,7 +536,36 @@ class MonthlyFinancialChart extends StatelessWidget {
     return months[month - 1];
   }
 
-  Widget _buildLegendItem(String label, Color color) {
+  String _formatCurrency(double value) {
+    return 'R\$ ${value.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        )}';
+  }
+
+  String _formatCurrencyShort(double value) {
+    if (value >= 1000000) {
+      return 'R\$ ${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return 'R\$ ${(value / 1000).toStringAsFixed(0)}k';
+    } else {
+      return 'R\$ ${value.toStringAsFixed(0)}';
+    }
+  }
+}
+
+class ChartLegendItem extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const ChartLegendItem({
+    Key? key,
+    required this.label,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -554,26 +587,8 @@ class MonthlyFinancialChart extends StatelessWidget {
       ],
     );
   }
-
-  String _formatCurrency(double value) {
-    return 'R\$ ${value.toStringAsFixed(0).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]}.',
-        )}';
-  }
-
-  String _formatCurrencyShort(double value) {
-    if (value >= 1000000) {
-      return 'R\$ ${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return 'R\$ ${(value / 1000).toStringAsFixed(0)}k';
-    } else {
-      return 'R\$ ${value.toStringAsFixed(0)}';
-    }
-  }
 }
 
-// Widget completo para usar na sua tela
 class FinancialChartScreen extends StatelessWidget {
   const FinancialChartScreen({Key? key}) : super(key: key);
 
