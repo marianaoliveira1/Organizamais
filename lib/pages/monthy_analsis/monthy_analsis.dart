@@ -54,7 +54,7 @@ class FinancialSummaryCards extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Resumo Anual ${DateTime.now().year}',
+              'Resumo Anual ${DateTime.now().year} (até hoje)',
               style: TextStyle(
                 fontSize: 12.sp,
                 color: DefaultColors.grey,
@@ -279,7 +279,7 @@ class FinancialDashboard extends StatelessWidget {
 }
 
 class MonthlyFinancialChart extends StatelessWidget {
-  const MonthlyFinancialChart({Key? key}) : super(key: key);
+  const MonthlyFinancialChart({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +303,7 @@ class MonthlyFinancialChart extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Ano ${DateTime.now().year}',
+              'Ano ${DateTime.now().year} (até hoje)',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -327,7 +327,7 @@ class MonthlyFinancialChart extends StatelessWidget {
               height: 300,
               child: BarChart(
                 BarChartData(
-                  alignment: BarChartAlignment.spaceEvenly,
+                  alignment: BarChartAlignment.center,
                   maxY: _getMaxValue(monthlyData) * 1.2,
                   barTouchData: BarTouchData(
                     enabled: true,
@@ -336,7 +336,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                           Colors.blueGrey.withOpacity(0.8),
                       tooltipRoundedRadius: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final month = _getMonthName(group.x);
+                        final month = _getMonthName(group.x.toInt());
                         final value = rod.toY;
                         final type = rodIndex == 0 ? 'Receitas' : 'Despesas';
                         return BarTooltipItem(
@@ -424,6 +424,7 @@ class MonthlyFinancialChart extends StatelessWidget {
   Map<int, Map<String, double>> _calculateMonthlyData(
       List<TransactionModel> transactions) {
     final currentYear = DateTime.now().year;
+    final currentDate = DateTime.now();
     final monthlyData = <int, Map<String, double>>{};
 
     // Inicializar todos os meses com zero
@@ -435,7 +436,7 @@ class MonthlyFinancialChart extends StatelessWidget {
     for (final transaction in transactions) {
       if (transaction.paymentDay != null) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        if (paymentDate.year == currentYear) {
+        if (paymentDate.year == currentYear && paymentDate.isBefore(currentDate)) {
           final month = paymentDate.month;
           final value = double.parse(
             transaction.value.replaceAll('.', '').replaceAll(',', '.'),
@@ -467,7 +468,7 @@ class MonthlyFinancialChart extends StatelessWidget {
           BarChartRodData(
             toY: data['receitas']!,
             color: Colors.green,
-            width: 6,
+            width: 12,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(4),
               topRight: Radius.circular(4),
@@ -476,14 +477,14 @@ class MonthlyFinancialChart extends StatelessWidget {
           BarChartRodData(
             toY: data['despesas']!,
             color: Colors.red,
-            width: 6,
+            width: 12,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(4),
               topRight: Radius.circular(4),
             ),
           ),
         ],
-        barsSpace: 30,
+        barsSpace: 4,
       );
     }).toList();
   }

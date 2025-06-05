@@ -81,11 +81,14 @@ class TransactionController extends GetxController {
   }
 
   double get totalReceitaAno {
-    final currentYear = DateTime.now().year;
+    final now = DateTime.now();
+    final currentYear = now.year;
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.receita && date.year == currentYear;
+        return t.type == TransactionType.receita && 
+               date.year == currentYear && 
+               date.isBefore(now);
       }
       return false;
     }).fold(
@@ -96,11 +99,14 @@ class TransactionController extends GetxController {
   }
 
   double get totalDespesasAno {
-    final currentYear = DateTime.now().year;
+    final now = DateTime.now();
+    final currentYear = now.year;
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.despesa && date.year == currentYear;
+        return t.type == TransactionType.despesa && 
+               date.year == currentYear && 
+               date.isBefore(now);
       }
       return false;
     }).fold(
