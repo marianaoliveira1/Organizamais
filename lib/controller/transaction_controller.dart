@@ -80,6 +80,18 @@ class TransactionController extends GetxController {
     );
   }
 
+  List<TransactionModel> get transactionsAno {
+    final now = DateTime.now();
+    final currentYear = now.year;
+    return transaction.where((t) {
+      if (t.paymentDay != null) {
+        final date = DateTime.parse(t.paymentDay!);
+        return date.year == currentYear && date.isBefore(now);
+      }
+      return false;
+    }).toList();
+  }
+
   double get totalReceitaAno {
     final now = DateTime.now();
     final currentYear = now.year;
