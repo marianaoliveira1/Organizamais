@@ -12,6 +12,7 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
+import '../graphics/graphics_page.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
@@ -132,17 +133,15 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            WidgetListCategoryGraphics(
+                            WidgetCategoryAnalise(
                               data: data,
                               totalValue: totalValue,
-                              selectedCategoryId: RxnInt(null),
                               theme: theme,
                               currencyFormatter: NumberFormat.currency(
                                 locale: 'pt_BR',
                                 symbol: 'R\$',
                                 decimalDigits: 2,
                               ),
-                              dateFormatter: DateFormat('dd/MM/yyyy'),
                               monthName: '',
                             ),
                           ],
@@ -157,6 +156,370 @@ class MonthlyAnalysisPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class WidgetCategoryAnalise extends StatelessWidget {
+  const WidgetCategoryAnalise({
+    super.key,
+    required this.data,
+    required this.monthName,
+    required this.totalValue,
+    required this.theme,
+    required this.currencyFormatter,
+  });
+
+  final List<Map<String, dynamic>> data;
+  final double totalValue;
+  final String monthName;
+  final ThemeData theme;
+  final NumberFormat currencyFormatter;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        var item = data[index];
+        var categoryId = item['category'] as int;
+        var valor = item['value'] as double;
+        var percentual = (valor / totalValue * 100);
+        var categoryColor = item['color'] as Color;
+        var categoryIcon = item['icon'] as String?;
+
+        return Column(
+          children: [
+            // Item da categoria
+            GestureDetector(
+              onTap: () {
+                // Navega para a página de análise da categoria
+                Get.to(() => CategoryAnalysisPage(
+                      categoryId: categoryId,
+                      categoryName: item['name'] as String,
+                      categoryColor: categoryColor,
+                      monthName: monthName,
+                      totalValue: valor,
+                      percentual: percentual,
+                    ));
+              },
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: 10.h,
+                  left: 5.w,
+                  right: 5.w,
+                ),
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    children: [
+                      // Ícone da categoria
+                      Container(
+                        width: 30.w,
+                        height: 30.h,
+                        decoration: BoxDecoration(
+                          color: categoryColor,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            categoryIcon ?? 'assets/icons/category.png',
+                            width: 20.w,
+                            height: 20.h,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 110.w,
+                              child: Text(
+                                item['name'] as String,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.primaryColor,
+                                ),
+                                textAlign: TextAlign.start,
+                                softWrap: true,
+                                overflow: TextOverflow.clip,
+                              ),
+                            ),
+                            Text(
+                              "${percentual.toStringAsFixed(0)}%",
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            currencyFormatter.format(valor),
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class CategoryAnalysisPage extends StatelessWidget {
+  final int categoryId;
+  final String categoryName;
+  final Color categoryColor;
+  final String monthName;
+  final double totalValue;
+  final double percentual;
+
+  const CategoryAnalysisPage({
+    super.key,
+    required this.categoryId,
+    required this.categoryName,
+    required this.categoryColor,
+    required this.monthName,
+    required this.totalValue,
+    required this.percentual,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+    final NumberFormat currencyFormatter = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: 'R\$',
+    );
+    final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
+
+    List<TransactionModel> transactions =
+        _getTransactionsByCategoryAndMonth(categoryId, monthName);
+
+    // Ordena por data (mais recente primeiro)
+    transactions.sort((a, b) {
+      if (a.paymentDay == null || b.paymentDay == null) return 0;
+      return DateTime.parse(b.paymentDay!)
+          .compareTo(DateTime.parse(a.paymentDay!));
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Análise de $categoryName',
+          style: TextStyle(fontSize: 18.sp),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Resumo da categoria
+            Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: categoryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        categoryName,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Get.theme.primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        '${percentual.toStringAsFixed(1)}% do total',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: DefaultColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    currencyFormatter.format(totalValue),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Get.theme.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 24.h),
+            // Lista de transações
+            Text(
+              'Transações em $monthName',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Get.theme.primaryColor,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            if (transactions.isEmpty)
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.h),
+                  child: Text(
+                    "Nenhuma transação encontrada",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: DefaultColors.grey,
+                    ),
+                  ),
+                ),
+              ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: transactions.length,
+              separatorBuilder: (context, index) => Divider(
+                color: DefaultColors.grey20.withOpacity(.5),
+                height: 1,
+              ),
+              itemBuilder: (context, index) {
+                var transaction = transactions[index];
+                var transactionValue = double.parse(
+                  transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                );
+
+                String formattedDate = transaction.paymentDay != null
+                    ? dateFormatter.format(
+                        DateTime.parse(transaction.paymentDay!),
+                      )
+                    : "Data não informada";
+
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              transaction.title,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Get.theme.primaryColor,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              formattedDate,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            currencyFormatter.format(transactionValue),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Get.theme.primaryColor,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            transaction.paymentType ?? 'N/A',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<TransactionModel> _getTransactionsByCategoryAndMonth(
+      int categoryId, String monthName) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+
+    List<TransactionModel> getFilteredTransactions() {
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
+
+      if (monthName.isNotEmpty) {
+        return despesas.where((transaction) {
+          if (transaction.paymentDay == null) return false;
+          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+          String transactionMonthName =
+              getAllMonths()[transactionDate.month - 1];
+          return transactionMonthName == monthName;
+        }).toList();
+      }
+
+      return despesas;
+    }
+
+    var filteredTransactions = getFilteredTransactions();
+    return filteredTransactions
+        .where((transaction) => transaction.category == categoryId)
+        .toList();
   }
 }
 
