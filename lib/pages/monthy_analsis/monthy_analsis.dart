@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
+import 'package:organizamais/pages/graphics/widgtes/widget_list_category_graphics.dart';
+import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/transaction_controller.dart';
@@ -15,6 +19,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final controller = Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -27,6 +32,125 @@ class MonthlyAnalysisPage extends StatelessWidget {
               children: [
                 FinancialSummaryCards(),
                 MonthlyFinancialChart(),
+                Obx(() {
+                  var filteredTransactions = controller.transactionsAno
+                      .where((e) => e.type == TransactionType.despesa)
+                      .toList();
+                  var categories = filteredTransactions
+                      .map((e) => e.category)
+                      .where((e) => e != null)
+                      .toSet()
+                      .toList()
+                      .cast<int>();
+
+                  var data = categories
+                      .map(
+                        (e) => {
+                          "category": e,
+                          "value": filteredTransactions
+                              .where((element) => element.category == e)
+                              .fold<double>(
+                            0.0,
+                            (previousValue, element) {
+                              // Remove os pontos e troca vírgula por ponto para corrigir o parse
+                              return previousValue +
+                                  double.parse(element.value
+                                      .replaceAll('.', '')
+                                      .replaceAll(',', '.'));
+                            },
+                          ),
+                          "name": findCategoryById(e)?['name'],
+                          "color": findCategoryById(e)?['color'],
+                          "icon": findCategoryById(
+                              e)?['icon'], // Adicionado para acessar o ícone
+                        },
+                      )
+                      .toList();
+
+                  // Ordenar os dados por valor (decrescente)
+                  data.sort((a, b) =>
+                      (b['value'] as double).compareTo(a['value'] as double));
+
+                  double totalValue = data.fold(
+                    0.0,
+                    (previousValue, element) =>
+                        previousValue + (element['value'] as double),
+                  );
+
+                  // Criar as seções do gráfico sem ícones (apenas cores)
+                  var chartData = data
+                      .map(
+                        (e) => PieChartSectionData(
+                          value: e['value'] as double,
+                          color: e['color'] as Color,
+                          title: '', // Sem título
+                          radius: 50,
+                          showTitle: false,
+                          badgePositionPercentageOffset: 0.9,
+                        ),
+                      )
+                      .toList();
+
+                  if (data.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Nenhuma despesa registrada para exibir o gráfico.",
+                        style: TextStyle(
+                          color: DefaultColors.grey,
+                          fontSize: 12.sp,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DefaultTextGraphic(
+                              text: "Por categoria",
+                            ),
+                            SizedBox(height: 16.h),
+                            Center(
+                              child: SizedBox(
+                                height: 180.h,
+                                child: PieChart(
+                                  PieChartData(
+                                    sectionsSpace: 0,
+                                    centerSpaceRadius: 26,
+                                    centerSpaceColor: theme.cardColor,
+                                    sections: chartData,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            WidgetListCategoryGraphics(
+                              data: data,
+                              totalValue: totalValue,
+                              selectedCategoryId: RxnInt(null),
+                              theme: theme,
+                              currencyFormatter: NumberFormat.currency(
+                                locale: 'pt_BR',
+                                symbol: 'R\$',
+                                decimalDigits: 2,
+                              ),
+                              dateFormatter: DateFormat('dd/MM/yyyy'),
+                              monthName: '',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                })
               ],
             ),
           ),
@@ -49,7 +173,7 @@ class FinancialSummaryCards extends StatelessWidget {
       final saldo = totalReceita - totalDespesas;
 
       return Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(top: 32, bottom: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -120,7 +244,7 @@ class FinancialCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,6 +407,7 @@ class MonthlyFinancialChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final TransactionController controller = Get.find<TransactionController>();
 
     return Obx(() {
@@ -290,6 +415,11 @@ class MonthlyFinancialChart extends StatelessWidget {
 
       return Container(
         padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 32),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -436,7 +566,8 @@ class MonthlyFinancialChart extends StatelessWidget {
     for (final transaction in transactions) {
       if (transaction.paymentDay != null) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        if (paymentDate.year == currentYear && paymentDate.isBefore(currentDate)) {
+        if (paymentDate.year == currentYear &&
+            paymentDate.isBefore(currentDate)) {
           final month = paymentDate.month;
           final value = double.parse(
             transaction.value.replaceAll('.', '').replaceAll(',', '.'),
