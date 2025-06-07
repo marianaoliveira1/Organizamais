@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 
-import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
@@ -50,7 +47,9 @@ class FinancialSummaryCards extends StatelessWidget {
                     icon: Icons.trending_up,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(
+                  width: 12.h,
+                ),
 
                 // Card de Despesas
                 Expanded(
@@ -63,9 +62,10 @@ class FinancialSummaryCards extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(
+              height: 16.h,
+            ),
 
-            // Card de Saldo
             SaldoCard(saldo: saldo),
           ],
         ),

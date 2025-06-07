@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 
-import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
@@ -48,12 +46,16 @@ class CategoryAnalysisPage extends StatelessWidget {
           .compareTo(DateTime.parse(a.paymentDay!));
     });
 
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Análise de $categoryName',
+          categoryName,
           style: TextStyle(fontSize: 18.sp),
         ),
+        backgroundColor: theme.scaffoldBackgroundColor,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -64,7 +66,7 @@ class CategoryAnalysisPage extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: categoryColor.withOpacity(0.1),
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Row(
@@ -107,12 +109,12 @@ class CategoryAnalysisPage extends StatelessWidget {
             Text(
               'Transações em $monthName',
               style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-                color: Get.theme.primaryColor,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.grey20,
               ),
             ),
-            SizedBox(height: 16.h),
+
             if (transactions.isEmpty)
               Center(
                 child: Padding(
@@ -131,6 +133,7 @@ class CategoryAnalysisPage extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: transactions.length,
               separatorBuilder: (context, index) => Divider(
+                // ignore: deprecated_member_use
                 color: DefaultColors.grey20.withOpacity(.5),
                 height: 1,
               ),
@@ -155,15 +158,18 @@ class CategoryAnalysisPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              transaction.title,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Get.theme.primaryColor,
+                            SizedBox(
+                              width: 180.w,
+                              child: Text(
+                                transaction.title,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: Get.theme.primaryColor,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 4.h),
                             Text(
