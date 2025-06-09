@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
+import '../../ads_banner/ads_banner.dart';
 import '../../controller/fixed_accounts_controller.dart';
 import '../../controller/transaction_controller.dart';
 
@@ -52,17 +52,7 @@ class InitialPage extends StatelessWidget {
                 child: Column(
                   spacing: 20.h,
                   children: [
-                    UnityBannerAd(
-                      placementId: 'Banner_Android',
-                      onLoad: (placementId) =>
-                          print('Banner loaded: $placementId'),
-                      onClick: (placementId) =>
-                          print('Banner clicked: $placementId'),
-                      onShown: (placementId) =>
-                          print('Banner shown: $placementId'),
-                      onFailed: (placementId, error, message) => print(
-                          'Banner Ad $placementId failed: $error $message'),
-                    ),
+                    AdsBanner(),
                     const FinanceSummaryWidget(),
                     const DefaultWidgetFixedAccounts(),
                     CreditCardSection(),

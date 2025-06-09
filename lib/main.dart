@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:organizamais/utils/color.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import 'controller/auth_controller.dart';
 import 'controller/card_controller.dart';
@@ -20,19 +20,10 @@ import 'routes/route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  UnityAds.init(
-    gameId: '5819004',
-    testMode: false,
-    onComplete: () => print('Initialization Complete'),
-    onFailed: (error, message) {
-      error.printError();
-      message.printError();
-      error.printInfo();
-      message.printInfo();
-      print('Initialization Failed: $error. $message');
-    },
-  );
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await MobileAds.instance.initialize();
 
   initializeDateFormatting('pt_BR', null);
 

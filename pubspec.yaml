@@ -51,6 +51,7 @@ dependencies:
   ficonsax: ^0.0.3
   chart_sparkline: ^1.1.1
   unity_ads_plugin: ^0.3.23
+  google_mobile_ads: ^6.0.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
