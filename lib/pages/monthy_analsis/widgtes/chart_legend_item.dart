@@ -5,10 +5,10 @@ class ChartLegendItem extends StatelessWidget {
   final Color color;
 
   const ChartLegendItem({
-    Key? key,
+    super.key,
     required this.label,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

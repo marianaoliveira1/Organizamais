@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'financial_summary_cards.dart';
 
 class FinancialDashboard extends StatelessWidget {
-  const FinancialDashboard({Key? key}) : super(key: key);
+  const FinancialDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {

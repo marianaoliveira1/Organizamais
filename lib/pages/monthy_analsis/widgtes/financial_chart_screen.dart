@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'monthly_financial_chart.dart';
 
 class FinancialChartScreen extends StatelessWidget {
-  const FinancialChartScreen({Key? key}) : super(key: key);
+  const FinancialChartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

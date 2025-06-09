@@ -7,9 +7,9 @@ class SaldoCard extends StatelessWidget {
   final double saldo;
 
   const SaldoCard({
-    Key? key,
+    super.key,
     required this.saldo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
