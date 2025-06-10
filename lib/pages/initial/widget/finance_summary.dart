@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:organizamais/ads_banner/ads_banner.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 

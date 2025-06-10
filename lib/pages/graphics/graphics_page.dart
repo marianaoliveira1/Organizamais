@@ -13,6 +13,7 @@ import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
+import '../../ads_banner/ads_banner.dart';
 import 'widgtes/default_text_graphic.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
@@ -236,194 +237,136 @@ class _GraphicsPageState extends State<GraphicsPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              children: [
-                // Lista de meses
-                SizedBox(
-                  height: 30.h,
-                  child: ListView.separated(
-                    controller: _monthScrollController,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: getAllMonths().length,
-                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                    itemBuilder: (context, index) {
-                      final month = getAllMonths()[index];
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 20.h,
+          ),
+          child: Column(
+            children: [
+              AdsBanner(),
+              SizedBox(
+                height: 20.h,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Lista de meses
+                      SizedBox(
+                        height: 30.h,
+                        child: ListView.separated(
+                          controller: _monthScrollController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: getAllMonths().length,
+                          separatorBuilder: (context, index) =>
+                              SizedBox(width: 8.w),
+                          itemBuilder: (context, index) {
+                            final month = getAllMonths()[index];
 
-                      return GestureDetector(
-                        onTap: () {
-                          if (selectedMonth == month) {
-                            selectedMonth = '';
-                          } else {
-                            setState(() {
-                              selectedMonth = month;
-                            });
-                          }
-                          // Resetar a categoria selecionada quando mudar de mês
-                          selectedCategoryId.value = null;
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color: selectedMonth == month
-                                  ? DefaultColors.green
-                                  : DefaultColors.grey.withOpacity(0.3),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            month,
-                            style: TextStyle(
-                              color: selectedMonth == month
-                                  ? theme.primaryColor
-                                  : DefaultColors.grey,
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                SizedBox(height: 20.h),
-
-                // Gráfico de linha Sparkline com smoothing
-                Obx(() {
-                  var sparklineData = getSparklineData();
-                  List<double> data = sparklineData['data'];
-                  List<String> labels = sparklineData['labels'];
-
-                  if (data.isEmpty) {
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 20.h),
-                      child: Center(
-                        child: Text(
-                          "",
-                          style: TextStyle(
-                            color: DefaultColors.grey,
-                            fontSize: 14.sp,
-                          ),
-                          textAlign: TextAlign.center,
+                            return GestureDetector(
+                              onTap: () {
+                                if (selectedMonth == month) {
+                                  selectedMonth = '';
+                                } else {
+                                  setState(() {
+                                    selectedMonth = month;
+                                  });
+                                }
+                                // Resetar a categoria selecionada quando mudar de mês
+                                selectedCategoryId.value = null;
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  border: Border.all(
+                                    color: selectedMonth == month
+                                        ? DefaultColors.green
+                                        : DefaultColors.grey.withOpacity(0.3),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  month,
+                                  style: TextStyle(
+                                    color: selectedMonth == month
+                                        ? theme.primaryColor
+                                        : DefaultColors.grey,
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  }
 
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 24.h),
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DefaultTextGraphic(
-                          text: "Despesas diárias",
-                        ),
-                        SizedBox(height: 16.h),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Coluna com os valores (vertical)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: List.generate(
-                                5,
-                                (index) {
-                                  double maxValue = data.isNotEmpty
-                                      ? data.reduce((a, b) => a > b ? a : b)
-                                      : 0;
-                                  double stepValue = maxValue / 4;
-                                  double value = maxValue - (stepValue * index);
+                      SizedBox(height: 20.h),
 
-                                  return Container(
-                                    height: 24.h,
-                                    alignment: Alignment.centerRight,
-                                    margin: EdgeInsets.only(
-                                        bottom: index == 4 ? 0 : 4.h),
-                                    child: Text(
-                                      currencyFormatter.format(value),
-                                      style: TextStyle(
-                                        fontSize: 8.sp,
-                                        color: DefaultColors.grey,
-                                      ),
-                                    ),
-                                  );
-                                },
+                      // Gráfico de linha Sparkline com smoothing
+                      Obx(() {
+                        var sparklineData = getSparklineData();
+                        List<double> data = sparklineData['data'];
+                        List<String> labels = sparklineData['labels'];
+
+                        if (data.isEmpty) {
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 20.h),
+                            child: Center(
+                              child: Text(
+                                "",
+                                style: TextStyle(
+                                  color: DefaultColors.grey,
+                                  fontSize: 14.sp,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
+                          );
+                        }
 
-                            SizedBox(width: 8.w),
-
-                            // Área principal do gráfico
-                            Expanded(
-                              child: Column(
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 24.h),
+                          padding: EdgeInsets.all(16.w),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DefaultTextGraphic(
+                                text: "Despesas diárias",
+                              ),
+                              SizedBox(height: 16.h),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Gráfico Sparkline com smoothing habilitado
-                                  SizedBox(
-                                    height: 120.h,
-                                    child: Sparkline(
-                                      data: data,
-                                      lineWidth: 3.0,
-                                      lineColor: DefaultColors.green,
-                                      enableThreshold: false,
-                                      sharpCorners:
-                                          false, // Desativa cantos afiados para um efeito mais suave
-                                      kLine: [
-                                        2.0
-                                      ], // Aumenta o fator de suavização
-                                      fillMode: FillMode.below,
-                                      fillGradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          DefaultColors.green.withOpacity(0.3),
-                                          DefaultColors.green.withOpacity(0.1),
-                                        ],
-                                      ),
-                                      enableGridLines: true,
-                                      gridLineColor:
-                                          DefaultColors.grey.withOpacity(0.2),
-                                      gridLineAmount: 4,
-                                      gridLineLabelPrecision: 0,
-                                      max: data.isNotEmpty
-                                          ? data.reduce(
-                                                  (a, b) => a > b ? a : b) *
-                                              1.2
-                                          : 100,
-                                      averageLine: false,
-                                      useCubicSmoothing:
-                                          true, // Usa suavização cúbica
-                                      cubicSmoothingFactor:
-                                          0.2, // Fator de suavização cúbica
-                                    ),
-                                  ),
+                                  // Coluna com os valores (vertical)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: List.generate(
+                                      5,
+                                      (index) {
+                                        double maxValue = data.isNotEmpty
+                                            ? data
+                                                .reduce((a, b) => a > b ? a : b)
+                                            : 0;
+                                        double stepValue = maxValue / 4;
+                                        double value =
+                                            maxValue - (stepValue * index);
 
-                                  SizedBox(height: 8.h),
-
-                                  // Mostra todos os dias do mês de 1 até o último dia
-                                  SizedBox(
-                                    height: 1.h,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: labels.length,
-                                      itemBuilder: (context, index) {
                                         return Container(
-                                          width: 30.w,
-                                          alignment: Alignment.center,
+                                          height: 24.h,
+                                          alignment: Alignment.centerRight,
+                                          margin: EdgeInsets.only(
+                                              bottom: index == 4 ? 0 : 4.h),
                                           child: Text(
-                                            labels[index],
+                                            currencyFormatter.format(value),
                                             style: TextStyle(
-                                              fontSize: 0.sp,
+                                              fontSize: 8.sp,
                                               color: DefaultColors.grey,
                                             ),
                                           ),
@@ -432,162 +375,240 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                     ),
                                   ),
 
-                                  Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: List.generate(
-                                          labels.length,
-                                          (index) => Text(
-                                            labels[index],
-                                            style: TextStyle(
-                                              fontSize: 5.sp,
-                                              color: DefaultColors.grey,
+                                  SizedBox(width: 8.w),
+
+                                  // Área principal do gráfico
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        // Gráfico Sparkline com smoothing habilitado
+                                        SizedBox(
+                                          height: 120.h,
+                                          child: Sparkline(
+                                            data: data,
+                                            lineWidth: 3.0,
+                                            lineColor: DefaultColors.green,
+                                            enableThreshold: false,
+                                            sharpCorners:
+                                                false, // Desativa cantos afiados para um efeito mais suave
+                                            kLine: [
+                                              2.0
+                                            ], // Aumenta o fator de suavização
+                                            fillMode: FillMode.below,
+                                            fillGradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                DefaultColors.green
+                                                    .withOpacity(0.3),
+                                                DefaultColors.green
+                                                    .withOpacity(0.1),
+                                              ],
                                             ),
+                                            enableGridLines: true,
+                                            gridLineColor: DefaultColors.grey
+                                                .withOpacity(0.2),
+                                            gridLineAmount: 4,
+                                            gridLineLabelPrecision: 0,
+                                            max: data.isNotEmpty
+                                                ? data.reduce((a, b) =>
+                                                        a > b ? a : b) *
+                                                    1.2
+                                                : 100,
+                                            averageLine: false,
+                                            useCubicSmoothing:
+                                                true, // Usa suavização cúbica
+                                            cubicSmoothingFactor:
+                                                0.2, // Fator de suavização cúbica
                                           ),
                                         ),
+
+                                        SizedBox(height: 8.h),
+
+                                        // Mostra todos os dias do mês de 1 até o último dia
+                                        SizedBox(
+                                          height: 1.h,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: labels.length,
+                                            itemBuilder: (context, index) {
+                                              return Container(
+                                                width: 30.w,
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  labels[index],
+                                                  style: TextStyle(
+                                                    fontSize: 0.sp,
+                                                    color: DefaultColors.grey,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+
+                                        Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: List.generate(
+                                                labels.length,
+                                                (index) => Text(
+                                                  labels[index],
+                                                  style: TextStyle(
+                                                    fontSize: 5.sp,
+                                                    color: DefaultColors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+
+                      // Gráficos de categorias (modificado para adicionar ícones)
+                      Obx(() {
+                        var filteredTransactions = getFilteredTransactions();
+                        var categories = filteredTransactions
+                            .map((e) => e.category)
+                            .where((e) => e != null)
+                            .toSet()
+                            .toList()
+                            .cast<int>();
+
+                        var data = categories
+                            .map(
+                              (e) => {
+                                "category": e,
+                                "value": filteredTransactions
+                                    .where((element) => element.category == e)
+                                    .fold<double>(
+                                  0.0,
+                                  (previousValue, element) {
+                                    // Remove os pontos e troca vírgula por ponto para corrigir o parse
+                                    return previousValue +
+                                        double.parse(element.value
+                                            .replaceAll('.', '')
+                                            .replaceAll(',', '.'));
+                                  },
+                                ),
+                                "name": findCategoryById(e)?['name'],
+                                "color": findCategoryById(e)?['color'],
+                                "icon": findCategoryById(e)?[
+                                    'icon'], // Adicionado para acessar o ícone
+                              },
+                            )
+                            .toList();
+
+                        // Ordenar os dados por valor (decrescente)
+                        data.sort((a, b) => (b['value'] as double)
+                            .compareTo(a['value'] as double));
+
+                        double totalValue = data.fold(
+                          0.0,
+                          (previousValue, element) =>
+                              previousValue + (element['value'] as double),
+                        );
+
+                        // Criar as seções do gráfico sem ícones (apenas cores)
+                        var chartData = data
+                            .map(
+                              (e) => PieChartSectionData(
+                                value: e['value'] as double,
+                                color: e['color'] as Color,
+                                title: '', // Sem título
+                                radius: 50,
+                                showTitle: false,
+                                badgePositionPercentageOffset: 0.9,
+                              ),
+                            )
+                            .toList();
+
+                        if (data.isEmpty) {
+                          return Center(
+                            child: Text(
+                              "Nenhuma despesa registrada para exibir o gráfico.",
+                              style: TextStyle(
+                                color: DefaultColors.grey,
+                                fontSize: 12.sp,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(16.w),
+                              decoration: BoxDecoration(
+                                color: theme.cardColor,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DefaultTextGraphic(
+                                    text: "Despesas por categoria",
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Center(
+                                    child: SizedBox(
+                                      height: 180.h,
+                                      child: PieChart(
+                                        PieChartData(
+                                          sectionsSpace: 0,
+                                          centerSpaceRadius: 26,
+                                          centerSpaceColor: theme.cardColor,
+                                          sections: chartData,
+                                        ),
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                  WidgetListCategoryGraphics(
+                                    data: data,
+                                    totalValue: totalValue,
+                                    selectedCategoryId: selectedCategoryId,
+                                    theme: theme,
+                                    currencyFormatter: currencyFormatter,
+                                    dateFormatter: dateFormatter,
+                                    monthName: selectedMonth,
                                   ),
                                 ],
                               ),
                             ),
                           ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                        );
+                      }),
 
-                // Gráficos de categorias (modificado para adicionar ícones)
-                Obx(() {
-                  var filteredTransactions = getFilteredTransactions();
-                  var categories = filteredTransactions
-                      .map((e) => e.category)
-                      .where((e) => e != null)
-                      .toSet()
-                      .toList()
-                      .cast<int>();
-
-                  var data = categories
-                      .map(
-                        (e) => {
-                          "category": e,
-                          "value": filteredTransactions
-                              .where((element) => element.category == e)
-                              .fold<double>(
-                            0.0,
-                            (previousValue, element) {
-                              // Remove os pontos e troca vírgula por ponto para corrigir o parse
-                              return previousValue +
-                                  double.parse(element.value
-                                      .replaceAll('.', '')
-                                      .replaceAll(',', '.'));
-                            },
-                          ),
-                          "name": findCategoryById(e)?['name'],
-                          "color": findCategoryById(e)?['color'],
-                          "icon": findCategoryById(
-                              e)?['icon'], // Adicionado para acessar o ícone
-                        },
-                      )
-                      .toList();
-
-                  // Ordenar os dados por valor (decrescente)
-                  data.sort((a, b) =>
-                      (b['value'] as double).compareTo(a['value'] as double));
-
-                  double totalValue = data.fold(
-                    0.0,
-                    (previousValue, element) =>
-                        previousValue + (element['value'] as double),
-                  );
-
-                  // Criar as seções do gráfico sem ícones (apenas cores)
-                  var chartData = data
-                      .map(
-                        (e) => PieChartSectionData(
-                          value: e['value'] as double,
-                          color: e['color'] as Color,
-                          title: '', // Sem título
-                          radius: 50,
-                          showTitle: false,
-                          badgePositionPercentageOffset: 0.9,
-                        ),
-                      )
-                      .toList();
-
-                  if (data.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "Nenhuma despesa registrada para exibir o gráfico.",
-                        style: TextStyle(
-                          color: DefaultColors.grey,
-                          fontSize: 12.sp,
-                        ),
-                        textAlign: TextAlign.center,
+                      DespesasPorTipoDePagamento(
+                        selectedMonth: selectedMonth,
                       ),
-                    );
-                  }
 
-                  return Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(16.w),
-                        decoration: BoxDecoration(
-                          color: theme.cardColor,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            DefaultTextGraphic(
-                              text: "Despesas por categoria",
-                            ),
-                            SizedBox(height: 16.h),
-                            Center(
-                              child: SizedBox(
-                                height: 180.h,
-                                child: PieChart(
-                                  PieChartData(
-                                    sectionsSpace: 0,
-                                    centerSpaceRadius: 26,
-                                    centerSpaceColor: theme.cardColor,
-                                    sections: chartData,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            WidgetListCategoryGraphics(
-                              data: data,
-                              totalValue: totalValue,
-                              selectedCategoryId: selectedCategoryId,
-                              theme: theme,
-                              currencyFormatter: currencyFormatter,
-                              dateFormatter: dateFormatter,
-                              monthName: selectedMonth,
-                            ),
-                          ],
-                        ),
+                      SizedBox(
+                        height: 30.h,
+                      ),
+                      GraficoPorcengtagemReceitaEDespesa(
+                        totalReceita: totalReceita,
+                        totalDespesas: totalDespesas,
+                      ),
+                      SizedBox(
+                        height: 20.h,
                       ),
                     ],
-                  );
-                }),
-
-                DespesasPorTipoDePagamento(
-                  selectedMonth: selectedMonth,
+                  ),
                 ),
-
-                SizedBox(
-                  height: 30.h,
-                ),
-                GraficoPorcengtagemReceitaEDespesa(
-                  totalReceita: totalReceita,
-                  totalDespesas: totalDespesas,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
