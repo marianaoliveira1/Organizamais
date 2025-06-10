@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
 import '../../graphics/graphics_page.dart';
@@ -57,160 +58,172 @@ class CategoryAnalysisPage extends StatelessWidget {
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Resumo da categoria
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Column(
+        children: [
+          AdsBanner(),
+          SizedBox(
+            height: 20.h,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        categoryName,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Get.theme.primaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        '${percentual.toStringAsFixed(1)}% do total',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: DefaultColors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    currencyFormatter.format(totalValue),
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Get.theme.primaryColor,
+                  // Resumo da categoria
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24.h),
-            // Lista de transações
-            Text(
-              'Transações em $monthName',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-                color: DefaultColors.grey20,
-              ),
-            ),
-
-            if (transactions.isEmpty)
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40.h),
-                  child: Text(
-                    "Nenhuma transação encontrada",
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: DefaultColors.grey,
-                    ),
-                  ),
-                ),
-              ),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: transactions.length,
-              separatorBuilder: (context, index) => Divider(
-                // ignore: deprecated_member_use
-                color: DefaultColors.grey20.withOpacity(.5),
-                height: 1,
-              ),
-              itemBuilder: (context, index) {
-                var transaction = transactions[index];
-                var transactionValue = double.parse(
-                  transaction.value.replaceAll('.', '').replaceAll(',', '.'),
-                );
-
-                String formattedDate = transaction.paymentDay != null
-                    ? dateFormatter.format(
-                        DateTime.parse(transaction.paymentDay!),
-                      )
-                    : "Data não informada";
-
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                              width: 180.w,
-                              child: Text(
-                                transaction.title,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Get.theme.primaryColor,
-                                ),
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              categoryName,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Get.theme.primaryColor,
                               ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              formattedDate,
+                              '${percentual.toStringAsFixed(1)}% do total',
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 14.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            currencyFormatter.format(transactionValue),
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Get.theme.primaryColor,
-                            ),
+                        Text(
+                          currencyFormatter.format(totalValue),
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Get.theme.primaryColor,
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            transaction.paymentType ?? 'N/A',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
+                  SizedBox(height: 24.h),
+                  // Lista de transações
+                  Text(
+                    'Transações em $monthName',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.grey20,
+                    ),
+                  ),
+
+                  if (transactions.isEmpty)
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        child: Text(
+                          "Nenhuma transação encontrada",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: transactions.length,
+                    separatorBuilder: (context, index) => Divider(
+                      // ignore: deprecated_member_use
+                      color: DefaultColors.grey20.withOpacity(.5),
+                      height: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      var transaction = transactions[index];
+                      var transactionValue = double.parse(
+                        transaction.value
+                            .replaceAll('.', '')
+                            .replaceAll(',', '.'),
+                      );
+
+                      String formattedDate = transaction.paymentDay != null
+                          ? dateFormatter.format(
+                              DateTime.parse(transaction.paymentDay!),
+                            )
+                          : "Data não informada";
+
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 180.w,
+                                    child: Text(
+                                      transaction.title,
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Get.theme.primaryColor,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Text(
+                                    formattedDate,
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: DefaultColors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  currencyFormatter.format(transactionValue),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Get.theme.primaryColor,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  transaction.paymentType ?? 'N/A',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: DefaultColors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

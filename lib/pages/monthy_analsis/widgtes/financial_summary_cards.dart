@@ -21,54 +21,54 @@ class FinancialSummaryCards extends StatelessWidget {
       final totalDespesas = controller.totalDespesasAno;
       final saldo = totalReceita - totalDespesas;
 
-      return Padding(
-        padding: const EdgeInsets.only(top: 32, bottom: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Resumo Anual ${DateTime.now().year} (até hoje)',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: DefaultColors.grey,
-                fontWeight: FontWeight.w500,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Resumo Anual ${DateTime.now().year} (até hoje)',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10.h),
+
+          // Cards de Receita e Despesa
+          Row(
+            children: [
+              // Card de Receitas
+              Expanded(
+                child: FinancialCard(
+                  title: 'Receitas',
+                  value: totalReceita,
+                  icon: Icons.trending_up,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              SizedBox(
+                width: 12.h,
+              ),
 
-            // Cards de Receita e Despesa
-            Row(
-              children: [
-                // Card de Receitas
-                Expanded(
-                  child: FinancialCard(
-                    title: 'Receitas',
-                    value: totalReceita,
-                    icon: Icons.trending_up,
-                  ),
+              // Card de Despesas
+              Expanded(
+                child: FinancialCard(
+                  title: 'Despesas',
+                  value: totalDespesas,
+                  icon: Icons.trending_down,
                 ),
-                SizedBox(
-                  width: 12.h,
-                ),
+              ),
+            ],
+          ),
 
-                // Card de Despesas
-                Expanded(
-                  child: FinancialCard(
-                    title: 'Despesas',
-                    value: totalDespesas,
-                    icon: Icons.trending_down,
-                  ),
-                ),
-              ],
-            ),
+          SizedBox(
+            height: 16.h,
+          ),
 
-            SizedBox(
-              height: 16.h,
-            ),
-
-            SaldoCard(saldo: saldo),
-          ],
-        ),
+          SaldoCard(saldo: saldo),
+          SizedBox(
+            height: 20.h,
+          )
+        ],
       );
     });
   }

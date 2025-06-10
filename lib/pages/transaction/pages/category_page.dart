@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../model/transaction_model.dart';
 
 final List<Map<String, dynamic>> categories_expenses = [
@@ -1474,6 +1475,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
             ),
           ),
+          AdsBanner(),
           Expanded(
             child: filteredCategories.isEmpty
                 ? Center(

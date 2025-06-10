@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
+import '../../../ads_banner/ads_banner.dart';
+
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({
     super.key,
@@ -12,7 +14,8 @@ class FinanceDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     final theme = Theme.of(context);
     final NumberFormat formatter = NumberFormat.currency(
       locale: "pt_BR",
@@ -30,10 +33,13 @@ class FinanceDetailsPage extends StatelessWidget {
       ),
       body: Obx(() {
         // Filtra transações de receita para o mês atual
-        final receivedTransactions = transactionController.transaction.where((t) {
+        final receivedTransactions =
+            transactionController.transaction.where((t) {
           if (t.paymentDay != null) {
             DateTime paymentDate = DateTime.parse(t.paymentDay!);
-            return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+            return t.type == TransactionType.receita &&
+                paymentDate.month == currentMonth &&
+                paymentDate.year == currentYear;
           }
           return false;
         }).toList();
@@ -42,14 +48,18 @@ class FinanceDetailsPage extends StatelessWidget {
         receivedTransactions.sort((a, b) {
           DateTime dateA = DateTime.parse(a.paymentDay!);
           DateTime dateB = DateTime.parse(b.paymentDay!);
-          return dateB.compareTo(dateA); // Ordenação decrescente (mais recente primeiro)
+          return dateB.compareTo(
+              dateA); // Ordenação decrescente (mais recente primeiro)
         });
 
         // Filtra transações de despesa para o mês atual
-        final expenseTransactions = transactionController.transaction.where((t) {
+        final expenseTransactions =
+            transactionController.transaction.where((t) {
           if (t.paymentDay != null) {
             DateTime paymentDate = DateTime.parse(t.paymentDay!);
-            return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+            return t.type == TransactionType.despesa &&
+                paymentDate.month == currentMonth &&
+                paymentDate.year == currentYear;
           }
           return false;
         }).toList();
@@ -58,78 +68,103 @@ class FinanceDetailsPage extends StatelessWidget {
         expenseTransactions.sort((a, b) {
           DateTime dateA = DateTime.parse(a.paymentDay!);
           DateTime dateB = DateTime.parse(b.paymentDay!);
-          return dateB.compareTo(dateA); // Ordenação decrescente (mais recente primeiro)
+          return dateB.compareTo(
+              dateA); // Ordenação decrescente (mais recente primeiro)
         });
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Receitas",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
+        return Column(
+          children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Receitas",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    receivedTransactions.isEmpty
+                        ? _buildEmptyState(
+                            "Nenhuma receita registrada neste mês")
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: receivedTransactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = receivedTransactions[index];
+                              final paymentDate =
+                                  DateTime.parse(transaction.paymentDay!);
+                              final formattedDate =
+                                  DateFormat('dd/MM/yyyy').format(paymentDate);
+                              final double value = double.parse(transaction
+                                  .value
+                                  .replaceAll('.', '')
+                                  .replaceAll(',', '.'));
+
+                              return TransactionCard(
+                                title: transaction.title,
+                                value: formatter.format(value),
+                                date: formattedDate,
+                                paymentType: transaction.paymentType ??
+                                    "Não especificado",
+                                categoryId: transaction.category ?? 0,
+                              );
+                            },
+                          ),
+
+                    // Seção de despesas
+                    Text(
+                      "Despesas",
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    expenseTransactions.isEmpty
+                        ? _buildEmptyState(
+                            "Nenhuma despesa registrada neste mês")
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: expenseTransactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = expenseTransactions[index];
+                              final paymentDate =
+                                  DateTime.parse(transaction.paymentDay!);
+                              final formattedDate =
+                                  DateFormat('dd/MM/yyyy').format(paymentDate);
+                              final double value = double.parse(transaction
+                                  .value
+                                  .replaceAll('.', '')
+                                  .replaceAll(',', '.'));
+
+                              return TransactionCard(
+                                title: transaction.title,
+                                value: formatter.format(value),
+                                date: formattedDate,
+                                paymentType: transaction.paymentType ??
+                                    "Não especificado",
+                                categoryId: transaction.category ?? 0,
+                              );
+                            },
+                          ),
+                  ],
                 ),
               ),
-              SizedBox(height: 8.h),
-              receivedTransactions.isEmpty
-                  ? _buildEmptyState("Nenhuma receita registrada neste mês")
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: receivedTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = receivedTransactions[index];
-                        final paymentDate = DateTime.parse(transaction.paymentDay!);
-                        final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
-                        final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
-
-                        return TransactionCard(
-                          title: transaction.title,
-                          value: formatter.format(value),
-                          date: formattedDate,
-                          paymentType: transaction.paymentType ?? "Não especificado",
-                          categoryId: transaction.category ?? 0,
-                        );
-                      },
-                    ),
-
-              // Seção de despesas
-              Text(
-                "Despesas",
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              expenseTransactions.isEmpty
-                  ? _buildEmptyState("Nenhuma despesa registrada neste mês")
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: expenseTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = expenseTransactions[index];
-                        final paymentDate = DateTime.parse(transaction.paymentDay!);
-                        final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
-                        final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
-
-                        return TransactionCard(
-                          title: transaction.title,
-                          value: formatter.format(value),
-                          date: formattedDate,
-                          paymentType: transaction.paymentType ?? "Não especificado",
-                          categoryId: transaction.category ?? 0,
-                        );
-                      },
-                    ),
-            ],
-          ),
+            ),
+          ],
         );
       }),
     );

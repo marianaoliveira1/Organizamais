@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/utils/color.dart';
+import '../../../ads_banner/ads_banner.dart';
 import '../../../model/fixed_account_model.dart';
 import '../../../model/transaction_model.dart';
 import '../../transaction/widget/button_select_category.dart';
@@ -21,7 +22,8 @@ class AddFixedAccountsFormPage extends StatefulWidget {
   const AddFixedAccountsFormPage({super.key, this.fixedAccount, this.onSave});
 
   @override
-  State<AddFixedAccountsFormPage> createState() => _AddFixedAccountsFormPageState();
+  State<AddFixedAccountsFormPage> createState() =>
+      _AddFixedAccountsFormPageState();
 }
 
 class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
@@ -72,6 +74,7 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
           spacing: 10.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdsBanner(),
             DefaultTitleTransaction(
               title: "Titulo",
             ),
@@ -129,7 +132,8 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly, // Aceita apenas números
+                  FilteringTextInputFormatter
+                      .digitsOnly, // Aceita apenas números
                   _MaxNumberInputFormatter(28), // Restringe a 31
                 ],
                 decoration: InputDecoration(
@@ -179,11 +183,16 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Verificação se todos os campos estão preenchidos
-                      if (titleController.text.isEmpty || valueController.text.isEmpty || dayOfTheMonthController.text.isEmpty || paymentTypeController.text.isEmpty || categoryId == null) {
+                      if (titleController.text.isEmpty ||
+                          valueController.text.isEmpty ||
+                          dayOfTheMonthController.text.isEmpty ||
+                          paymentTypeController.text.isEmpty ||
+                          categoryId == null) {
                         // Mostrar mensagem de erro se algum campo estiver vazio
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("Por favor, preencha todos os campos"),
+                            content:
+                                Text("Por favor, preencha todos os campos"),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -244,7 +253,8 @@ class _MaxNumberInputFormatter extends TextInputFormatter {
   _MaxNumberInputFormatter(this.max);
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.text.isEmpty) return newValue;
 
     final int? value = int.tryParse(newValue.text);

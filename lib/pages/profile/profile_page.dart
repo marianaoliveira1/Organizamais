@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
+import '../../ads_banner/ads_banner.dart';
 import '../../controller/auth_controller.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -19,7 +20,8 @@ class ProfilePage extends StatelessWidget {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Deletar Conta"),
-            content: const Text("Tem certeza que deseja deletar sua conta? Esta ação não pode ser desfeita."),
+            content: const Text(
+                "Tem certeza que deseja deletar sua conta? Esta ação não pode ser desfeita."),
             actions: [
               TextButton(
                 onPressed: () {
@@ -32,7 +34,8 @@ class ProfilePage extends StatelessWidget {
                   Navigator.of(context).pop();
                   authController.deleteAccount();
                 },
-                child: const Text("Deletar", style: TextStyle(color: Colors.red)),
+                child:
+                    const Text("Deletar", style: TextStyle(color: Colors.red)),
               ),
             ],
           );
@@ -54,6 +57,10 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
             Text(
               "Nome",
               style: TextStyle(

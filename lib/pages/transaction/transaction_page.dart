@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
 
+import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';
 import 'widget/button_back.dart';
 import 'widget/button_select_category.dart';
@@ -18,10 +19,12 @@ import 'widget/title_transaction.dart';
 
 /// Formatter para converter a entrada em formato de moeda (R$)
 class CurrencyInputFormatter extends TextInputFormatter {
-  final NumberFormat currencyFormat = NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+  final NumberFormat currencyFormat =
+      NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     // Remove tudo que não for dígito
     String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
@@ -126,7 +129,8 @@ class _TransactionPageState extends State<TransactionPage> {
               primary: theme.primaryColor, // Botões de ação ("OK" e "Cancelar")
               onPrimary: theme.cardColor, // Texto dentro dos botões
               surface: theme.scaffoldBackgroundColor,
-              onSurface: theme.primaryColor, // Cor do título "Selecione a data" e da data selecionada
+              onSurface: theme
+                  .primaryColor, // Cor do título "Selecione a data" e da data selecionada
             ),
             dialogBackgroundColor: theme.primaryColor, // Fundo do calendário
             textButtonTheme: TextButtonThemeData(
@@ -178,7 +182,9 @@ class _TransactionPageState extends State<TransactionPage> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              color: _selectedType == TransactionType.receita ? Colors.green : Colors.red,
+              color: _selectedType == TransactionType.receita
+                  ? Colors.green
+                  : Colors.red,
               child: Column(
                 children: [
                   SizedBox(height: 20.h),
@@ -212,14 +218,13 @@ class _TransactionPageState extends State<TransactionPage> {
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      CurrencyInputFormatter()
-                    ],
+                    inputFormatters: [CurrencyInputFormatter()],
                   ),
                 ],
               ),
             ),
             SizedBox(height: 4.h),
+            AdsBanner(),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 20.h,
@@ -305,9 +310,9 @@ class _TransactionPageState extends State<TransactionPage> {
                         spacing: 10.h,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           SizedBox(
-                          height: 2.h,
-                        ),
+                          SizedBox(
+                            height: 2.h,
+                          ),
                           DefaultTitleTransaction(
                             title: "Forma de pagamento",
                           ),
@@ -382,20 +387,26 @@ class _TransactionPageState extends State<TransactionPage> {
                                     value: _installments,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        borderSide: BorderSide(color: DefaultColors.grey),
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        borderSide: BorderSide(
+                                            color: DefaultColors.grey),
                                       ),
                                       focusColor: DefaultColors.grey,
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8.r),
-                                        borderSide: BorderSide(color: DefaultColors.grey),
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        borderSide: BorderSide(
+                                            color: DefaultColors.grey),
                                       ),
                                       contentPadding: EdgeInsets.symmetric(
                                         horizontal: 12.w,
                                         vertical: 8.h,
                                       ),
                                     ),
-                                    items: List.generate(23, (index) => index + 2).map((int value) {
+                                    items:
+                                        List.generate(23, (index) => index + 2)
+                                            .map((int value) {
                                       return DropdownMenuItem<int>(
                                         value: value,
                                         child: Text(
@@ -411,7 +422,8 @@ class _TransactionPageState extends State<TransactionPage> {
                                       if (newValue != null) {
                                         setState(() {
                                           _installments = newValue;
-                                          installmentsController.text = newValue.toString();
+                                          installmentsController.text =
+                                              newValue.toString();
                                         });
                                       }
                                     },
@@ -462,7 +474,6 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
-         
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -473,9 +484,16 @@ class _TransactionPageState extends State<TransactionPage> {
                   Expanded(
                     child: InkWell(
                       onTap: () async {
-                        final TransactionController transactionController = Get.find<TransactionController>();
+                        final TransactionController transactionController =
+                            Get.find<TransactionController>();
 
-                        if (titleController.text.isEmpty || valuecontroller.text.isEmpty || _selectedDate == null || (_selectedType != TransactionType.transferencia && categoryId == null) || (_selectedType != TransactionType.transferencia && paymentTypeController.text.isEmpty)) {
+                        if (titleController.text.isEmpty ||
+                            valuecontroller.text.isEmpty ||
+                            _selectedDate == null ||
+                            (_selectedType != TransactionType.transferencia &&
+                                categoryId == null) ||
+                            (_selectedType != TransactionType.transferencia &&
+                                paymentTypeController.text.isEmpty)) {
                           Get.snackbar(
                             'Erro',
                             'Preencha todos os campos obrigatórios',
@@ -488,7 +506,8 @@ class _TransactionPageState extends State<TransactionPage> {
 
                         final TransactionModel transaction = TransactionModel(
                           title: titleController.text,
-                          value: valuecontroller.text.replaceAll('R\$', '').trim(),
+                          value:
+                              valuecontroller.text.replaceAll('R\$', '').trim(),
                           type: _selectedType,
                           category: categoryId,
                           paymentDay: _selectedDate!.toString().split(' ')[0],
@@ -497,14 +516,18 @@ class _TransactionPageState extends State<TransactionPage> {
 
                         try {
                           if (widget.overrideTransactionSalvar != null) {
-                            await widget.overrideTransactionSalvar!(transaction.copyWith(
+                            await widget.overrideTransactionSalvar!(
+                                transaction.copyWith(
                               id: widget.transaction!.id,
                             ));
                             Navigator.pop(context);
                             return;
                           }
 
-                          await transactionController.addTransaction(transaction, isInstallment: _isInstallment, installments: _installments);
+                          await transactionController.addTransaction(
+                              transaction,
+                              isInstallment: _isInstallment,
+                              installments: _installments);
                           Navigator.pop(context);
                         } catch (e) {
                           Get.snackbar(
@@ -517,7 +540,8 @@ class _TransactionPageState extends State<TransactionPage> {
                         }
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.w, vertical: 10.h),
                         decoration: BoxDecoration(
                           color: theme.primaryColor,
                           borderRadius: BorderRadius.circular(10.r),

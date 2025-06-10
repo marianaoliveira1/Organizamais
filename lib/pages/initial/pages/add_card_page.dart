@@ -9,6 +9,7 @@ import 'package:organizamais/pages/transaction/widget/title_transaction.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/card_controller.dart';
 import '../../../model/cards_model.dart';
 import 'select_icon_page.dart';
@@ -77,6 +78,10 @@ class _AddCardPageState extends State<AddCardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
             DefaultTitleTransaction(title: "Nome do cartão"),
             SizedBox(
               height: 10.h,
@@ -231,7 +236,8 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
               onTap: () {
                 if (nameController.text.isEmpty || selectedIconPath == null) {
-                  Get.snackbar('Erro', 'Preencha todos os campos', snackPosition: SnackPosition.BOTTOM);
+                  Get.snackbar('Erro', 'Preencha todos os campos',
+                      snackPosition: SnackPosition.BOTTOM);
                   return;
                 }
 

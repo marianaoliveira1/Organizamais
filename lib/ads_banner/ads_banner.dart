@@ -21,7 +21,7 @@ class _AdsBannerState extends State<AdsBanner> {
   void _loadBannerAd() {
     _bannerAd = BannerAd(
       adUnitId: 'ca-app-pub-8308246738505070/6410645428', // Seu ID do banner
-      size: AdSize.leaderboard,
+      size: AdSize.banner, // Banner com altura menor (320x50)
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
@@ -48,10 +48,13 @@ class _AdsBannerState extends State<AdsBanner> {
   @override
   Widget build(BuildContext context) {
     if (_isAdLoaded && _bannerAd != null) {
-      return SizedBox(
-        width: _bannerAd!.size.width.toDouble(),
-        height: _bannerAd!.size.height.toDouble(),
-        child: AdWidget(ad: _bannerAd!),
+      return Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: _bannerAd!.size.width.toDouble(),
+          height: _bannerAd!.size.height.toDouble(),
+          child: AdWidget(ad: _bannerAd!),
+        ),
       );
     } else {
       return const SizedBox(); // Retorna vazio se o anúncio não está pronto

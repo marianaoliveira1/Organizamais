@@ -42,29 +42,34 @@ class InitialPage extends StatelessWidget {
       ),
       drawer: const CustomDrawer(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20.h,
-                ),
-                child: Column(
-                  spacing: 20.h,
-                  children: [
-                    AdsBanner(),
-                    const FinanceSummaryWidget(),
-                    const DefaultWidgetFixedAccounts(),
-                    CreditCardSection(),
-                    ParcelamentosCard(),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                  ],
+        child: Column(
+          children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.h,
+                  ),
+                  child: Column(
+                    spacing: 20.h,
+                    children: [
+                      const FinanceSummaryWidget(),
+                      const DefaultWidgetFixedAccounts(),
+                      CreditCardSection(),
+                      ParcelamentosCard(),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

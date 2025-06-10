@@ -12,11 +12,13 @@ class ResumePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.w, horizontal: 20.h),
-        child: SingleChildScrollView(
-          child: SafeArea(
-            child: ResumeContent(),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.h),
+          child: SingleChildScrollView(
+            child: SafeArea(
+              child: ResumeContent(),
+            ),
           ),
         ),
       ),

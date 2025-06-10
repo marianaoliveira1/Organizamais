@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
+import '../../graphics/widgtes/default_text_graphic.dart';
 import 'chart_legend_item.dart';
 
 class MonthlyFinancialChart extends StatelessWidget {
@@ -28,15 +29,12 @@ class MonthlyFinancialChart extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Receitas vs Despesas Mensais',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+            DefaultTextGraphic(
+              text: "Receitas vs Despesas Mensais",
             ),
-            const SizedBox(height: 8),
+            SizedBox(
+              height: 8.h,
+            ),
             Text(
               'Ano ${DateTime.now().year} (até hoje)',
               style: TextStyle(
