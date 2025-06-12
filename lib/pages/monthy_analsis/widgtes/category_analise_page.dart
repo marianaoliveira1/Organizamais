@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 import 'package:organizamais/utils/color.dart';
 
@@ -113,6 +113,118 @@ class CategoryAnalysisPage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.h),
+
+                  // Gráfico de barras
+                  if (transactions.isNotEmpty) ...[
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Gastos por Dia em $monthName',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Get.theme.primaryColor,
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          SizedBox(
+                            height: 200.h,
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.spaceAround,
+                                maxY: _getMaxValue(transactions),
+                                barTouchData: BarTouchData(
+                                  enabled: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    getTooltipItem:
+                                        (group, groupIndex, rod, rodIndex) {
+                                      final value = rod.toY;
+                                      return BarTooltipItem(
+                                        currencyFormatter.format(value),
+                                        TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12.sp,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          value.toInt().toString(),
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 12.sp,
+                                          ),
+                                        );
+                                      },
+                                      reservedSize: 30.h,
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, meta) {
+                                        if (value == 0)
+                                          return const SizedBox.shrink();
+                                        return Text(
+                                          'R\$${(value / 1000).toStringAsFixed(0)}k',
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 10.sp,
+                                          ),
+                                        );
+                                      },
+                                      reservedSize: 40.w,
+                                    ),
+                                  ),
+                                  topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                ),
+                                borderData: FlBorderData(
+                                  show: false,
+                                ),
+                                barGroups: _getBarGroups(transactions),
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawHorizontalLine: true,
+                                  drawVerticalLine: false,
+                                  horizontalInterval:
+                                      _getMaxValue(transactions) / 5,
+                                  getDrawingHorizontalLine: (value) {
+                                    return FlLine(
+                                      color:
+                                          DefaultColors.grey20.withOpacity(0.3),
+                                      strokeWidth: 1,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                  ],
+
                   // Lista de transações
                   Text(
                     'Transações em $monthName',
@@ -255,5 +367,55 @@ class CategoryAnalysisPage extends StatelessWidget {
     return filteredTransactions
         .where((transaction) => transaction.category == categoryId)
         .toList();
+  }
+
+  // Agrupa as transações por dia e soma os valores
+  Map<int, double> _groupTransactionsByDay(
+      List<TransactionModel> transactions) {
+    Map<int, double> dailyTotals = {};
+
+    for (var transaction in transactions) {
+      if (transaction.paymentDay != null) {
+        DateTime date = DateTime.parse(transaction.paymentDay!);
+        int day = date.day;
+        double value = double.parse(
+          transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+        );
+
+        dailyTotals[day] = (dailyTotals[day] ?? 0) + value;
+      }
+    }
+
+    return dailyTotals;
+  }
+
+  // Cria os grupos de barras para o gráfico
+  List<BarChartGroupData> _getBarGroups(List<TransactionModel> transactions) {
+    Map<int, double> dailyTotals = _groupTransactionsByDay(transactions);
+
+    return dailyTotals.entries.map((entry) {
+      return BarChartGroupData(
+        x: entry.key,
+        barRods: [
+          BarChartRodData(
+            toY: entry.value,
+            color: categoryColor,
+            width: 16.w,
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+        ],
+      );
+    }).toList()
+      ..sort((a, b) => a.x.compareTo(b.x)); // Ordena por dia
+  }
+
+  // Calcula o valor máximo para o eixo Y
+  double _getMaxValue(List<TransactionModel> transactions) {
+    Map<int, double> dailyTotals = _groupTransactionsByDay(transactions);
+    if (dailyTotals.isEmpty) return 100;
+
+    double maxValue = dailyTotals.values.reduce((a, b) => a > b ? a : b);
+    // Adiciona uma margem de 20% ao valor máximo
+    return maxValue * 1.2;
   }
 }

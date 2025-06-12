@@ -6,8 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
-import 'package:organizamais/pages/monthy_analsis/widgtes/monthly_financial_chart.dart'
-    show MonthlyFinancialChart;
 
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
@@ -17,6 +15,7 @@ import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 
 import 'widgtes/financial_summary_cards.dart';
+import 'widgtes/monthly_financial_chart.dart';
 import 'widgtes/widget_category_analise.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
