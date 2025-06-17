@@ -239,8 +239,8 @@ class CategoryMonthlyChart extends StatelessWidget {
                 Text(
                   item['month'],
                   style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
                     color: theme.primaryColor,
                   ),
                 ),
@@ -248,7 +248,8 @@ class CategoryMonthlyChart extends StatelessWidget {
                 Text(
                   item['analysis'],
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
                     color: DefaultColors.grey,
                   ),
                 ),
@@ -257,7 +258,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                   item['message'],
                   style: TextStyle(
                     fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: item['cardColor'],
                   ),
                 ),
@@ -710,7 +711,7 @@ class CategoryAnalysisPage extends StatelessWidget {
 
                   // Lista de transações
                   Text(
-                    'Transações em $monthName (até hoje)',
+                    'Transações em $monthName',
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
