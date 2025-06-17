@@ -7,7 +7,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
-import '../../graphics/graphics_page.dart';
+
 import '../../graphics/widgtes/default_text_graphic.dart';
 
 class CategoryMonthlyChart extends StatelessWidget {
@@ -649,7 +649,7 @@ class CategoryAnalysisPage extends StatelessWidget {
       body: Column(
         children: [
           AdsBanner(),
-          SizedBox(height: 20.h),
+          SizedBox(height: 5.h),
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -667,33 +667,34 @@ class CategoryAnalysisPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
+                          spacing: 5.h,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               categoryName,
                               style: TextStyle(
-                                fontSize: 16.sp,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                            Text(
+                              currencyFormatter.format(totalValue),
+                              style: TextStyle(
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Get.theme.primaryColor,
                               ),
                             ),
-                            SizedBox(height: 4.h),
                             Text(
                               '${percentual.toStringAsFixed(1)}% do total',
                               style: TextStyle(
-                                fontSize: 14.sp,
-                                color: DefaultColors.grey,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: DefaultColors.grey20,
                               ),
                             ),
                           ],
-                        ),
-                        Text(
-                          currencyFormatter.format(totalValue),
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Get.theme.primaryColor,
-                          ),
                         ),
                       ],
                     ),

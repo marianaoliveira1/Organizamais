@@ -210,7 +210,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      width: 130.w,
+                                      width: 120.w,
                                       child: Text(
                                         transaction.title,
                                         style: TextStyle(
