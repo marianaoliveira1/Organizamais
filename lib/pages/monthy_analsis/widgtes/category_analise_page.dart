@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-
 import 'package:organizamais/utils/color.dart';
-
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
@@ -221,21 +218,17 @@ class CategoryMonthlyChart extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: item['isPositive']
-            ? Colors.red.withOpacity(0.1)
-            : Colors.green.withOpacity(0.1),
+        color: item['cardColor'].withOpacity(0.1),
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
-          color: item['isPositive']
-              ? Colors.red.withOpacity(0.3)
-              : Colors.green.withOpacity(0.3),
+          color: item['cardColor'].withOpacity(0.3),
         ),
       ),
       child: Row(
         children: [
           Icon(
-            item['isPositive'] ? Icons.trending_up : Icons.trending_down,
-            color: item['isPositive'] ? Colors.red : Colors.green,
+            item['icon'],
+            color: item['cardColor'],
             size: 20.sp,
           ),
           SizedBox(width: 8.w),
@@ -259,6 +252,15 @@ class CategoryMonthlyChart extends StatelessWidget {
                     color: DefaultColors.grey,
                   ),
                 ),
+                SizedBox(height: 4.h),
+                Text(
+                  item['message'],
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                    color: item['cardColor'],
+                  ),
+                ),
               ],
             ),
           ),
@@ -275,37 +277,58 @@ class CategoryMonthlyChart extends StatelessWidget {
     for (int month = 2; month <= currentMonth; month++) {
       double currentValue = monthlyData[month] ?? 0;
       double previousValue = monthlyData[month - 1] ?? 0;
+      double difference = currentValue - previousValue;
+      double absoluteDifference = difference.abs();
 
       if (currentValue > 0 || previousValue > 0) {
         double percentChange = 0;
         if (previousValue > 0) {
-          percentChange =
-              ((currentValue - previousValue) / previousValue) * 100;
+          percentChange = (difference / previousValue) * 100;
         } else if (currentValue > 0) {
           percentChange = 100; // Primeira despesa na categoria
         }
 
-        String analysisText = '';
-        bool isPositive = percentChange > 0;
+        String variationText = '';
+        Color cardColor;
+        IconData icon;
+        String message;
 
-        if (percentChange.abs() < 5) {
-          analysisText =
-              'Gastos estáveis (${percentChange.toStringAsFixed(1)}%)';
-        } else if (isPositive) {
-          analysisText =
-              'Aumento de ${percentChange.toStringAsFixed(1)}% vs ${_getMonthName(month - 1)}';
+        if (percentChange > 15) {
+          cardColor = Colors.red;
+          icon = Icons.arrow_upward;
+          message = "Alerta: aumento expressivo!";
+        } else if (percentChange >= 5 && percentChange <= 15) {
+          cardColor = Colors.orange;
+          icon = Icons.arrow_upward;
+          message = "Aumento moderado";
+        } else if (percentChange >= -5 && percentChange <= 5) {
+          cardColor = Colors.grey;
+          icon = Icons.circle;
+          message = "Estável";
+        } else if (percentChange >= -15 && percentChange <= -5) {
+          cardColor = Colors.green;
+          icon = Icons.arrow_downward;
+          message = "Boa redução!";
         } else {
-          analysisText =
-              'Redução de ${percentChange.abs().toStringAsFixed(1)}% vs ${_getMonthName(month - 1)}';
+          cardColor = Colors.green;
+          icon = Icons.arrow_downward;
+          message = "Economia significativa!";
         }
+
+        String valueText = difference >= 0
+            ? 'Aumentou ${_formatCurrency(absoluteDifference)}'
+            : 'Diminuiu ${_formatCurrency(absoluteDifference)}';
 
         analysis.add({
           'month': _getMonthName(month),
-          'analysis': analysisText,
+          'analysis': '${valueText} (${percentChange.toStringAsFixed(1)}%)',
           'percentChange': percentChange,
-          'isPositive': isPositive,
+          'isPositive': difference > 0,
           'currentValue': currentValue,
           'previousValue': previousValue,
+          'cardColor': cardColor,
+          'icon': icon,
+          'message': message,
         });
       }
     }
@@ -599,7 +622,7 @@ class CategoryAnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final NumberFormat currencyFormatter =
-        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\,');
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
     List<TransactionModel> transactions =
@@ -686,7 +709,7 @@ class CategoryAnalysisPage extends StatelessWidget {
 
                   // Lista de transações
                   Text(
-                    'Transações em $monthName',
+                    'Transações em $monthName (até hoje)',
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
@@ -802,6 +825,7 @@ class CategoryAnalysisPage extends StatelessWidget {
       int categoryId, String monthName) {
     final TransactionController transactionController =
         Get.find<TransactionController>();
+    final currentDate = DateTime.now();
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction
@@ -814,7 +838,10 @@ class CategoryAnalysisPage extends StatelessWidget {
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String transactionMonthName =
               getAllMonths()[transactionDate.month - 1];
-          return transactionMonthName == monthName;
+
+          // Filter by month and date <= current date
+          return transactionMonthName == monthName &&
+              transactionDate.isBefore(currentDate);
         }).toList();
       }
 
@@ -825,5 +852,22 @@ class CategoryAnalysisPage extends StatelessWidget {
     return filteredTransactions
         .where((transaction) => transaction.category == categoryId)
         .toList();
+  }
+
+  List<String> getAllMonths() {
+    return [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
   }
 }
