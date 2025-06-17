@@ -289,7 +289,6 @@ class CategoryMonthlyChart extends StatelessWidget {
           percentChange = 100; // Primeira despesa na categoria
         }
 
-        String variationText = '';
         Color cardColor;
         IconData icon;
         String message;

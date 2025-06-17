@@ -27,13 +27,13 @@ class TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (transactionController.transaction.isEmpty) {
-        return Center(
-          child: const DefaultTextNotTransaction(),
-        );
+        return const DefaultTextNotTransaction();
       }
 
       // Ordena as transações da mais recente para a mais antiga
-      final sortedTransactions = transactionController.transaction.toList()..sort((a, b) => DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!)));
+      final sortedTransactions = transactionController.transaction.toList()
+        ..sort((a, b) => DateTime.parse(b.paymentDay!)
+            .compareTo(DateTime.parse(a.paymentDay!)));
 
       final groupedTransactions = _groupTransactionsByDate(sortedTransactions);
 
@@ -61,7 +61,8 @@ class TransactionsList extends StatelessWidget {
       DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
 
       if (selectedMonth.value.isNotEmpty) {
-        String monthName = ResumeContent.getAllMonths()[transactionDate.month - 1];
+        String monthName =
+            ResumeContent.getAllMonths()[transactionDate.month - 1];
         if (monthName != selectedMonth.value) continue;
       }
 

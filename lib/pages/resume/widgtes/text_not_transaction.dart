@@ -10,54 +10,50 @@ class DefaultTextNotTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Nenhum lançamento no período",
-            style: TextStyle(
-              color: DefaultColors.black,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-            ),
+    return Column(
+      children: [
+        Text(
+          "Nenhum lançamento no período",
+          style: TextStyle(
+            color: DefaultColors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Toque em ",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: DefaultColors.grey,
-                ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Toque em ",
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.grey,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: DefaultColors.green,
-                  borderRadius: BorderRadius.circular(18.r),
-                ),
-                padding: EdgeInsets.all(5.w),
-                child: Icon(
-                  Iconsax.add,
-                  color: DefaultColors.white,
-                  size: 16.sp,
-                ),
-              ),
-            ],
-          ),
-          Text(
-            " para adicionar um lançamento ",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: DefaultColors.grey,
-              fontSize: 14.sp,
             ),
+            Container(
+              decoration: BoxDecoration(
+                color: DefaultColors.green,
+                borderRadius: BorderRadius.circular(18.r),
+              ),
+              padding: EdgeInsets.all(5.w),
+              child: Icon(
+                Iconsax.add,
+                color: DefaultColors.white,
+                size: 16.sp,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          " para adicionar um lançamento ",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: DefaultColors.grey,
+            fontSize: 14.sp,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

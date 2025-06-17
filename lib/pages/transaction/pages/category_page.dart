@@ -153,7 +153,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 75,
     'name': 'Cinema/Streaming',
-    'icon': 'assets/icon-category/movie.png',
+    'icon': 'assets/icon-category/cinema.png',
     'color': DefaultColors.amethyst,
     'synonyms': ['netflix', 'filme'],
     'relations': ['entretenimento', 'assinaturas'],
@@ -315,7 +315,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 77,
     'name': 'Doações/Caridade',
-    'icon': 'assets/icon-category/donation.png',
+    'icon': 'assets/icon-category/doacoes.png',
     'color': DefaultColors.rosyPink,
     'synonyms': ['ong', 'solidariedade'],
     'relations': ['social', 'presentes'],
@@ -485,7 +485,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 70,
     'name': 'IPVA',
-    'icon': 'assets/icon-category/tax.png',
+    'icon': 'assets/icon-category/ipva.png',
     'color': DefaultColors.cobalt,
     'synonyms': ['ipva', 'licenciamento', 'taxa veicular'],
     'relations': ['carro', 'impostos'],
@@ -577,7 +577,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 76,
     'name': 'Livros/Revistas',
-    'icon': 'assets/icon-category/book.png',
+    'icon': 'assets/icon-category/livros.png',
     'color': DefaultColors.earthBrown,
     'synonyms': ['leitura', 'ebook'],
     'relations': ['educação', 'cultura'],
@@ -760,19 +760,19 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 71,
     'name': 'Pedágio',
-    'icon': 'assets/icon-category/toll.png',
+    'icon': 'assets/icon-category/pedagios.png',
     'color': DefaultColors.slateGrey,
     'synonyms': ['tarifa rodoviária'],
     'relations': ['transporte', 'viagem'],
   },
-  {
-    'id': 78,
-    'name': 'Pet (Veterinário/Ração)',
-    'icon': 'assets/icon-category/pet.png',
-    'color': DefaultColors.jungleGreen,
-    'synonyms': ['animal', 'ração'],
-    'relations': ['família', 'saúde'],
-  },
+  // {
+  //   'id': 78,
+  //   'name': 'Pet (Veterinário/Ração)',
+  //   'icon': 'assets/icon-category/pet.png',
+  //   'color': DefaultColors.jungleGreen,
+  //   'synonyms': ['animal', 'ração'],
+  //   'relations': ['família', 'saúde'],
+  // },
   {
     'id': 13,
     'name': 'Pets',
@@ -889,33 +889,33 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 80,
-    'name': 'Seguro Celular',
-    'icon': 'assets/icon-category/phone-insurance.png',
+    'name': 'Seguros',
+    'icon': 'assets/icon-category/seguros.png',
     'color': DefaultColors.topaz,
     'synonyms': ['proteção', 'aparelho'],
     'relations': ['tecnologia', 'seguros'],
   },
-  {
-    'id': 32,
-    'name': 'Seguro do Carro',
-    'icon': 'assets/icon-category/seguros.png',
-    'color': DefaultColors.blueGrey,
-    'synonyms': [
-      'seguro veicular',
-      'seguro auto',
-      'proteção veicular',
-      'seguro automóvel'
-    ],
-    'relations': [
-      'seguro veicular',
-      'seguro auto',
-      'proteção veicular',
-      'seguro automóvel',
-      'carro',
-      'veículo',
-      'transporte'
-    ],
-  },
+  // {
+  //   'id': 32,
+  //   'name': 'Seguro do Carro',
+  //   'icon': 'assets/icon-category/seguros.png',
+  //   'color': DefaultColors.blueGrey,
+  //   'synonyms': [
+  //     'seguro veicular',
+  //     'seguro auto',
+  //     'proteção veicular',
+  //     'seguro automóvel'
+  //   ],
+  //   'relations': [
+  //     'seguro veicular',
+  //     'seguro auto',
+  //     'proteção veicular',
+  //     'seguro automóvel',
+  //     'carro',
+  //     'veículo',
+  //     'transporte'
+  //   ],
+  // },
   {
     'id': 23,
     'name': 'Streaming',
@@ -943,8 +943,8 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 79,
-    'name': 'Taxas Bancárias',
-    'icon': 'assets/icon-category/bank-fee.png',
+    'name': 'Taxas',
+    'icon': 'assets/icon-category/taxas.png',
     'color': DefaultColors.magenta,
     'synonyms': ['tarifa', 'anuidade'],
     'relations': ['finanças', 'banco'],
@@ -1081,7 +1081,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 74,
     'name': 'Viagens',
-    'icon': 'assets/icon-category/travel.png',
+    'icon': 'assets/icon-category/viagens.png',
     'color': DefaultColors.oceanBlue,
     'synonyms': ['turismo', 'férias'],
     'relations': ['lazer', 'hospedagem'],
@@ -1272,7 +1272,7 @@ final List<Map<String, dynamic>> categories_income = [
   {
     'id': 81,
     'name': 'Aluguel Recebido',
-    'icon': 'assets/icon-category/rent.png',
+    'icon': 'assets/icon-category/aluguel.png',
     'color': DefaultColors.chartreuse, // Nova cor
     'synonyms': ['imóvel', 'renda imobiliária'],
     'relations': ['investimento', 'moradia'],
@@ -1280,7 +1280,7 @@ final List<Map<String, dynamic>> categories_income = [
   {
     'id': 82,
     'name': 'Dividendos',
-    'icon': 'assets/icon-category/dividends.png',
+    'icon': 'assets/icon-category/dividendos.png',
     'color': DefaultColors.forestGreen, // Nova cor
     'synonyms': ['investimentos', 'ações'],
     'relations': ['renda passiva', 'finanças'],
@@ -1288,7 +1288,7 @@ final List<Map<String, dynamic>> categories_income = [
   {
     'id': 83,
     'name': 'Venda de Itens Usados',
-    'icon': 'assets/icon-category/sell.png',
+    'icon': 'assets/icon-category/vendas.png',
     'color': DefaultColors.tangerine, // Nova cor
     'synonyms': ['brechó', 'usado'],
     'relations': ['compras', 'renda extra'],
@@ -1296,7 +1296,7 @@ final List<Map<String, dynamic>> categories_income = [
   {
     'id': 84,
     'name': 'Reembolsos',
-    'icon': 'assets/icon-category/refund.png',
+    'icon': 'assets/icon-category/reembolso.png',
     'color': DefaultColors.seaGreen, // Nova cor
     'synonyms': ['devolução', 'estorno'],
     'relations': ['compras', 'finanças'],
@@ -1304,7 +1304,7 @@ final List<Map<String, dynamic>> categories_income = [
   {
     'id': 85,
     'name': 'Pensão Alimentícia',
-    'icon': 'assets/icon-category/alimony.png',
+    'icon': 'assets/icon-category/pensao.png',
     'color': DefaultColors.oliveGreen, // Nova cor
     'synonyms': ['alimentos', 'judicial'],
     'relations': ['família', 'filhos'],
