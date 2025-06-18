@@ -35,7 +35,9 @@ class WidgetCategoryAnalise extends StatelessWidget {
         var categoryId = item['category'] as int;
         var valor = item['value'] as double;
         var percentual = (valor / totalValue * 100);
-        var categoryColor = item['color'] as Color;
+        var categoryColor = item['color'] == null
+            ? Colors.grey.withOpacity(0.5)
+            : item['color'] as Color;
         var categoryIcon = item['icon'] as String?;
 
         return Column(
@@ -92,7 +94,9 @@ class WidgetCategoryAnalise extends StatelessWidget {
                             SizedBox(
                               width: 110.w,
                               child: Text(
-                                item['name'] as String,
+                                item['name'] == null
+                                    ? 'Categoria não encontrada'
+                                    : item['name'] as String,
                                 style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,

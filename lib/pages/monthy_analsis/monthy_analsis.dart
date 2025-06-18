@@ -95,7 +95,9 @@ class MonthlyAnalysisPage extends StatelessWidget {
                               .map(
                                 (e) => PieChartSectionData(
                                   value: e['value'] as double,
-                                  color: e['color'] as Color,
+                                  color: e['color'] == null
+                                      ? Colors.grey.withOpacity(0.5)
+                                      : e['color'] as Color,
                                   title: '', // Sem título
                                   radius: 50,
                                   showTitle: false,

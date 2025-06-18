@@ -765,14 +765,14 @@ final List<Map<String, dynamic>> categories_expenses = [
     'synonyms': ['tarifa rodoviária'],
     'relations': ['transporte', 'viagem'],
   },
-  // {
-  //   'id': 78,
-  //   'name': 'Pet (Veterinário/Ração)',
-  //   'icon': 'assets/icon-category/pet.png',
-  //   'color': DefaultColors.jungleGreen,
-  //   'synonyms': ['animal', 'ração'],
-  //   'relations': ['família', 'saúde'],
-  // },
+  {
+    'id': 78,
+    'name': 'Pet (Veterinário/Ração)',
+    'icon': 'assets/icon-category/pet.png',
+    'color': DefaultColors.jungleGreen,
+    'synonyms': ['animal', 'ração'],
+    'relations': ['família', 'saúde'],
+  },
   {
     'id': 13,
     'name': 'Pets',
@@ -895,27 +895,27 @@ final List<Map<String, dynamic>> categories_expenses = [
     'synonyms': ['proteção', 'aparelho'],
     'relations': ['tecnologia', 'seguros'],
   },
-  // {
-  //   'id': 32,
-  //   'name': 'Seguro do Carro',
-  //   'icon': 'assets/icon-category/seguros.png',
-  //   'color': DefaultColors.blueGrey,
-  //   'synonyms': [
-  //     'seguro veicular',
-  //     'seguro auto',
-  //     'proteção veicular',
-  //     'seguro automóvel'
-  //   ],
-  //   'relations': [
-  //     'seguro veicular',
-  //     'seguro auto',
-  //     'proteção veicular',
-  //     'seguro automóvel',
-  //     'carro',
-  //     'veículo',
-  //     'transporte'
-  //   ],
-  // },
+  {
+    'id': 32,
+    'name': 'Seguro do Carro',
+    'icon': 'assets/icon-category/seguros.png',
+    'color': DefaultColors.blueGrey,
+    'synonyms': [
+      'seguro veicular',
+      'seguro auto',
+      'proteção veicular',
+      'seguro automóvel'
+    ],
+    'relations': [
+      'seguro veicular',
+      'seguro auto',
+      'proteção veicular',
+      'seguro automóvel',
+      'carro',
+      'veículo',
+      'transporte'
+    ],
+  },
   {
     'id': 23,
     'name': 'Streaming',
