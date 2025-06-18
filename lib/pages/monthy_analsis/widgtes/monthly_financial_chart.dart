@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'dart:math';
 
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
@@ -50,11 +49,13 @@ class MonthlyFinancialChart extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ChartLegendItem(label: 'Receitas', color: Colors.green),
-                const SizedBox(width: 20),
+                SizedBox(
+                  width: 20.w,
+                ),
                 ChartLegendItem(label: 'Despesas', color: Colors.red),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             // Gráfico
             LayoutBuilder(
@@ -124,7 +125,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                           },
                         ),
                       ),
-                      backgroundColor: Colors.white,
+                      backgroundColor: theme.cardColor,
                       gridData: FlGridData(
                         show: true,
                         drawVerticalLine: true,
@@ -167,7 +168,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                                 _getMonthAbbr(value.toInt()),
                                 style: TextStyle(
                                   color: Colors.grey[600],
-                                  fontSize:10,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
