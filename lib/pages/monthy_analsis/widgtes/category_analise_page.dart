@@ -352,86 +352,165 @@ class CategoryMonthlyChart extends StatelessWidget {
 
     // Dicas específicas por categoria
     switch (categoryName.toLowerCase()) {
+      // Grupo Alimentação (Restaurantes, Delivery, Mercado, Lanches)
       case 'alimentação':
       case 'comida':
       case 'restaurante':
+      case 'delivery':
+      case 'mercado':
+      case 'lanches':
+      case 'padaria':
+      case 'alimentação em viagens':
         tips.addAll([
-          'Planeje cardápios semanais para evitar compras por impulso',
-          'Compre em atacado itens não perecíveis quando houver promoção',
-          'Considere meal prep nos fins de semana para economizar tempo e dinheiro',
-          'Negocie com fornecedores locais para compras em quantidade'
+          'Faça "batch cooking" - cozinhe grandes quantidades e congele porções individuais',
+          'Compre cortes de carne menos nobres e aprenda técnicas para deixá-los macios',
+          'Crie um "banco de alimentos" com amigos para comprar atacado coletivamente',
+          'Use apps como Too Good To Go para comprar excedentes de restaurantes a preços reduzidos',
+          'Transforme sobras em novas refeições (ex: arroz vira bolinho, frango vira sanduíche)'
         ]);
         break;
 
+      // Grupo Transporte (Combustível, Uber, Pedágio, etc)
       case 'transporte':
       case 'combustível':
       case 'gasolina':
+      case 'uber/99':
+      case 'pedágio':
+      case 'multas':
+      case 'ipva':
+      case 'seguro do carro':
         tips.addAll([
-          'Use apps de trânsito para otimizar rotas e economizar combustível',
-          'Considere caronas compartilhadas para trajetos recorrentes',
-          'Monitore a pressão dos pneus mensalmente (pode economizar até 10%)',
-          'Avalie transporte público para trajetos regulares'
+          'Experimente a "direção hipereficiente" (manter velocidade constante, antecipar frenagens)',
+          'Crie um sistema de caronas rotativas com vizinhos para atividades regulares',
+          'Negocie pacotes de corridas com motoristas de aplicativo fixos',
+          'Use apps de estacionamento para encontrar vagas gratuitas ou mais baratas',
+          'Considere alugar sua vaga de garagem quando não estiver usando'
         ]);
         break;
 
-      case 'lazer':
-      case 'entretenimento':
-        tips.addAll([
-          'Procure eventos gratuitos na sua cidade nos fins de semana',
-          'Compartilhe assinaturas de streaming com familiares',
-          'Explore atividades ao ar livre que custam pouco',
-          'Defina um orçamento mensal fixo para lazer e use apenas dinheiro'
-        ]);
-        break;
-
-      case 'saúde':
-      case 'farmácia':
-      case 'médico':
-        tips.addAll([
-          'Invista em prevenção para evitar gastos maiores no futuro',
-          'Compare preços de medicamentos em diferentes farmácias',
-          'Considere genéricos quando aprovados pelo médico',
-          'Mantenha um kit básico de primeiros socorros em casa'
-        ]);
-        break;
-
-      case 'educação':
-      case 'cursos':
-        tips.addAll([
-          'Procure cursos gratuitos online antes de pagar por similares',
-          'Avalie o ROI de cada curso antes de se inscrever',
-          'Forme grupos de estudo para dividir custos de materiais',
-          'Considere bibliotecas públicas para livros e materiais'
-        ]);
-        break;
-
-      case 'roupas':
-      case 'vestuário':
-        tips.addAll([
-          'Compre peças atemporais e de qualidade ao invés de fast fashion',
-          'Aproveite liquidações de fim de estação',
-          'Considere brechós para peças únicas e sustentáveis',
-          'Faça um inventário do guarda-roupa antes de comprar'
-        ]);
-        break;
-
+      // Grupo Moradia (Contas, Manutenção, Casa)
       case 'casa':
       case 'moradia':
       case 'manutenção':
+      case 'contas (água, luz, gás, internet)':
+      case 'coisas para casa':
         tips.addAll([
-          'Faça manutenções preventivas para evitar reparos caros',
-          'Compare orçamentos de pelo menos 3 fornecedores',
-          'Aprenda técnicas básicas de reparo via YouTube',
-          'Compre ferramentas básicas para pequenos reparos'
+          'Instale válvulas de fechamento automático em torneiras para evitar vazamentos',
+          'Use garrafas PET cheias de água na caixa acoplada do vaso para reduzir consumo',
+          'Crie um "clube de ferramentas" com vizinhos para compartilhar equipamentos',
+          'Aplique filme refletivo em janelas para melhorar isolamento térmico',
+          'Negocie pacotes de serviços com prestadores fixos (eletricista, encanador)'
+        ]);
+        break;
+
+      // Grupo Saúde & Bem-estar
+      case 'saúde':
+      case 'farmácia':
+      case 'médico':
+      case 'plano de saúde/seguro de vida':
+      case 'academia':
+      case 'cuidados pessoais':
+        tips.addAll([
+          'Agende consultas médicas no final do expediente - muitos profissionais oferecem descontos',
+          'Participe de programas de prevenção gratuitos oferecidos por planos de saúde',
+          'Aprenda automassagem para reduzir idas a massagistas',
+          'Compre medicamentos em farmácias de bairro (muitas têm preços melhores que redes)',
+          'Use apps de exercícios em casa ao invés de academia quando possível'
+        ]);
+        break;
+
+      // Grupo Entretenimento & Lazer
+      case 'lazer':
+      case 'entretenimento':
+      case 'cinema/streaming':
+      case 'jogos online':
+      case 'viagens':
+      case 'hospedagens':
+      case 'passeios':
+      case 'passagens':
+        tips.addAll([
+          'Assine serviços de streaming durante promoções anuais (Black Friday costuma valer a pena)',
+          'Explore programas de fidelidade de companhias aéreas mesmo para voos baratos',
+          'Visite atrações turísticas em dias de entrada gratuita ou horários com desconto',
+          'Troque experiências (ex: ofereça hospedagem em sua cidade em plataformas de troca)',
+          'Compre ingressos de atrações turísticas com antecedência online (muitas vezes mais barato)'
+        ]);
+        break;
+
+      // Grupo Educação & Desenvolvimento
+      case 'educação':
+      case 'cursos':
+      case 'livros/revistas':
+        tips.addAll([
+          'Organize grupos de estudo coletivo para dividir custos de cursos caros',
+          'Procure edições internacionais de livros técnicos (muitas vezes mais baratas)',
+          'Peça samples gratuitos de materiais educacionais diretamente aos fornecedores',
+          'Participe como voluntário em eventos acadêmicos para ter acesso gratuito',
+          'Venda materiais didáticos antigos para financiar os novos'
+        ]);
+        break;
+
+      // Grupo Vestuário & Acessórios
+      case 'roupas':
+      case 'vestuário':
+      case 'roupas e acessórios':
+        tips.addAll([
+          'Organize eventos de troca de roupas com amigos periodicamente',
+          'Compre roupas de estação fora de época (agasalhos no verão, roupas de banho no inverno)',
+          'Aprenda técnicas básicas de costura para fazer reparos e ajustes',
+          'Invista em acessórios versáteis que mudam o visual de poucas peças básicas',
+          'Compre roupas de qualidade em leilões de estoque de lojas premium'
+        ]);
+        break;
+
+      // Grupo Tecnologia & Serviços
+      case 'assinaturas e serviços':
+      case 'aplicativos':
+      case 'streaming':
+      case 'taxas':
+        tips.addAll([
+          'Use cartões pré-pagos para assinaturas e evite cobranças automáticas',
+          'Negocie diretamente com atendentes para obter descontos em serviços',
+          'Compartilhe contas familiares maximizando os perfis permitidos',
+          'Cancele serviços sazonais durante períodos de não uso',
+          'Prefira planos anuais quando o desconto for superior a 20%'
+        ]);
+        break;
+
+      // Grupo Família & Pets
+      case 'família e filhos':
+      case 'pets':
+      case 'pet (veterinário/ração)':
+        tips.addAll([
+          'Organize uma creche compartilhada com outros pais em seu bairro',
+          'Compre ração em sacos grandes e armazene em potes herméticos',
+          'Aprenda a fazer brinquedos educativos caseiros para crianças/pets',
+          'Negocie pacotes de consultas com veterinários/pediátricas',
+          'Junte-se a outros donos de pets para comprar medicamentos em atacado'
+        ]);
+        break;
+
+      // Grupo Financeiros & Impostos
+      case 'impostos':
+      case 'financiamento':
+      case 'empréstimos':
+      case 'doações/caridade':
+        tips.addAll([
+          'Antecipe pagamentos de impostos quando houver desconto',
+          'Considere refinanciar dívidas sempre que as taxas caírem significativamente',
+          'Documente doações para abater no imposto de renda',
+          'Negocie taxas diretamente com gerentes bancários',
+          'Use serviços gratuitos de consultoria financeira oferecidos por algumas instituições'
         ]);
         break;
 
       default:
         tips.addAll([
-          'Analise se estes gastos são realmente necessários',
-          'Considere alternativas mais econômicas',
-          'Defina um limite mensal para esta categoria',
-          'Avalie fornecedores alternativos para melhores preços'
+          'Implemente a regra 72h: espere 3 dias antes de qualquer gasto não essencial',
+          'Crie um sistema de "orçamento reverso" (defina o que quer guardar primeiro)',
+          'Automatize transferências para poupança imediatamente após receber o salário',
+          'Converse com profissionais da área para descobrir "hacks" específicos',
+          'Monitore por 3 meses antes de cortar - alguns gastos trazem retornos ocultos'
         ]);
     }
 
