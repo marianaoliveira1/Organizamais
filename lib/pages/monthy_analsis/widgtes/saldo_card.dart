@@ -45,7 +45,7 @@ class SaldoCard extends StatelessWidget {
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: saldo < 0
-                        ? Colors.red
+                        ? DefaultColors.red
                         : theme
                             .primaryColor, // Cor vermelha para saldo negativo
                   ),
