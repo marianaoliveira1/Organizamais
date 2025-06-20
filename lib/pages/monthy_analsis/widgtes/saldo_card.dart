@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../utils/color.dart';
 
 class SaldoCard extends StatelessWidget {
@@ -40,11 +39,15 @@ class SaldoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatCurrency(saldo.abs()),
+                  _formatCurrency(
+                      saldo), // Removido o .abs() para mostrar valores negativos
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+                    color: saldo < 0
+                        ? Colors.red
+                        : theme
+                            .primaryColor, // Cor vermelha para saldo negativo
                   ),
                 ),
               ],
@@ -56,9 +59,14 @@ class SaldoCard extends StatelessWidget {
   }
 
   String _formatCurrency(double value) {
-    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',').replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]}.',
-        )}';
+    final isNegative = value < 0;
+    final absValue = value.abs();
+    final formatted =
+        absValue.toStringAsFixed(2).replaceAll('.', ',').replaceAllMapped(
+              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+              (Match m) => '${m[1]}.',
+            );
+
+    return '${isNegative ? '-' : ''}R\$ $formatted';
   }
 }
