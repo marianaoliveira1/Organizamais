@@ -56,9 +56,13 @@ class TransactionsList extends StatelessWidget {
 
   Map<String, List<dynamic>> _groupTransactionsByDate(List transactions) {
     Map<String, List<dynamic>> grouped = {};
+    final int currentYear = DateTime.now().year;
 
     for (var transaction in transactions) {
       DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+
+      // Filtra apenas transações do ano atual
+      if (transactionDate.year != currentYear) continue;
 
       if (selectedMonth.value.isNotEmpty) {
         String monthName =

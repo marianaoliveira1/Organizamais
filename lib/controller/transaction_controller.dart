@@ -10,21 +10,47 @@ class TransactionController extends GetxController {
   final _transaction = <TransactionModel>[].obs;
   FixedAccountsController get fixedAccountsController =>
       Get.find<FixedAccountsController>();
-
   List<TransactionModel> get transaction {
     var fakeTransactionsFromFixed = <TransactionModel>[];
     final today = DateTime.now();
 
-    for (final e in fixedAccountsController.fixedAccounts) {
-      for (var i = 0; i < 12; i++) {
-        final todayWithRightDay =
-            DateTime(today.year, today.month - 6 + i, int.parse(e.paymentDay));
+    for (final e in fixedAccountsController.allFixedAccounts) {
+      for (var i = 0; i < 2400; i++) { // 200 years * 12 months = 2400 months
+        final transactionMonth = today.month - 1200 + i; // Center around current date (100 years back, 100 years forward)
+        final transactionYear = today.year + (transactionMonth > 12 ? (transactionMonth - 1) ~/ 12 : transactionMonth < 1 ? (transactionMonth - 12) ~/ 12 : 0);
+        final normalizedMonth = ((transactionMonth - 1) % 12) + 1;
+        final adjustedNormalizedMonth = normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
+        final adjustedYear = normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
+        
+        final todayWithRightDay = DateTime(adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
+        
+        // Skip if account was deactivated before this transaction date
+        if (e.deactivatedAt != null) {
+          if (e.deactivatedAt!.isBefore(todayWithRightDay)) {
+            continue;
+          }
+        }
+
+        if (e.startMonth != null && e.startYear != null) {
+          final startDate = DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
+          if (todayWithRightDay.isBefore(startDate)) {
+            continue;
+          }
+        }
+        
+        // Skip if transaction date is before the account was created
+        // if (e.createdAt != null) {
+        //   if (todayWithRightDay.isBefore(e.createdAt!)) {
+        //     continue;
+        //   }
+        // }
+        
         fakeTransactionsFromFixed.add(TransactionModel(
           id: e.id,
           value: e.value.split('\$')[1],
           type: TransactionType.despesa,
           paymentDay: todayWithRightDay.toString(),
-          title: "Conta fixa: ${e.title}",
+          title: "Conta fixa: ${e.title} \n ${e.deactivatedAt != null ? '${e.deactivatedAt?.toLocal()}' : ''}",
           paymentType: e.paymentType,
           category: e.category,
         ));

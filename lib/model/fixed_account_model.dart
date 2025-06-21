@@ -8,6 +8,9 @@ class FixedAccountModel {
   final int category;
   final String paymentDay;
   final String? paymentType;
+  final int? startMonth;
+  final int? startYear;
+  final DateTime? deactivatedAt;
 
   FixedAccountModel({
     this.id,
@@ -17,6 +20,9 @@ class FixedAccountModel {
     required this.category,
     required this.paymentDay,
     required this.paymentType,
+    this.startMonth,
+    this.startYear,
+    this.deactivatedAt,
   });
 
   FixedAccountModel copyWith({
@@ -27,6 +33,9 @@ class FixedAccountModel {
     int? category,
     String? paymentDay,
     String? paymentType,
+    int? startMonth,
+    int? startYear,
+    DateTime? deactivatedAt,
   }) {
     return FixedAccountModel(
       id: id ?? this.id,
@@ -36,6 +45,9 @@ class FixedAccountModel {
       category: category ?? this.category,
       paymentDay: paymentDay ?? this.paymentDay,
       paymentType: paymentType ?? this.paymentType,
+      startMonth: startMonth ?? this.startMonth,
+      startYear: startYear ?? this.startYear,
+      deactivatedAt: deactivatedAt ?? this.deactivatedAt,
     );
   }
 
@@ -69,6 +81,21 @@ class FixedAccountModel {
         'paymentType': paymentType
       });
     }
+    if (startMonth != null) {
+      result.addAll({
+        'startMonth': startMonth
+      });
+    }
+    if (startYear != null) {
+      result.addAll({
+        'startYear': startYear
+      });
+    }
+    if (deactivatedAt != null) {
+      result.addAll({
+        'deactivatedAt': deactivatedAt!.toIso8601String()
+      });
+    }
 
     return result;
   }
@@ -82,6 +109,9 @@ class FixedAccountModel {
       category: map['category']?.toInt() ?? 0,
       paymentDay: map['paymentDay'] ?? '',
       paymentType: map['paymentType'],
+      startMonth: map['startMonth']?.toInt(),
+      startYear: map['startYear']?.toInt(),
+      deactivatedAt: map['deactivatedAt'] != null ? DateTime.parse(map['deactivatedAt']) : null,
     );
   }
 
@@ -91,18 +121,18 @@ class FixedAccountModel {
 
   @override
   String toString() {
-    return 'FixedAccount(id: $id, userId: $userId, title: $title, value: $value, category: $category, paymentDay: $paymentDay, paymentType: $paymentType)';
+    return 'FixedAccount(id: $id, userId: $userId, title: $title, value: $value, category: $category, paymentDay: $paymentDay, paymentType: $paymentType, startMonth: $startMonth, startYear: $startYear, deactivatedAt: $deactivatedAt)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is FixedAccountModel && other.id == id && other.userId == userId && other.title == title && other.value == value && other.category == category && other.paymentDay == paymentDay && other.paymentType == paymentType;
+    return other is FixedAccountModel && other.id == id && other.userId == userId && other.title == title && other.value == value && other.category == category && other.paymentDay == paymentDay && other.paymentType == paymentType && other.startMonth == startMonth && other.startYear == startYear && other.deactivatedAt == deactivatedAt;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ value.hashCode ^ category.hashCode ^ paymentDay.hashCode ^ paymentType.hashCode;
+    return id.hashCode ^ userId.hashCode ^ title.hashCode ^ value.hashCode ^ category.hashCode ^ paymentDay.hashCode ^ paymentType.hashCode ^ startMonth.hashCode ^ startYear.hashCode ^ deactivatedAt.hashCode;
   }
 }

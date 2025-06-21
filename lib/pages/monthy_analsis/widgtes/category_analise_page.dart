@@ -16,11 +16,11 @@ class CategoryMonthlyChart extends StatelessWidget {
   final Color categoryColor;
 
   const CategoryMonthlyChart({
-    Key? key,
+    super.key,
     required this.categoryId,
     required this.categoryName,
     required this.categoryColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -321,7 +321,7 @@ class CategoryMonthlyChart extends StatelessWidget {
 
         analysis.add({
           'month': _getMonthName(month),
-          'analysis': '${valueText} (${percentChange.toStringAsFixed(1)}%)',
+          'analysis': '$valueText (${percentChange.toStringAsFixed(1)}%)',
           'percentChange': percentChange,
           'isPositive': difference > 0,
           'currentValue': currentValue,
@@ -342,8 +342,9 @@ class CategoryMonthlyChart extends StatelessWidget {
 
     // Calcular padrões de gasto
     List<double> values = monthlyData.values.where((v) => v > 0).toList();
-    if (values.isEmpty)
+    if (values.isEmpty) {
       return [_buildTipItem("Sem dados suficientes para análise", theme)];
+    }
 
     double average = values.reduce((a, b) => a + b) / values.length;
     double maxValue = values.reduce((a, b) => a > b ? a : b);

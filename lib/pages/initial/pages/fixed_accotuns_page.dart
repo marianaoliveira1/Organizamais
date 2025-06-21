@@ -28,6 +28,8 @@ class AddFixedAccountsFormPage extends StatefulWidget {
 
 class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
   int? categoryId;
+  int selectedMonth = DateTime.now().month;
+  int selectedYear = DateTime.now().year;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
@@ -42,6 +44,8 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
       dayOfTheMonthController.text = widget.fixedAccount!.paymentDay;
       paymentTypeController.text = widget.fixedAccount!.paymentType ?? '';
       categoryId = widget.fixedAccount!.category;
+      selectedMonth = widget.fixedAccount!.startMonth ?? DateTime.now().month;
+      selectedYear = widget.fixedAccount!.startYear ?? DateTime.now().year;
     }
   }
 
@@ -65,181 +69,268 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
           ),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: 20.w,
-          horizontal: 20.h,
-        ),
-        child: Column(
-          spacing: 10.h,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdsBanner(),
-            DefaultTitleTransaction(
-              title: "Titulo",
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(12.r),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            vertical: 20.w,
+            horizontal: 20.h,
+          ),
+          child: Column(
+            spacing: 10.h,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AdsBanner(),
+              DefaultTitleTransaction(
+                title: "Titulo",
               ),
-              child: DefaultTextFieldTransaction(
-                hintText: 'ex: Aluguel',
-                controller: titleController,
-                keyboardType: TextInputType.text,
-              ),
-            ),
-            DefaultTitleTransaction(
-              title: "Valor",
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: TextFieldValueFixedAccotuns(
-                valueController: valueController,
-                theme: theme,
-              ),
-            ),
-            DefaultTitleTransaction(
-              title: "Categoria",
-            ),
-            DefaultButtonSelectCategory(
-              selectedCategory: categoryId,
-              transactionType: TransactionType.despesa,
-              onTap: (category) {
-                setState(() {
-                  categoryId = category;
-                });
-              },
-            ),
-            DefaultTitleTransaction(
-              title: "Dia do pagamento ",
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: TextField(
-                controller: dayOfTheMonthController,
-                cursorColor: theme.primaryColor,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: theme.primaryColor,
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter
-                      .digitsOnly, // Aceita apenas números
-                  _MaxNumberInputFormatter(28), // Restringe a 31
-                ],
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      12.r,
-                    ),
-                    borderSide: BorderSide(
-                      color: theme.primaryColor.withOpacity(.5),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      12.r,
-                    ),
-                    borderSide: BorderSide(
-                      color: theme.primaryColor.withOpacity(.5),
-                    ),
-                  ),
-                  focusColor: theme.primaryColor,
-                  hintText: 'ex: 5',
-                  hintStyle: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
+                child: DefaultTextFieldTransaction(
+                  hintText: 'ex: Aluguel',
+                  controller: titleController,
+                  keyboardType: TextInputType.text,
+                ),
+              ),
+              DefaultTitleTransaction(
+                title: "Valor",
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: TextFieldValueFixedAccotuns(
+                  valueController: valueController,
+                  theme: theme,
+                ),
+              ),
+              DefaultTitleTransaction(
+                title: "Mês e ano de início",
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
                     color: theme.primaryColor.withOpacity(.5),
                   ),
                 ),
-              ),
-            ),
-            Text(
-              "Máximo permitido: até 28, pois alguns meses têm no máximo 28 dias. Se for um número maior, a cobrança ocorrerá no dia 28.",
-              style: TextStyle(
-                color: DefaultColors.grey20,
-                fontSize: 9.sp,
-              ),
-            ),
-            DefaultTitleTransaction(
-              title: "Tipo de pagamento",
-            ),
-            PaymentTypeField(
-              controller: paymentTypeController,
-            ),
-            Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Verificação se todos os campos estão preenchidos
-                      if (titleController.text.isEmpty ||
-                          valueController.text.isEmpty ||
-                          dayOfTheMonthController.text.isEmpty ||
-                          paymentTypeController.text.isEmpty ||
-                          categoryId == null) {
-                        // Mostrar mensagem de erro se algum campo estiver vazio
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text("Por favor, preencha todos os campos"),
-                            backgroundColor: Colors.red,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: DropdownButton<int>(
+                          value: selectedMonth,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: theme.primaryColor,
                           ),
-                        );
-                        return;
-                      }
+                          dropdownColor: theme.scaffoldBackgroundColor,
+                          items: List.generate(12, (index) {
+                            int month = index + 1;
+                            List<String> monthNames = [
+                              'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                              'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                            ];
+                            return DropdownMenuItem<int>(
+                              value: month,
+                              child: Text(monthNames[index]),
+                            );
+                          }),
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              selectedMonth = newValue!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 50.h,
+                      color: theme.primaryColor.withOpacity(.3),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: DropdownButton<int>(
+                          value: selectedYear,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: theme.primaryColor,
+                          ),
+                          dropdownColor: theme.scaffoldBackgroundColor,
+                                                  items: List.generate(40, (index) {
+                          int year = DateTime.now().year - 10 + index;
+                          return DropdownMenuItem<int>(
+                            value: year,
+                            child: Text(year.toString()),
+                          );
+                        }),
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              selectedYear = newValue!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              DefaultTitleTransaction(
+                title: "Categoria",
+              ),
+              DefaultButtonSelectCategory(
+                selectedCategory: categoryId,
+                transactionType: TransactionType.despesa,
+                onTap: (category) {
+                  setState(() {
+                    categoryId = category;
+                  });
+                },
+              ),
+              DefaultTitleTransaction(
+                title: "Dia do pagamento ",
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: TextField(
+                  controller: dayOfTheMonthController,
+                  cursorColor: theme.primaryColor,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: theme.primaryColor,
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter
+                        .digitsOnly, // Aceita apenas números
+                    _MaxNumberInputFormatter(28), // Restringe a 31
+                  ],
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        12.r,
+                      ),
+                      borderSide: BorderSide(
+                        color: theme.primaryColor.withOpacity(.5),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        12.r,
+                      ),
+                      borderSide: BorderSide(
+                        color: theme.primaryColor.withOpacity(.5),
+                      ),
+                    ),
+                    focusColor: theme.primaryColor,
+                    hintText: 'ex: 5',
+                    hintStyle: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: theme.primaryColor.withOpacity(.5),
+                    ),
+                  ),
+                ),
+              ),
+              Text(
+                "Máximo permitido: até 28, pois alguns meses têm no máximo 28 dias. Se for um número maior, a cobrança ocorrerá no dia 28.",
+                style: TextStyle(
+                  color: DefaultColors.grey20,
+                  fontSize: 9.sp,
+                ),
+              ),
+              DefaultTitleTransaction(
+                title: "Tipo de pagamento",
+              ),
+              PaymentTypeField(
+                controller: paymentTypeController,
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Verificação se todos os campos estão preenchidos
+                        if (titleController.text.isEmpty ||
+                            valueController.text.isEmpty ||
+                            dayOfTheMonthController.text.isEmpty ||
+                            paymentTypeController.text.isEmpty ||
+                            categoryId == null) {
+                          // Mostrar mensagem de erro se algum campo estiver vazio
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text("Por favor, preencha todos os campos"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
 
-                      // Se todos os campos estiverem preenchidos, continua com o salvamento
-                      if (widget.onSave != null) {
-                        widget.onSave!(FixedAccountModel(
-                          id: widget.fixedAccount!.id,
+                        // Se todos os campos estiverem preenchidos, continua com o salvamento
+                        if (widget.onSave != null) {
+                          widget.onSave!(FixedAccountModel(
+                            id: widget.fixedAccount?.id,
+                            title: titleController.text,
+                            value: valueController.text,
+                            category: categoryId ?? 0,
+                            paymentDay: dayOfTheMonthController.text,
+                            paymentType: paymentTypeController.text,
+                            startMonth: selectedMonth,
+                            startYear: selectedYear,
+                          ));
+                          Navigator.pop(context);
+                          return;
+                        }
+                        Navigator.pop(context);
+                        fixedAccountsController.addFixedAccount(FixedAccountModel(
                           title: titleController.text,
                           value: valueController.text,
                           category: categoryId ?? 0,
                           paymentDay: dayOfTheMonthController.text,
                           paymentType: paymentTypeController.text,
+                          startMonth: selectedMonth,
+                          startYear: selectedYear,
                         ));
-                        Navigator.pop(context);
-                        return;
-                      }
-                      Navigator.pop(context);
-                      fixedAccountsController.addFixedAccount(FixedAccountModel(
-                        title: titleController.text,
-                        value: valueController.text,
-                        category: categoryId ?? 0,
-                        paymentDay: dayOfTheMonthController.text,
-                        paymentType: paymentTypeController.text,
-                      ));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryColor,
-                      padding: EdgeInsets.all(15.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        padding: EdgeInsets.all(15.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      "Salvar",
-                      style: TextStyle(
-                        color: theme.cardColor,
-                        fontSize: 14.sp,
+                      child: Text(
+                        "Salvar",
+                        style: TextStyle(
+                          color: theme.cardColor,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -38,9 +38,7 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
           SizedBox(
             height: 10.h,
           ),
-          FixedAccounts(
-            fixedAccounts: Get.find<FixedAccountsController>().fixedAccounts,
-          ),
+          FixedAccounts(),
         ],
       ),
     );
