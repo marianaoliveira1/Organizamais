@@ -58,11 +58,12 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
           .toList();
 
       if (selectedMonth.isNotEmpty) {
+        final int currentYear = DateTime.now().year;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth;
+          return monthName == selectedMonth && transactionDate.year == currentYear;
         }).toList();
       }
 
@@ -538,11 +539,12 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
           .toList();
 
       if (selectedMonth.isNotEmpty) {
+        final int currentYear = DateTime.now().year;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth;
+          return monthName == selectedMonth && transactionDate.year == currentYear;
         }).toList();
       }
       return despesas;

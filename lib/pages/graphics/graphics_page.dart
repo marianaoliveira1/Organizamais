@@ -114,15 +114,13 @@ class _GraphicsPageState extends State<GraphicsPage> {
           .toList();
 
       if (selectedMonth.isNotEmpty) {
+        final int currentYear = DateTime.now().year;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          if (monthName == selectedMonth) {
-            print(monthName);
-            print(selectedMonth);
-          }
-          return monthName == selectedMonth;
+          // Verifica se o mês corresponde e se é do ano atual
+          return monthName == selectedMonth && transactionDate.year == currentYear;
         }).toList();
       }
 
@@ -193,6 +191,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
     }
 
     final bool isFirstDay = DateTime.now().day == 1;
+    final int currentYear = DateTime.now().year;
     num totalReceita = isFirstDay
         ? 0
         : transactionController.transaction.where((t) {
@@ -200,8 +199,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
               DateTime paymentDate = DateTime.parse(
                   t.paymentDay!); // Converte a string para DateTime
               return t.type == TransactionType.receita &&
-                  // paymentDate.month == selectedMonth;
-                  getAllMonths()[paymentDate.month - 1] == selectedMonth;
+                  getAllMonths()[paymentDate.month - 1] == selectedMonth &&
+                  paymentDate.year == currentYear;
             }
             return false;
           }).fold(
@@ -221,8 +220,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
               DateTime paymentDate = DateTime.parse(
                   t.paymentDay!); // Converte a string para DateTime
               return t.type == TransactionType.despesa &&
-                  // paymentDate.month == currentMonth;
-                  getAllMonths()[paymentDate.month - 1] == selectedMonth;
+                  getAllMonths()[paymentDate.month - 1] == selectedMonth &&
+                  paymentDate.year == currentYear;
             }
             return false; // Caso paymentDay seja nulo
           }).fold(

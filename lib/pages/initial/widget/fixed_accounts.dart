@@ -63,7 +63,7 @@ class FixedAccounts extends StatelessWidget {
       ];
       
       String monthName = monthNames[fixedAccount.startMonth! - 1];
-      baseText += " (desde ${monthName}/${fixedAccount.startYear})";
+      baseText += " (desde $monthName/${fixedAccount.startYear})";
     }
     
     return baseText;
