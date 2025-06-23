@@ -35,10 +35,6 @@ class ResumeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AdsBanner(),
-        SizedBox(
-          height: 20.h,
-        ),
         MonthSelectorResume(
           selectedMonth: _selectedMonth,
           initialMonth:

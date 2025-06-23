@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../ads_banner/ads_banner.dart';
 import 'widgtes/resume_content.dart';
 
 class ResumePage extends StatelessWidget {
@@ -15,10 +16,20 @@ class ResumePage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.h),
-          child: SingleChildScrollView(
-            child: SafeArea(
-              child: ResumeContent(),
-            ),
+          child: Column(
+            children: [
+              AdsBanner(),
+              SizedBox(
+                height: 20.h,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: SafeArea(
+                    child: ResumeContent(),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
