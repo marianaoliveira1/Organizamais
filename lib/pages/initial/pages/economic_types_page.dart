@@ -5,54 +5,80 @@ class EconomicTipsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tips = {
-      '🧠 Hacks Comportamentais': [
-        '🛒 Regra dos 7 Dias: Coloque no carrinho e espere 7 dias antes de comprar. Desejo impulsivo passa.',
-        '💰 Quantas horas custa?: R\$ 500 = 10h de trabalho (se ganha R\$50/h). Vale a pena?',
-        '🔐 Crie barreiras: Deslogue cartões de apps, senha difícil, sem 1 clique.',
-      ],
-      '🛍️ Compras Inteligentes': [
-        '❄️ Compre fora da temporada: Ar-condicionado em agosto, Natal em abril, etc.',
-        '👥 Clube de Compras Coletivas: Junte vizinhos para compras no atacado.',
-        '🏭 Zona Industrial: Oficinas e serviços 50% mais baratos que no shopping.',
-      ],
-      '💡 Redução de Custos Escondidos': [
-        '🔌 Desligue stand-by: Réguas com botão ON/OFF economizam até R\$200/ano.',
-        '📞 Negocie anuais: Desconto de 5–15% ao pagar plano à vista.',
-        '📦 Alugue espaço: Vaga, despensa ou armário parado podem virar renda.',
-      ],
-      '📱 Tecnologia a Seu Favor': [
-        '🧾 Extensões de Cashback: Instale MeuDesconto, Zoom no navegador.',
-        '💬 Peça desconto direto: Chame no WhatsApp e pergunte sobre desconto no PIX.',
-      ],
-      '🥦 Alimentação Inteligente': [
-        '🥣 Sopa de Geladeira: Use sobras pra fazer sopa toda semana.',
-        '🥩 Cortes desvalorizados: Músculo, acém e paleta são 40% mais baratos.',
-      ],
-      '🚫 Evite Economias Falsas': [
-        '👞 Qualidade > Preço: Um sapato de R\$300 que dura 2 anos é melhor que um de R\$100 que dura 3 meses.',
-        '📉 Promoção de inúteis: 50% de algo inútil ainda é 100% desperdício.',
-      ],
-      '💎 Dica Bônus': [
-        '💰 Fundo de Emergência: Invista em CDBs com IPCA+ a partir de R\$50/mês. Seguro e melhor que poupança.',
-      ],
-    };
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dicas de Economia'),
         backgroundColor: Colors.green.shade700,
       ),
-      body: ListView(
-        children: tips.entries.map((entry) {
-          return ExpansionTile(
-            title: Text(entry.key,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            children:
-                entry.value.map((tip) => ListTile(title: Text(tip))).toList(),
-          );
-        }).toList(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            Text(
+              '💡 Pequenos hábitos mudam sua vida financeira!',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Confira abaixo algumas dicas práticas e psicológicas para economizar melhor, gastar com mais consciência e usar a tecnologia a seu favor.',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 24),
+
+            // 🧠 Hacks Comportamentais
+            Text('🧠 Hacks Comportamentais', style: sectionTitle),
+            tip('🛒 Regra dos 7 Dias: coloque no carrinho e espere 7 dias antes de comprar. Impulsos passam.'),
+            tip('💰 Quantas horas custa?: R\$ 500 = 10h de trabalho (se ganha R\$50/h). Vale a pena?'),
+            tip('🔐 Crie barreiras: deslogue cartões, desative 1 clique, use senhas difíceis.'),
+
+            // 🛍️ Compras Inteligentes
+            Text('🛍️ Compras Inteligentes', style: sectionTitle),
+            tip('❄️ Fora da temporada: ar-condicionado em agosto, Natal em abril, etc.'),
+            tip('👥 Clube Coletivo: junte vizinhos para compras no atacado.'),
+            tip('🏭 Zona Industrial: serviços 50% mais baratos que no shopping.'),
+
+            // 💡 Redução de Custos Escondidos
+            Text('💡 Redução de Custos Escondidos', style: sectionTitle),
+            tip('🔌 Desligue stand-by: use réguas com botão ON/OFF. Economia de até R\$200/ano.'),
+            tip('📞 Negocie planos anuais: pague à vista e peça desconto (5–15%).'),
+            tip('📦 Alugue espaços ociosos: garagem, armário ou despensa.'),
+
+            // 📱 Tecnologia a Seu Favor
+            Text('📱 Tecnologia a Seu Favor', style: sectionTitle),
+            tip('🧾 Extensões de Cashback: instale MeuDesconto, Zoom no navegador.'),
+            tip('💬 Peça desconto direto: chame no WhatsApp e pergunte "Tem desconto no PIX?"'),
+
+            // 🥦 Alimentação Inteligente
+            Text('🥦 Alimentação Inteligente', style: sectionTitle),
+            tip('🥣 Sopa de Geladeira: use sobras para fazer sopa semanal. Zero desperdício.'),
+            tip('🥩 Cortes mais baratos: músculo, acém e paleta. 40% mais baratos e saborosos.'),
+
+            // 🚫 Evite Economias Falsas
+            Text('🚫 Evite Economias Falsas', style: sectionTitle),
+            tip('👞 Qualidade > preço: um bom sapato que dura 2 anos vale mais que 3 baratos.'),
+            tip('📉 Promoção do que não precisa: ainda é desperdício, mesmo com 50% OFF.'),
+
+            // 💎 Dica Bônus
+            Text('💎 Dica Bônus', style: sectionTitle),
+            tip('💰 Fundo de Emergência: invista em CDBs com IPCA+. Comece com R\$50/mês. Rende mais que poupança e tem resgate rápido.'),
+            SizedBox(height: 40),
+          ],
+        ),
       ),
+    );
+  }
+
+  static const sectionTitle = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.green,
+    height: 2,
+  );
+
+  static Widget tip(String text) {
+    return Padding(
+      padding: EdgeInsets.only(top: 4, bottom: 4),
+      child: Text("• $text", style: TextStyle(fontSize: 15)),
     );
   }
 }
