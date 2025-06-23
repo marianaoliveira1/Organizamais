@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/resume/widgtes/month_selector_resume.dart';
 
-import '../../../ads_banner/ads_banner.dart';
 import 'transaction_list_resume.dart';
 
 class ResumeContent extends StatelessWidget {

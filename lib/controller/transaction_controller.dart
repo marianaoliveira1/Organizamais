@@ -15,15 +15,26 @@ class TransactionController extends GetxController {
     final today = DateTime.now();
 
     for (final e in fixedAccountsController.allFixedAccounts) {
-      for (var i = 0; i < 2400; i++) { // 200 years * 12 months = 2400 months
-        final transactionMonth = today.month - 1200 + i; // Center around current date (100 years back, 100 years forward)
-        final transactionYear = today.year + (transactionMonth > 12 ? (transactionMonth - 1) ~/ 12 : transactionMonth < 1 ? (transactionMonth - 12) ~/ 12 : 0);
+      for (var i = 0; i < 2400; i++) {
+        // 200 years * 12 months = 2400 months
+        final transactionMonth = today.month -
+            1200 +
+            i; // Center around current date (100 years back, 100 years forward)
+        final transactionYear = today.year +
+            (transactionMonth > 12
+                ? (transactionMonth - 1) ~/ 12
+                : transactionMonth < 1
+                    ? (transactionMonth - 12) ~/ 12
+                    : 0);
         final normalizedMonth = ((transactionMonth - 1) % 12) + 1;
-        final adjustedNormalizedMonth = normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
-        final adjustedYear = normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
-        
-        final todayWithRightDay = DateTime(adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
-        
+        final adjustedNormalizedMonth =
+            normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
+        final adjustedYear =
+            normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
+
+        final todayWithRightDay = DateTime(
+            adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
+
         // Skip if account was deactivated before this transaction date
         if (e.deactivatedAt != null) {
           if (e.deactivatedAt!.isBefore(todayWithRightDay)) {
@@ -32,25 +43,27 @@ class TransactionController extends GetxController {
         }
 
         if (e.startMonth != null && e.startYear != null) {
-          final startDate = DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
+          final startDate =
+              DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
           if (todayWithRightDay.isBefore(startDate)) {
             continue;
           }
         }
-        
+
         // Skip if transaction date is before the account was created
         // if (e.createdAt != null) {
         //   if (todayWithRightDay.isBefore(e.createdAt!)) {
         //     continue;
         //   }
         // }
-        
+
         fakeTransactionsFromFixed.add(TransactionModel(
           id: e.id,
           value: e.value.split('\$')[1],
           type: TransactionType.despesa,
           paymentDay: todayWithRightDay.toString(),
-          title: "Conta fixa: ${e.title} \n ${e.deactivatedAt != null ? '${e.deactivatedAt?.toLocal()}' : ''}",
+          title:
+              "Conta fixa: ${e.title} \n ${e.deactivatedAt != null ? '${e.deactivatedAt?.toLocal()}' : ''}",
           paymentType: e.paymentType,
           category: e.category,
         ));
@@ -124,9 +137,9 @@ class TransactionController extends GetxController {
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.receita && 
-               date.year == currentYear && 
-               date.isBefore(now);
+        return t.type == TransactionType.receita &&
+            date.year == currentYear &&
+            date.isBefore(now);
       }
       return false;
     }).fold(
@@ -142,9 +155,9 @@ class TransactionController extends GetxController {
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.despesa && 
-               date.year == currentYear && 
-               date.isBefore(now);
+        return t.type == TransactionType.despesa &&
+            date.year == currentYear &&
+            date.isBefore(now);
       }
       return false;
     }).fold(

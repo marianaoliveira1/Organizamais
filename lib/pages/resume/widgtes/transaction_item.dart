@@ -31,7 +31,8 @@ class TransactionItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
         child: InkWell(
           borderRadius: BorderRadius.circular(24.r),
-          onLongPress: () => _showDeleteConfirmationDialog(context, transaction),
+          onLongPress: () =>
+              _showDeleteConfirmationDialog(context, transaction),
           onTap: () => Get.to(
             () => TransactionPage(
               transaction: transaction,
@@ -69,7 +70,7 @@ class TransactionItem extends StatelessWidget {
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                             ),
-                            maxLines: 2,
+                            maxLines: 3,
                             softWrap: true,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -131,13 +132,15 @@ class TransactionItem extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, dynamic transaction) {
+  void _showDeleteConfirmationDialog(
+      BuildContext context, dynamic transaction) {
     final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardColor,
-        content: Text('Tem certeza que deseja excluir o cartão ${transaction.title}?'),
+        content: Text(
+            'Tem certeza que deseja excluir o cartão ${transaction.title}?'),
         actions: [
           TextButton(
             child: Text(
@@ -173,7 +176,9 @@ class TransactionItem extends StatelessWidget {
       double? doubleValue = double.tryParse(
         value.replaceAll('.', '').replaceAll(',', '.'),
       );
-      return doubleValue != null ? formatter.format(doubleValue) : formatter.format(0);
+      return doubleValue != null
+          ? formatter.format(doubleValue)
+          : formatter.format(0);
     } else if (value is num) {
       return formatter.format(value);
     }
