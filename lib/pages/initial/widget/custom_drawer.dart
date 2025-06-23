@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:organizamais/pages/initial/pages/economic_types_page.dart';
 
 import '../../../controller/auth_controller.dart';
 import '../../cards/cards_page.dart';
@@ -48,6 +49,12 @@ class CustomDrawer extends StatelessWidget {
               icon: Iconsax.receipt_1,
               title: 'Minhas Contas Fixas',
               onTap: () => Get.to(() => const FixedAccountsPage()),
+            ),
+            _buildDivider(),
+            SettingItem(
+              icon: Iconsax.lamp,
+              title: 'Dicas',
+              onTap: () => Get.to(() => const EconomicTipsPage()),
             ),
             const Spacer(),
             LogoutButton(
