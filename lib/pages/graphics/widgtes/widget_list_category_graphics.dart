@@ -306,14 +306,30 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       if (monthName.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
+
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+          DateTime today = DateTime.now();
+
+          // Filtra apenas transações até hoje
+          if (transactionDate.isAfter(today)) {
+            return false;
+          }
+
           String transactionMonthName =
               getAllMonths()[transactionDate.month - 1];
           return transactionMonthName == monthName;
         }).toList();
       }
 
-      return despesas;
+      // Se não há filtro de mês, filtra apenas por data até hoje
+      return despesas.where((transaction) {
+        if (transaction.paymentDay == null) return false;
+
+        DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+        DateTime today = DateTime.now();
+
+        return !transactionDate.isAfter(today);
+      }).toList();
     }
 
     var filteredTransactions = getFilteredTransactions();

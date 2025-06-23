@@ -906,7 +906,7 @@ class CategoryAnalysisPage extends StatelessWidget {
       int categoryId, String monthName) {
     final TransactionController transactionController =
         Get.find<TransactionController>();
-    final currentDate = DateTime.now();
+    final DateTime now = DateTime.now();
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction
@@ -916,17 +916,21 @@ class CategoryAnalysisPage extends StatelessWidget {
       if (monthName.isNotEmpty) {
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
+
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String transactionMonthName =
               getAllMonths()[transactionDate.month - 1];
 
-          // Filter by month and date <= current date
           return transactionMonthName == monthName &&
-              transactionDate.isBefore(currentDate);
+              transactionDate.isBefore(now.add(const Duration(days: 1)));
         }).toList();
       }
 
-      return despesas;
+      return despesas.where((transaction) {
+        if (transaction.paymentDay == null) return false;
+        DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+        return transactionDate.isBefore(now.add(const Duration(days: 1)));
+      }).toList();
     }
 
     var filteredTransactions = getFilteredTransactions();
