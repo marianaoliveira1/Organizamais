@@ -14,100 +14,157 @@ class EconomicTipsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Dicas de Economia'),
         backgroundColor: theme.scaffoldBackgroundColor,
+        title: const Text('Dicas de Economia Inteligente'),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 20.h,
-        ),
-        child: Column(
-          children: [
-            AdsBanner(),
-            SizedBox(
-              height: 20.h,
+      body: Column(
+        children: [
+          AdsBanner(),
+          SizedBox(
+            height: 20.h,
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                TipCard(
+                  title: 'Dica Nada Óbvia: O Clube da Troca de Habilidades',
+                  description:
+                      'Em vez de pagar por serviços (como cortar o cabelo, consertar algo, dar aulas de algo que você domina), troque habilidades com amigos ou vizinhos. Você faz algo para eles e eles fazem algo para você. É economia direta e ainda fortalece laços!',
+                  isObvious: false,
+                  // Usando a cor principal do tema para títulos não óbvios
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title:
+                      'Dica Nada Óbvia: Reavalie Suas "Necessidades Sociais"',
+                  description:
+                      'Muitos gastos vêm da pressão social: sair todo fim de semana, comprar a roupa da moda, ter o gadget mais recente. Questione se essas atividades realmente te trazem felicidade ou se são apenas para "acompanhar". Priorize experiências que não custam fortunas.',
+                  isObvious: false,
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title: 'Dica Nada Óbvia: A Regra do "Custo Por Uso"',
+                  description:
+                      'Antes de comprar algo, principalmente algo caro, calcule quantas vezes você realmente vai usar. Uma máquina de café superpotente que você usa uma vez por mês tem um "custo por uso" altíssimo. Alugar ou pegar emprestado pode ser mais inteligente.',
+                  isObvious: false,
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title:
+                      'Dica Nada Óbvia: Venda o Que Não Usa (e Não Sentirá Falta)',
+                  description:
+                      'Você provavelmente tem itens em casa que não usa há anos. Roupas, livros, eletrônicos. Desapegue! Venda-os em plataformas online. Além de liberar espaço, o dinheiro extra pode ser um ótimo impulso para sua poupança.',
+                  isObvious: false,
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title: 'Dica Nada Óbvia: Auditoria de Assinaturas (a Fundo!)',
+                  description:
+                      'Não olhe só os serviços de streaming. Inclua apps de celular, academias que você não frequenta, jornais digitais que não lê. Muitas vezes nos esquecemos de pequenas assinaturas que se somam a um valor considerável. Use apps de gerenciamento financeiro para rastreá-las.',
+                  isObvious: false,
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title: 'Dica Nada Óbvia: O Desafio do "Dia Sem Gastos"',
+                  description:
+                      'Escolha um dia na semana (ou até alguns dias no mês) onde você se compromete a não gastar absolutamente nada, a não ser o essencial. Leve marmita, não compre café, evite sair. É um exercício de disciplina que mostra o quanto você gasta "sem pensar".',
+                  isObvious: false,
+                  textColor: Theme.of(context).primaryColor,
+                ),
+                TipCard(
+                  title: 'Dica Óbvia: Crie um Orçamento e Siga-o',
+                  description:
+                      'Anote todas as suas receitas e despesas. Saber para onde seu dinheiro está indo é o primeiro passo para ter controle e economizar. Defina limites para cada categoria de gasto.',
+                  isObvious: true,
+                  textColor: DefaultColors.grey20,
+                ),
+                TipCard(
+                  title: 'Dica Óbvia: Cozinhe Mais em Casa e Leve Marmita',
+                  description:
+                      'Comer fora é um dos maiores vilões do orçamento. Preparar suas próprias refeições é geralmente mais barato e saudável. Leve sua marmita para o trabalho ou faculdade.',
+                  isObvious: true,
+                  textColor: DefaultColors.grey20,
+                ),
+                TipCard(
+                  title: 'Dica Óbvia: Evite Compras por Impulso',
+                  description:
+                      'Antes de comprar algo, especialmente itens não essenciais, dê um tempo. Espere 24 horas, ou até alguns dias, para ver se você realmente precisa ou deseja o item. Muitas vezes, o impulso passa.',
+                  isObvious: true,
+                  textColor: DefaultColors.grey20,
+                ),
+                TipCard(
+                  title: 'Dica Óbvia: Pesquise Preços Antes de Comprar',
+                  description:
+                      'Não compre no primeiro lugar. Compare preços em diferentes lojas físicas e online. Usar comparadores de preço pode te poupar um bom dinheiro.',
+                  isObvious: true,
+                  textColor: DefaultColors.grey20,
+                ),
+                TipCard(
+                  title:
+                      'Dica Óbvia: Use o Transporte Público ou Vá a Pé/Bicicleta',
+                  description:
+                      'Reduza o uso do carro. Além do combustível, há gastos com manutenção, estacionamento e impostos. O transporte público, bicicleta ou caminhadas são alternativas mais econômicas e, muitas vezes, mais saudáveis.',
+                  isObvious: true,
+                  textColor: DefaultColors.grey20,
+                ),
+              ],
             ),
-            Expanded(
-              child: ListView(
-                children: [
-                  Text(
-                    '💡 Pequenos hábitos mudam sua vida financeira!',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Confira abaixo algumas dicas práticas e psicológicas para economizar melhor, gastar com mais consciência e usar a tecnologia a seu favor.',
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 24),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-                  // 🧠 Hacks Comportamentais
-                  Text(
-                    '🧠 Hacks Comportamentais',
-                    style: sectionTitle,
-                  ),
-                  tip('🛒 Regra dos 7 Dias: coloque no carrinho e espere 7 dias antes de comprar. Impulsos passam.'),
-                  tip('💰 Quantas horas custa?: R\$ 500 = 10h de trabalho (se ganha R\$50/h). Vale a pena?'),
-                  tip('🔐 Crie barreiras: deslogue cartões, desative 1 clique, use senhas difíceis.'),
+class TipCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final bool isObvious;
+  final Color textColor; // Adicionamos uma propriedade para a cor do texto
 
-                  // 🛍️ Compras Inteligentes
-                  Text('🛍️ Compras Inteligentes', style: sectionTitle),
-                  tip('❄️ Fora da temporada: ar-condicionado em agosto, Natal em abril, etc.'),
-                  tip('👥 Clube Coletivo: junte vizinhos para compras no atacado.'),
-                  tip('🏭 Zona Industrial: serviços 50% mais baratos que no shopping.'),
+  const TipCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.isObvious,
+    required this.textColor, // Agora é obrigatório passar a cor
+  });
 
-                  // 💡 Redução de Custos Escondidos
-                  Text('💡 Redução de Custos Escondidos', style: sectionTitle),
-                  tip('🔌 Desligue stand-by: use réguas com botão ON/OFF. Economia de até R\$200/ano.'),
-                  tip('📞 Negocie planos anuais: pague à vista e peça desconto (5–15%).'),
-                  tip('📦 Alugue espaços ociosos: garagem, armário ou despensa.'),
-
-                  // 📱 Tecnologia a Seu Favor
-                  Text('📱 Tecnologia a Seu Favor', style: sectionTitle),
-                  tip('🧾 Extensões de Cashback: instale MeuDesconto, Zoom no navegador.'),
-                  tip('💬 Peça desconto direto: chame no WhatsApp e pergunte "Tem desconto no PIX?"'),
-
-                  // 🥦 Alimentação Inteligente
-                  Text('🥦 Alimentação Inteligente', style: sectionTitle),
-                  tip('🥣 Sopa de Geladeira: use sobras para fazer sopa semanal. Zero desperdício.'),
-                  tip('🥩 Cortes mais baratos: músculo, acém e paleta. 40% mais baratos e saborosos.'),
-
-                  // 🚫 Evite Economias Falsas
-                  Text('🚫 Evite Economias Falsas', style: sectionTitle),
-                  tip('👞 Qualidade > preço: um bom sapato que dura 2 anos vale mais que 3 baratos.'),
-                  tip('📉 Promoção do que não precisa: ainda é desperdício, mesmo com 50% OFF.'),
-
-                  // 💎 Dica Bônus
-                  Text('💎 Dica Bônus', style: sectionTitle),
-                  tip('💰 Fundo de Emergência: invista em CDBs com IPCA+. Comece com R\$50/mês. Rende mais que poupança e tem resgate rápido.'),
-                  SizedBox(height: 40),
-                ],
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 16.0.h),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          10.r,
+        ), // Bordas arredondadas
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(14.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                color: textColor, // Usando a cor passada via construtor
               ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: DefaultColors.grey20,
+              ), // Cor do texto da descrição
             ),
           ],
         ),
       ),
-    );
-  }
-
-  static const sectionTitle = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: DefaultColors.grey,
-    height: 2,
-  );
-
-  static Widget tip(String text) {
-    return Padding(
-      padding: EdgeInsets.only(top: 4, bottom: 4),
-      child: Text("• $text", style: TextStyle(fontSize: 15)),
     );
   }
 }
