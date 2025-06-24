@@ -8,7 +8,7 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
-import 'widgtes/default_text_graphic.dart';
+import 'default_text_graphic.dart';
 
 class DespesasPorTipoDePagamento extends StatelessWidget {
   const DespesasPorTipoDePagamento({super.key, required this.selectedMonth});
@@ -63,7 +63,8 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth && transactionDate.year == currentYear;
+          return monthName == selectedMonth &&
+              transactionDate.year == currentYear;
         }).toList();
       }
 
@@ -544,7 +545,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth && transactionDate.year == currentYear;
+          return monthName == selectedMonth &&
+              transactionDate.year == currentYear;
         }).toList();
       }
       return despesas;

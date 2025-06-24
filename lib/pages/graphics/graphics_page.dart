@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:chart_sparkline/chart_sparkline.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
-import 'package:organizamais/pages/graphics/despesas_por_tipo_de_pagamento.dart';
+import 'package:organizamais/pages/graphics/widgtes/despesas_por_tipo_de_pagamento.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -62,7 +62,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
     // Estimar a posição do mês atual para centralizar
     final int currentMonthIndex = DateTime.now().month - 1;
     final double itemWidth =
-        100.w; // Ajuste este valor conforme a largura real do seu item
+        80.w; // Ajuste este valor conforme a largura real do seu item
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
@@ -120,7 +120,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String monthName = getAllMonths()[transactionDate.month - 1];
           // Verifica se o mês corresponde e se é do ano atual
-          return monthName == selectedMonth && transactionDate.year == currentYear;
+          return monthName == selectedMonth &&
+              transactionDate.year == currentYear;
         }).toList();
       }
 
