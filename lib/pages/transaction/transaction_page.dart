@@ -124,18 +124,17 @@ class _TransactionPageState extends State<TransactionPage> {
         final theme = Theme.of(context);
         return Theme(
           data: ThemeData(
-            primaryColor: theme.primaryColor, // Cor principal do app
+            primaryColor: theme.primaryColor,
             colorScheme: ColorScheme.light(
-              primary: theme.primaryColor, // Botões de ação ("OK" e "Cancelar")
-              onPrimary: theme.cardColor, // Texto dentro dos botões
+              primary: theme.primaryColor,
+              onPrimary: theme.cardColor,
               surface: theme.scaffoldBackgroundColor,
-              onSurface: theme
-                  .primaryColor, // Cor do título "Selecione a data" e da data selecionada
+              onSurface: theme.primaryColor,
             ),
-            dialogBackgroundColor: theme.primaryColor, // Fundo do calendário
+            dialogBackgroundColor: theme.primaryColor,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: theme.primaryColor, // Botões "OK" e "Cancelar"
+                foregroundColor: theme.primaryColor,
               ),
             ),
           ),
@@ -177,7 +176,7 @@ class _TransactionPageState extends State<TransactionPage> {
       backgroundColor: theme.cardColor,
       body: SingleChildScrollView(
         child: Column(
-          spacing: 10.h,
+          spacing: 4.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -223,8 +222,8 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
-            SizedBox(height: 4.h),
             AdsBanner(),
+
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 20.h,
@@ -244,203 +243,194 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
-            if (_selectedType != TransactionType.transferencia)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
-                    child: Column(
-                      spacing: 10.h,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DefaultTitleTransaction(
-                          title: "Categoria",
-                        ),
-                        DefaultButtonSelectCategory(
-                          selectedCategory: categoryId,
-                          transactionType: _selectedType,
-                          onTap: (category) {
-                            setState(() {
-                              categoryId = category;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
+            // if (_selectedType != TransactionType.transferencia)
+            Column(
+              spacing: 4.h,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DefaultTitleTransaction(
+                        title: "Categoria",
+                      ),
+                      DefaultButtonSelectCategory(
+                        selectedCategory: categoryId,
+                        transactionType: _selectedType,
+                        onTap: (category) {
+                          setState(() {
+                            categoryId = category;
+                          });
+                        },
+                      ),
+                    ],
                   ),
+                ),
+                Divider(
+                  color: DefaultColors.grey,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_selectedType == TransactionType.receita)
+                        DefaultTitleTransaction(
+                          title: "Recebi em",
+                        ),
+                      if (_selectedType == TransactionType.despesa)
+                        DefaultTitleTransaction(
+                          title: "Pago com",
+                        ),
+                      PaymentTypeField(
+                        controller: paymentTypeController,
+                      ),
+                    ],
+                  ),
+                ),
+                if (_selectedType == TransactionType.despesa)
                   Divider(
                     color: DefaultColors.grey,
                   ),
+                if (_selectedType == TransactionType.despesa)
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 20.h,
                     ),
                     child: Column(
-                      spacing: 10.h,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 2.h,
+                        DefaultTitleTransaction(
+                          title: "Forma de pagamento",
                         ),
-                        if (_selectedType == TransactionType.receita)
-                          DefaultTitleTransaction(
-                            title: "Recebi em",
-                          ),
-                        if (_selectedType == TransactionType.despesa)
-                          DefaultTitleTransaction(
-                            title: "Pago com",
-                          ),
-                        PaymentTypeField(
-                          controller: paymentTypeController,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile<bool>(
+                                title: Text(
+                                  "À vista",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                value: false,
+                                groupValue: _isInstallment,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isInstallment = value!;
+                                    _installments = 1;
+                                    installmentsController.text = "1";
+                                  });
+                                },
+                                activeColor: theme.primaryColor,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile<bool>(
+                                title: Text(
+                                  "A prazo",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                value: true,
+                                groupValue: _isInstallment,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isInstallment = value!;
+                                    if (_installments < 2) {
+                                      _installments = 2;
+                                      installmentsController.text = "2";
+                                    }
+                                  });
+                                },
+                                activeColor: theme.primaryColor,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ],
                         ),
+                        if (_isInstallment)
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Número de parcelas",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                DropdownButtonFormField<int>(
+                                  dropdownColor: theme.cardColor,
+                                  focusColor: theme.primaryColor,
+                                  value: _installments,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      borderSide:
+                                          BorderSide(color: DefaultColors.grey),
+                                    ),
+                                    focusColor: DefaultColors.grey,
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      borderSide:
+                                          BorderSide(color: DefaultColors.grey),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                      vertical: 8.h,
+                                    ),
+                                  ),
+                                  items: List.generate(23, (index) => index + 2)
+                                      .map((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(
+                                        value.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? newValue) {
+                                    if (newValue != null) {
+                                      setState(() {
+                                        _installments = newValue;
+                                        installmentsController.text =
+                                            newValue.toString();
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
-                  if (_selectedType == TransactionType.despesa)
-                    Divider(
-                      color: DefaultColors.grey,
-                    ),
-                  if (_selectedType == TransactionType.despesa)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.h,
-                      ),
-                      child: Column(
-                        spacing: 10.h,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 2.h,
-                          ),
-                          DefaultTitleTransaction(
-                            title: "Forma de pagamento",
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text(
-                                    "À vista",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: theme.primaryColor,
-                                    ),
-                                  ),
-                                  value: false,
-                                  groupValue: _isInstallment,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isInstallment = value!;
-                                      _installments = 1;
-                                      installmentsController.text = "1";
-                                    });
-                                  },
-                                  activeColor: theme.primaryColor,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text(
-                                    "A prazo",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: theme.primaryColor,
-                                    ),
-                                  ),
-                                  value: true,
-                                  groupValue: _isInstallment,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isInstallment = value!;
-                                      if (_installments < 2) {
-                                        _installments = 2;
-                                        installmentsController.text = "2";
-                                      }
-                                    });
-                                  },
-                                  activeColor: theme.primaryColor,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (_isInstallment)
-                            Padding(
-                              padding: EdgeInsets.only(top: 8.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Número de parcelas",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: theme.primaryColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  DropdownButtonFormField<int>(
-                                    dropdownColor: theme.cardColor,
-                                    focusColor: theme.primaryColor,
-                                    value: _installments,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        borderSide: BorderSide(
-                                            color: DefaultColors.grey),
-                                      ),
-                                      focusColor: DefaultColors.grey,
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        borderSide: BorderSide(
-                                            color: DefaultColors.grey),
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12.w,
-                                        vertical: 8.h,
-                                      ),
-                                    ),
-                                    items:
-                                        List.generate(23, (index) => index + 2)
-                                            .map((int value) {
-                                      return DropdownMenuItem<int>(
-                                        value: value,
-                                        child: Text(
-                                          value.toString(),
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: theme.primaryColor,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (int? newValue) {
-                                      if (newValue != null) {
-                                        setState(() {
-                                          _installments = newValue;
-                                          installmentsController.text =
-                                              newValue.toString();
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  Divider(
-                    color: DefaultColors.grey,
-                  ),
-                ],
-              ),
+                Divider(
+                  color: DefaultColors.grey,
+                ),
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.h,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -474,8 +464,9 @@ class _TransactionPageState extends State<TransactionPage> {
             Divider(
               color: DefaultColors.grey,
             ),
+
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(2.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
