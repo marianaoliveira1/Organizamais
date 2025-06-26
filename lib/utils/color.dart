@@ -9,7 +9,7 @@ class DefaultColors {
   static const white = Color(0xFFFFFFFF);
   static const green = Color(0xFF66BB6A);
   static const red = Color(0xFFEF5350);
-  static const grey20 = Color(0xFF91919F);
+  static const grey20 = Color(0xFFA7AFB7);
   static const backgroundDark = Color(0xFF121212);
   static const backgroundCard = Color(0xFF1E1E1E);
   static const backgroundgreyDark = Color(0xFF757575);

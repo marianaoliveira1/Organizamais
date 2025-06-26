@@ -34,20 +34,20 @@ class SaldoCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
-                    color: DefaultColors.grey20,
+                    color: DefaultColors.grey,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 2.h),
                 Text(
                   _formatCurrency(
                       saldo), // Removido o .abs() para mostrar valores negativos
                   style: TextStyle(
-                    fontSize: 18.sp,
+                    fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
                     color: saldo < 0
-                        ? DefaultColors.redDark
+                        ? DefaultColors.red
                         : DefaultColors
-                            .greenDark, // Cor vermelha para saldo negativo
+                            .green, // Cor vermelha para saldo negativo
                   ),
                 ),
               ],
