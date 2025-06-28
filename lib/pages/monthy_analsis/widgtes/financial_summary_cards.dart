@@ -20,6 +20,8 @@ class FinancialSummaryCards extends StatelessWidget {
       final totalReceita = controller.totalReceitaAno;
       final totalDespesas = controller.totalDespesasAno;
       final saldo = totalReceita - totalDespesas;
+      final mediaReceita = controller.mediaReceitaMensal;
+      final mediaDespesa = controller.mediaDespesaMensal;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +57,46 @@ class FinancialSummaryCards extends StatelessWidget {
                   title: 'Despesas',
                   value: totalDespesas,
                   icon: Icons.trending_down,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(
+            height: 16.h,
+          ),
+
+          // Cards de Média Mensal
+          Text(
+            'Médias Mensais (meses finalizados)',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10.h),
+
+          Row(
+            children: [
+              // Card de Média de Receitas
+              Expanded(
+                child: FinancialCard(
+                  title: 'Média Receitas',
+                  value: mediaReceita,
+                  icon: Icons.show_chart,
+                ),
+              ),
+              SizedBox(
+                width: 12.h,
+              ),
+
+              // Card de Média de Despesas
+              Expanded(
+                child: FinancialCard(
+                  title: 'Média Despesas',
+                  value: mediaDespesa,
+                  icon: Icons.analytics_outlined,
                 ),
               ),
             ],
