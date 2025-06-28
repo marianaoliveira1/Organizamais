@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:chart_sparkline/chart_sparkline.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/widgtes/despesas_por_tipo_de_pagamento.dart';
@@ -381,45 +380,74 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                   Expanded(
                                     child: Column(
                                       children: [
-                                        // Gráfico Sparkline com smoothing habilitado
+                                        // Gráfico LineChart com fl_chart
                                         SizedBox(
                                           height: 120.h,
-                                          child: Sparkline(
-                                            data: data,
-                                            lineWidth: 3.0,
-                                            lineColor: DefaultColors.green,
-                                            enableThreshold: false,
-                                            sharpCorners:
-                                                false, // Desativa cantos afiados para um efeito mais suave
-                                            kLine: [
-                                              2.0
-                                            ], // Aumenta o fator de suavização
-                                            fillMode: FillMode.below,
-                                            fillGradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                                DefaultColors.green
-                                                    .withOpacity(0.3),
-                                                DefaultColors.green
-                                                    .withOpacity(0.1),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                handleBuiltInTouches: true,
+                                                touchTooltipData: LineTouchTooltipData(
+                                                  getTooltipColor: (touchedSpot) =>
+                                                      DefaultColors.green.withOpacity(0.8),
+                                                ),
+                                              ),
+                                              gridData: FlGridData(
+                                                show: true,
+                                                drawVerticalLine: false,
+                                                horizontalInterval: data.isNotEmpty
+                                                    ? (data.reduce((a, b) => a > b ? a : b) > 0 
+                                                        ? data.reduce((a, b) => a > b ? a : b) / 4 
+                                                        : 1)
+                                                    : 1,
+                                                getDrawingHorizontalLine: (value) {
+                                                  return FlLine(
+                                                    color: DefaultColors.grey.withOpacity(0.2),
+                                                    strokeWidth: 1,
+                                                  );
+                                                },
+                                              ),
+                                              titlesData: FlTitlesData(
+                                                show: false,
+                                              ),
+                                              borderData: FlBorderData(
+                                                show: false,
+                                              ),
+                                              minX: 0,
+                                              maxX: (data.length - 1).toDouble(),
+                                              minY: 0,
+                                              maxY: data.isNotEmpty && data.reduce((a, b) => a > b ? a : b) > 0
+                                                  ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                                                  : 100,
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: data.asMap().entries.map((entry) {
+                                                    return FlSpot(
+                                                      entry.key.toDouble(),
+                                                      entry.value,
+                                                    );
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  curveSmoothness: 0.3,
+                                                  color: DefaultColors.green,
+                                                  barWidth: 3,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(show: false),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    gradient: LinearGradient(
+                                                      begin: Alignment.topCenter,
+                                                      end: Alignment.bottomCenter,
+                                                      colors: [
+                                                        DefaultColors.green.withOpacity(0.3),
+                                                        DefaultColors.green.withOpacity(0.1),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
                                               ],
                                             ),
-                                            enableGridLines: true,
-                                            gridLineColor: DefaultColors.grey
-                                                .withOpacity(0.2),
-                                            gridLineAmount: 4,
-                                            gridLineLabelPrecision: 0,
-                                            max: data.isNotEmpty
-                                                ? data.reduce((a, b) =>
-                                                        a > b ? a : b) *
-                                                    1.2
-                                                : 100,
-                                            averageLine: false,
-                                            useCubicSmoothing:
-                                                true, // Usa suavização cúbica
-                                            cubicSmoothingFactor:
-                                                0.2, // Fator de suavização cúbica
+                                            duration: const Duration(milliseconds: 250),
                                           ),
                                         ),
 
