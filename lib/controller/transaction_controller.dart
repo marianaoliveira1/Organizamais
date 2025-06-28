@@ -8,7 +8,8 @@ import '../model/transaction_model.dart';
 class TransactionController extends GetxController {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
   final _transaction = <TransactionModel>[].obs;
-  FixedAccountsController get fixedAccountsController => Get.find<FixedAccountsController>();
+  FixedAccountsController get fixedAccountsController =>
+      Get.find<FixedAccountsController>();
   List<TransactionModel> get transaction {
     var fakeTransactionsFromFixed = <TransactionModel>[];
     final today = DateTime.now();
@@ -16,7 +17,9 @@ class TransactionController extends GetxController {
     for (final e in fixedAccountsController.allFixedAccounts) {
       for (var i = 0; i < 2400; i++) {
         // 200 years * 12 months = 2400 months
-        final transactionMonth = today.month - 1200 + i; // Center around current date (100 years back, 100 years forward)
+        final transactionMonth = today.month -
+            1200 +
+            i; // Center around current date (100 years back, 100 years forward)
         final transactionYear = today.year +
             (transactionMonth > 12
                 ? (transactionMonth - 1) ~/ 12
@@ -24,10 +27,13 @@ class TransactionController extends GetxController {
                     ? (transactionMonth - 12) ~/ 12
                     : 0);
         final normalizedMonth = ((transactionMonth - 1) % 12) + 1;
-        final adjustedNormalizedMonth = normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
-        final adjustedYear = normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
+        final adjustedNormalizedMonth =
+            normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
+        final adjustedYear =
+            normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
 
-        final todayWithRightDay = DateTime(adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
+        final todayWithRightDay = DateTime(
+            adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
 
         // Skip if account was deactivated before this transaction date
         if (e.deactivatedAt != null) {
@@ -37,7 +43,8 @@ class TransactionController extends GetxController {
         }
 
         if (e.startMonth != null && e.startYear != null) {
-          final startDate = DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
+          final startDate =
+              DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
           if (todayWithRightDay.isBefore(startDate)) {
             continue;
           }
@@ -62,10 +69,7 @@ class TransactionController extends GetxController {
       }
     }
 
-    return [
-      ..._transaction,
-      ...fakeTransactionsFromFixed
-    ];
+    return [..._transaction, ...fakeTransactionsFromFixed];
   }
 
   get isFirstDay {
@@ -82,12 +86,16 @@ class TransactionController extends GetxController {
         : transaction.where((t) {
             if (t.paymentDay != null) {
               DateTime paymentDate = DateTime.parse(t.paymentDay!);
-              return t.type == TransactionType.receita && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+              return t.type == TransactionType.receita &&
+                  paymentDate.month == currentMonth &&
+                  paymentDate.year == currentYear;
             }
             return false;
           }).fold<double>(
             0,
-            (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
+            (sum, t) =>
+                sum +
+                double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
           );
   }
 
@@ -98,12 +106,15 @@ class TransactionController extends GetxController {
     return transaction.where((t) {
       if (t.paymentDay != null) {
         DateTime paymentDate = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.despesa && paymentDate.month == currentMonth && paymentDate.year == currentYear;
+        return t.type == TransactionType.despesa &&
+            paymentDate.month == currentMonth &&
+            paymentDate.year == currentYear;
       }
       return false;
     }).fold<double>(
       0,
-      (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
+      (sum, t) =>
+          sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')),
     );
   }
 
@@ -125,10 +136,16 @@ class TransactionController extends GetxController {
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.receita && date.year == currentYear && date.isBefore(now);
+        return t.type == TransactionType.receita &&
+            date.year == currentYear &&
+            date.isBefore(now);
       }
       return false;
-    }).fold(0.0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    }).fold(
+        0.0,
+        (sum, t) =>
+            sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
   }
 
   double get totalDespesasAno {
@@ -137,10 +154,16 @@ class TransactionController extends GetxController {
     return transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        return t.type == TransactionType.despesa && date.year == currentYear && date.isBefore(now);
+        return t.type == TransactionType.despesa &&
+            date.year == currentYear &&
+            date.isBefore(now);
       }
       return false;
-    }).fold(0.0, (sum, t) => sum + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    }).fold(
+        0.0,
+        (sum, t) =>
+            sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
   }
 
   double get mediaReceitaMensal {
@@ -156,8 +179,9 @@ class TransactionController extends GetxController {
         final date = DateTime.parse(t.paymentDay!);
         if (date.year == currentYear && date.isBefore(now)) {
           final month = date.month;
-          final value = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-          
+          final value =
+              double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+
           if (t.type == TransactionType.receita) {
             receitasPorMes[month] = (receitasPorMes[month] ?? 0) + value;
           } else if (t.type == TransactionType.despesa) {
@@ -168,11 +192,14 @@ class TransactionController extends GetxController {
     }
 
     // Encontra meses que têm TANTO receitas QUANTO despesas
-    final mesesCompletos = receitasPorMes.keys.where((mes) => despesasPorMes.containsKey(mes)).toList();
-    
+    final mesesCompletos = receitasPorMes.keys
+        .where((mes) => despesasPorMes.containsKey(mes))
+        .toList();
+
     if (mesesCompletos.isEmpty) return 0.0;
 
-    final totalReceitas = mesesCompletos.fold(0.0, (sum, mes) => sum + receitasPorMes[mes]!);
+    final totalReceitas =
+        mesesCompletos.fold(0.0, (sum, mes) => sum + receitasPorMes[mes]!);
     return totalReceitas / mesesCompletos.length;
   }
 
@@ -189,8 +216,9 @@ class TransactionController extends GetxController {
         final date = DateTime.parse(t.paymentDay!);
         if (date.year == currentYear && date.isBefore(now)) {
           final month = date.month;
-          final value = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-          
+          final value =
+              double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+
           if (t.type == TransactionType.receita) {
             receitasPorMes[month] = (receitasPorMes[month] ?? 0) + value;
           } else if (t.type == TransactionType.despesa) {
@@ -201,11 +229,14 @@ class TransactionController extends GetxController {
     }
 
     // Encontra meses que têm TANTO receitas QUANTO despesas
-    final mesesCompletos = despesasPorMes.keys.where((mes) => receitasPorMes.containsKey(mes)).toList();
-    
+    final mesesCompletos = despesasPorMes.keys
+        .where((mes) => receitasPorMes.containsKey(mes))
+        .toList();
+
     if (mesesCompletos.isEmpty) return 0.0;
 
-    final totalDespesas = mesesCompletos.fold(0.0, (sum, mes) => sum + despesasPorMes[mes]!);
+    final totalDespesas =
+        mesesCompletos.fold(0.0, (sum, mes) => sum + despesasPorMes[mes]!);
     return totalDespesas / mesesCompletos.length;
   }
 
@@ -230,14 +261,22 @@ class TransactionController extends GetxController {
     });
   }
 
-  Future<void> addTransaction(TransactionModel transaction, {bool isInstallment = false, int installments = 1}) async {
+  Future<void> addTransaction(TransactionModel transaction,
+      {bool isInstallment = false, int installments = 1}) async {
     if (isInstallment) {
       for (var i = 0; i < installments; i++) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        final newPaymentDay = DateTime(paymentDate.year, paymentDate.month + i, paymentDate.day).toString();
-        final value = double.parse(transaction.value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.'));
+        final newPaymentDay =
+            DateTime(paymentDate.year, paymentDate.month + i, paymentDate.day)
+                .toString();
+        final value = double.parse(transaction.value
+            .replaceAll('R\$', '')
+            .trim()
+            .replaceAll('.', '')
+            .replaceAll(',', '.'));
         final localizedValue = value / installments;
-        final localizedValueString = localizedValue.toStringAsFixed(2).replaceAll('.', ',');
+        final localizedValueString =
+            localizedValue.toStringAsFixed(2).replaceAll('.', ',');
         var transactionWithUserId = transaction.copyWith(
           userId: Get.find<AuthController>().firebaseUser.value?.uid,
           value: localizedValueString,
@@ -261,14 +300,20 @@ class TransactionController extends GetxController {
 
   Future<void> updateTransaction(TransactionModel transaction) async {
     if (transaction.id == null) return;
-    await FirebaseFirestore.instance.collection('transactions').doc(transaction.id!).update(
+    await FirebaseFirestore.instance
+        .collection('transactions')
+        .doc(transaction.id!)
+        .update(
           transaction.toMap(),
         );
     Get.snackbar('Sucesso', 'Transação atualizada com sucesso');
   }
 
   Future<void> deleteTransaction(String id) async {
-    await FirebaseFirestore.instance.collection('transactions').doc(id).delete();
+    await FirebaseFirestore.instance
+        .collection('transactions')
+        .doc(id)
+        .delete();
     Get.snackbar('Sucesso', 'Transação removida com sucesso');
   }
 }
