@@ -10,1107 +10,420 @@ import '../../../ads_banner/ads_banner.dart';
 import '../../../model/transaction_model.dart';
 
 final List<Map<String, dynamic>> categories_expenses = [
+  // ========== MORADIA E CASA ==========
   {
-    'id': 25,
-    'name': 'Academia',
-    'icon': 'assets/icon-category/academia.png',
-    'color': DefaultColors.lightGreen,
-    'synonyms': [
-      'musculação',
-      'fitness',
-      'gym',
-      'treino',
-      'exercício',
-      'personal'
-    ],
-    'relations': [
-      'musculação',
-      'fitness',
-      'gym',
-      'treino',
-      'exercício',
-      'personal',
-      'saúde',
-      'bem-estar',
-      'esporte'
-    ],
-  },
-  {
-    'id': 1,
-    'name': 'Alimentação',
-    'icon': 'assets/icon-category/food.png',
-    'color': DefaultColors.emeraldBright,
-    'synonyms': [
-      'comida',
-      'refeição',
-      'almoço',
-      'jantar',
-      'café',
-      'lanche',
-      'nutrição'
-    ],
-    'relations': [
-      'comida',
-      'refeição',
-      'almoço',
-      'jantar',
-      'café',
-      'lanche',
-      'nutrição',
-      'restaurante',
-      'mercado',
-      'delivery'
-    ],
-  },
-  {
-    'id': 63,
-    'name': 'Alimentação em Viagens',
-    'icon': 'assets/icon-category/alimentacaoemviagens.png',
-    'color': DefaultColors.coral,
-    'synonyms': [
-      'refeição viagem',
-      'comida viagem',
-      'restaurante viagem',
-      'alimentação fora'
-    ],
-    'relations': [
-      'refeição viagem',
-      'comida viagem',
-      'restaurante viagem',
-      'alimentação fora',
-      'viagem',
-      'turismo',
-      'lazer'
-    ],
-  },
-  {
-    'id': 67,
-    'name': 'Aplicativos',
-    'icon': 'assets/icon-category/app.png',
-    'color': DefaultColors.ultramarineBlue,
-    'synonyms': [
-      'apps',
-      'software',
-      'programa',
-      'aplicação',
-      'app store',
-      'play store'
-    ],
-    'relations': [
-      'apps',
-      'software',
-      'programa',
-      'aplicação',
-      'app store',
-      'play store',
-      'tecnologia',
-      'assinaturas',
-      'serviços'
-    ],
-  },
-  {
-    'id': 2,
-    'name': 'Assinaturas e serviços',
-    'icon': 'assets/icon-category/cartao.png',
-    'color': DefaultColors.navy,
-    'synonyms': [
-      'mensalidade',
-      'serviço',
-      'assinatura',
-      'signature',
-      'subscription',
-      'plano'
-    ],
-    'relations': [
-      'mensalidade',
-      'serviço',
-      'assinatura',
-      'signature',
-      'subscription',
-      'plano',
-      'streaming',
-      'aplicativos'
-    ],
-  },
-  {
-    'id': 3,
-    'name': 'Bares',
-    'icon': 'assets/icon-category/wine.png',
-    'color': DefaultColors.burgundy,
-    'synonyms': ['pub', 'boteco', 'bar', 'happy hour', 'cervejaria', 'drinks'],
-    'relations': [
-      'pub',
-      'boteco',
-      'bar',
-      'happy hour',
-      'cervejaria',
-      'drinks',
-      'lazer',
-      'alimentação',
-      'entretenimento'
-    ],
-  },
-  {
-    'id': 75,
-    'name': 'Cinema/Streaming',
-    'icon': 'assets/icon-category/cinema.png',
-    'color': DefaultColors.amethyst,
-    'synonyms': ['netflix', 'filme'],
-    'relations': ['entretenimento', 'assinaturas'],
-  },
-  {
-    'id': 65,
-    'name': 'Coisas para Casa',
-    'icon': 'assets/icon-category/coisasparacasa.png',
-    'color': DefaultColors.pastelBlue,
-    'synonyms': [
-      'utensílios',
-      'decoração',
-      'móveis',
-      'eletrodomésticos',
-      'casa',
-      'doméstico'
-    ],
-    'relations': [
-      'utensílios',
-      'decoração',
-      'móveis',
-      'eletrodomésticos',
-      'casa',
-      'doméstico',
-      'moradia',
-      'compras'
-    ],
-  },
-  {
-    'id': 6,
-    'name': 'Compras',
-    'icon': 'assets/icon-category/shopping.png',
-    'color': DefaultColors.hotPink,
-    'synonyms': [
-      'shopping',
-      'loja',
-      'varejo',
-      'compra',
-      'aquisição',
-      'consumo'
-    ],
-    'relations': [
-      'shopping',
-      'loja',
-      'varejo',
-      'compra',
-      'aquisição',
-      'consumo',
-      'roupas',
-      'acessórios',
-      'presentes'
-    ],
-  },
-  {
-    'id': 28,
-    'name': 'Combustível',
-    'icon': 'assets/icon-category/combustivel.png',
-    'color': DefaultColors.amber,
-    'synonyms': [
-      'gasolina',
-      'etanol',
-      'diesel',
-      'álcool',
-      'gnv',
-      'posto',
-      'abastecimento'
-    ],
-    'relations': [
-      'gasolina',
-      'etanol',
-      'diesel',
-      'álcool',
-      'gnv',
-      'posto',
-      'abastecimento',
-      'carro',
-      'transporte',
-      'veículo'
-    ],
+    'id': 5,
+    'name': 'Moradia',
+    'icon': 'assets/icon-category/home.png',
+    'color': DefaultColors.blue,
+    'synonyms': ['casa', 'aluguel', 'hipoteca', 'condomínio'],
+    'relations': ['habitação', 'imóvel', 'residência']
   },
   {
     'id': 26,
     'name': 'Contas (água, luz, gás, internet)',
     'icon': 'assets/icon-category/contas.png',
     'color': DefaultColors.skyBlue,
-    'synonyms': [
-      'água',
-      'luz',
-      'energia',
-      'gás',
-      'internet',
-      'wifi',
-      'contas fixas',
-      'utilidades',
-      'despesas fixas'
-    ],
-    'relations': [
-      'água',
-      'luz',
-      'energia',
-      'gás',
-      'internet',
-      'wifi',
-      'contas fixas',
-      'utilidades',
-      'despesas fixas',
-      'casa',
-      'moradia'
-    ],
+    'synonyms': ['utilidades', 'energia', 'wifi', 'conta de luz']
   },
   {
-    'id': 7,
-    'name': 'Cuidados pessoais',
-    'icon': 'assets/icon-category/skincare.png',
-    'color': DefaultColors.pastelPurple,
-    'synonyms': [
-      'higiene',
-      'beleza',
-      'cosméticos',
-      'skincare',
-      'produtos de beleza',
-      'cuidados'
-    ],
-    'relations': [
-      'higiene',
-      'beleza',
-      'cosméticos',
-      'skincare',
-      'produtos de beleza',
-      'cuidados',
-      'saúde',
-      'bem-estar'
-    ],
-  },
-  {
-    'id': 21,
-    'name': 'Delivery',
-    'icon': 'assets/icon-category/delivery-bike.png',
-    'color': DefaultColors.orangeDark,
-    'synonyms': [
-      'entrega',
-      'ifood',
-      'rappi',
-      'uber eats',
-      'pedido',
-      'comida delivery'
-    ],
-    'relations': [
-      'entrega',
-      'ifood',
-      'rappi',
-      'uber eats',
-      'pedido',
-      'comida delivery',
-      'alimentação',
-      'restaurantes'
-    ],
-  },
-  {
-    'id': 77,
-    'name': 'Doações/Caridade',
-    'icon': 'assets/icon-category/doacoes.png',
-    'color': DefaultColors.rosyPink,
-    'synonyms': ['ong', 'solidariedade'],
-    'relations': ['social', 'presentes'],
-  },
-  {
-    'id': 9,
-    'name': 'Educação',
-    'icon': 'assets/icon-category/education.png',
-    'color': DefaultColors.deepPurpleDark,
-    'synonyms': [
-      'escola',
-      'faculdade',
-      'curso',
-      'universidade',
-      'estudo',
-      'ensino',
-      'material escolar'
-    ],
-    'relations': [
-      'escola',
-      'faculdade',
-      'curso',
-      'universidade',
-      'estudo',
-      'ensino',
-      'material escolar',
-      'livros',
-      'desenvolvimento'
-    ],
-  },
-  {
-    'id': 66,
-    'name': 'Emergência',
-    'icon': 'assets/icon-category/emergency.png',
-    'color': DefaultColors.brightRed,
-    'synonyms': ['urgência', 'imprevisto', 'emergencial', 'socorro', 'urgente'],
-    'relations': [
-      'urgência',
-      'imprevisto',
-      'emergencial',
-      'socorro',
-      'urgente',
-      'saúde',
-      'hospital',
-      'farmácia'
-    ],
-  },
-  {
-    'id': 38,
-    'name': 'Empréstimos',
-    'icon': 'assets/icon-category/emprestimos.png',
-    'color': DefaultColors.greenDark,
-    'synonyms': [
-      'empréstimo',
-      'crédito pessoal',
-      'dívida',
-      'emprestado',
-      'crediário'
-    ],
-    'relations': [
-      'empréstimo',
-      'crédito pessoal',
-      'dívida',
-      'emprestado',
-      'crediário',
-      'financiamento',
-      'banco',
-      'finanças'
-    ],
-  },
-  {
-    'id': 10,
-    'name': 'Família e filhos',
-    'icon': 'assets/icon-category/family.png',
-    'color': DefaultColors.pastelGreen,
-    'synonyms': [
-      'crianças',
-      'bebê',
-      'família',
-      'filhos',
-      'parentes',
-      'criança'
-    ],
-    'relations': [
-      'crianças',
-      'bebê',
-      'família',
-      'filhos',
-      'parentes',
-      'criança',
-      'educação',
-      'lazer',
-      'saúde'
-    ],
-  },
-  {
-    'id': 24,
-    'name': 'Farmácia',
-    'icon': 'assets/icon-category/farmacia.png',
-    'color': DefaultColors.pastelRed,
-    'synonyms': [
-      'drogaria',
-      'medicamentos',
-      'remédios',
-      'farmácia',
-      'medicamento'
-    ],
-    'relations': [
-      'drogaria',
-      'medicamentos',
-      'remédios',
-      'farmácia',
-      'medicamento',
-      'saúde',
-      'bem-estar'
-    ],
-  },
-  {
-    'id': 37,
-    'name': 'Financiamento',
-    'icon': 'assets/icon-category/financiamentos.png',
-    'color': DefaultColors.sapphire,
-    'synonyms': [
-      'financiamento',
-      'prestação',
-      'parcela',
-      'crédito',
-      'financiar'
-    ],
-    'relations': [
-      'financiamento',
-      'prestação',
-      'parcela',
-      'crédito',
-      'financiar',
-      'dívidas',
-      'empréstimos',
-      'moradia',
-      'carro'
-    ],
-  },
-  {
-    'id': 62,
-    'name': 'Hospedagens',
-    'icon': 'assets/icon-category/hoteis.png',
-    'color': DefaultColors.gold,
-    'synonyms': [
-      'hotel',
-      'pousada',
-      'airbnb',
-      'alojamento',
-      'estadia',
-      'resort'
-    ],
-    'relations': [
-      'hotel',
-      'pousada',
-      'airbnb',
-      'alojamento',
-      'estadia',
-      'resort',
-      'viagem',
-      'lazer',
-      'turismo'
-    ],
-  },
-  {
-    'id': 70,
-    'name': 'IPVA',
-    'icon': 'assets/icon-category/ipva.png',
-    'color': DefaultColors.cobalt,
-    'synonyms': ['ipva', 'licenciamento', 'taxa veicular'],
-    'relations': ['carro', 'impostos'],
-  },
-  {
-    'id': 35,
-    'name': 'Impostos',
-    'icon': 'assets/icon-category/impostos.png',
-    'color': DefaultColors.grey,
-    'synonyms': ['tributos', 'taxas', 'iptu', 'ipva', 'ir', 'imposto de renda'],
-    'relations': [
-      'tributos',
-      'taxas',
-      'iptu',
-      'ipva',
-      'ir',
-      'imposto de renda',
-      'finanças',
-      'obrigações'
-    ],
-  },
-  {
-    'id': 68,
-    'name': 'Jogos Online',
-    'icon': 'assets/icon-category/jogosonline.png',
-    'color': DefaultColors.neonGreen,
-    'synonyms': ['games', 'videogame', 'jogo', 'gaming', 'game pass', 'steam'],
-    'relations': [
-      'games',
-      'videogame',
-      'jogo',
-      'gaming',
-      'game pass',
-      'steam',
-      'entretenimento',
-      'lazer',
-      'tecnologia'
-    ],
-  },
-  {
-    'id': 12,
-    'name': 'Lazer e hobbies',
-    'icon': 'assets/icon-category/lazer.png',
-    'color': DefaultColors.tangerine,
-    'synonyms': [
-      'diversão',
-      'entretenimento',
-      'hobby',
-      'passatempo',
-      'recreação',
-      'lazer'
-    ],
-    'relations': [
-      'diversão',
-      'entretenimento',
-      'hobby',
-      'passatempo',
-      'recreação',
-      'lazer',
-      'esporte',
-      'cultura',
-      'viagem'
-    ],
-  },
-  {
-    'id': 31,
-    'name': 'Lanches',
-    'icon': 'assets/icon-category/lanches.png',
-    'color': DefaultColors.vibrantYellow,
-    'synonyms': [
-      'lanchinho',
-      'snacks',
-      'petisco',
-      'merenda',
-      'fast food',
-      'salgados'
-    ],
-    'relations': [
-      'lanchinho',
-      'snacks',
-      'petisco',
-      'merenda',
-      'fast food',
-      'salgados',
-      'alimentação',
-      'comida'
-    ],
-  },
-  {
-    'id': 76,
-    'name': 'Livros/Revistas',
-    'icon': 'assets/icon-category/livros.png',
-    'color': DefaultColors.earthBrown,
-    'synonyms': ['leitura', 'ebook'],
-    'relations': ['educação', 'cultura'],
+    'id': 65,
+    'name': 'Coisas para Casa',
+    'icon': 'assets/icon-category/coisasparacasa.png',
+    'color': DefaultColors.pastelBlue,
+    'synonyms': ['móveis', 'decoração', 'eletrodomésticos', 'utensílios']
   },
   {
     'id': 19,
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
     'color': DefaultColors.titanium,
-    'synonyms': [
-      'conserto',
-      'reparo',
-      'reforma',
-      'concerto',
-      'manutenção',
-      'consertos',
-      'reparos',
-      'reformas'
-    ],
-    'relations': [
-      'conserto',
-      'reparo',
-      'reforma',
-      'concerto',
-      'manutenção',
-      'consertos',
-      'reparos',
-      'reformas',
-      'casa',
-      'carro',
-      'equipamento'
-    ],
+    'synonyms': ['reforma', 'conserto', 'reparo', 'serviços domésticos']
+  },
+
+  // ========== ALIMENTAÇÃO ==========
+  {
+    'id': 1,
+    'name': 'Alimentação',
+    'icon': 'assets/icon-category/food.png',
+    'color': DefaultColors.emeraldBright,
+    'synonyms': ['comida', 'supermercado', 'feira', 'despensa']
   },
   {
     'id': 29,
     'name': 'Mercado',
     'icon': 'assets/icon-category/mercado.png',
     'color': DefaultColors.vibrantGreen,
-    'synonyms': [
-      'supermercado',
-      'feira',
-      'compras do mês',
-      'mantimentos',
-      'alimentos',
-      'mercearia',
-      'hortifruti'
-    ],
-    'relations': [
-      'supermercado',
-      'feira',
-      'compras do mês',
-      'mantimentos',
-      'alimentos',
-      'mercearia',
-      'hortifruti',
-      'alimentação',
-      'casa'
-    ],
-  },
-  {
-    'id': 5,
-    'name': 'Moradia',
-    'icon': 'assets/icon-category/home.png',
-    'color': DefaultColors.blue,
-    'synonyms': [
-      'casa',
-      'lar',
-      'apartamento',
-      'residência',
-      'imóvel',
-      'aluguel',
-      'habitação',
-      'moradia'
-    ],
-    'relations': [
-      'casa',
-      'lar',
-      'apartamento',
-      'residência',
-      'imóvel',
-      'aluguel',
-      'habitação',
-      'moradia'
-    ],
-  },
-  {
-    'id': 33,
-    'name': 'Multas',
-    'icon': 'assets/icon-category/multas.png',
-    'color': DefaultColors.redDark,
-    'synonyms': [
-      'infração',
-      'multa de trânsito',
-      'penalidade',
-      'infração de trânsito'
-    ],
-    'relations': [
-      'infração',
-      'multa de trânsito',
-      'penalidade',
-      'infração de trânsito',
-      'carro',
-      'veículo',
-      'transporte'
-    ],
-  },
-  {
-    'id': 69,
-    'name': 'Padaria',
-    'icon': 'assets/icon-category/padaria.png',
-    'color': DefaultColors.sandyBeige,
-    'synonyms': [
-      'pão',
-      'panificadora',
-      'confeitaria',
-      'pães',
-      'doces',
-      'bolos'
-    ],
-    'relations': [
-      'pão',
-      'panificadora',
-      'confeitaria',
-      'pães',
-      'doces',
-      'bolos',
-      'alimentação',
-      'mercado'
-    ],
-  },
-  {
-    'id': 64,
-    'name': 'Passeios',
-    'icon': 'assets/icon-category/passeios.png',
-    'color': DefaultColors.sunflowerYellow,
-    'synonyms': [
-      'tour',
-      'excursão',
-      'turismo',
-      'visita',
-      'sightseeing',
-      'atração turística'
-    ],
-    'relations': [
-      'tour',
-      'excursão',
-      'turismo',
-      'visita',
-      'sightseeing',
-      'atração turística',
-      'viagem',
-      'lazer',
-      'entretenimento'
-    ],
-  },
-  {
-    'id': 61,
-    'name': 'Passagens',
-    'icon': 'assets/icon-category/passagens.png',
-    'color': DefaultColors.lightBlue,
-    'synonyms': [
-      'bilhete',
-      'ticket',
-      'passagem aérea',
-      'voo',
-      'viagem',
-      'transporte'
-    ],
-    'relations': [
-      'bilhete',
-      'ticket',
-      'passagem aérea',
-      'voo',
-      'viagem',
-      'transporte',
-      'lazer',
-      'turismo'
-    ],
-  },
-  {
-    'id': 71,
-    'name': 'Pedágio',
-    'icon': 'assets/icon-category/pedagios.png',
-    'color': DefaultColors.slateGrey,
-    'synonyms': ['tarifa rodoviária'],
-    'relations': ['transporte', 'viagem'],
-  },
-  {
-    'id': 78,
-    'name': 'Pet (Veterinário/Ração)',
-    'icon': 'assets/icon-category/pet.png',
-    'color': DefaultColors.jungleGreen,
-    'synonyms': ['animal', 'ração'],
-    'relations': ['família', 'saúde'],
-  },
-  {
-    'id': 13,
-    'name': 'Pets',
-    'icon': 'assets/icon-category/dog.png',
-    'color': DefaultColors.emerald,
-    'synonyms': [
-      'animais',
-      'cachorro',
-      'gato',
-      'animal de estimação',
-      'veterinário',
-      'pet shop'
-    ],
-    'relations': [
-      'animais',
-      'cachorro',
-      'gato',
-      'animal de estimação',
-      'veterinário',
-      'pet shop',
-      'saúde',
-      'família'
-    ],
-  },
-  {
-    'id': 36,
-    'name': 'Plano de Saúde/Seguro de vida',
-    'icon': 'assets/icon-category/planodesaude.png',
-    'color': DefaultColors.teal,
-    'synonyms': [
-      'convênio médico',
-      'seguro saúde',
-      'plano médico',
-      'seguro de vida',
-      'assistência médica'
-    ],
-    'relations': [
-      'convênio médico',
-      'seguro saúde',
-      'plano médico',
-      'seguro de vida',
-      'assistência médica',
-      'saúde',
-      'bem-estar',
-      'seguros'
-    ],
-  },
-  {
-    'id': 14,
-    'name': 'Presentes',
-    'icon': 'assets/icon-category/gift.png',
-    'color': DefaultColors.vibrantPink,
-    'synonyms': ['presente', 'doação', 'caridade', 'gift', 'lembrança', 'mimo'],
-    'relations': [
-      'presente',
-      'doação',
-      'caridade',
-      'gift',
-      'lembrança',
-      'mimo',
-      'compras',
-      'família',
-      'amigos'
-    ],
+    'synonyms': ['compra do mês', 'hortifruti', 'despensa']
   },
   {
     'id': 4,
     'name': 'Restaurantes',
     'icon': 'assets/icon-category/restaurante.png',
     'color': DefaultColors.scarlet,
-    'synonyms': [
-      'restaurante',
-      'almoço fora',
-      'jantar fora',
-      'self-service',
-      'buffet',
-      'à la carte'
-    ],
-    'relations': [
-      'restaurante',
-      'almoço fora',
-      'jantar fora',
-      'self-service',
-      'buffet',
-      'à la carte',
-      'alimentação',
-      'lazer'
-    ],
+    'synonyms': ['jantar fora', 'delivery', 'fast food']
   },
   {
-    'id': 15,
-    'name': 'Saúde',
-    'icon': 'assets/icon-category/saude.png',
-    'color': DefaultColors.vibrantTeal,
-    'synonyms': [
-      'médico',
-      'hospital',
-      'remédio',
-      'consulta',
-      'exame',
-      'tratamento'
-    ],
-    'relations': [
-      'médico',
-      'hospital',
-      'remédio',
-      'consulta',
-      'exame',
-      'tratamento',
-      'farmácia',
-      'bem-estar',
-      'plano de saúde'
-    ],
+    'id': 21,
+    'name': 'Delivery',
+    'icon': 'assets/icon-category/delivery-bike.png',
+    'color': DefaultColors.orangeDark,
+    'synonyms': ['Ifood', 'Uber Eats', 'comida pronta']
   },
   {
-    'id': 80,
-    'name': 'Seguros',
-    'icon': 'assets/icon-category/seguros.png',
-    'color': DefaultColors.topaz,
-    'synonyms': ['proteção', 'aparelho'],
-    'relations': ['tecnologia', 'seguros'],
+    'id': 31,
+    'name': 'Lanches',
+    'icon': 'assets/icon-category/lanches.png',
+    'color': DefaultColors.vibrantYellow,
+    'synonyms': ['petisco', 'fast food', 'salgadinho']
+  },
+  {
+    'id': 69,
+    'name': 'Padaria',
+    'icon': 'assets/icon-category/padaria.png',
+    'color': DefaultColors.sandyBeige,
+    'synonyms': ['pão', 'confeitaria', 'doces']
+  },
+
+  // ========== TRANSPORTE ==========
+  {
+    'id': 17,
+    'name': 'Transporte',
+    'icon': 'assets/icon-category/car.png',
+    'color': DefaultColors.indigo,
+    'synonyms': ['ônibus', 'metrô', 'combustível', 'táxi']
+  },
+  {
+    'id': 28,
+    'name': 'Combustível',
+    'icon': 'assets/icon-category/combustivel.png',
+    'color': DefaultColors.amber,
+    'synonyms': ['gasolina', 'posto', 'abastecimento']
+  },
+  {
+    'id': 22,
+    'name': 'Transporte por Aplicativo',
+    'icon': 'assets/icon-category/taxi.png',
+    'color': DefaultColors.deepPurple,
+    'synonyms': ['aplicativo de transporte', 'carona']
+  },
+  {
+    'id': 71,
+    'name': 'Pedágio',
+    'icon': 'assets/icon-category/pedagios.png',
+    'color': DefaultColors.slateGrey,
+    'synonyms': ['tarifa rodoviária', 'estrada']
+  },
+  {
+    'id': 33,
+    'name': 'Multas',
+    'icon': 'assets/icon-category/multas.png',
+    'color': DefaultColors.redDark,
+    'synonyms': ['infração', 'trânsito', 'penalidade']
+  },
+  {
+    'id': 70,
+    'name': 'IPVA',
+    'icon': 'assets/icon-category/ipva.png',
+    'color': DefaultColors.cobalt,
+    'synonyms': ['licenciamento', 'taxa veicular']
   },
   {
     'id': 32,
     'name': 'Seguro do Carro',
     'icon': 'assets/icon-category/seguros.png',
     'color': DefaultColors.blueGrey,
-    'synonyms': [
-      'seguro veicular',
-      'seguro auto',
-      'proteção veicular',
-      'seguro automóvel'
-    ],
-    'relations': [
-      'seguro veicular',
-      'seguro auto',
-      'proteção veicular',
-      'seguro automóvel',
-      'carro',
-      'veículo',
-      'transporte'
-    ],
+    'synonyms': ['seguro auto', 'proteção veicular']
+  },
+
+  // ========== SAÚDE E BEM-ESTAR ==========
+  {
+    'id': 15,
+    'name': 'Saúde',
+    'icon': 'assets/icon-category/saude.png',
+    'color': DefaultColors.vibrantTeal,
+    'synonyms': ['médico', 'hospital', 'plano de saúde']
+  },
+  {
+    'id': 86, // NOVA
+    'name': 'Exames',
+    'icon': 'assets/icon-category/exames.png',
+    'color': DefaultColors.lightBlue,
+    'synonyms': ['produtos de limpeza', 'faxina', 'empregada doméstica']
+  },
+  {
+    'id': 24,
+    'name': 'Farmácia',
+    'icon': 'assets/icon-category/farmacia.png',
+    'color': DefaultColors.pastelRed,
+    'synonyms': ['remédio', 'medicamento', 'drogaria']
+  },
+  {
+    'id': 36,
+    'name': 'Plano de Saúde/Seguro de vida',
+    'icon': 'assets/icon-category/planodesaude.png',
+    'color': DefaultColors.teal,
+    'synonyms': ['convênio médico', 'assistência médica']
+  },
+  {
+    'id': 87, // NOVA
+    'name': 'Consultas Médicas',
+    'icon': 'assets/icon-category/consultas.png',
+    'color': DefaultColors.indigoLight,
+    'synonyms': ['médico', 'dentista', 'psicólogo', 'terapia']
+  },
+  {
+    'id': 88, // NOVA
+    'name': 'Salão/Barbearia',
+    'icon': 'assets/icon-category/salao.png',
+    'color': DefaultColors.pink,
+    'synonyms': ['cabeleireiro', 'corte de cabelo', 'beleza', 'estética']
+  },
+  {
+    'id': 7,
+    'name': 'Cuidados pessoais',
+    'icon': 'assets/icon-category/skincare.png',
+    'color': DefaultColors.pastelPurple,
+    'synonyms': ['cosméticos', 'higiene', 'perfumaria']
+  },
+  {
+    'id': 25,
+    'name': 'Academia',
+    'icon': 'assets/icon-category/academia.png',
+    'color': DefaultColors.lightGreen,
+    'synonyms': ['ginástica', 'treino', 'fitness']
+  },
+
+  // ========== EDUCAÇÃO ==========
+  {
+    'id': 9,
+    'name': 'Educação',
+    'icon': 'assets/icon-category/education.png',
+    'color': DefaultColors.deepPurpleDark,
+    'synonyms': ['escola', 'curso', 'faculdade', 'material escolar']
+  },
+  {
+    'id': 76,
+    'name': 'Livros/Revistas',
+    'icon': 'assets/icon-category/livros.png',
+    'color': DefaultColors.earthBrown,
+    'synonyms': ['leitura', 'biblioteca', 'ebook']
+  },
+
+  // ========== LAZER E ENTRETENIMENTO ==========
+  {
+    'id': 12,
+    'name': 'Lazer e hobbies',
+    'icon': 'assets/icon-category/lazer.png',
+    'color': DefaultColors.tangerine,
+    'synonyms': ['cinema', 'parque', 'passeio', 'hobby']
+  },
+  {
+    'id': 3,
+    'name': 'Bares',
+    'icon': 'assets/icon-category/wine.png',
+    'color': DefaultColors.burgundy,
+    'synonyms': ['happy hour', 'drinks', 'boteco']
+  },
+  {
+    'id': 75,
+    'name': 'Cinema',
+    'icon': 'assets/icon-category/cinema.png',
+    'color': DefaultColors.amethyst,
+    'synonyms': ['Netflix', 'ingresso', 'filme']
   },
   {
     'id': 23,
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
     'color': DefaultColors.electricPurple,
-    'synonyms': [
-      'netflix',
-      'amazon prime',
-      'disney+',
-      'hbo',
-      'spotify',
-      'youtube'
-    ],
-    'relations': [
-      'netflix',
-      'amazon prime',
-      'disney+',
-      'hbo',
-      'spotify',
-      'youtube',
-      'entretenimento',
-      'assinaturas',
-      'lazer'
-    ],
+    'synonyms': ['Spotify', 'Disney+', 'assinatura']
   },
   {
-    'id': 79,
-    'name': 'Taxas',
-    'icon': 'assets/icon-category/taxas.png',
-    'color': DefaultColors.magenta,
-    'synonyms': ['tarifa', 'anuidade'],
-    'relations': ['finanças', 'banco'],
-  },
-  {
-    'id': 17,
-    'name': 'Transporte',
-    'icon': 'assets/icon-category/car.png',
-    'color': DefaultColors.indigo,
-    'synonyms': [
-      'locomoção',
-      'deslocamento',
-      'condução',
-      'mobilidade',
-      'transporte público',
-      'ônibus',
-      'metrô',
-      'trem'
-    ],
-    'relations': [
-      'locomoção',
-      'deslocamento',
-      'condução',
-      'mobilidade',
-      'transporte público',
-      'ônibus',
-      'metrô',
-      'trem',
-      'uber',
-      'táxi',
-      'combustível'
-    ],
-  },
-  {
-    'id': 16,
-    'name': 'Trabalho',
-    'icon': 'assets/icon-category/work.png',
-    'color': DefaultColors.indigoDark,
-    'synonyms': [
-      'profissional',
-      'emprego',
-      'escritório',
-      'negócios',
-      'carreira'
-    ],
-    'relations': [
-      'profissional',
-      'emprego',
-      'escritório',
-      'negócios',
-      'carreira',
-      'educação',
-      'transporte',
-      'alimentação'
-    ],
-  },
-  {
-    'id': 22,
-    'name': 'Uber/99',
-    'icon': 'assets/icon-category/taxi.png',
-    'color': DefaultColors.deepPurple,
-    'synonyms': [
-      'uber',
-      '99',
-      'táxi',
-      'corrida',
-      'aplicativo de transporte',
-      'carona',
-      'ride'
-    ],
-    'relations': [
-      'uber',
-      '99',
-      'táxi',
-      'corrida',
-      'aplicativo de transporte',
-      'carona',
-      'ride',
-      'transporte',
-      'locomoção'
-    ],
-  },
-  {
-    'id': 20,
-    'name': 'Vestuário',
-    'icon': 'assets/icon-category/roupas.png',
-    'color': DefaultColors.plum,
-    'synonyms': [
-      'roupa',
-      'vestimenta',
-      'traje',
-      'indumentária',
-      'vestido',
-      'calça'
-    ],
-    'relations': [
-      'roupa',
-      'vestimenta',
-      'traje',
-      'indumentária',
-      'vestido',
-      'calça',
-      'compras',
-      'acessórios',
-      'moda'
-    ],
-  },
-  {
-    'id': 34,
-    'name': 'Roupas e acessórios',
-    'icon': 'assets/icon-category/roupas-e-calcados.png',
-    'color': DefaultColors.lavender,
-    'synonyms': [
-      'vestuário',
-      'calçados',
-      'sapatos',
-      'acessório',
-      'moda',
-      'bijuteria',
-      'joias'
-    ],
-    'relations': [
-      'vestuário',
-      'calçados',
-      'sapatos',
-      'acessório',
-      'moda',
-      'bijuteria',
-      'joias',
-      'compras',
-      'shopping'
-    ],
+    'id': 68,
+    'name': 'Jogos Online',
+    'icon': 'assets/icon-category/jogosonline.png',
+    'color': DefaultColors.neonGreen,
+    'synonyms': ['videogame', 'steam', 'game pass']
   },
   {
     'id': 74,
     'name': 'Viagens',
     'icon': 'assets/icon-category/viagens.png',
     'color': DefaultColors.oceanBlue,
-    'synonyms': ['turismo', 'férias'],
-    'relations': ['lazer', 'hospedagem'],
+    'synonyms': ['férias', 'turismo', 'passeio']
   },
+  {
+    'id': 62,
+    'name': 'Hospedagens',
+    'icon': 'assets/icon-category/hoteis.png',
+    'color': DefaultColors.gold,
+    'synonyms': ['hotel', 'Airbnb', 'resort']
+  },
+  {
+    'id': 61,
+    'name': 'Passagens',
+    'icon': 'assets/icon-category/passagens.png',
+    'color': DefaultColors.lightBlue,
+    'synonyms': ['avião', 'ônibus', 'viagem']
+  },
+  {
+    'id': 63,
+    'name': 'Alimentação em Viagens',
+    'icon': 'assets/icon-category/alimentacaoemviagens.png',
+    'color': DefaultColors.coral,
+    'synonyms': ['comida de viagem', 'restaurante turístico']
+  },
+  {
+    'id': 64,
+    'name': 'Passeios',
+    'icon': 'assets/icon-category/passeios.png',
+    'color': DefaultColors.sunflowerYellow,
+    'synonyms': ['turismo', 'ponto turístico', 'excursão']
+  },
+
+  // ========== COMPRAS ==========
+  {
+    'id': 6,
+    'name': 'Compras',
+    'icon': 'assets/icon-category/shopping.png',
+    'color': DefaultColors.hotPink,
+    'synonyms': ['shopping', 'loja', 'e-commerce']
+  },
+  {
+    'id': 20,
+    'name': 'Vestuário',
+    'icon': 'assets/icon-category/roupas.png',
+    'color': DefaultColors.plum,
+    'synonyms': ['roupa', 'moda', 'vestido']
+  },
+  {
+    'id': 34,
+    'name': 'Roupas e acessórios',
+    'icon': 'assets/icon-category/roupas-e-calcados.png',
+    'color': DefaultColors.lavender,
+    'synonyms': ['calçados', 'bolsas', 'joias']
+  },
+  {
+    'id': 14,
+    'name': 'Presentes',
+    'icon': 'assets/icon-category/gift.png',
+    'color': DefaultColors.vibrantPink,
+    'synonyms': ['lembrança', 'mimo', 'aniversário']
+  },
+
+  // ========== PETS ==========
+  {
+    'id': 13,
+    'name': 'Pets',
+    'icon': 'assets/icon-category/dog.png',
+    'color': DefaultColors.emerald,
+    'synonyms': ['animal', 'veterinário', 'pet shop']
+  },
+  // {
+  //   'id': 78,
+  //   'name': 'Pet (Veterinário/Ração)',
+  //   'icon': 'assets/icon-category/pet.png',
+  //   'color': DefaultColors.jungleGreen,
+  //   'synonyms': ['gato', 'cachorro', 'animal de estimação']
+  // },
+
+  // ========== FINANÇAS ==========
+  {
+    'id': 35,
+    'name': 'Impostos',
+    'icon': 'assets/icon-category/impostos.png',
+    'color': DefaultColors.grey,
+    'synonyms': ['IPTU', 'IRPF', 'tributo']
+  },
+  {
+    'id': 37,
+    'name': 'Financiamento',
+    'icon': 'assets/icon-category/financiamentos.png',
+    'color': DefaultColors.sapphire,
+    'synonyms': ['empréstimo', 'parcela', 'crédito']
+  },
+  {
+    'id': 38,
+    'name': 'Empréstimos',
+    'icon': 'assets/icon-category/emprestimos.png',
+    'color': DefaultColors.greenDark,
+    'synonyms': ['dívida', 'crediário', 'consignado']
+  },
+  {
+    'id': 79,
+    'name': 'Taxas',
+    'icon': 'assets/icon-category/taxas.png',
+    'color': DefaultColors.magenta,
+    'synonyms': ['tarifa', 'anuidade', 'juros']
+  },
+  {
+    'id': 2,
+    'name': 'Assinaturas e serviços',
+    'icon': 'assets/icon-category/cartao.png',
+    'color': DefaultColors.navy,
+    'synonyms': ['mensalidade', 'plano', 'serviço']
+  },
+  {
+    'id': 67,
+    'name': 'Aplicativos',
+    'icon': 'assets/icon-category/app.png',
+    'color': DefaultColors.ultramarineBlue,
+    'synonyms': ['software', 'app pago', 'assinatura']
+  },
+  {
+    'id': 80,
+    'name': 'Seguros',
+    'icon': 'assets/icon-category/seguros.png',
+    'color': DefaultColors.topaz,
+    'synonyms': ['proteção', 'apólice', 'seguro residencial']
+  },
+
+  // ========== FAMÍLIA ==========
+  {
+    'id': 10,
+    'name': 'Família e filhos',
+    'icon': 'assets/icon-category/family.png',
+    'color': DefaultColors.pastelGreen,
+    'synonyms': ['criança', 'escola', 'creche']
+  },
+  {
+    'id': 77,
+    'name': 'Doações/Caridade',
+    'icon': 'assets/icon-category/doacoes.png',
+    'color': DefaultColors.rosyPink,
+    'synonyms': ['ONG', 'solidariedade', 'contribuição']
+  },
+
+  // ========== TRABALHO ==========
+  {
+    'id': 16,
+    'name': 'Trabalho',
+    'icon': 'assets/icon-category/work.png',
+    'color': DefaultColors.indigoDark,
+    'synonyms': ['escritório', 'material', 'profissional']
+  },
+
+  // ========== IMPREVISTOS ==========
+  {
+    'id': 66,
+    'name': 'Emergência',
+    'icon': 'assets/icon-category/emergency.png',
+    'color': DefaultColors.brightRed,
+    'synonyms': ['imprevisto', 'urgência', 'socorro']
+  },
+
+  // ========== OUTROS ==========
   {
     'id': 30,
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.darkGrey,
-    'synonyms': [
-      'diversos',
-      'variados',
-      'miscelânea',
-      'outro',
-      'demais',
-      'geral'
-    ],
-    'relations': [
-      'diversos',
-      'variados',
-      'miscelânea',
-      'outro',
-      'demais',
-      'geral',
-      'despesas',
-      'gastos'
-    ],
+    'synonyms': ['diversos', 'variados', 'geral']
   },
 ];
+
+// [Continua com as categorias de renda...]
 
 final List<Map<String, dynamic>> categories_income = [
   {

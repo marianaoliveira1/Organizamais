@@ -8,7 +8,8 @@ import '../../../controller/transaction_controller.dart';
 import '../pages/parcelas_details_page.dart';
 
 class ParcelamentosCard extends StatelessWidget {
-  final TransactionController _transactionController = Get.find<TransactionController>();
+  final TransactionController _transactionController =
+      Get.find<TransactionController>();
 
   ParcelamentosCard({super.key});
 
@@ -24,7 +25,11 @@ class ParcelamentosCard extends StatelessWidget {
   // Função para converter string de valor para double
   double _parseCurrencyValue(String value) {
     return double.tryParse(
-          value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.'),
+          value
+              .replaceAll('R\$', '')
+              .trim()
+              .replaceAll('.', '')
+              .replaceAll(',', '.'),
         ) ??
         0.0;
   }
@@ -47,18 +52,17 @@ class ParcelamentosCard extends StatelessWidget {
           Obx(() {
             final currentMonth = DateTime.now().month;
             final currentYear = DateTime.now().year;
-            
+
             final parcelamentosCount = _transactionController.transaction
                 .where((t) => t.title.contains('Parcela'))
                 .where((t) {
-                  if (t.paymentDay == null) return false;
-                  final date = DateTime.parse(t.paymentDay!);
-                  return date.month == currentMonth && date.year == currentYear;
-                })
-                .length;
-                
+              if (t.paymentDay == null) return false;
+              final date = DateTime.parse(t.paymentDay!);
+              return date.month == currentMonth && date.year == currentYear;
+            }).length;
+
             return DefaultTitleCard(
-              text: parcelamentosCount > 0 
+              text: parcelamentosCount > 0
                   ? 'Parcelas do Mês ($parcelamentosCount)'
                   : 'Parcelas do Mês',
               onTap: () {},
@@ -75,7 +79,9 @@ class ParcelamentosCard extends StatelessWidget {
               final currentYear = DateTime.now().year;
 
               // Filtra transações que são parcelamentos (título contém "Parcela")
-              final parcelamentos = _transactionController.transaction.where((t) => t.title.contains('Parcela')).where((t) {
+              final parcelamentos = _transactionController.transaction
+                  .where((t) => t.title.contains('Parcela'))
+                  .where((t) {
                 if (t.paymentDay == null) return false;
                 final date = DateTime.parse(t.paymentDay!);
                 return date.month == currentMonth && date.year == currentYear;
@@ -89,48 +95,34 @@ class ParcelamentosCard extends StatelessWidget {
               });
 
               if (parcelamentos.isEmpty) {
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: DefaultColors.grey.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.credit_card_off,
-                        size: 32.sp,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Nenhuma parcela este mês',
+                      style: TextStyle(
                         color: DefaultColors.grey20,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Nenhuma parcela este mês',
-                        style: TextStyle(
-                          color: DefaultColors.grey20,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Suas parcelas aparecerão aqui',
+                      style: TextStyle(
+                        color: DefaultColors.grey,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w400,
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'Suas parcelas aparecerão aqui',
-                        style: TextStyle(
-                          color: DefaultColors.grey,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               }
 
               // Calcular o valor total das parcelas
-              final totalParcelasValue = parcelamentos.fold(0.0, (sum, parcela) {
+              final totalParcelasValue =
+                  parcelamentos.fold(0.0, (sum, parcela) {
                 return sum + _parseCurrencyValue(parcela.value);
               });
 
@@ -271,47 +263,19 @@ class ParcelamentosCard extends StatelessWidget {
 
                   SizedBox(height: 12.h),
                   // Total das parcelas
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: theme.primaryColor.withOpacity(0.2),
-                        width: 1,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatCurrency(totalParcelasValue),
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11.sp,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.receipt_long,
-                              size: 16.sp,
-                              color: theme.primaryColor,
-                            ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              'Total das Parcelas:',
-                              style: TextStyle(
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          _formatCurrency(totalParcelasValue),
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ],
               );
