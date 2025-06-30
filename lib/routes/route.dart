@@ -11,6 +11,7 @@ import '../pages/home/home_page.dart';
 import '../pages/initial/initial_page.dart';
 
 import '../pages/initial/pages/fixed_accotuns_page.dart';
+import '../pages/initial/pages/parcelas_details_page.dart';
 import '../pages/login/login_page.dart';
 import '../pages/register/register_page.dart';
 

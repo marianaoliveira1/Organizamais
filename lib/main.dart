@@ -22,11 +22,23 @@ import 'routes/route.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
 
-  await MobileAds.instance.initialize();
+  try {
+    await MobileAds.instance.initialize();
+  } catch (e) {
+    print('Error initializing MobileAds: $e');
+  }
 
-  initializeDateFormatting('pt_BR', null);
+  try {
+    initializeDateFormatting('pt_BR', null);
+  } catch (e) {
+    print('Error initializing date formatting: $e');
+  }
 
   // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
