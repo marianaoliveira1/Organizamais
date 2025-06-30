@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/pages/initial/widget/title_card.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../../controller/transaction_controller.dart';
+import '../pages/parcelas_details_page.dart';
 
 class ParcelamentosCard extends StatelessWidget {
   final TransactionController _transactionController =
@@ -149,70 +150,97 @@ class ParcelamentosCard extends StatelessWidget {
                         .where((t) => t.title.contains(': $tituloOriginal'))
                         .length;
 
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 4.h,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Parcela $parcelaAtual de $totalParcelas',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 10.sp,
-                                    color: DefaultColors.grey20,
+                    return InkWell(
+                      onTap: () {
+                        Get.to(() => ParcelasDetailsPage(productName: tituloOriginal));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 8.h),
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: theme.scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: DefaultColors.grey.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Parcela $parcelaAtual de $totalParcelas',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10.sp,
+                                      color: DefaultColors.grey20,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 1.h),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      tituloOriginal,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.sp,
-                                        color: theme.primaryColor,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    tituloOriginal,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13.sp,
+                                      color: theme.primaryColor,
                                     ),
-                                    Text(
-                                      _formatCurrency(
-                                          _parseCurrencyValue(parcela.value)),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.sp,
-                                        color: theme.primaryColor,
-                                      ),
-                                      textAlign: TextAlign.end,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  if (parcela.paymentDay != null)
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_today,
+                                          size: 12.sp,
+                                          color: DefaultColors.grey20,
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy').format(
+                                            DateTime.parse(parcela.paymentDay!),
+                                          ),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 11.sp,
+                                            color: DefaultColors.grey20,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      DateFormat('dd/MM/yyyy').format(
-                                        DateTime.parse(parcela.paymentDay!),
-                                      ),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 11.sp,
-                                        color: DefaultColors.grey20,
-                                      ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    _formatCurrency(_parseCurrencyValue(parcela.value)),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp,
+                                      color: theme.primaryColor,
                                     ),
-                                    if (parcela.paymentType != null &&
-                                        parcela.paymentType!.isNotEmpty)
-                                      Text(
+                                    textAlign: TextAlign.end,
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  if (parcela.paymentType != null && parcela.paymentType!.isNotEmpty)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                                      decoration: BoxDecoration(
+                                        color: DefaultColors.grey.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8.r),
+                                      ),
+                                      child: Text(
                                         parcela.paymentType!,
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
@@ -223,12 +251,12 @@ class ParcelamentosCard extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                  ],
-                                ),
-                              ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   }),
