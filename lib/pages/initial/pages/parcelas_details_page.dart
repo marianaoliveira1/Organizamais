@@ -233,15 +233,23 @@ class ParcelasDetailsPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12.sp,
                             color: theme.primaryColor,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'Total: ${_formatCurrency(valorTotal)}',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
+                            'Total: ${_formatCurrency(valorTotal)}',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -280,47 +288,48 @@ class ParcelasDetailsPage extends StatelessWidget {
                               ),
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 // Conteúdo principal da parcela
-                                Padding(
-                                  padding: EdgeInsets.all(16.w),
-                                  child: Row(
-                                    children: [
-                                      // Indicador de status
-                                      Container(
-                                        width: 4.w,
-                                        height: 40.h,
-                                        decoration: BoxDecoration(
-                                          color: isPaga
-                                              ? Colors.green
-                                              : theme.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(2.r),
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.w),
+                                    child: Row(
+                                      children: [
+                                        // Indicador de status
+                                        Container(
+                                          width: 4.w,
+                                          height: 40.h,
+                                          decoration: BoxDecoration(
+                                            color: isPaga
+                                                ? Colors.green
+                                                : theme.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(2.r),
+                                          ),
                                         ),
-                                      ),
 
-                                      SizedBox(width: 12.w),
+                                        SizedBox(width: 12.w),
 
-                                      // Informações da parcela
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                        // Informações da parcela
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                'Parcela $numeroParcela',
-                                                style: TextStyle(
-                                                  fontSize: 14.sp,
-                                                  color: theme.primaryColor,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Column(
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
+                                                  Text(
+                                                    'Parcela $numeroParcela',
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      color: theme.primaryColor,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
                                                   Text(
                                                     _formatCurrency(
                                                         _parseCurrencyValue(
@@ -332,36 +341,10 @@ class ParcelasDetailsPage extends StatelessWidget {
                                                           FontWeight.bold,
                                                     ),
                                                   ),
-                                                  if (parcela.paymentType !=
-                                                          null &&
-                                                      parcela.paymentType!
-                                                          .isNotEmpty)
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 4.h),
-                                                      child: Text(
-                                                        parcela.paymentType!,
-                                                        style: TextStyle(
-                                                          fontSize: 11.sp,
-                                                          color: DefaultColors
-                                                              .grey20,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          if (parcela.paymentDay != null)
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
+                                              SizedBox(height: 4.h),
+                                              if (parcela.paymentDay != null)
                                                 Row(
                                                   children: [
                                                     Icon(
@@ -374,45 +357,61 @@ class ParcelasDetailsPage extends StatelessWidget {
                                                           : DefaultColors
                                                               .grey20,
                                                     ),
-                                                    SizedBox(
-                                                      width: 4.h,
-                                                    ),
+                                                    SizedBox(width: 4.w),
                                                     Text(
-                                                      isPaga
-                                                          ? 'Paga'
-                                                          : 'Pendente',
+                                                      DateFormat('dd/MM/yyyy')
+                                                          .format(
+                                                        DateTime.parse(parcela
+                                                            .paymentDay!),
+                                                      ),
                                                       style: TextStyle(
-                                                        fontSize: 11.sp,
+                                                        fontSize: 12.sp,
                                                         color: isPaga
                                                             ? Colors.green
-                                                            : Colors.orange,
+                                                            : DefaultColors
+                                                                .grey20,
                                                         fontWeight:
-                                                            FontWeight.w600,
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
+                                                    SizedBox(width: 8.w),
+                                                    // Text(
+                                                    //   isPaga
+                                                    //       ? 'Paga'
+                                                    //       : 'Pendente',
+                                                    //   style: TextStyle(
+                                                    //     fontSize: 11.sp,
+                                                    //     color: isPaga
+                                                    //         ? Colors.green
+                                                    //         : Colors.orange,
+                                                    //     fontWeight:
+                                                    //         FontWeight.w600,
+                                                    //   ),
+                                                    // ),
                                                   ],
                                                 ),
-                                                SizedBox(width: 4.w),
-                                                Text(
-                                                  DateFormat('dd/MM/yyyy')
-                                                      .format(
-                                                    DateTime.parse(
-                                                        parcela.paymentDay!),
-                                                  ),
-                                                  style: TextStyle(
-                                                    fontSize: 12.sp,
-                                                    color: isPaga
-                                                        ? Colors.green
-                                                        : DefaultColors.grey20,
-                                                    fontWeight: FontWeight.w500,
+                                              if (parcela.paymentType != null &&
+                                                  parcela
+                                                      .paymentType!.isNotEmpty)
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 4.h),
+                                                  child: Text(
+                                                    parcela.paymentType!,
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      color:
+                                                          DefaultColors.grey20,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                                   ),
                                                 ),
-                                                SizedBox(width: 8.w),
-                                              ],
-                                            ),
-                                        ],
-                                      ),
-                                    ],
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
 
