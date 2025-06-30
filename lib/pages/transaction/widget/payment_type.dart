@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/card_controller.dart';
 import '../../../utils/color.dart';
 import 'payment_option.dart';
@@ -38,6 +39,10 @@ class PaymentTypeField extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                AdsBanner(),
+                SizedBox(
+                  height: 20.h,
+                ),
                 Text(
                   'Selecione o método de pagamento',
                   style: TextStyle(
@@ -71,13 +76,11 @@ class PaymentTypeField extends StatelessWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: cardController.card.length,
-
                           separatorBuilder: (context, index) => SizedBox(
                             height: 0.h,
                           ),
                           itemBuilder: (context, index) {
                             final card = cardController.card[index ~/ 1];
-                      
 
                             return Container(
                               decoration: BoxDecoration(
@@ -120,6 +123,11 @@ class PaymentTypeField extends StatelessWidget {
                           },
                         );
                       }),
+                    PaymentOption(
+                      title: 'Débito',
+                      assetPath: 'assets/icon-category/debito.png',
+                      controller: controller,
+                    ),
                     PaymentOption(
                       title: 'Dinheiro',
                       assetPath: 'assets/icon-payment/money.png',

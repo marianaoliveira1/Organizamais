@@ -210,28 +210,24 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
   static Color _getPaymentTypeColor(String paymentType) {
     switch (paymentType.toLowerCase()) {
       case 'crédito':
-        return DefaultColors
-            .darkBlue; // Azul escuro (não está nos custom cards)
+        return DefaultColors.deepPurple;
       case 'débito':
-        return DefaultColors
-            .greenDark; // Verde escuro (não está nos custom cards)
+        return DefaultColors.darkBlue;
       case 'dinheiro':
-        return DefaultColors
-            .orangeDark; // Laranja escuro (não está nos custom cards)
+        return DefaultColors.orangeDark;
       case 'pix':
-        return DefaultColors
-            .deepPurple; // Roxo profundo (não está nos custom cards)
+        return DefaultColors.greenDark;
+        ;
       case 'boleto':
-        return DefaultColors.brown; // Marrom (não está nos custom cards)
+        return DefaultColors.brown;
       case 'transferência':
-        return DefaultColors.blueGrey; // Azul-cinza (não está nos custom cards)
+        return DefaultColors.blueGrey;
       case 'cheque':
-        return DefaultColors.gold; // Dourado (não está nos custom cards)
+        return DefaultColors.gold;
       case 'vale':
-        return DefaultColors.lime; // Lima (não está nos custom cards)
+        return DefaultColors.lime;
       case 'criptomoeda':
-        return DefaultColors
-            .slateGrey; // Cinza ardósia (não está nos custom cards)
+        return DefaultColors.slateGrey;
       case 'cupom':
         return DefaultColors.hotPink; // Rosa forte (não está nos custom cards)
       default:
