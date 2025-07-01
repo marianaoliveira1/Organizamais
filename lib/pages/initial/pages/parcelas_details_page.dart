@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/utils/color.dart';
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 
 class ParcelasDetailsPage extends StatelessWidget {
   final String productName;
-  final TransactionController _transactionController = Get.find<TransactionController>();
+  final TransactionController _transactionController =
+      Get.find<TransactionController>();
 
   ParcelasDetailsPage({super.key, required this.productName});
 
@@ -23,13 +25,18 @@ class ParcelasDetailsPage extends StatelessWidget {
   // Função para converter string de valor para double
   double _parseCurrencyValue(String value) {
     return double.tryParse(
-          value.replaceAll('R\$', '').trim().replaceAll('.', '').replaceAll(',', '.'),
+          value
+              .replaceAll('R\$', '')
+              .trim()
+              .replaceAll('.', '')
+              .replaceAll(',', '.'),
         ) ??
         0.0;
   }
 
   // Função para mostrar dialog de confirmação de exclusão
-  void _showDeleteConfirmation(BuildContext context, String transactionId, String parcelaInfo) {
+  void _showDeleteConfirmation(
+      BuildContext context, String transactionId, String parcelaInfo) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -90,7 +97,7 @@ class ParcelasDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -104,21 +111,25 @@ class ParcelasDetailsPage extends StatelessWidget {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'Detalhes das Parcelas',
-          style: TextStyle(
-            color: theme.primaryColor,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        // title: Text(
+        //   'Detalhes das Parcelas',
+        //   style: TextStyle(
+        //     color: theme.primaryColor,
+        //     fontSize: 18.sp,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        // centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
             // Header com nome do produto
             Container(
               width: double.infinity,
@@ -140,7 +151,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                   Text(
                     'Produto',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 10.sp,
                       color: DefaultColors.grey20,
                       fontWeight: FontWeight.w500,
                     ),
@@ -149,7 +160,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                   Text(
                     productName,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 14.sp,
                       color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -157,9 +168,9 @@ class ParcelasDetailsPage extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             SizedBox(height: 20.h),
-            
+
             // Lista de parcelas
             Expanded(
               child: Obx(() {
@@ -174,10 +185,10 @@ class ParcelasDetailsPage extends StatelessWidget {
                   final regexB = RegExp(r'Parcela (\d+):');
                   final matchA = regexA.firstMatch(a.title);
                   final matchB = regexB.firstMatch(b.title);
-                  
+
                   final parcelaA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
                   final parcelaB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
-                  
+
                   return parcelaA.compareTo(parcelaB);
                 });
 
@@ -220,13 +231,14 @@ class ParcelasDetailsPage extends StatelessWidget {
                         Text(
                           'Parcelas (${parcelasProduct.length})',
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 12.sp,
                             color: theme.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 6.h),
                           decoration: BoxDecoration(
                             color: theme.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20.r),
@@ -242,32 +254,34 @@ class ParcelasDetailsPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     SizedBox(height: 16.h),
-                    
+
                     // Lista das parcelas
                     Expanded(
                       child: ListView.builder(
                         itemCount: parcelasProduct.length,
                         itemBuilder: (context, index) {
                           final parcela = parcelasProduct[index];
-                          
+
                           // Extrai número da parcela
                           final regex = RegExp(r'Parcela (\d+):');
                           final match = regex.firstMatch(parcela.title);
-                          final numeroParcela = match?.group(1) ?? '${index + 1}';
-                          
+                          final numeroParcela =
+                              match?.group(1) ?? '${index + 1}';
+
                           // Verifica se a parcela já foi paga (data no passado)
-                          final isPaga = parcela.paymentDay != null && 
-                              DateTime.parse(parcela.paymentDay!).isBefore(DateTime.now());
-                          
+                          final isPaga = parcela.paymentDay != null &&
+                              DateTime.parse(parcela.paymentDay!)
+                                  .isBefore(DateTime.now());
+
                           return Container(
                             margin: EdgeInsets.only(bottom: 12.h),
                             decoration: BoxDecoration(
                               color: theme.cardColor,
                               borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
-                                color: isPaga 
+                                color: isPaga
                                     ? Colors.green.withOpacity(0.3)
                                     : DefaultColors.grey.withOpacity(0.2),
                                 width: 1,
@@ -286,89 +300,110 @@ class ParcelasDetailsPage extends StatelessWidget {
                                           width: 4.w,
                                           height: 40.h,
                                           decoration: BoxDecoration(
-                                            color: isPaga ? Colors.green : theme.primaryColor,
-                                            borderRadius: BorderRadius.circular(2.r),
+                                            color: isPaga
+                                                ? Colors.green
+                                                : theme.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(2.r),
                                           ),
                                         ),
-                                        
+
                                         SizedBox(width: 12.w),
-                                        
+
                                         // Informações da parcela
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
                                                     'Parcela $numeroParcela',
                                                     style: TextStyle(
                                                       fontSize: 14.sp,
                                                       color: theme.primaryColor,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                   Text(
-                                                    _formatCurrency(_parseCurrencyValue(parcela.value)),
+                                                    _formatCurrency(
+                                                        _parseCurrencyValue(
+                                                            parcela.value)),
                                                     style: TextStyle(
-                                                      fontSize: 16.sp,
+                                                      fontSize: 14.sp,
                                                       color: theme.primaryColor,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                              
                                               SizedBox(height: 4.h),
-                                              
                                               if (parcela.paymentDay != null)
                                                 Row(
                                                   children: [
                                                     Icon(
-                                                      isPaga ? Icons.check_circle : Icons.schedule,
+                                                      isPaga
+                                                          ? Icons.check_circle
+                                                          : Icons.schedule,
                                                       size: 14.sp,
-                                                      color: isPaga ? Colors.green : DefaultColors.grey20,
+                                                      color: isPaga
+                                                          ? Colors.green
+                                                          : DefaultColors
+                                                              .grey20,
                                                     ),
                                                     SizedBox(width: 4.w),
                                                     Text(
-                                                      DateFormat('dd/MM/yyyy').format(
-                                                        DateTime.parse(parcela.paymentDay!),
+                                                      DateFormat('dd/MM/yyyy')
+                                                          .format(
+                                                        DateTime.parse(parcela
+                                                            .paymentDay!),
                                                       ),
                                                       style: TextStyle(
                                                         fontSize: 12.sp,
-                                                        color: isPaga ? Colors.green : DefaultColors.grey20,
-                                                        fontWeight: FontWeight.w500,
+                                                        color: isPaga
+                                                            ? Colors.green
+                                                            : DefaultColors
+                                                                .grey20,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
                                                     SizedBox(width: 8.w),
-                                                    Text(
-                                                      isPaga ? 'Paga' : 'Pendente',
-                                                      style: TextStyle(
-                                                        fontSize: 11.sp,
-                                                        color: isPaga ? Colors.green : Colors.orange,
-                                                        fontWeight: FontWeight.w600,
-                                                      ),
-                                                    ),
+                                                    // Text(
+                                                    //   isPaga
+                                                    //       ? 'Paga'
+                                                    //       : 'Pendente',
+                                                    //   style: TextStyle(
+                                                    //     fontSize: 11.sp,
+                                                    //     color: isPaga
+                                                    //         ? Colors.green
+                                                    //         : Colors.orange,
+                                                    //     fontWeight:
+                                                    //         FontWeight.w600,
+                                                    //   ),
+                                                    // ),
                                                   ],
                                                 ),
-                                              
-                                              if (parcela.paymentType != null && parcela.paymentType!.isNotEmpty)
+                                              if (parcela.paymentType != null &&
+                                                  parcela
+                                                      .paymentType!.isNotEmpty)
                                                 Padding(
-                                                  padding: EdgeInsets.only(top: 4.h),
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                                                    decoration: BoxDecoration(
-                                                      color: DefaultColors.grey.withOpacity(0.1),
-                                                      borderRadius: BorderRadius.circular(8.r),
-                                                    ),
-                                                    child: Text(
-                                                      parcela.paymentType!,
-                                                      style: TextStyle(
-                                                        fontSize: 10.sp,
-                                                        color: DefaultColors.grey20,
-                                                        fontWeight: FontWeight.w500,
-                                                      ),
+                                                  padding:
+                                                      EdgeInsets.only(top: 4.h),
+                                                  child: Text(
+                                                    parcela.paymentType!,
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      color:
+                                                          DefaultColors.grey20,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -379,36 +414,29 @@ class ParcelasDetailsPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                
+
                                 // Botão de excluir
-                                Container(
+                                SizedBox(
                                   width: 60.w,
                                   height: 80.h,
-                                  child: Material(
-                                    color: Colors.red.withOpacity(0.1),
+                                  child: InkWell(
                                     borderRadius: BorderRadius.only(
                                       topRight: Radius.circular(12.r),
                                       bottomRight: Radius.circular(12.r),
                                     ),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(12.r),
-                                        bottomRight: Radius.circular(12.r),
-                                      ),
-                                                                             onTap: () {
-                                         if (parcela.id != null) {
-                                           _showDeleteConfirmation(
-                                             context,
-                                             parcela.id!,
-                                             'Parcela $numeroParcela',
-                                           );
-                                         }
-                                       },
-                                      child: Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.red,
-                                        size: 24.sp,
-                                      ),
+                                    onTap: () {
+                                      if (parcela.id != null) {
+                                        _showDeleteConfirmation(
+                                          context,
+                                          parcela.id!,
+                                          'Parcela $numeroParcela',
+                                        );
+                                      }
+                                    },
+                                    child: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red,
+                                      size: 24.sp,
                                     ),
                                   ),
                                 ),
@@ -427,4 +455,4 @@ class ParcelasDetailsPage extends StatelessWidget {
       ),
     );
   }
-} 
+}
