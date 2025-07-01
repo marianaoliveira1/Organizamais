@@ -236,20 +236,12 @@ class ParcelasDetailsPage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.w, vertical: 6.h),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Text(
-                            'Total: ${_formatCurrency(valorTotal)}',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        Text(
+                          'Total: ${_formatCurrency(valorTotal)}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],

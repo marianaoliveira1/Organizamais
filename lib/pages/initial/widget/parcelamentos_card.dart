@@ -69,194 +69,190 @@ class ParcelamentosCard extends StatelessWidget {
             );
           }),
           SizedBox(height: 12.h),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 1.h,
-              horizontal: 1.w,
-            ),
-            child: Obx(() {
-              final currentMonth = DateTime.now().month;
-              final currentYear = DateTime.now().year;
+          Obx(() {
+            final currentMonth = DateTime.now().month;
+            final currentYear = DateTime.now().year;
 
-              // Filtra transações que são parcelamentos (título contém "Parcela")
-              final parcelamentos = _transactionController.transaction
-                  .where((t) => t.title.contains('Parcela'))
-                  .where((t) {
-                if (t.paymentDay == null) return false;
-                final date = DateTime.parse(t.paymentDay!);
-                return date.month == currentMonth && date.year == currentYear;
-              }).toList();
+            // Filtra transações que são parcelamentos (título contém "Parcela")
+            final parcelamentos = _transactionController.transaction
+                .where((t) => t.title.contains('Parcela'))
+                .where((t) {
+              if (t.paymentDay == null) return false;
+              final date = DateTime.parse(t.paymentDay!);
+              return date.month == currentMonth && date.year == currentYear;
+            }).toList();
 
-              // Ordena por data (do menor para o maior)
-              parcelamentos.sort((a, b) {
-                final dateA = DateTime.parse(a.paymentDay!);
-                final dateB = DateTime.parse(b.paymentDay!);
-                return dateA.compareTo(dateB);
-              });
+            // Ordena por data (do menor para o maior)
+            parcelamentos.sort((a, b) {
+              final dateA = DateTime.parse(a.paymentDay!);
+              final dateB = DateTime.parse(b.paymentDay!);
+              return dateA.compareTo(dateB);
+            });
 
-              if (parcelamentos.isEmpty) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Nenhuma parcela este mês',
-                      style: TextStyle(
-                        color: DefaultColors.grey20,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      'Suas parcelas aparecerão aqui',
-                      style: TextStyle(
-                        color: DefaultColors.grey,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                );
-              }
-
-              // Calcular o valor total das parcelas
-              final totalParcelasValue =
-                  parcelamentos.fold(0.0, (sum, parcela) {
-                return sum + _parseCurrencyValue(parcela.value);
-              });
-
-              // Contar quantas parcelas únicas (produtos diferentes) existem
-              final produtosUnicos = <String>{};
-              for (final parcela in parcelamentos) {
-                final regex = RegExp(r'Parcela (\d+): (.+)');
-                final match = regex.firstMatch(parcela.title);
-                if (match != null) {
-                  produtosUnicos.add(match.group(2)!);
-                }
-              }
-
+            if (parcelamentos.isEmpty) {
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ...parcelamentos.map((parcela) {
-                    // Extrai informações da parcela do título
-                    final regex = RegExp(r'Parcela (\d+): (.+)');
-                    final match = regex.firstMatch(parcela.title);
-                    final parcelaAtual = match?.group(1) ?? '1';
-                    final tituloOriginal = match?.group(2) ?? parcela.title;
+                  Text(
+                    'Nenhuma parcela este mês',
+                    style: TextStyle(
+                      color: DefaultColors.grey20,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Suas parcelas aparecerão aqui',
+                    style: TextStyle(
+                      color: DefaultColors.grey,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              );
+            }
 
-                    // Busca quantas parcelas totais existem para este item
-                    final totalParcelas = _transactionController.transaction
-                        .where((t) => t.title.contains(': $tituloOriginal'))
-                        .length;
+            // Calcular o valor total das parcelas
+            final totalParcelasValue = parcelamentos.fold(0.0, (sum, parcela) {
+              return sum + _parseCurrencyValue(parcela.value);
+            });
 
-                    return InkWell(
-                      onTap: () {
-                        Get.to(() =>
-                            ParcelasDetailsPage(productName: tituloOriginal));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Parcela $parcelaAtual de $totalParcelas',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 10.sp,
-                                    color: DefaultColors.grey20,
-                                  ),
+            // Contar quantas parcelas únicas (produtos diferentes) existem
+            final produtosUnicos = <String>{};
+            for (final parcela in parcelamentos) {
+              final regex = RegExp(r'Parcela (\d+): (.+)');
+              final match = regex.firstMatch(parcela.title);
+              if (match != null) {
+                produtosUnicos.add(match.group(2)!);
+              }
+            }
+
+            return Column(
+              children: [
+                ...parcelamentos.map((parcela) {
+                  // Extrai informações da parcela do título
+                  final regex = RegExp(r'Parcela (\d+): (.+)');
+                  final match = regex.firstMatch(parcela.title);
+                  final parcelaAtual = match?.group(1) ?? '1';
+                  final tituloOriginal = match?.group(2) ?? parcela.title;
+
+                  // Busca quantas parcelas totais existem para este item
+                  final totalParcelas = _transactionController.transaction
+                      .where((t) => t.title.contains(': $tituloOriginal'))
+                      .length;
+
+                  return InkWell(
+                    onTap: () {
+                      Get.to(() =>
+                          ParcelasDetailsPage(productName: tituloOriginal));
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Parcela $parcelaAtual de $totalParcelas',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10.sp,
+                                  color: DefaultColors.grey20,
                                 ),
-                                SizedBox(height: 2.h),
+                              ),
+                              SizedBox(height: 2.h),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    tituloOriginal,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13.sp,
+                                      color: theme.primaryColor,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    _formatCurrency(
+                                        _parseCurrencyValue(parcela.value)),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13.sp,
+                                      color: theme.primaryColor,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4.h),
+                              if (parcela.paymentDay != null)
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      tituloOriginal,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.sp,
-                                        color: theme.primaryColor,
+                                      DateFormat('dd/MM/yyyy').format(
+                                        DateTime.parse(parcela.paymentDay!),
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      _formatCurrency(
-                                          _parseCurrencyValue(parcela.value)),
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.sp,
-                                        color: theme.primaryColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11.sp,
+                                        color: DefaultColors.grey20,
                                       ),
-                                      textAlign: TextAlign.end,
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 4.h),
-                                if (parcela.paymentDay != null)
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
+                                    if (parcela.paymentType != null &&
+                                        parcela.paymentType!.isNotEmpty)
                                       Text(
-                                        DateFormat('dd/MM/yyyy').format(
-                                          DateTime.parse(parcela.paymentDay!),
-                                        ),
+                                        parcela.paymentType!,
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 11.sp,
                                           color: DefaultColors.grey20,
                                         ),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      if (parcela.paymentType != null &&
-                                          parcela.paymentType!.isNotEmpty)
-                                        Text(
-                                          parcela.paymentType!,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 11.sp,
-                                            color: DefaultColors.grey20,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                    ],
-                                  ),
-                              ],
-                            ),
+                                  ],
+                                ),
+                              SizedBox(
+                                height: 10.h,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }),
-
-                  SizedBox(height: 12.h),
-                  // Total das parcelas
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        _formatCurrency(totalParcelasValue),
-                        style: TextStyle(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11.sp,
                         ),
+                      ],
+                    ),
+                  );
+                }),
+
+                SizedBox(height: 12.h),
+                // Total das parcelas
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      _formatCurrency(totalParcelasValue),
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 11.sp,
                       ),
-                    ],
-                  ),
-                ],
-              );
-            }),
-          ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );
