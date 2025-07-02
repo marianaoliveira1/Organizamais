@@ -190,48 +190,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
       };
     }
 
-    final bool isFirstDay = DateTime.now().day == 1;
-    final int currentYear = DateTime.now().year;
-    num totalReceita = isFirstDay
-        ? 0
-        : transactionController.transaction.where((t) {
-            if (t.paymentDay != null) {
-              DateTime paymentDate = DateTime.parse(
-                  t.paymentDay!); // Converte a string para DateTime
-              return t.type == TransactionType.receita &&
-                  getAllMonths()[paymentDate.month - 1] == selectedMonth &&
-                  paymentDate.year == currentYear;
-            }
-            return false;
-          }).fold(
-            0,
-            (sum, t) =>
-                sum +
-                double.parse(
-                  t.value.replaceAll('.', '').replaceAll(',', '.'),
-                ),
-          );
 
-    num totalDespesas = isFirstDay
-        ? 0
-        : transactionController.transaction.where((t) {
-            // Verifica se paymentDay não é nulo e se a data corresponde ao mês e ano atuais
-            if (t.paymentDay != null) {
-              DateTime paymentDate = DateTime.parse(
-                  t.paymentDay!); // Converte a string para DateTime
-              return t.type == TransactionType.despesa &&
-                  getAllMonths()[paymentDate.month - 1] == selectedMonth &&
-                  paymentDate.year == currentYear;
-            }
-            return false; // Caso paymentDay seja nulo
-          }).fold(
-            0,
-            (sum, t) =>
-                sum +
-                double.parse(
-                  t.value.replaceAll('.', '').replaceAll(',', '.'),
-                ),
-          );
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -626,8 +585,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                         height: 30.h,
                       ),
                       GraficoPorcengtagemReceitaEDespesa(
-                        totalReceita: totalReceita,
-                        totalDespesas: totalDespesas,
+                        selectedMonth: selectedMonth,
                       ),
                       SizedBox(
                         height: 20.h,
