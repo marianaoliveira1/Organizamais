@@ -349,6 +349,23 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                                 touchTooltipData: LineTouchTooltipData(
                                                   getTooltipColor: (touchedSpot) =>
                                                       DefaultColors.green.withOpacity(0.8),
+                                                  getTooltipItems: (touchedSpots) {
+                                                    return touchedSpots.map((touchedSpot) {
+                                                      return LineTooltipItem(
+                                                        currencyFormatter.format(touchedSpot.y),
+                                                        TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.w500,
+                                                          fontSize: 8.sp,
+                                                        ),
+                                                      );
+                                                    }).toList();
+                                                  },
+                                                  tooltipPadding: EdgeInsets.symmetric(
+                                                    horizontal: 6.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  tooltipRoundedRadius: 4.r,
                                                 ),
                                               ),
                                               gridData: FlGridData(
