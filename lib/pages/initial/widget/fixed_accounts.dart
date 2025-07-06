@@ -576,52 +576,52 @@ class FixedAccounts extends StatelessWidget {
               );
             },
           ),
-          Obx(() {
-            final currentFixedAccounts = fixedAccountsController.fixedAccountsWithDeactivated;
-            final activeAccounts = currentFixedAccounts.where((account) => !fixedAccountsController.isAccountDeactivated(account)).toList();
-            final deactivatedAccounts = currentFixedAccounts.where((account) => fixedAccountsController.isAccountDeactivated(account)).toList();
+          // Obx(() {
+          //   final currentFixedAccounts = fixedAccountsController.fixedAccountsWithDeactivated;
+          //   final activeAccounts = currentFixedAccounts.where((account) => !fixedAccountsController.isAccountDeactivated(account)).toList();
+          //   final deactivatedAccounts = currentFixedAccounts.where((account) => fixedAccountsController.isAccountDeactivated(account)).toList();
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (activeAccounts.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.h, right: 10.h),
-                    child: Text(
-                      _formatCurrency(
-                        activeAccounts.fold(0.0, (total, account) {
-                          String cleanValue = account.value.replaceAll('R\$', '').trim();
-                          if (cleanValue.contains('.') && cleanValue.contains(',')) {
-                            cleanValue = cleanValue.replaceAll('.', '').replaceAll(',', '.');
-                          } else if (cleanValue.contains(',')) {
-                            cleanValue = cleanValue.replaceAll(',', '.');
-                          }
-                          return total + (double.tryParse(cleanValue) ?? 0);
-                        }).toString(),
-                      ),
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 11.sp,
-                      ),
-                    ),
-                  ),
-                if (deactivatedAccounts.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(top: 4.h, right: 10.h),
-                    child: Text(
-                      "${deactivatedAccounts.length} conta${deactivatedAccounts.length > 1 ? 's' : ''} desativada${deactivatedAccounts.length > 1 ? 's' : ''}",
-                      style: TextStyle(
-                        color: DefaultColors.grey,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 9.sp,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          }),
+          //   return Column(
+          //     crossAxisAlignment: CrossAxisAlignment.end,
+          //     children: [
+          //       if (activeAccounts.isNotEmpty)
+          //         Padding(
+          //           padding: EdgeInsets.only(top: 10.h, right: 10.h),
+          //           child: Text(
+          //             _formatCurrency(
+          //               activeAccounts.fold(0.0, (total, account) {
+          //                 String cleanValue = account.value.replaceAll('R\$', '').trim();
+          //                 if (cleanValue.contains('.') && cleanValue.contains(',')) {
+          //                   cleanValue = cleanValue.replaceAll('.', '').replaceAll(',', '.');
+          //                 } else if (cleanValue.contains(',')) {
+          //                   cleanValue = cleanValue.replaceAll(',', '.');
+          //                 }
+          //                 return total + (double.tryParse(cleanValue) ?? 0);
+          //               }).toString(),
+          //             ),
+          //             style: TextStyle(
+          //               color: theme.primaryColor,
+          //               fontWeight: FontWeight.w500,
+          //               fontSize: 11.sp,
+          //             ),
+          //           ),
+          //         ),
+          //       if (deactivatedAccounts.isNotEmpty)
+          //         Padding(
+          //           padding: EdgeInsets.only(top: 4.h, right: 10.h),
+          //           child: Text(
+          //             "${deactivatedAccounts.length} conta${deactivatedAccounts.length > 1 ? 's' : ''} desativada${deactivatedAccounts.length > 1 ? 's' : ''}",
+          //             style: TextStyle(
+          //               color: DefaultColors.grey,
+          //               fontWeight: FontWeight.w400,
+          //               fontSize: 9.sp,
+          //               fontStyle: FontStyle.italic,
+          //             ),
+          //           ),
+          //         ),
+          //     ],
+          //   );
+          // }),
         ],
       ),
     );
