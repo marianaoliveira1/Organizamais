@@ -57,6 +57,7 @@ class TransactionsList extends StatelessWidget {
   Map<String, List<dynamic>> _groupTransactionsByDate(List transactions) {
     Map<String, List<dynamic>> grouped = {};
     final int currentYear = DateTime.now().year;
+    final today = DateTime.now();
 
     for (var transaction in transactions) {
       DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
@@ -74,12 +75,26 @@ class TransactionsList extends StatelessWidget {
       grouped.putIfAbsent(relativeDate, () => []).add(transaction);
     }
 
-    // Ordena as datas das transações (mais recente primeiro)
+    // Ordena as datas das transações
     final sortedKeys = grouped.keys.toList()
       ..sort((a, b) {
         DateTime dateA = _parseRelativeDate(a);
         DateTime dateB = _parseRelativeDate(b);
-        return dateB.compareTo(dateA);
+        
+        // Colocar datas futuras no final
+        bool aIsFuture = dateA.isAfter(today) && !DateUtils.isSameDay(dateA, today);
+        bool bIsFuture = dateB.isAfter(today) && !DateUtils.isSameDay(dateB, today);
+        
+        if (aIsFuture && !bIsFuture) return 1;  // a é futuro, b não -> a vai depois
+        if (!aIsFuture && bIsFuture) return -1; // a não é futuro, b é -> a vai antes
+        
+        // Se ambos são futuros, ordena cronologicamente (mais próximo primeiro)
+        // Se ambos são passados, ordena por mais recente primeiro
+        if (aIsFuture && bIsFuture) {
+          return dateA.compareTo(dateB); // Futuro: mais próximo primeiro
+        } else {
+          return dateB.compareTo(dateA); // Passado: mais recente primeiro
+        }
       });
 
     Map<String, List<dynamic>> sortedGrouped = {};
@@ -91,26 +106,64 @@ class TransactionsList extends StatelessWidget {
   }
 
   DateTime _parseRelativeDate(String relativeDate) {
+    DateTime now = DateTime.now();
+    
     if (relativeDate == 'Hoje') {
-      return DateTime.now();
+      return now;
     } else if (relativeDate == 'Ontem') {
-      return DateTime.now().subtract(const Duration(days: 1));
-    } else {
+      return now.subtract(const Duration(days: 1));
+    } else if (relativeDate == 'Antes de ontem') {
+      return now.subtract(const Duration(days: 2));
+    } else if (relativeDate == 'Amanhã') {
+      return now.add(const Duration(days: 1));
+    } else if (relativeDate == 'Depois de amanhã') {
+      return now.add(const Duration(days: 2));
+    } else if (relativeDate.contains('dias atrás')) {
+      // Extrai o número de dias (ex: "3 dias atrás" -> 3)
+      final match = RegExp(r'(\d+) dias atrás').firstMatch(relativeDate);
+      if (match != null) {
+        int days = int.parse(match.group(1)!);
+        return now.subtract(Duration(days: days));
+      }
+    } else if (relativeDate.contains('Daqui')) {
+      // Extrai o número de dias (ex: "Daqui 3 dias" -> 3)
+      final match = RegExp(r'Daqui (\d+) dias').firstMatch(relativeDate);
+      if (match != null) {
+        int days = int.parse(match.group(1)!);
+        return now.add(Duration(days: days));
+      }
+    }
+    
+    // Se não é nenhuma das opções acima, tenta fazer parse da data
+    try {
       return DateFormat('dd/MM/yyyy').parse(relativeDate);
+    } catch (e) {
+      return now; // Fallback para hoje se não conseguir fazer parse
     }
   }
 
   String _getRelativeDate(String dateStr) {
     DateTime date = DateTime.parse(dateStr);
     DateTime now = DateTime.now();
+    
+    // Calcular diferença em dias
+    int differenceInDays = date.difference(DateTime(now.year, now.month, now.day)).inDays;
 
-    if (DateUtils.isSameDay(date, now)) return 'Hoje';
-    if (DateUtils.isSameDay(
-      date,
-      now.subtract(
-        const Duration(days: 1),
-      ),
-    )) return 'Ontem';
+    // Datas passadas
+    if (differenceInDays == 0) return 'Hoje';
+    if (differenceInDays == -1) return 'Ontem';
+    if (differenceInDays == -2) return 'Antes de ontem';
+    if (differenceInDays >= -5 && differenceInDays <= -3) {
+      return '${differenceInDays.abs()} dias atrás';
+    }
+
+    // Datas futuras
+    if (differenceInDays == 1) return 'Amanhã';
+    if (differenceInDays == 2) return 'Depois de amanhã';
+    if (differenceInDays >= 3 && differenceInDays <= 5) {
+      return 'Daqui $differenceInDays dias';
+    }
+    
     return DateFormat('dd/MM/yyyy').format(date);
   }
 }

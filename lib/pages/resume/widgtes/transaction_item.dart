@@ -23,6 +23,12 @@ class TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = findCategoryById(transaction.category);
     final theme = Theme.of(context);
+    
+    // Verificar se é uma transação futura
+    final transactionDate = DateTime.parse(transaction.paymentDay!);
+    final today = DateTime.now();
+    final isToday = DateUtils.isSameDay(transactionDate, today);
+    final isFuture = transactionDate.isAfter(today) && !isToday;
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -56,6 +62,7 @@ class TransactionItem extends StatelessWidget {
                       category?['icon'] ?? 'assets/icon-category/default.png',
                       width: 28.w,
                       height: 28.h,
+                      opacity: isFuture ? const AlwaysStoppedAnimation(0.4) : null,
                     ),
                     SizedBox(width: 16.w),
                     Column(
@@ -66,7 +73,7 @@ class TransactionItem extends StatelessWidget {
                           child: Text(
                             transaction.title,
                             style: TextStyle(
-                              color: theme.primaryColor,
+                              color: isFuture ? DefaultColors.grey : theme.primaryColor,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                             ),
@@ -75,18 +82,43 @@ class TransactionItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        SizedBox(
-                          width: 120.w,
-                          child: Text(
-                            category?['name'] ?? 'Categoria não encontrada',
-                            style: TextStyle(
-                              color: DefaultColors.grey20,
-                              fontSize: 10.sp,
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: isFuture ? 80.w : 120.w,
+                              child: Text(
+                                category?['name'] ?? 'Categoria não encontrada',
+                                style: TextStyle(
+                                  color: isFuture ? DefaultColors.grey.withOpacity(0.6) : DefaultColors.grey20,
+                                  fontSize: 10.sp,
+                                ),
+                                maxLines: 2,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            maxLines: 2,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                            if (isFuture) ...[
+                              SizedBox(width: 4.w),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 4.w,
+                                  vertical: 1.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: DefaultColors.grey.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(6.r),
+                                ),
+                                child: Text(
+                                  'Em breve',
+                                  style: TextStyle(
+                                    color: DefaultColors.grey,
+                                    fontSize: 7.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
                     ),
@@ -101,7 +133,7 @@ class TransactionItem extends StatelessWidget {
                       child: Text(
                         _formatValue(transaction.value),
                         style: TextStyle(
-                          color: theme.primaryColor,
+                          color: isFuture ? DefaultColors.grey : theme.primaryColor,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -113,7 +145,7 @@ class TransactionItem extends StatelessWidget {
                       child: Text(
                         transaction.paymentType,
                         style: TextStyle(
-                          color: DefaultColors.grey20,
+                          color: isFuture ? DefaultColors.grey.withOpacity(0.6) : DefaultColors.grey20,
                           fontSize: 10.sp,
                         ),
                         textAlign: TextAlign.end,

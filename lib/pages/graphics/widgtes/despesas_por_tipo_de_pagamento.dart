@@ -88,7 +88,12 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
                 (paymentType) => {
                   "paymentType": paymentType,
                   "value": filteredTransactions
-                      .where((element) => element.paymentType == paymentType)
+                      .where((element) {
+                        if (element.paymentType == null) return false;
+                        // Usar a mesma lógica robusta de comparação
+                        return element.paymentType!.trim().toLowerCase() == 
+                               paymentType.trim().toLowerCase();
+                      })
                       .fold<double>(
                     0.0,
                     (previousValue, element) {
@@ -549,8 +554,17 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     }
 
     var filteredTransactions = getFilteredTransactions();
-    return filteredTransactions
-        .where((transaction) => transaction.paymentType == paymentType)
+    
+    // Comparação mais robusta para tipos de pagamento
+    var paymentTypeTransactions = filteredTransactions
+        .where((transaction) {
+          if (transaction.paymentType == null) return false;
+          // Comparação ignorando maiúsculas/minúsculas e espaços extras
+          return transaction.paymentType!.trim().toLowerCase() == 
+                 paymentType.trim().toLowerCase();
+        })
         .toList();
+    
+    return paymentTypeTransactions;
   }
 }
