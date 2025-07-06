@@ -781,6 +781,10 @@ class CategoryAnalysisPage extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
 
+                  // Card com média mensal
+                  _buildMonthlyAverageCard(context, theme),
+                  SizedBox(height: 24.h),
+
                   // Gráfico mensal da categoria
                   CategoryMonthlyChart(
                     categoryId: categoryId,
@@ -915,6 +919,203 @@ class CategoryAnalysisPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildMonthlyAverageCard(BuildContext context, ThemeData theme) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+
+    // Calcular dados mensais para a categoria
+    final monthlyData =
+        _calculateMonthlyDataForCategory(transactionController.transaction);
+
+    // Calcular média mensal
+    final activeMonths =
+        monthlyData.values.where((value) => value > 0).toList();
+    final monthlyAverage = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a + b) / activeMonths.length
+        : 0.0;
+
+    // Calcular maior e menor gasto
+    final maxSpending = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a > b ? a : b)
+        : 0.0;
+    final minSpending = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a < b ? a : b)
+        : 0.0;
+
+    final NumberFormat currencyFormatter =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.analytics_outlined,
+                color: categoryColor,
+                size: 20.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Análise da Categoria',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Get.theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Média Mensal',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      currencyFormatter.format(monthlyAverage),
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: categoryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Maior Gasto',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      currencyFormatter.format(maxSpending),
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Menor Gasto',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      currencyFormatter.format(minSpending),
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Meses Ativos',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '${activeMonths.length} de ${DateTime.now().month}',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Get.theme.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<int, double> _calculateMonthlyDataForCategory(
+      List<TransactionModel> transactions) {
+    final currentYear = DateTime.now().year;
+    final currentDate = DateTime.now();
+    final monthlyData = <int, double>{};
+
+    // Inicializar todos os meses com zero
+    for (int month = 1; month <= 12; month++) {
+      monthlyData[month] = 0.0;
+    }
+
+    // Calcular totais por mês para a categoria específica
+    for (final transaction in transactions) {
+      if (transaction.paymentDay != null &&
+          transaction.category == categoryId &&
+          transaction.type == TransactionType.despesa) {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+        if (paymentDate.year == currentYear &&
+            paymentDate.isBefore(currentDate)) {
+          final month = paymentDate.month;
+          final value = double.parse(
+            transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+          );
+          monthlyData[month] = monthlyData[month]! + value;
+        }
+      }
+    }
+
+    return monthlyData;
   }
 
   List<TransactionModel> _getTransactionsByCategoryAndMonth(
