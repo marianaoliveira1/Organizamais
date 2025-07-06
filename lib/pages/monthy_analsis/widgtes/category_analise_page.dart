@@ -721,7 +721,7 @@ class CategoryAnalysisPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          categoryName,
+          "Analise de $categoryName",
           style: TextStyle(fontSize: 18.sp),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -956,25 +956,15 @@ class CategoryAnalysisPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.analytics_outlined,
-                color: categoryColor,
-                size: 20.sp,
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                'Análise da Categoria',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Get.theme.primaryColor,
-                ),
-              ),
-            ],
+          Text(
+            'Análise da Categoria',
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: DefaultColors.grey20,
+            ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           Row(
             children: [
               Expanded(
@@ -1002,30 +992,6 @@ class CategoryAnalysisPage extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Maior Gasto',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.grey20,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      currencyFormatter.format(maxSpending),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           SizedBox(height: 12.h),
@@ -1061,7 +1027,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Meses Ativos',
+                      'Maior Gasto',
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
@@ -1070,16 +1036,40 @@ class CategoryAnalysisPage extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      '${activeMonths.length} de ${DateTime.now().month}',
+                      currencyFormatter.format(maxSpending),
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
-                        color: Get.theme.primaryColor,
+                        color: Colors.red,
                       ),
                     ),
                   ],
                 ),
               ),
+              // Expanded(
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Text(
+              //         'Meses Ativos',
+              //         style: TextStyle(
+              //           fontSize: 12.sp,
+              //           fontWeight: FontWeight.w500,
+              //           color: DefaultColors.grey20,
+              //         ),
+              //       ),
+              //       SizedBox(height: 4.h),
+              //       Text(
+              //         '${activeMonths.length} de ${DateTime.now().month}',
+              //         style: TextStyle(
+              //           fontSize: 14.sp,
+              //           fontWeight: FontWeight.bold,
+              //           color: Get.theme.primaryColor,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ],
