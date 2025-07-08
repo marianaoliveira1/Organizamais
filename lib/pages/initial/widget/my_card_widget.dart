@@ -103,10 +103,13 @@ class MyCardsWidget extends StatelessWidget {
                       Row(
                         children: [
                           if (card.iconPath != null)
-                            Image.asset(
-                              card.iconPath!,
-                              width: 36.w,
-                              height: 36.h,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.asset(
+                                card.iconPath!,
+                                width: 36.w,
+                                height: 36.h,
+                              ),
                             ),
                           SizedBox(
                             width: 10.w,
