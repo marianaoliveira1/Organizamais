@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/routes/route.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../model/fixed_account_model.dart';
@@ -297,10 +298,9 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                             startMonth: selectedMonth,
                             startYear: selectedYear,
                           ));
-                          Navigator.pop(context);
+                          Get.offAllNamed(Routes.TRANSACTION);
                           return;
                         }
-                        Navigator.pop(context);
                         fixedAccountsController.addFixedAccount(FixedAccountModel(
                           title: titleController.text,
                           value: valueController.text,
@@ -310,6 +310,7 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                           startMonth: selectedMonth,
                           startYear: selectedYear,
                         ));
+                        Get.offAllNamed(Routes.TRANSACTION);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,
