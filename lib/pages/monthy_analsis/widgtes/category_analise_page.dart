@@ -190,24 +190,24 @@ class CategoryMonthlyChart extends StatelessWidget {
             ),
 
           // Dicas Personalizadas
-          // Container(
-          //   padding: EdgeInsets.all(16.w),
-          //   margin: EdgeInsets.only(bottom: 24.h),
-          //   decoration: BoxDecoration(
-          //     color: theme.cardColor,
-          //     borderRadius: BorderRadius.circular(12.r),
-          //   ),
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       DefaultTextGraphic(
-          //         text: "💡 Dicas Inteligentes",
-          //       ),
-          //       SizedBox(height: 16.h),
-          //       ..._getCategoryTips(categoryName, monthlyData, theme),
-          //     ],
-          //   ),
-          // ),
+          Container(
+            padding: EdgeInsets.all(16.w),
+            margin: EdgeInsets.only(bottom: 24.h),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DefaultTextGraphic(
+                  text: "💡 Dicas Inteligentes",
+                ),
+                SizedBox(height: 16.h),
+                ..._getCategoryTips(categoryName, monthlyData, theme),
+              ],
+            ),
+          ),
         ],
       );
     });
@@ -1112,6 +1112,7 @@ class CategoryAnalysisPage extends StatelessWidget {
       int categoryId, String monthName) {
     final TransactionController transactionController =
         Get.find<TransactionController>();
+    final DateTime today = DateTime.now();
 
     List<TransactionModel> getFilteredTransactions() {
       var despesas = transactionController.transaction
@@ -1128,11 +1129,16 @@ class CategoryAnalysisPage extends StatelessWidget {
               getAllMonths()[transactionDate.month - 1];
 
           return transactionMonthName == monthName &&
-              transactionDate.year == currentYear;
+              transactionDate.year == currentYear &&
+              transactionDate.isBefore(today.add(Duration(days: 1)));
         }).toList();
       }
 
-      return despesas;
+      return despesas.where((transaction) {
+        if (transaction.paymentDay == null) return false;
+        DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+        return transactionDate.isBefore(today.add(Duration(days: 1)));
+      }).toList();
     }
 
     var filteredTransactions = getFilteredTransactions();
