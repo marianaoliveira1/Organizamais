@@ -190,24 +190,24 @@ class CategoryMonthlyChart extends StatelessWidget {
             ),
 
           // Dicas Personalizadas
-          Container(
-            padding: EdgeInsets.all(16.w),
-            margin: EdgeInsets.only(bottom: 24.h),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DefaultTextGraphic(
-                  text: "💡 Dicas Inteligentes",
-                ),
-                SizedBox(height: 16.h),
-                ..._getCategoryTips(categoryName, monthlyData, theme),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: EdgeInsets.all(16.w),
+          //   margin: EdgeInsets.only(bottom: 24.h),
+          //   decoration: BoxDecoration(
+          //     color: theme.cardColor,
+          //     borderRadius: BorderRadius.circular(12.r),
+          //   ),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       DefaultTextGraphic(
+          //         text: "💡 Dicas Inteligentes",
+          //       ),
+          //       SizedBox(height: 16.h),
+          //       ..._getCategoryTips(categoryName, monthlyData, theme),
+          //     ],
+          //   ),
+          // ),
         ],
       );
     });
