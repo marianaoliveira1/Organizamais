@@ -23,6 +23,8 @@ class FinanceSummaryWidget extends StatelessWidget {
     );
     final theme = Theme.of(context);
 
+    String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
+
     return GestureDetector(
       onTap: () {
         Get.to(() => const FinanceDetailsPage());
@@ -39,12 +41,11 @@ class FinanceSummaryWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // AdsBanner(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Total",
+                  "Saldo do mês de  ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)}",
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: DefaultColors.grey,
