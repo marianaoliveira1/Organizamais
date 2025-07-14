@@ -137,8 +137,18 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                           items: List.generate(12, (index) {
                             int month = index + 1;
                             List<String> monthNames = [
-                              'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                              'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                              'Janeiro',
+                              'Fevereiro',
+                              'Março',
+                              'Abril',
+                              'Maio',
+                              'Junho',
+                              'Julho',
+                              'Agosto',
+                              'Setembro',
+                              'Outubro',
+                              'Novembro',
+                              'Dezembro'
                             ];
                             return DropdownMenuItem<int>(
                               value: month,
@@ -171,13 +181,13 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                             color: theme.primaryColor,
                           ),
                           dropdownColor: theme.scaffoldBackgroundColor,
-                                                  items: List.generate(40, (index) {
-                          int year = DateTime.now().year - 10 + index;
-                          return DropdownMenuItem<int>(
-                            value: year,
-                            child: Text(year.toString()),
-                          );
-                        }),
+                          items: List.generate(40, (index) {
+                            int year = DateTime.now().year - 10 + index;
+                            return DropdownMenuItem<int>(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }),
                           onChanged: (int? newValue) {
                             setState(() {
                               selectedYear = newValue!;
@@ -298,10 +308,11 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                             startMonth: selectedMonth,
                             startYear: selectedYear,
                           ));
-                          Get.offAllNamed(Routes.TRANSACTION);
+                          Get.offAllNamed(Routes.HOME);
                           return;
                         }
-                        fixedAccountsController.addFixedAccount(FixedAccountModel(
+                        fixedAccountsController
+                            .addFixedAccount(FixedAccountModel(
                           title: titleController.text,
                           value: valueController.text,
                           category: categoryId ?? 0,
@@ -310,7 +321,7 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                           startMonth: selectedMonth,
                           startYear: selectedYear,
                         ));
-                        Get.offAllNamed(Routes.TRANSACTION);
+                        Get.offAllNamed(Routes.HOME);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,

@@ -72,6 +72,8 @@ class _TransactionPageState extends State<TransactionPage> {
   bool _isInstallment = false;
   int _installments = 1;
 
+  bool _isSaving = false;
+
   @override
   void dispose() {
     valuecontroller.dispose();
@@ -530,24 +532,34 @@ class _TransactionPageState extends State<TransactionPage> {
                           );
                         }
                       },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.w, vertical: 10.h),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Salvar",
-                            style: TextStyle(
-                              color: theme.cardColor,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
+                      child: _isSaving
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.h,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.cardColor),
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20.w, vertical: 10.h),
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor,
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Salvar",
+                                  style: TextStyle(
+                                    color: theme.cardColor,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 ],
