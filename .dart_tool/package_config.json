@@ -494,6 +494,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "shimmer_animation",
+      "rootUri": "file:///C:/Users/maria/AppData/Local/Pub/Cache/hosted/pub.dev/shimmer_animation-2.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "sky_engine",
       "rootUri": "file:///C:/Users/maria/Documents/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
@@ -632,7 +638,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-07-08T17:34:52.550322Z",
+  "generated": "2025-07-14T17:12:57.976601Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///C:/Users/maria/Documents/flutter",
