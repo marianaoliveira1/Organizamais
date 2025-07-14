@@ -27,7 +27,7 @@ class TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (transactionController.transaction.isEmpty) {
-        return const DefaultTextNotTransaction();
+        return DefaultTextNotTransaction();
       }
 
       // Ordena as transações da mais recente para a mais antiga
@@ -80,14 +80,18 @@ class TransactionsList extends StatelessWidget {
       ..sort((a, b) {
         DateTime dateA = _parseRelativeDate(a);
         DateTime dateB = _parseRelativeDate(b);
-        
+
         // Colocar datas futuras no final
-        bool aIsFuture = dateA.isAfter(today) && !DateUtils.isSameDay(dateA, today);
-        bool bIsFuture = dateB.isAfter(today) && !DateUtils.isSameDay(dateB, today);
-        
-        if (aIsFuture && !bIsFuture) return 1;  // a é futuro, b não -> a vai depois
-        if (!aIsFuture && bIsFuture) return -1; // a não é futuro, b é -> a vai antes
-        
+        bool aIsFuture =
+            dateA.isAfter(today) && !DateUtils.isSameDay(dateA, today);
+        bool bIsFuture =
+            dateB.isAfter(today) && !DateUtils.isSameDay(dateB, today);
+
+        if (aIsFuture && !bIsFuture)
+          return 1; // a é futuro, b não -> a vai depois
+        if (!aIsFuture && bIsFuture)
+          return -1; // a não é futuro, b é -> a vai antes
+
         // Se ambos são futuros, ordena cronologicamente (mais próximo primeiro)
         // Se ambos são passados, ordena por mais recente primeiro
         if (aIsFuture && bIsFuture) {
@@ -107,7 +111,7 @@ class TransactionsList extends StatelessWidget {
 
   DateTime _parseRelativeDate(String relativeDate) {
     DateTime now = DateTime.now();
-    
+
     if (relativeDate == 'Hoje') {
       return now;
     } else if (relativeDate == 'Ontem') {
@@ -133,7 +137,7 @@ class TransactionsList extends StatelessWidget {
         return now.add(Duration(days: days));
       }
     }
-    
+
     // Se não é nenhuma das opções acima, tenta fazer parse da data
     try {
       return DateFormat('dd/MM/yyyy').parse(relativeDate);
@@ -145,9 +149,10 @@ class TransactionsList extends StatelessWidget {
   String _getRelativeDate(String dateStr) {
     DateTime date = DateTime.parse(dateStr);
     DateTime now = DateTime.now();
-    
+
     // Calcular diferença em dias
-    int differenceInDays = date.difference(DateTime(now.year, now.month, now.day)).inDays;
+    int differenceInDays =
+        date.difference(DateTime(now.year, now.month, now.day)).inDays;
 
     // Datas passadas
     if (differenceInDays == 0) return 'Hoje';
@@ -163,7 +168,7 @@ class TransactionsList extends StatelessWidget {
     if (differenceInDays >= 3 && differenceInDays <= 5) {
       return 'Daqui $differenceInDays dias';
     }
-    
+
     return DateFormat('dd/MM/yyyy').format(date);
   }
 }
