@@ -53,6 +53,7 @@ dependencies:
   unity_ads_plugin: ^0.3.23
   google_mobile_ads: ^6.0.0
   shimmer_animation: ^2.2.2
+  fade_shimmer: ^2.4.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
