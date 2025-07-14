@@ -190,8 +190,6 @@ class _GraphicsPageState extends State<GraphicsPage> {
       };
     }
 
-
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -346,22 +344,31 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                             LineChartData(
                                               lineTouchData: LineTouchData(
                                                 handleBuiltInTouches: true,
-                                                touchTooltipData: LineTouchTooltipData(
-                                                  getTooltipColor: (touchedSpot) =>
-                                                      DefaultColors.green.withOpacity(0.8),
-                                                  getTooltipItems: (touchedSpots) {
-                                                    return touchedSpots.map((touchedSpot) {
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                  getTooltipColor:
+                                                      (touchedSpot) =>
+                                                          DefaultColors.green
+                                                              .withOpacity(0.8),
+                                                  getTooltipItems:
+                                                      (touchedSpots) {
+                                                    return touchedSpots
+                                                        .map((touchedSpot) {
                                                       return LineTooltipItem(
-                                                        currencyFormatter.format(touchedSpot.y),
+                                                        currencyFormatter
+                                                            .format(
+                                                                touchedSpot.y),
                                                         TextStyle(
                                                           color: Colors.white,
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                           fontSize: 8.sp,
                                                         ),
                                                       );
                                                     }).toList();
                                                   },
-                                                  tooltipPadding: EdgeInsets.symmetric(
+                                                  tooltipPadding:
+                                                      EdgeInsets.symmetric(
                                                     horizontal: 6.w,
                                                     vertical: 4.h,
                                                   ),
@@ -371,14 +378,21 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                               gridData: FlGridData(
                                                 show: true,
                                                 drawVerticalLine: false,
-                                                horizontalInterval: data.isNotEmpty
-                                                    ? (data.reduce((a, b) => a > b ? a : b) > 0 
-                                                        ? data.reduce((a, b) => a > b ? a : b) / 4 
+                                                horizontalInterval: data
+                                                        .isNotEmpty
+                                                    ? (data.reduce((a, b) =>
+                                                                a > b ? a : b) >
+                                                            0
+                                                        ? data.reduce((a, b) =>
+                                                                a > b ? a : b) /
+                                                            4
                                                         : 1)
                                                     : 1,
-                                                getDrawingHorizontalLine: (value) {
+                                                getDrawingHorizontalLine:
+                                                    (value) {
                                                   return FlLine(
-                                                    color: DefaultColors.grey.withOpacity(0.2),
+                                                    color: DefaultColors.grey
+                                                        .withOpacity(0.2),
                                                     strokeWidth: 1,
                                                   );
                                                 },
@@ -390,14 +404,23 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                                 show: false,
                                               ),
                                               minX: 0,
-                                              maxX: (data.length - 1).toDouble(),
+                                              maxX:
+                                                  (data.length - 1).toDouble(),
                                               minY: 0,
-                                              maxY: data.isNotEmpty && data.reduce((a, b) => a > b ? a : b) > 0
-                                                  ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                                              maxY: data.isNotEmpty &&
+                                                      data.reduce((a, b) =>
+                                                              a > b ? a : b) >
+                                                          0
+                                                  ? data.reduce((a, b) =>
+                                                          a > b ? a : b) *
+                                                      1.2
                                                   : 100,
                                               lineBarsData: [
                                                 LineChartBarData(
-                                                  spots: data.asMap().entries.map((entry) {
+                                                  spots: data
+                                                      .asMap()
+                                                      .entries
+                                                      .map((entry) {
                                                     return FlSpot(
                                                       entry.key.toDouble(),
                                                       entry.value,
@@ -408,22 +431,28 @@ class _GraphicsPageState extends State<GraphicsPage> {
                                                   color: DefaultColors.green,
                                                   barWidth: 3,
                                                   isStrokeCapRound: true,
-                                                  dotData: FlDotData(show: false),
+                                                  dotData:
+                                                      FlDotData(show: false),
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     gradient: LinearGradient(
-                                                      begin: Alignment.topCenter,
-                                                      end: Alignment.bottomCenter,
+                                                      begin:
+                                                          Alignment.topCenter,
+                                                      end: Alignment
+                                                          .bottomCenter,
                                                       colors: [
-                                                        DefaultColors.green.withOpacity(0.3),
-                                                        DefaultColors.green.withOpacity(0.1),
+                                                        DefaultColors.green
+                                                            .withOpacity(0.3),
+                                                        DefaultColors.green
+                                                            .withOpacity(0.1),
                                                       ],
                                                     ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            duration: const Duration(milliseconds: 250),
+                                            duration: const Duration(
+                                                milliseconds: 250),
                                           ),
                                         ),
 

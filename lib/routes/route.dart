@@ -11,7 +11,7 @@ import '../pages/home/home_page.dart';
 import '../pages/initial/initial_page.dart';
 
 import '../pages/initial/pages/fixed_accotuns_page.dart';
-import '../pages/initial/pages/parcelas_details_page.dart';
+
 import '../pages/login/login_page.dart';
 import '../pages/register/register_page.dart';
 
@@ -46,9 +46,12 @@ class AppPages {
     GetPage(name: Routes.RESUME, page: () => ResumePage()),
     GetPage(name: Routes.TRANSACTION, page: () => TransactionPage()),
     GetPage(name: Routes.CATEGORY, page: () => CategoryPage()),
-    GetPage(name: Routes.FIXED_ACCOUNTS, page: () => AddFixedAccountsFormPage()),
+    GetPage(
+        name: Routes.FIXED_ACCOUNTS, page: () => AddFixedAccountsFormPage()),
     GetPage(name: Routes.PROFILE, page: () => ProfilePage()),
-    GetPage(name: Routes.FIXED_ACCOUNTS_PAGE, page: () => const FixedAccountsPage()),
+    GetPage(
+        name: Routes.FIXED_ACCOUNTS_PAGE,
+        page: () => const FixedAccountsPage()),
     // GetPage(name: Routes.ADDGOALPAGE, page: () => AddGoalPage()),
   ];
 
