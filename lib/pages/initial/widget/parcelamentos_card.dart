@@ -90,28 +90,16 @@ class ParcelamentosCard extends StatelessWidget {
             });
 
             if (parcelamentos.isEmpty) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Nenhuma parcela este mês',
-                    style: TextStyle(
-                      color: DefaultColors.grey20,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+              return Center(
+                child: Text(
+                  'Nenhuma parcela este mês',
+                  style: TextStyle(
+                    color: DefaultColors.grey20,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w500,
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Suas parcelas aparecerão aqui',
-                    style: TextStyle(
-                      color: DefaultColors.grey,
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
+                  textAlign: TextAlign.center,
+                ),
               );
             }
 
