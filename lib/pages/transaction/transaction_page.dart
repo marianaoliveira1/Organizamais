@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/utils/color.dart';
@@ -72,7 +73,7 @@ class _TransactionPageState extends State<TransactionPage> {
   bool _isInstallment = false;
   int _installments = 1;
 
-  bool _isSaving = false;
+  final bool _isSaving = false;
 
   @override
   void dispose() {
@@ -170,17 +171,17 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     _getTypeColor(_selectedType);
-    Get.put(TransactionController());
+    final TransactionController transactionController = Get.put(TransactionController());
 
     final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: theme.cardColor,
       body: SingleChildScrollView(
-        child: Column(
-          spacing: 4.h,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          child: Column(
+            spacing: 4.h,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
               color: _selectedType == TransactionType.receita
@@ -604,6 +605,173 @@ class _TransactionPageState extends State<TransactionPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerSkeleton(ThemeData theme) {
+    return SingleChildScrollView(
+      child: Column(
+        spacing: 4.h,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Shimmer for header section
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+            color: Colors.red,
+            child: Column(
+              children: [
+                // Shimmer for type buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildTypeButtonSkeleton(),
+                    _buildTypeButtonSkeleton(),
+                  ],
+                ),
+                SizedBox(height: 20.h),
+                // Shimmer for value input
+                Shimmer(
+                  duration: const Duration(milliseconds: 1400),
+                  color: Colors.white.withOpacity(0.3),
+                  child: Container(
+                    height: 40.h,
+                    width: 200.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.h),
+          // Shimmer for form fields
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Description field shimmer
+                _buildFormFieldSkeleton("Descrição"),
+                SizedBox(height: 16.h),
+                Divider(color: DefaultColors.grey),
+                SizedBox(height: 16.h),
+                // Category field shimmer
+                _buildFormFieldSkeleton("Categoria"),
+                SizedBox(height: 16.h),
+                Divider(color: DefaultColors.grey),
+                SizedBox(height: 16.h),
+                // Payment type field shimmer
+                _buildFormFieldSkeleton("Pago com"),
+                SizedBox(height: 16.h),
+                Divider(color: DefaultColors.grey),
+                SizedBox(height: 16.h),
+                // Date field shimmer
+                _buildFormFieldSkeleton("Data"),
+                SizedBox(height: 24.h),
+                // Buttons shimmer
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withOpacity(0.6),
+                        child: Container(
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withOpacity(0.6),
+                        child: Container(
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypeButtonSkeleton() {
+    return Shimmer(
+      duration: const Duration(milliseconds: 1400),
+      color: Colors.white.withOpacity(0.3),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 16.h,
+            width: 80.w,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Container(
+            height: 2.h,
+            width: 85.w,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(2.r),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormFieldSkeleton(String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label shimmer
+        Shimmer(
+          duration: const Duration(milliseconds: 1400),
+          color: Colors.white.withOpacity(0.6),
+          child: Container(
+            height: 16.h,
+            width: 100.w,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        // Field shimmer
+        Shimmer(
+          duration: const Duration(milliseconds: 1400),
+          color: Colors.white.withOpacity(0.6),
+          child: Container(
+            height: 40.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -221,8 +221,7 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
       case 'dinheiro':
         return DefaultColors.orangeDark;
       case 'pix':
-        return DefaultColors.greenDark;
-        ;
+        return DefaultColors.greenDark; {}
       case 'boleto':
         return DefaultColors.brown;
       case 'transferência':

@@ -66,6 +66,7 @@ class FixedAccountsController extends GetxController {
             (e) => FixedAccountModel.fromMap(e.data()).copyWith(id: e.id),
           )
           .toList();
+      isLoading.value = false;
     });
   }
 

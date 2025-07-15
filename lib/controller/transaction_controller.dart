@@ -8,8 +8,13 @@ import '../model/transaction_model.dart';
 class TransactionController extends GetxController {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
   final _transaction = <TransactionModel>[].obs;
+  final _isLoading = true.obs;
+  
   FixedAccountsController get fixedAccountsController =>
       Get.find<FixedAccountsController>();
+  
+  bool get isLoading => _isLoading.value;
+
   List<TransactionModel> get transaction {
     var fakeTransactionsFromFixed = <TransactionModel>[];
     final today = DateTime.now();
@@ -258,6 +263,7 @@ class TransactionController extends GetxController {
       }).toList();
       var filteredMap = map.where((e) => e != null).toList();
       _transaction.value = filteredMap.cast<TransactionModel>();
+      _isLoading.value = false;
     });
   }
 
