@@ -580,20 +580,15 @@ class _GraphicsPageState extends State<GraphicsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(
-                        labels.length > 10 ? 10 : labels.length,
+                        DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day,
                         (index) {
-                          int step = labels.length > 10 ? (labels.length / 10).floor() : 1;
-                          int actualIndex = index * step;
-                          if (actualIndex < labels.length) {
-                            return Text(
-                              labels[actualIndex],
-                              style: TextStyle(
-                                fontSize: 8.sp,
-                                color: DefaultColors.grey,
-                              ),
-                            );
-                          }
-                          return SizedBox.shrink();
+                          return Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              fontSize: 8.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          );
                         },
                       ),
                     ),
