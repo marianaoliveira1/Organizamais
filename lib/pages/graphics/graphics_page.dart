@@ -585,7 +585,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
                           return Text(
                             '${index + 1}',
                             style: TextStyle(
-                              fontSize: 8.sp,
+                              fontSize: 6.sp,
                               color: DefaultColors.grey,
                             ),
                           );
