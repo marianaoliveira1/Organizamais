@@ -68,19 +68,18 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
 
     return Obx(() {
       var filteredTransactions = getFilteredTransactions();
-      
+
       // Calcular receitas
       var receitas = filteredTransactions
           .where((e) => e.type == TransactionType.receita)
           .toList();
-      
+
       double totalReceita = receitas.fold<double>(
         0.0,
         (previousValue, element) {
           return previousValue +
-              double.parse(element.value
-                  .replaceAll('.', '')
-                  .replaceAll(',', '.'));
+              double.parse(
+                  element.value.replaceAll('.', '').replaceAll(',', '.'));
         },
       );
 
@@ -88,14 +87,13 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       var despesas = filteredTransactions
           .where((e) => e.type == TransactionType.despesa)
           .toList();
-      
+
       double totalDespesas = despesas.fold<double>(
         0.0,
         (previousValue, element) {
           return previousValue +
-              double.parse(element.value
-                  .replaceAll('.', '')
-                  .replaceAll(',', '.'));
+              double.parse(
+                  element.value.replaceAll('.', '').replaceAll(',', '.'));
         },
       );
 
@@ -107,12 +105,13 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DefaultTextGraphic(text: "Gráfico porcentagem de receita e despesas"),
+            DefaultTextGraphic(
+                text: "Gráfico porcentagem de receita e despesas"),
             SizedBox(
               height: 16.h,
             ),

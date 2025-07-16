@@ -42,7 +42,7 @@ class FinanceSummaryWidget extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(24.r),
+            borderRadius: BorderRadius.circular(16.r),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

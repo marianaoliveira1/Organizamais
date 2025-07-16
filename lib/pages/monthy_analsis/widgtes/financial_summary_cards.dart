@@ -21,7 +21,7 @@ class FinancialSummaryCards extends StatelessWidget {
       if (controller.isLoading) {
         return _buildShimmerSkeleton();
       }
-      
+
       final totalReceita = controller.totalReceitaAno;
       final totalDespesas = controller.totalDespesasAno;
       final saldo = totalReceita - totalDespesas;
@@ -87,7 +87,7 @@ class FinancialSummaryCards extends StatelessWidget {
               // Card de Média de Receitas
               Expanded(
                 child: FinancialCard(
-                  title: 'Média Receitas',
+                  title: 'Média de Receitas',
                   value: mediaReceita,
                   icon: Icons.show_chart,
                 ),
@@ -99,7 +99,7 @@ class FinancialSummaryCards extends StatelessWidget {
               // Card de Média de Despesas
               Expanded(
                 child: FinancialCard(
-                  title: 'Média Despesas',
+                  title: 'Média de Despesas',
                   value: mediaDespesa,
                   icon: Icons.analytics_outlined,
                 ),

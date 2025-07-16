@@ -20,7 +20,7 @@ class CreditCardSection extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(

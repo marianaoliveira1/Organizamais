@@ -34,7 +34,7 @@ class TransactionItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(16.r),
         child: InkWell(
           onLongPress: () =>
               _showDeleteConfirmationDialog(context, transaction),

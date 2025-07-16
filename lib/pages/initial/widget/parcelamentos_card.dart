@@ -40,7 +40,7 @@ class ParcelamentosCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(16.r),
         color: theme.cardColor,
       ),
       padding: EdgeInsets.symmetric(
