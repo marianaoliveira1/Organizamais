@@ -122,7 +122,10 @@ class MonthlyAnalysisPage extends StatelessWidget {
                           return Column(
                             children: [
                               Container(
-                                padding: EdgeInsets.all(16.w),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 12.h,
+                                  horizontal: 14.w,
+                                ),
                                 decoration: BoxDecoration(
                                   color: theme.cardColor,
                                   borderRadius: BorderRadius.circular(12.r),

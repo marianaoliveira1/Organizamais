@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChartLegendItem extends StatelessWidget {
   final String label;
@@ -15,18 +16,20 @@ class ChartLegendItem extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 16,
+          width: 14,
           height: 16,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(4.r),
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(
+          width: 8.w,
+        ),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: 12.sp,
             fontWeight: FontWeight.w600,
           ),
         ),

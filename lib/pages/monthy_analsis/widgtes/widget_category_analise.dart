@@ -57,13 +57,13 @@ class WidgetCategoryAnalise extends StatelessWidget {
               },
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: 10.h,
-                  left: 5.w,
-                  right: 5.w,
+                  left: 4.w,
+                  right: 4.w,
                 ),
                 child: Container(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),

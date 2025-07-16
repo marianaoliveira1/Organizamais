@@ -20,8 +20,13 @@ class MonthlyFinancialChart extends StatelessWidget {
       final monthlyData = _calculateMonthlyData(controller.transaction);
 
       return Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 32),
+        padding: EdgeInsets.symmetric(
+          vertical: 12.h,
+          horizontal: 14.w,
+        ),
+        margin: EdgeInsets.only(
+          bottom: 32.h,
+        ),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(12.r),
@@ -38,11 +43,11 @@ class MonthlyFinancialChart extends StatelessWidget {
             Text(
               'Ano ${DateTime.now().year} (até hoje)',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 10.sp,
                 color: Colors.grey[600],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 16.h),
 
             // Legenda
             Row(
@@ -208,8 +213,6 @@ class MonthlyFinancialChart extends StatelessWidget {
                 );
               },
             ),
-
-            const SizedBox(height: 20),
           ],
         ),
       );
