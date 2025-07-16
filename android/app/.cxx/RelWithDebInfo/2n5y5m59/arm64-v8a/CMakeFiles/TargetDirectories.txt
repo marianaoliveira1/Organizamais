@@ -1,0 +1,2 @@
+C:/Users/maria/Documents/Organizamais/android/app/.cxx/RelWithDebInfo/2n5y5m59/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/maria/Documents/Organizamais/android/app/.cxx/RelWithDebInfo/2n5y5m59/arm64-v8a/CMakeFiles/rebuild_cache.dir
