@@ -36,9 +36,8 @@ class ResumeContent extends StatelessWidget {
       children: [
         MonthSelectorResume(
           selectedMonth: _selectedMonth,
-          initialMonth:
-              DateTime.now().month - 1, // Posição do mês atual (abril = 3)
-          centerCurrentMonth: true, // Adicione esta propriedade
+          initialMonth: DateTime.now().month - 1,
+          centerCurrentMonth: true,
         ),
         SizedBox(height: 20.h),
         TransactionsList(
