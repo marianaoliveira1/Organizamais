@@ -33,6 +33,17 @@ class CustomDrawer extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
+            Text(
+              "Organiza+",
+              style: TextStyle(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w600,
+                color: theme.primaryColor,
+              ),
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
             SettingItem(
               icon: Iconsax.user,
               title: 'Perfil',
