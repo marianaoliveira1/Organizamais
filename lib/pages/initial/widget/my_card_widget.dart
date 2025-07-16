@@ -23,9 +23,6 @@ class MyCardsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
       ),
-      padding: EdgeInsets.all(
-        1.h,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
@@ -48,7 +45,7 @@ class MyCardsWidget extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: cardController.card.length,
               separatorBuilder: (context, index) => SizedBox(
-                height: 14.h,
+                height: 12.h,
               ),
               itemBuilder: (context, index) {
                 final card = cardController.card[index];
@@ -58,7 +55,8 @@ class MyCardsWidget extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         backgroundColor: theme.cardColor,
-                        content: Text('Tem certeza que deseja excluir o cartão ${card.name}?'),
+                        content: Text(
+                            'Tem certeza que deseja excluir o cartão ${card.name}?'),
                         actions: [
                           TextButton(
                             child: Text(

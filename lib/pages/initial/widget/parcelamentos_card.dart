@@ -44,7 +44,7 @@ class ParcelamentosCard extends StatelessWidget {
         color: theme.cardColor,
       ),
       padding: EdgeInsets.symmetric(
-        vertical: 10.h,
+        vertical: 12.h,
         horizontal: 14.w,
       ),
       child: Column(
@@ -54,7 +54,7 @@ class ParcelamentosCard extends StatelessWidget {
             if (_transactionController.isLoading) {
               return _buildShimmerSkeleton(theme);
             }
-            
+
             final currentMonth = DateTime.now().month;
             final currentYear = DateTime.now().year;
 
@@ -150,8 +150,7 @@ class ParcelamentosCard extends StatelessWidget {
 
           return InkWell(
             onTap: () {
-              Get.to(() =>
-                  ParcelasDetailsPage(productName: tituloOriginal));
+              Get.to(() => ParcelasDetailsPage(productName: tituloOriginal));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,8 +170,7 @@ class ParcelamentosCard extends StatelessWidget {
                       ),
                       SizedBox(height: 2.h),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             tituloOriginal,
@@ -185,8 +183,7 @@ class ParcelamentosCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            _formatCurrency(
-                                _parseCurrencyValue(parcela.value)),
+                            _formatCurrency(_parseCurrencyValue(parcela.value)),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13.sp,
@@ -199,8 +196,7 @@ class ParcelamentosCard extends StatelessWidget {
                       SizedBox(height: 4.h),
                       if (parcela.paymentDay != null)
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               DateFormat('dd/MM/yyyy').format(

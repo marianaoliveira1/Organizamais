@@ -43,7 +43,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         var valor = item['value'] as double;
         var percentual = (valor / totalValue * 100);
         var categoryColor = item['color'] as Color;
-        var categoryIcon = item['icon'] as String?; // Obtém o ícone da categoria
+        var categoryIcon =
+            item['icon'] as String?; // Obtém o ícone da categoria
 
         return Column(
           children: [
@@ -58,19 +59,21 @@ class WidgetListCategoryGraphics extends StatelessWidget {
               },
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: 10.h,
-                  left: 5.w,
-                  right: 5.w,
+                  left: 4.w,
+                  right: 4.w,
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
-                    color: selectedCategoryId.value == categoryId ? categoryColor.withOpacity(0.1) : Colors.transparent,
+                    color: selectedCategoryId.value == categoryId
+                        ? categoryColor.withOpacity(0.1)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
                     children: [
-                      // ALTERAÇÃO: Adiciona ícone da categoria
                       Container(
                         width: 30.w,
                         height: 30.h,
@@ -127,7 +130,9 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            selectedCategoryId.value == categoryId ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            selectedCategoryId.value == categoryId
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
                             color: DefaultColors.grey,
                           ),
                         ],
@@ -145,10 +150,12 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   return const SizedBox();
                 }
 
-                var categoryTransactions = getTransactionsByCategoryAndMonth(categoryId, monthName);
+                var categoryTransactions =
+                    getTransactionsByCategoryAndMonth(categoryId, monthName);
                 categoryTransactions.sort((a, b) {
                   if (a.paymentDay == null || b.paymentDay == null) return 0;
-                  return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
+                  return DateTime.parse(b.paymentDay!)
+                      .compareTo(DateTime.parse(a.paymentDay!));
                 });
 
                 return Container(
@@ -182,7 +189,9 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         itemBuilder: (context, index) {
                           var transaction = categoryTransactions[index];
                           var transactionValue = double.parse(
-                            transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                            transaction.value
+                                .replaceAll('.', '')
+                                .replaceAll(',', '.'),
                           );
 
                           String formattedDate = transaction.paymentDay != null
@@ -228,7 +237,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      currencyFormatter.format(transactionValue),
+                                      currencyFormatter
+                                          .format(transactionValue),
                                       style: TextStyle(
                                         fontSize: 11.sp,
                                         fontWeight: FontWeight.w500,
@@ -282,11 +292,15 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     );
   }
 
-  List<TransactionModel> getTransactionsByCategoryAndMonth(int categoryId, String monthName) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+  List<TransactionModel> getTransactionsByCategoryAndMonth(
+      int categoryId, String monthName) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
 
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
       if (monthName.isNotEmpty) {
         final int currentYear = DateTime.now().year;
@@ -294,7 +308,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           if (transaction.paymentDay == null) return false;
 
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String transactionMonthName = getAllMonths()[transactionDate.month - 1];
+          String transactionMonthName =
+              getAllMonths()[transactionDate.month - 1];
           return transactionMonthName == monthName &&
               transactionDate.year == currentYear;
         }).toList();
@@ -304,6 +319,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     var filteredTransactions = getFilteredTransactions();
-    return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
+    return filteredTransactions
+        .where((transaction) => transaction.category == categoryId)
+        .toList();
   }
 }

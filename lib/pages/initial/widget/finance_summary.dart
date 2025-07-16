@@ -30,15 +30,15 @@ class FinanceSummaryWidget extends StatelessWidget {
       if (transactionController.isLoading) {
         return _buildShimmerSkeleton(theme);
       }
-      
+
       return GestureDetector(
         onTap: () {
           Get.to(() => const FinanceDetailsPage());
         },
         child: Container(
           padding: EdgeInsets.symmetric(
-            vertical: 20.h,
-            horizontal: 16.w,
+            vertical: 12.h,
+            horizontal: 14.w,
           ),
           decoration: BoxDecoration(
             color: theme.cardColor,

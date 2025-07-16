@@ -87,14 +87,12 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
               .map(
                 (paymentType) => {
                   "paymentType": paymentType,
-                  "value": filteredTransactions
-                      .where((element) {
-                        if (element.paymentType == null) return false;
-                        // Usar a mesma lógica robusta de comparação
-                        return element.paymentType!.trim().toLowerCase() == 
-                               paymentType.trim().toLowerCase();
-                      })
-                      .fold<double>(
+                  "value": filteredTransactions.where((element) {
+                    if (element.paymentType == null) return false;
+                    // Usar a mesma lógica robusta de comparação
+                    return element.paymentType!.trim().toLowerCase() ==
+                        paymentType.trim().toLowerCase();
+                  }).fold<double>(
                     0.0,
                     (previousValue, element) {
                       // Remove os pontos e troca vírgula por ponto para corrigir o parse
@@ -149,7 +147,10 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
           return Column(
             children: [
               Container(
-                padding: EdgeInsets.all(16.w),
+                padding: EdgeInsets.symmetric(
+                  vertical: 12.h,
+                  horizontal: 14.w,
+                ),
                 decoration: BoxDecoration(
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12.r),
@@ -158,7 +159,7 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DefaultTextGraphic(
-                      text: "Despesas por Tipo de Pagamento",
+                      text: "Despesas por tipo de Pagamento",
                     ),
                     SizedBox(height: 16.h),
                     Center(
@@ -221,7 +222,8 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
       case 'dinheiro':
         return DefaultColors.orangeDark;
       case 'pix':
-        return DefaultColors.greenDark; {}
+        return DefaultColors.greenDark;
+        {}
       case 'boleto':
         return DefaultColors.brown;
       case 'transferência':
@@ -286,13 +288,13 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
               },
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: 10.h,
-                  left: 5.w,
-                  right: 5.w,
+                  left: 4.w,
+                  right: 4.w,
                 ),
                 child: Container(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     color: selectedPaymentType.value == paymentType
                         ? paymentTypeColor.withOpacity(0.1)
@@ -553,17 +555,15 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     }
 
     var filteredTransactions = getFilteredTransactions();
-    
+
     // Comparação mais robusta para tipos de pagamento
-    var paymentTypeTransactions = filteredTransactions
-        .where((transaction) {
-          if (transaction.paymentType == null) return false;
-          // Comparação ignorando maiúsculas/minúsculas e espaços extras
-          return transaction.paymentType!.trim().toLowerCase() == 
-                 paymentType.trim().toLowerCase();
-        })
-        .toList();
-    
+    var paymentTypeTransactions = filteredTransactions.where((transaction) {
+      if (transaction.paymentType == null) return false;
+      // Comparação ignorando maiúsculas/minúsculas e espaços extras
+      return transaction.paymentType!.trim().toLowerCase() ==
+          paymentType.trim().toLowerCase();
+    }).toList();
+
     return paymentTypeTransactions;
   }
 }

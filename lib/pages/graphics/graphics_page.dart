@@ -61,9 +61,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
   void _scrollToCurrentMonth() {
     // Estimar a posição do mês atual para centralizar
     final int currentMonthIndex = DateTime.now().month - 1;
-    final double itemWidth = 80.w; // Ajuste este valor conforme a largura real do seu item
+    final double itemWidth =
+        80.w; // Ajuste este valor conforme a largura real do seu item
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double offset = currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+    final double offset =
+        currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
 
     // Limitar o scroll para não ir além dos limites
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
@@ -85,7 +87,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TransactionController transactionController = Get.put(TransactionController());
+    final TransactionController transactionController =
+        Get.put(TransactionController());
 
     // Formatador de moeda brasileira
     final currencyFormatter = NumberFormat.currency(
@@ -121,7 +124,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
                           controller: _monthScrollController,
                           scrollDirection: Axis.horizontal,
                           itemCount: getAllMonths().length,
-                          separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                          separatorBuilder: (context, index) =>
+                              SizedBox(width: 8.w),
                           itemBuilder: (context, index) {
                             final month = getAllMonths()[index];
 
@@ -171,7 +175,13 @@ class _GraphicsPageState extends State<GraphicsPage> {
                         if (transactionController.isLoading) {
                           return _buildShimmerContent(theme);
                         }
-                        return _buildGraphicsContent(theme, transactionController, currencyFormatter, dateFormatter, dayFormatter, selectedCategoryId);
+                        return _buildGraphicsContent(
+                            theme,
+                            transactionController,
+                            currencyFormatter,
+                            dateFormatter,
+                            dayFormatter,
+                            selectedCategoryId);
                       }),
                     ],
                   ),
@@ -284,8 +294,9 @@ class _GraphicsPageState extends State<GraphicsPage> {
           ),
           SizedBox(height: 16.h),
           // Shimmer for category list
-          ...List.generate(4, (index) => 
-            Padding(
+          ...List.generate(
+            4,
+            (index) => Padding(
               padding: EdgeInsets.only(bottom: 8.h),
               child: Row(
                 children: [
@@ -337,15 +348,23 @@ class _GraphicsPageState extends State<GraphicsPage> {
     );
   }
 
-  Widget _buildGraphicsContent(ThemeData theme, TransactionController transactionController, NumberFormat currencyFormatter, DateFormat dateFormatter, DateFormat dayFormatter, RxnInt selectedCategoryId) {
+  Widget _buildGraphicsContent(
+      ThemeData theme,
+      TransactionController transactionController,
+      NumberFormat currencyFormatter,
+      DateFormat dateFormatter,
+      DateFormat dayFormatter,
+      RxnInt selectedCategoryId) {
     return Column(
       children: [
         // Line Chart - Despesas diárias
-        _buildLineChart(theme, transactionController, currencyFormatter, dayFormatter),
-        
+        _buildLineChart(
+            theme, transactionController, currencyFormatter, dayFormatter),
+
         // Pie Chart - Despesas por categoria
-        _buildCategoryChart(theme, transactionController, selectedCategoryId, currencyFormatter, dateFormatter),
-        
+        _buildCategoryChart(theme, transactionController, selectedCategoryId,
+            currencyFormatter, dateFormatter),
+
         // Outros gráficos
         DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
         SizedBox(height: 30.h),
@@ -355,7 +374,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
     );
   }
 
-  List<TransactionModel> getFilteredTransactions(TransactionController transactionController) {
+  List<TransactionModel> getFilteredTransactions(
+      TransactionController transactionController) {
     var despesas = transactionController.transaction
         .where((e) => e.type == TransactionType.despesa)
         .toList();
@@ -374,7 +394,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
     return despesas;
   }
 
-  Map<String, dynamic> getSparklineData(TransactionController transactionController, DateFormat dayFormatter) {
+  Map<String, dynamic> getSparklineData(
+      TransactionController transactionController, DateFormat dayFormatter) {
     var filteredTransactions = getFilteredTransactions(transactionController);
 
     int selectedMonthIndex = selectedMonth.isEmpty
@@ -426,7 +447,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
     };
   }
 
-  Widget _buildLineChart(ThemeData theme, TransactionController transactionController, NumberFormat currencyFormatter, DateFormat dayFormatter) {
+  Widget _buildLineChart(
+      ThemeData theme,
+      TransactionController transactionController,
+      NumberFormat currencyFormatter,
+      DateFormat dayFormatter) {
     var sparklineData = getSparklineData(transactionController, dayFormatter);
     List<double> data = sparklineData['data'];
     List<String> labels = sparklineData['labels'];
@@ -449,7 +474,10 @@ class _GraphicsPageState extends State<GraphicsPage> {
 
     return Container(
       margin: EdgeInsets.only(bottom: 24.h),
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(
+        vertical: 12.h,
+        horizontal: 14.w,
+      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
@@ -580,7 +608,9 @@ class _GraphicsPageState extends State<GraphicsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(
-                        DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day,
+                        DateTime(DateTime.now().year, DateTime.now().month + 1,
+                                0)
+                            .day,
                         (index) {
                           return Text(
                             '${index + 1}',
@@ -602,7 +632,12 @@ class _GraphicsPageState extends State<GraphicsPage> {
     );
   }
 
-  Widget _buildCategoryChart(ThemeData theme, TransactionController transactionController, RxnInt selectedCategoryId, NumberFormat currencyFormatter, DateFormat dateFormatter) {
+  Widget _buildCategoryChart(
+      ThemeData theme,
+      TransactionController transactionController,
+      RxnInt selectedCategoryId,
+      NumberFormat currencyFormatter,
+      DateFormat dateFormatter) {
     var filteredTransactions = getFilteredTransactions(transactionController);
     var categories = filteredTransactions
         .map((e) => e.category)
@@ -635,8 +670,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
 
     double totalValue = data.fold(
       0.0,
-      (previousValue, element) =>
-          previousValue + (element['value'] as double),
+      (previousValue, element) => previousValue + (element['value'] as double),
     );
 
     var chartData = data
@@ -664,8 +698,11 @@ class _GraphicsPageState extends State<GraphicsPage> {
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: 20.h),
-      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.symmetric(
+        vertical: 12.h,
+        horizontal: 14.w,
+      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),

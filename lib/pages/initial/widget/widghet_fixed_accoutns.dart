@@ -24,7 +24,7 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
         borderRadius: BorderRadius.circular(24.r),
       ),
       padding: EdgeInsets.symmetric(
-        vertical: 10.h,
+        vertical: 12.h,
         horizontal: 14.w,
       ),
       child: Column(

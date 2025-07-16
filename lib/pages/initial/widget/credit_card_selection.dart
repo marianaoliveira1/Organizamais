@@ -24,7 +24,7 @@ class CreditCardSection extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          vertical: 10.h,
+          vertical: 12.h,
           horizontal: 14.w,
         ),
         child: Column(
