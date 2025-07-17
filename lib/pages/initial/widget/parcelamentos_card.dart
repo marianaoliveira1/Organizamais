@@ -172,24 +172,31 @@ class ParcelamentosCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            tituloOriginal,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13.sp,
-                              color: theme.primaryColor,
+                          SizedBox(
+                            width: 115.w,
+                            child: Text(
+                              tituloOriginal,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                                color: theme.primaryColor,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          Text(
-                            _formatCurrency(_parseCurrencyValue(parcela.value)),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13.sp,
-                              color: theme.primaryColor,
+                          SizedBox(
+                            width: 110.w,
+                            child: Text(
+                              _formatCurrency(
+                                  _parseCurrencyValue(parcela.value)),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                                color: theme.primaryColor,
+                              ),
+                              textAlign: TextAlign.end,
                             ),
-                            textAlign: TextAlign.end,
                           ),
                         ],
                       ),
@@ -210,16 +217,19 @@ class ParcelamentosCard extends StatelessWidget {
                             ),
                             if (parcela.paymentType != null &&
                                 parcela.paymentType!.isNotEmpty)
-                              Text(
-                                parcela.paymentType!,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11.sp,
-                                  color: DefaultColors.grey20,
+                              SizedBox(
+                                width: 115.w,
+                                child: Text(
+                                  parcela.paymentType!,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11.sp,
+                                    color: DefaultColors.grey20,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                           ],
                         ),
