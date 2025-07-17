@@ -39,7 +39,7 @@ class FinancialSummaryCards extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 6.h),
 
           // Cards de Receita e Despesa
           Row(

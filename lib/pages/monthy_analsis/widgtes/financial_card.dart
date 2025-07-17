@@ -30,32 +30,24 @@ class FinancialCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                icon,
-                size: 28,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              ),
-            ],
+          Icon(
+            icon,
+            size: 20.h,
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 2.h),
           Text(
             title,
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 10.sp,
               fontWeight: FontWeight.w600,
               color: DefaultColors.grey20,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 2.h),
           Text(
             _formatCurrency(value),
             style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 14.sp,
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
             ),

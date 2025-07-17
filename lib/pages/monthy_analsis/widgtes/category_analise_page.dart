@@ -62,7 +62,10 @@ class CategoryMonthlyChart extends StatelessWidget {
                     final double minBarWidth = 8.0;
                     final double minBarSpacing = 8.0;
 
-                    double barWidth = ((availableWidth - (monthCount - 1) * minBarSpacing) / monthCount).clamp(minBarWidth, 24.0);
+                    double barWidth =
+                        ((availableWidth - (monthCount - 1) * minBarSpacing) /
+                                monthCount)
+                            .clamp(minBarWidth, 24.0);
 
                     return SizedBox(
                       height: 300,
@@ -127,8 +130,9 @@ class CategoryMonthlyChart extends StatelessWidget {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 120,
-                                interval: _getOptimalInterval(_getMaxValue(monthlyData)),
+                                reservedSize: 80,
+                                interval: _getOptimalInterval(
+                                    _getMaxValue(monthlyData)),
                                 getTitlesWidget: (value, meta) {
                                   // Evita mostrar o mesmo valor formatado duas vezes
                                   if (value < 0) return const SizedBox.shrink();
@@ -146,11 +150,13 @@ class CategoryMonthlyChart extends StatelessWidget {
                             ),
                           ),
                           borderData: FlBorderData(show: false),
-                          barGroups: _createBarGroups(monthlyData, barWidth: barWidth),
+                          barGroups:
+                              _createBarGroups(monthlyData, barWidth: barWidth),
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: false,
-                            horizontalInterval: _getOptimalInterval(_getMaxValue(monthlyData)),
+                            horizontalInterval:
+                                _getOptimalInterval(_getMaxValue(monthlyData)),
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
                                 color: DefaultColors.grey.withOpacity(0.2),
@@ -269,7 +275,8 @@ class CategoryMonthlyChart extends StatelessWidget {
     );
   }
 
-  List<Map<String, dynamic>> _generateMonthlyAnalysis(Map<int, double> monthlyData) {
+  List<Map<String, dynamic>> _generateMonthlyAnalysis(
+      Map<int, double> monthlyData) {
     List<Map<String, dynamic>> analysis = [];
     final currentMonth = DateTime.now().month;
 
@@ -313,7 +320,9 @@ class CategoryMonthlyChart extends StatelessWidget {
           message = "Economia significativa!";
         }
 
-        String valueText = difference >= 0 ? 'Aumentou ${_formatCurrency(absoluteDifference)}' : 'Diminuiu ${_formatCurrency(absoluteDifference)}';
+        String valueText = difference >= 0
+            ? 'Aumentou ${_formatCurrency(absoluteDifference)}'
+            : 'Diminuiu ${_formatCurrency(absoluteDifference)}';
 
         analysis.add({
           'month': _getMonthName(month),
@@ -332,20 +341,20 @@ class CategoryMonthlyChart extends StatelessWidget {
     return analysis;
   }
 
-  List<Widget> _getCategoryTips(String categoryName, Map<int, double> monthlyData, ThemeData theme) {
+  List<Widget> _getCategoryTips(
+      String categoryName, Map<int, double> monthlyData, ThemeData theme) {
     List<String> tips = [];
 
     // Calcular padrões de gasto
     List<double> values = monthlyData.values.where((v) => v > 0).toList();
     if (values.isEmpty) {
-      return [
-        _buildTipItem("Sem dados suficientes para análise", theme)
-      ];
+      return [_buildTipItem("Sem dados suficientes para análise", theme)];
     }
 
     double average = values.reduce((a, b) => a + b) / values.length;
     double maxValue = values.reduce((a, b) => a > b ? a : b);
-    int peakMonth = monthlyData.entries.firstWhere((e) => e.value == maxValue).key;
+    int peakMonth =
+        monthlyData.entries.firstWhere((e) => e.value == maxValue).key;
 
     // Dicas específicas por categoria
     switch (categoryName.toLowerCase()) {
@@ -513,13 +522,17 @@ class CategoryMonthlyChart extends StatelessWidget {
 
     // Dicas baseadas em padrões de gasto
     if (peakMonth >= 11 || peakMonth <= 2) {
-      tips.add('Gastos maiores no fim/início do ano são normais, mas planeje-se antecipadamente');
+      tips.add(
+          'Gastos maiores no fim/início do ano são normais, mas planeje-se antecipadamente');
     }
 
     if (values.length > 1) {
-      double variation = (values.reduce((a, b) => a > b ? a : b) - values.reduce((a, b) => a < b ? a : b)) / average;
+      double variation = (values.reduce((a, b) => a > b ? a : b) -
+              values.reduce((a, b) => a < b ? a : b)) /
+          average;
       if (variation > 0.5) {
-        tips.add('Seus gastos variam muito mês a mês. Tente criar uma rotina mais consistente');
+        tips.add(
+            'Seus gastos variam muito mês a mês. Tente criar uma rotina mais consistente');
       }
     }
 
@@ -575,9 +588,12 @@ class CategoryMonthlyChart extends StatelessWidget {
 
     // Calcular totais por mês para a categoria específica
     for (final transaction in transactions) {
-      if (transaction.paymentDay != null && transaction.category == categoryId && transaction.type == TransactionType.despesa) {
+      if (transaction.paymentDay != null &&
+          transaction.category == categoryId &&
+          transaction.type == TransactionType.despesa) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        if (paymentDate.year == currentYear && paymentDate.isBefore(currentDate)) {
+        if (paymentDate.year == currentYear &&
+            paymentDate.isBefore(currentDate)) {
           final month = paymentDate.month;
           final value = double.parse(
             transaction.value.replaceAll('.', '').replaceAll(',', '.'),
@@ -590,7 +606,8 @@ class CategoryMonthlyChart extends StatelessWidget {
     return monthlyData;
   }
 
-  List<BarChartGroupData> _createBarGroups(Map<int, double> monthlyData, {required double barWidth}) {
+  List<BarChartGroupData> _createBarGroups(Map<int, double> monthlyData,
+      {required double barWidth}) {
     return monthlyData.entries.map((entry) {
       return BarChartGroupData(
         x: entry.key,
@@ -610,7 +627,8 @@ class CategoryMonthlyChart extends StatelessWidget {
   }
 
   double _getMaxValue(Map<int, double> monthlyData) {
-    double maxValue = monthlyData.values.fold(0, (max, value) => value > max ? value : max);
+    double maxValue =
+        monthlyData.values.fold(0, (max, value) => value > max ? value : max);
     return maxValue == 0 ? 1000 : maxValue;
   }
 
@@ -743,15 +761,18 @@ class CategoryAnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final NumberFormat currencyFormatter =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
-    List<TransactionModel> transactions = _getTransactionsByCategoryAndMonth(categoryId, monthName);
+    List<TransactionModel> transactions =
+        _getTransactionsByCategoryAndMonth(categoryId, monthName);
 
     // Ordena por data (mais recente primeiro)
     transactions.sort((a, b) {
       if (a.paymentDay == null || b.paymentDay == null) return 0;
-      return DateTime.parse(b.paymentDay!).compareTo(DateTime.parse(a.paymentDay!));
+      return DateTime.parse(b.paymentDay!)
+          .compareTo(DateTime.parse(a.paymentDay!));
     });
 
     final theme = Theme.of(context);
@@ -873,23 +894,28 @@ class CategoryAnalysisPage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             var transaction = transactions[index];
                             var transactionValue = double.parse(
-                              transaction.value.replaceAll('.', '').replaceAll(',', '.'),
+                              transaction.value
+                                  .replaceAll('.', '')
+                                  .replaceAll(',', '.'),
                             );
 
-                            String formattedDate = transaction.paymentDay != null
-                                ? dateFormatter.format(
-                                    DateTime.parse(transaction.paymentDay!),
-                                  )
-                                : "Data não informada";
+                            String formattedDate =
+                                transaction.paymentDay != null
+                                    ? dateFormatter.format(
+                                        DateTime.parse(transaction.paymentDay!),
+                                      )
+                                    : "Data não informada";
 
                             return Padding(
                               padding: EdgeInsets.symmetric(vertical: 12.h),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
                                           width: 180.w,
@@ -920,7 +946,8 @@ class CategoryAnalysisPage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        currencyFormatter.format(transactionValue),
+                                        currencyFormatter
+                                            .format(transactionValue),
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w500,
@@ -955,20 +982,30 @@ class CategoryAnalysisPage extends StatelessWidget {
   }
 
   Widget _buildMonthlyAverageCard(BuildContext context, ThemeData theme) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
 
     // Calcular dados mensais para a categoria
-    final monthlyData = _calculateMonthlyDataForCategory(transactionController.transaction);
+    final monthlyData =
+        _calculateMonthlyDataForCategory(transactionController.transaction);
 
     // Calcular média mensal
-    final activeMonths = monthlyData.values.where((value) => value > 0).toList();
-    final monthlyAverage = activeMonths.isNotEmpty ? activeMonths.reduce((a, b) => a + b) / activeMonths.length : 0.0;
+    final activeMonths =
+        monthlyData.values.where((value) => value > 0).toList();
+    final monthlyAverage = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a + b) / activeMonths.length
+        : 0.0;
 
     // Calcular maior e menor gasto
-    final maxSpending = activeMonths.isNotEmpty ? activeMonths.reduce((a, b) => a > b ? a : b) : 0.0;
-    final minSpending = activeMonths.isNotEmpty ? activeMonths.reduce((a, b) => a < b ? a : b) : 0.0;
+    final maxSpending = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a > b ? a : b)
+        : 0.0;
+    final minSpending = activeMonths.isNotEmpty
+        ? activeMonths.reduce((a, b) => a < b ? a : b)
+        : 0.0;
 
-    final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final NumberFormat currencyFormatter =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -1100,7 +1137,8 @@ class CategoryAnalysisPage extends StatelessWidget {
     );
   }
 
-  Map<int, double> _calculateMonthlyDataForCategory(List<TransactionModel> transactions) {
+  Map<int, double> _calculateMonthlyDataForCategory(
+      List<TransactionModel> transactions) {
     final currentYear = DateTime.now().year;
     final currentDate = DateTime.now();
     final monthlyData = <int, double>{};
@@ -1112,9 +1150,12 @@ class CategoryAnalysisPage extends StatelessWidget {
 
     // Calcular totais por mês para a categoria específica
     for (final transaction in transactions) {
-      if (transaction.paymentDay != null && transaction.category == categoryId && transaction.type == TransactionType.despesa) {
+      if (transaction.paymentDay != null &&
+          transaction.category == categoryId &&
+          transaction.type == TransactionType.despesa) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        if (paymentDate.year == currentYear && paymentDate.isBefore(currentDate)) {
+        if (paymentDate.year == currentYear &&
+            paymentDate.isBefore(currentDate)) {
           final month = paymentDate.month;
           final value = double.parse(
             transaction.value.replaceAll('.', '').replaceAll(',', '.'),
@@ -1127,12 +1168,16 @@ class CategoryAnalysisPage extends StatelessWidget {
     return monthlyData;
   }
 
-  List<TransactionModel> _getTransactionsByCategoryAndMonth(int categoryId, String monthName) {
-    final TransactionController transactionController = Get.find<TransactionController>();
+  List<TransactionModel> _getTransactionsByCategoryAndMonth(
+      int categoryId, String monthName) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
     final DateTime today = DateTime.now();
 
     List<TransactionModel> getFilteredTransactions() {
-      var despesas = transactionController.transaction.where((e) => e.type == TransactionType.despesa).toList();
+      var despesas = transactionController.transaction
+          .where((e) => e.type == TransactionType.despesa)
+          .toList();
 
       if (monthName.isNotEmpty) {
         final int currentYear = DateTime.now().year;
@@ -1140,9 +1185,12 @@ class CategoryAnalysisPage extends StatelessWidget {
           if (transaction.paymentDay == null) return false;
 
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String transactionMonthName = getAllMonths()[transactionDate.month - 1];
+          String transactionMonthName =
+              getAllMonths()[transactionDate.month - 1];
 
-          return transactionMonthName == monthName && transactionDate.year == currentYear && transactionDate.isBefore(today.add(Duration(days: 1)));
+          return transactionMonthName == monthName &&
+              transactionDate.year == currentYear &&
+              transactionDate.isBefore(today.add(Duration(days: 1)));
         }).toList();
       }
 
@@ -1154,7 +1202,9 @@ class CategoryAnalysisPage extends StatelessWidget {
     }
 
     var filteredTransactions = getFilteredTransactions();
-    return filteredTransactions.where((transaction) => transaction.category == categoryId).toList();
+    return filteredTransactions
+        .where((transaction) => transaction.category == categoryId)
+        .toList();
   }
 
   List<String> getAllMonths() {

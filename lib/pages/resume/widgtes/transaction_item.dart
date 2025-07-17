@@ -133,7 +133,7 @@ class TransactionItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
-                      width: 120.w,
+                      width: 115.w,
                       child: Text(
                         _formatValue(transaction.value),
                         style: TextStyle(

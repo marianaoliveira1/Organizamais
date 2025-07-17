@@ -32,9 +32,9 @@ class SaldoCard extends StatelessWidget {
                 Text(
                   'Saldo do Ano',
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 10.sp,
                     fontWeight: FontWeight.w600,
-                    color: DefaultColors.grey,
+                    color: DefaultColors.grey20,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -42,7 +42,7 @@ class SaldoCard extends StatelessWidget {
                   _formatCurrency(
                       saldo), // Removido o .abs() para mostrar valores negativos
                   style: TextStyle(
-                    fontSize: 22.sp,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                     color: saldo < 0
                         ? DefaultColors.red
