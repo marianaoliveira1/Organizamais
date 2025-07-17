@@ -908,64 +908,122 @@ class CategoryAnalysisPage extends StatelessWidget {
 
                             return Padding(
                               padding: EdgeInsets.symmetric(vertical: 12.h),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 180.w,
-                                          child: Text(
-                                            transaction.title,
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Get.theme.primaryColor,
-                                            ),
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4.h),
-                                        Text(
-                                          formattedDate,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 150.w,
+                                        child: Text(
+                                          transaction.title,
                                           style: TextStyle(
                                             fontSize: 12.sp,
-                                            color: DefaultColors.grey,
+                                            fontWeight: FontWeight.w500,
+                                            color: Get.theme.primaryColor,
                                           ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
+                                      ),
                                       Text(
                                         currencyFormatter
                                             .format(transactionValue),
                                         style: TextStyle(
-                                          fontSize: 14.sp,
+                                          fontSize: 12.sp,
                                           fontWeight: FontWeight.w500,
                                           color: Get.theme.primaryColor,
                                         ),
                                       ),
-                                      SizedBox(height: 4.h),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
                                       Text(
-                                        transaction.paymentType ?? 'N/A',
+                                        formattedDate,
                                         style: TextStyle(
-                                          fontSize: 12.sp,
-                                          color: DefaultColors.grey,
+                                          fontSize: 11.sp,
+                                          color: DefaultColors.grey20,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 110.w,
+                                        child: Text(
+                                          transaction.paymentType ?? 'N/A',
+                                          style: TextStyle(
+                                            fontSize: 11.sp,
+                                            color: DefaultColors.grey20,
+                                          ),
+                                          textAlign: TextAlign.end,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
-                                  ),
+                                  )
                                 ],
                               ),
+                              // child: Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Expanded(
+                              //       child: Column(
+                              //         crossAxisAlignment:
+                              //             CrossAxisAlignment.start,
+                              //         children: [
+                              //           SizedBox(
+                              //             width: 180.w,
+                              //             child: Text(
+                              //               transaction.title,
+                              //               style: TextStyle(
+                              //                 fontSize: 14.sp,
+                              //                 fontWeight: FontWeight.w500,
+                              //                 color: Get.theme.primaryColor,
+                              //               ),
+                              //               maxLines: 3,
+                              //               overflow: TextOverflow.ellipsis,
+                              //             ),
+                              //           ),
+                              //           SizedBox(height: 4.h),
+                              //           Text(
+                              //             formattedDate,
+                              //             style: TextStyle(
+                              //               fontSize: 12.sp,
+                              //               color: DefaultColors.grey,
+                              //             ),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 8.w),
+                              //     Column(
+                              //       crossAxisAlignment: CrossAxisAlignment.end,
+                              //       children: [
+                              //         Text(
+                              //           currencyFormatter
+                              //               .format(transactionValue),
+                              //           style: TextStyle(
+                              //             fontSize: 14.sp,
+                              //             fontWeight: FontWeight.w500,
+                              //             color: Get.theme.primaryColor,
+                              //           ),
+                              //         ),
+                              //         SizedBox(height: 4.h),
+                              //         Text(
+                              //           transaction.paymentType ?? 'N/A',
+                              //           style: TextStyle(
+                              //             fontSize: 12.sp,
+                              //             color: DefaultColors.grey,
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ],
+                              // ),
                             );
                           },
                         ),
