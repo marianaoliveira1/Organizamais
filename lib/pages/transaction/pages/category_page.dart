@@ -1049,7 +1049,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           title: Text(
                             category['name'],
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                               color: theme.primaryColor,
                             ),
