@@ -348,7 +348,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'id': 89,
     'name': 'Eletrônicos',
     'icon': 'assets/icon-category/eletronicos.png',
-    'color': DefaultColors.ultramarineBlue,
+    'color': DefaultColors.jungleGreen,
     'macrocategoria': 'Compras',
     'synonyms': ['tecnologia', 'gadgets', 'computador', 'celular', 'notebook', 'tablet', 'smartphone', 'TV', 'televisão', 'fone', 'headphone']
   },
@@ -876,10 +876,49 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       body: Column(
         children: [
+          
+             AdsBanner(),
+             SizedBox(height: 10.h,),
+          Padding(
+            padding:EdgeInsets.symmetric(vertical: 2.h,horizontal: 10.w,),
+            child: TextField(
+              controller: searchController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: theme.primaryColor,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Pesquisar categoria',
+                hintStyle: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: theme.primaryColor.withOpacity(0.5),
+                ),
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                ),
+                prefixIconColor: DefaultColors.grey,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor,
+                  ),
+                ),
+                filled: true,
+                fillColor: theme.cardColor,
+              ),
+            ),
+          ),
           // Macrocategorias chips
           Container(
             height: 50.h,
-            margin: EdgeInsets.symmetric(vertical: 8.h),
+            margin: EdgeInsets.symmetric(vertical: 6.h),
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -941,44 +980,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ],
             ),
           ),
-          
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: TextField(
-              controller: searchController,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: theme.primaryColor,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Pesquisar categoria',
-                hintStyle: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: theme.primaryColor.withOpacity(0.5),
-                ),
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    12.r,
-                  ),
-                ),
-                prefixIconColor: DefaultColors.grey,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                    12.r,
-                  ),
-                  borderSide: BorderSide(
-                    color: theme.primaryColor,
-                  ),
-                ),
-                filled: true,
-                fillColor: theme.cardColor,
-              ),
-            ),
-          ),
-          AdsBanner(),
+       
           Expanded(
             child: filteredCategories.isEmpty
                 ? Center(
@@ -1003,7 +1005,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           bottom: 10.h,
                         ),
                         padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
+                          vertical: 6.h,
                           horizontal: 6.w,
                         ),
                         decoration: BoxDecoration(
@@ -1019,13 +1021,13 @@ class _CategoryPageState extends State<CategoryPage> {
                             ),
                             child: Image.asset(
                               category['icon'],
-                              height: 50.h,
+                              height: 20.h,
                             ),
                           ),
                           title: Text(
                             category['name'],
                             style: TextStyle(
-                              fontSize: 14.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                               color: theme.primaryColor,
                             ),
