@@ -32,22 +32,22 @@ class FinancialCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 20.h,
+            size: 22.h,
           ),
-          SizedBox(height: 2.h),
+          SizedBox(height: 4.h),
           Text(
             title,
             style: TextStyle(
-              fontSize: 10.sp,
+              fontSize: 11.sp,
               fontWeight: FontWeight.w600,
               color: DefaultColors.grey20,
             ),
           ),
-          SizedBox(height: 2.h),
+          SizedBox(height: 4.h),
           Text(
             _formatCurrency(value),
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 20.sp,
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
             ),
