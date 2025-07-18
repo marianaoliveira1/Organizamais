@@ -89,7 +89,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                                   TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 6.sp,
+                                    fontSize: 12.sp,
                                   ),
                                 );
                               },
@@ -130,7 +130,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 80,
+                                reservedSize: 45.w,
                                 interval: _getOptimalInterval(
                                     _getMaxValue(monthlyData)),
                                 getTitlesWidget: (value, meta) {

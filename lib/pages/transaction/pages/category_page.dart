@@ -937,7 +937,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         : theme.primaryColor.withOpacity(0.3),
                     ),
                   ),
-                )).toList(),
+                )),
               ],
             ),
           ),
