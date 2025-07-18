@@ -16,6 +16,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Moradia',
     'icon': 'assets/icon-category/home.png',
     'color': DefaultColors.blue,
+    'macrocategoria': 'Moradia e Casa',
     'synonyms': ['casa', 'aluguel', 'hipoteca', 'condomínio'],
     'relations': ['habitação', 'imóvel', 'residência']
   },
@@ -24,6 +25,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Contas (água, luz, gás, internet)',
     'icon': 'assets/icon-category/contas.png',
     'color': DefaultColors.skyBlue,
+    'macrocategoria': 'Moradia e Casa',
     'synonyms': ['utilidades', 'energia', 'wifi', 'conta de luz']
   },
   {
@@ -31,6 +33,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Coisas para Casa',
     'icon': 'assets/icon-category/coisasparacasa.png',
     'color': DefaultColors.pastelBlue,
+    'macrocategoria': 'Moradia e Casa',
     'synonyms': ['móveis', 'decoração', 'eletrodomésticos', 'utensílios']
   },
   {
@@ -38,6 +41,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Manutenção e reparos',
     'icon': 'assets/icon-category/manutencao.png',
     'color': DefaultColors.titanium,
+    'macrocategoria': 'Moradia e Casa',
     'synonyms': ['reforma', 'conserto', 'reparo', 'serviços domésticos']
   },
 
@@ -47,6 +51,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Alimentação',
     'icon': 'assets/icon-category/food.png',
     'color': DefaultColors.emeraldBright,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['comida', 'supermercado', 'feira', 'despensa']
   },
   {
@@ -54,6 +59,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Mercado',
     'icon': 'assets/icon-category/mercado.png',
     'color': DefaultColors.vibrantGreen,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['compra do mês', 'hortifruti', 'despensa']
   },
   {
@@ -61,6 +67,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Restaurantes',
     'icon': 'assets/icon-category/restaurante.png',
     'color': DefaultColors.scarlet,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['jantar fora', 'delivery', 'fast food']
   },
   {
@@ -68,6 +75,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Delivery',
     'icon': 'assets/icon-category/delivery-bike.png',
     'color': DefaultColors.orangeDark,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['Ifood', 'Uber Eats', 'comida pronta']
   },
   {
@@ -75,6 +83,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Lanches',
     'icon': 'assets/icon-category/lanches.png',
     'color': DefaultColors.vibrantYellow,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['petisco', 'fast food', 'salgadinho']
   },
   {
@@ -82,6 +91,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Padaria',
     'icon': 'assets/icon-category/padaria.png',
     'color': DefaultColors.sandyBeige,
+    'macrocategoria': 'Alimentação',
     'synonyms': ['pão', 'confeitaria', 'doces']
   },
 
@@ -91,6 +101,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Transporte',
     'icon': 'assets/icon-category/car.png',
     'color': DefaultColors.indigo,
+    'macrocategoria': 'Transporte',
     'synonyms': ['ônibus', 'metrô', 'combustível', 'táxi']
   },
   {
@@ -98,6 +109,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Combustível',
     'icon': 'assets/icon-category/combustivel.png',
     'color': DefaultColors.amber,
+    'macrocategoria': 'Transporte',
     'synonyms': ['gasolina', 'posto', 'abastecimento']
   },
   {
@@ -105,6 +117,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Transporte por Aplicativo',
     'icon': 'assets/icon-category/taxi.png',
     'color': DefaultColors.deepPurple,
+    'macrocategoria': 'Transporte',
     'synonyms': ['aplicativo de transporte', 'carona']
   },
   {
@@ -112,6 +125,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Pedágio',
     'icon': 'assets/icon-category/pedagios.png',
     'color': DefaultColors.slateGrey,
+    'macrocategoria': 'Transporte',
     'synonyms': ['tarifa rodoviária', 'estrada']
   },
   {
@@ -119,6 +133,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Multas',
     'icon': 'assets/icon-category/multas.png',
     'color': DefaultColors.redDark,
+    'macrocategoria': 'Transporte',
     'synonyms': ['infração', 'trânsito', 'penalidade']
   },
   {
@@ -126,6 +141,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'IPVA',
     'icon': 'assets/icon-category/ipva.png',
     'color': DefaultColors.cobalt,
+    'macrocategoria': 'Transporte',
     'synonyms': ['licenciamento', 'taxa veicular']
   },
   {
@@ -133,6 +149,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Seguro do Carro',
     'icon': 'assets/icon-category/seguros.png',
     'color': DefaultColors.blueGrey,
+    'macrocategoria': 'Transporte',
     'synonyms': ['seguro auto', 'proteção veicular']
   },
 
@@ -142,6 +159,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Saúde',
     'icon': 'assets/icon-category/saude.png',
     'color': DefaultColors.vibrantTeal,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['médico', 'hospital', 'plano de saúde']
   },
   {
@@ -149,6 +167,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Exames',
     'icon': 'assets/icon-category/exames.png',
     'color': DefaultColors.lightBlue,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['produtos de limpeza', 'faxina', 'empregada doméstica']
   },
   {
@@ -156,6 +175,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Farmácia',
     'icon': 'assets/icon-category/farmacia.png',
     'color': DefaultColors.pastelRed,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['remédio', 'medicamento', 'drogaria']
   },
   {
@@ -163,6 +183,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Plano de Saúde/Seguro de vida',
     'icon': 'assets/icon-category/planodesaude.png',
     'color': DefaultColors.teal,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['convênio médico', 'assistência médica']
   },
   {
@@ -170,6 +191,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Consultas Médicas',
     'icon': 'assets/icon-category/consultas.png',
     'color': DefaultColors.indigoLight,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['médico', 'dentista', 'psicólogo', 'terapia']
   },
   {
@@ -177,6 +199,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Salão/Barbearia',
     'icon': 'assets/icon-category/salao.png',
     'color': DefaultColors.pink,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['cabeleireiro', 'corte de cabelo', 'beleza', 'estética']
   },
   {
@@ -184,6 +207,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Cuidados pessoais',
     'icon': 'assets/icon-category/skincare.png',
     'color': DefaultColors.pastelPurple,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['cosméticos', 'higiene', 'perfumaria']
   },
   {
@@ -191,6 +215,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Academia',
     'icon': 'assets/icon-category/academia.png',
     'color': DefaultColors.lightGreen,
+    'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['ginástica', 'treino', 'fitness']
   },
 
@@ -200,6 +225,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Educação',
     'icon': 'assets/icon-category/education.png',
     'color': DefaultColors.deepPurpleDark,
+    'macrocategoria': 'Educação',
     'synonyms': ['escola', 'curso', 'faculdade', 'material escolar']
   },
   {
@@ -207,6 +233,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Livros/Revistas',
     'icon': 'assets/icon-category/livros.png',
     'color': DefaultColors.earthBrown,
+    'macrocategoria': 'Educação',
     'synonyms': ['leitura', 'biblioteca', 'ebook']
   },
 
@@ -216,6 +243,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Lazer e hobbies',
     'icon': 'assets/icon-category/lazer.png',
     'color': DefaultColors.tangerine,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['cinema', 'parque', 'passeio', 'hobby']
   },
   {
@@ -223,6 +251,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Bares',
     'icon': 'assets/icon-category/wine.png',
     'color': DefaultColors.burgundy,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['happy hour', 'drinks', 'boteco']
   },
   {
@@ -230,6 +259,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Cinema',
     'icon': 'assets/icon-category/cinema.png',
     'color': DefaultColors.amethyst,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['Netflix', 'ingresso', 'filme']
   },
   {
@@ -237,6 +267,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Streaming',
     'icon': 'assets/icon-category/streaming.png',
     'color': DefaultColors.electricPurple,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['Spotify', 'Disney+', 'assinatura']
   },
   {
@@ -244,6 +275,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Jogos Online',
     'icon': 'assets/icon-category/jogosonline.png',
     'color': DefaultColors.neonGreen,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['videogame', 'steam', 'game pass']
   },
   {
@@ -251,6 +283,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Viagens',
     'icon': 'assets/icon-category/viagens.png',
     'color': DefaultColors.oceanBlue,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['férias', 'turismo', 'passeio']
   },
   {
@@ -258,6 +291,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Hospedagens',
     'icon': 'assets/icon-category/hoteis.png',
     'color': DefaultColors.gold,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['hotel', 'Airbnb', 'resort']
   },
   {
@@ -265,6 +299,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Passagens',
     'icon': 'assets/icon-category/passagens.png',
     'color': DefaultColors.lightBlue,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['avião', 'ônibus', 'viagem']
   },
   {
@@ -272,6 +307,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Alimentação em Viagens',
     'icon': 'assets/icon-category/alimentacaoemviagens.png',
     'color': DefaultColors.coral,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['comida de viagem', 'restaurante turístico']
   },
   {
@@ -279,6 +315,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Passeios',
     'icon': 'assets/icon-category/passeios.png',
     'color': DefaultColors.sunflowerYellow,
+    'macrocategoria': 'Lazer e Entretenimento',
     'synonyms': ['turismo', 'ponto turístico', 'excursão']
   },
 
@@ -288,6 +325,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Compras',
     'icon': 'assets/icon-category/shopping.png',
     'color': DefaultColors.hotPink,
+    'macrocategoria': 'Compras',
     'synonyms': ['shopping', 'loja', 'e-commerce']
   },
   {
@@ -295,6 +333,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Vestuário',
     'icon': 'assets/icon-category/roupas.png',
     'color': DefaultColors.plum,
+    'macrocategoria': 'Compras',
     'synonyms': ['roupa', 'moda', 'vestido']
   },
   {
@@ -302,13 +341,23 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Roupas e acessórios',
     'icon': 'assets/icon-category/roupas-e-calcados.png',
     'color': DefaultColors.lavender,
+    'macrocategoria': 'Compras',
     'synonyms': ['calçados', 'bolsas', 'joias']
+  },
+  {
+    'id': 89,
+    'name': 'Eletrônicos',
+    'icon': 'assets/icon-category/eletronicos.png',
+    'color': DefaultColors.ultramarineBlue,
+    'macrocategoria': 'Compras',
+    'synonyms': ['tecnologia', 'gadgets', 'computador', 'celular', 'notebook', 'tablet', 'smartphone', 'TV', 'televisão', 'fone', 'headphone']
   },
   {
     'id': 14,
     'name': 'Presentes',
     'icon': 'assets/icon-category/gift.png',
     'color': DefaultColors.vibrantPink,
+    'macrocategoria': 'Compras',
     'synonyms': ['lembrança', 'mimo', 'aniversário']
   },
 
@@ -318,6 +367,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Pets',
     'icon': 'assets/icon-category/dog.png',
     'color': DefaultColors.emerald,
+    'macrocategoria': 'Pets',
     'synonyms': ['animal', 'veterinário', 'pet shop']
   },
   // {
@@ -325,6 +375,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   //   'name': 'Pet (Veterinário/Ração)',
   //   'icon': 'assets/icon-category/pet.png',
   //   'color': DefaultColors.jungleGreen,
+  //   'macrocategoria': 'Pets',
   //   'synonyms': ['gato', 'cachorro', 'animal de estimação']
   // },
 
@@ -334,6 +385,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Impostos',
     'icon': 'assets/icon-category/impostos.png',
     'color': DefaultColors.grey,
+    'macrocategoria': 'Finanças',
     'synonyms': ['IPTU', 'IRPF', 'tributo']
   },
   {
@@ -341,6 +393,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Financiamento',
     'icon': 'assets/icon-category/financiamentos.png',
     'color': DefaultColors.sapphire,
+    'macrocategoria': 'Finanças',
     'synonyms': ['empréstimo', 'parcela', 'crédito']
   },
   {
@@ -348,6 +401,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Empréstimos',
     'icon': 'assets/icon-category/emprestimos.png',
     'color': DefaultColors.greenDark,
+    'macrocategoria': 'Finanças',
     'synonyms': ['dívida', 'crediário', 'consignado']
   },
   {
@@ -355,6 +409,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Taxas',
     'icon': 'assets/icon-category/taxas.png',
     'color': DefaultColors.magenta,
+    'macrocategoria': 'Finanças',
     'synonyms': ['tarifa', 'anuidade', 'juros']
   },
   {
@@ -362,6 +417,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Assinaturas e serviços',
     'icon': 'assets/icon-category/cartao.png',
     'color': DefaultColors.navy,
+    'macrocategoria': 'Finanças',
     'synonyms': ['mensalidade', 'plano', 'serviço']
   },
   {
@@ -369,6 +425,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Aplicativos',
     'icon': 'assets/icon-category/app.png',
     'color': DefaultColors.ultramarineBlue,
+    'macrocategoria': 'Finanças',
     'synonyms': ['software', 'app pago', 'assinatura']
   },
   {
@@ -376,6 +433,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Seguros',
     'icon': 'assets/icon-category/seguros.png',
     'color': DefaultColors.topaz,
+    'macrocategoria': 'Finanças',
     'synonyms': ['proteção', 'apólice', 'seguro residencial']
   },
 
@@ -385,6 +443,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Família e filhos',
     'icon': 'assets/icon-category/family.png',
     'color': DefaultColors.pastelGreen,
+    'macrocategoria': 'Família',
     'synonyms': ['criança', 'escola', 'creche']
   },
   {
@@ -392,6 +451,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Doações/Caridade',
     'icon': 'assets/icon-category/doacoes.png',
     'color': DefaultColors.rosyPink,
+    'macrocategoria': 'Família',
     'synonyms': ['ONG', 'solidariedade', 'contribuição']
   },
 
@@ -401,6 +461,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Trabalho',
     'icon': 'assets/icon-category/work.png',
     'color': DefaultColors.indigoDark,
+    'macrocategoria': 'Trabalho',
     'synonyms': ['escritório', 'material', 'profissional']
   },
 
@@ -410,6 +471,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Emergência',
     'icon': 'assets/icon-category/emergency.png',
     'color': DefaultColors.brightRed,
+    'macrocategoria': 'Imprevistos',
     'synonyms': ['imprevisto', 'urgência', 'socorro']
   },
 
@@ -419,6 +481,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.darkGrey,
+    'macrocategoria': 'Outros',
     'synonyms': ['diversos', 'variados', 'geral']
   },
 ];
@@ -431,6 +494,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Salário',
     'icon': 'assets/icon-category/mooney.png',
     'color': Colors.green,
+    'macrocategoria': 'Renda do Trabalho',
     'synonyms': [
       'pagamento',
       'remuneração',
@@ -456,6 +520,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Poupança',
     'icon': 'assets/icon-category/renda.png',
     'color': Colors.blue,
+    'macrocategoria': 'Investimentos',
     'synonyms': [
       'economia',
       'investimento',
@@ -479,6 +544,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Bonificação',
     'icon': 'assets/icon-category/bonus.png',
     'color': Colors.blue,
+    'macrocategoria': 'Renda do Trabalho',
     'synonyms': ['bônus', 'prêmio', 'gratificação', 'comissão', 'incentivo'],
     'relations': [
       'bônus',
@@ -496,6 +562,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Renda extra',
     'icon': 'assets/icon-category/income.png',
     'color': Colors.blue,
+    'macrocategoria': 'Renda Extra',
     'synonyms': ['extra', 'adicional', 'complemento', 'bico', 'ganho extra'],
     'relations': [
       'extra',
@@ -511,6 +578,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Transfrencia bancária',
     'icon': 'assets/icon-category/transfer.png',
     'color': Colors.blue,
+    'macrocategoria': 'Transferências',
     'synonyms': ['transferência', 'pix', 'ted', 'doc', 'depósito'],
     'relations': [
       'transferência',
@@ -527,6 +595,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Freelance',
     'icon': 'assets/icon-category/freelancer.png',
     'color': DefaultColors.teal,
+    'macrocategoria': 'Renda Extra',
     'synonyms': [
       'autônomo',
       'freelancer',
@@ -547,6 +616,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Indenização',
     'icon': 'assets/icon-category/indenização.png',
     'color': DefaultColors.lavender,
+    'macrocategoria': 'Reembolsos e Compensações',
     'synonyms': [
       'ressarcimento',
       'reembolso',
@@ -567,6 +637,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Prêmios',
     'icon': 'assets/icon-category/premios.png',
     'color': DefaultColors.peach,
+    'macrocategoria': 'Reembolsos e Compensações',
     'synonyms': [
       'premiação',
       'recompensa',
@@ -587,6 +658,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Aluguel Recebido',
     'icon': 'assets/icon-category/aluguel.png',
     'color': DefaultColors.chartreuse, // Nova cor
+    'macrocategoria': 'Investimentos',
     'synonyms': ['imóvel', 'renda imobiliária'],
     'relations': ['investimento', 'moradia'],
   },
@@ -595,6 +667,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Dividendos',
     'icon': 'assets/icon-category/dividendos.png',
     'color': DefaultColors.forestGreen, // Nova cor
+    'macrocategoria': 'Investimentos',
     'synonyms': ['investimentos', 'ações'],
     'relations': ['renda passiva', 'finanças'],
   },
@@ -603,6 +676,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Venda de Itens Usados',
     'icon': 'assets/icon-category/vendas.png',
     'color': DefaultColors.tangerine, // Nova cor
+    'macrocategoria': 'Renda Extra',
     'synonyms': ['brechó', 'usado'],
     'relations': ['compras', 'renda extra'],
   },
@@ -611,6 +685,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Reembolsos',
     'icon': 'assets/icon-category/reembolso.png',
     'color': DefaultColors.seaGreen, // Nova cor
+    'macrocategoria': 'Reembolsos e Compensações',
     'synonyms': ['devolução', 'estorno'],
     'relations': ['compras', 'finanças'],
   },
@@ -619,6 +694,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Pensão Alimentícia',
     'icon': 'assets/icon-category/pensao.png',
     'color': DefaultColors.oliveGreen, // Nova cor
+    'macrocategoria': 'Família',
     'synonyms': ['alimentos', 'judicial'],
     'relations': ['família', 'filhos'],
   },
@@ -627,6 +703,7 @@ final List<Map<String, dynamic>> categories_income = [
     'name': 'Outros',
     'icon': 'assets/icon-category/outros.png',
     'color': DefaultColors.grey,
+    'macrocategoria': 'Outros',
     'synonyms': [
       'diversos',
       'variados',
@@ -671,6 +748,23 @@ Map<String, dynamic>? findCategoryById(int? id) {
   return null;
 }
 
+List<Map<String, dynamic>> getCategoriesByMacrocategoria(String macrocategoria, {bool isIncome = false}) {
+  final List<Map<String, dynamic>> targetCategories = isIncome ? categories_income : categories_expenses;
+  
+  return targetCategories.where((category) => 
+    category['macrocategoria'].toString().toLowerCase() == macrocategoria.toLowerCase()
+  ).toList();
+}
+
+List<String> getAllMacrocategorias({bool isIncome = false}) {
+  final List<Map<String, dynamic>> targetCategories = isIncome ? categories_income : categories_expenses;
+  
+  return targetCategories
+    .map((category) => category['macrocategoria'].toString())
+    .toSet()
+    .toList();
+}
+
 class CategoryPage extends StatefulWidget {
   final TransactionType? transactionType;
 
@@ -687,6 +781,8 @@ class _CategoryPageState extends State<CategoryPage> {
   final searchController = TextEditingController();
   late List<Map<String, dynamic>> allCategories;
   late List<Map<String, dynamic>> filteredCategories;
+  late List<String> macrocategorias;
+  String? selectedMacrocategoria;
 
   @override
   void initState() {
@@ -696,6 +792,12 @@ class _CategoryPageState extends State<CategoryPage> {
             ? categories_income
             : categories_expenses);
     filteredCategories = List<Map<String, dynamic>>.from(allCategories);
+    
+    // Get all unique macrocategorias
+    macrocategorias = getAllMacrocategorias(
+      isIncome: widget.transactionType == TransactionType.receita
+    );
+    
     searchController.addListener(_filterCategories);
   }
 
@@ -710,17 +812,32 @@ class _CategoryPageState extends State<CategoryPage> {
     final query = searchController.text.trim();
 
     setState(() {
+      List<Map<String, dynamic>> categoriesToFilter = allCategories;
+      
+      // First filter by macrocategoria if selected
+      if (selectedMacrocategoria != null) {
+        categoriesToFilter = allCategories.where((category) =>
+          category['macrocategoria'].toString() == selectedMacrocategoria
+        ).toList();
+      }
+      
       if (query.isEmpty) {
-        // Reset to all categories if query is empty
-        filteredCategories = List<Map<String, dynamic>>.from(allCategories);
+        // Show filtered categories by macrocategoria or all if none selected
+        filteredCategories = List<Map<String, dynamic>>.from(categoriesToFilter);
       } else {
-        // Filter categories based on name and synonyms
-        filteredCategories = allCategories.where((category) {
-          final name = category.toString().toLowerCase();
+        // Filter categories based on name, synonyms and macrocategoria
+        filteredCategories = categoriesToFilter.where((category) {
+          final name = category['name'].toString().toLowerCase();
+          final macrocategoria = category['macrocategoria'].toString().toLowerCase();
           final searchQuery = query.toLowerCase();
 
           // Check if name contains query
           if (name.contains(searchQuery)) {
+            return true;
+          }
+
+          // Check if macrocategoria contains query
+          if (macrocategoria.contains(searchQuery)) {
             return true;
           }
 
@@ -738,6 +855,13 @@ class _CategoryPageState extends State<CategoryPage> {
     });
   }
 
+  void _selectMacrocategoria(String? macrocategoria) {
+    setState(() {
+      selectedMacrocategoria = macrocategoria;
+      _filterCategories();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -752,6 +876,72 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       body: Column(
         children: [
+          // Macrocategorias chips
+          Container(
+            height: 50.h,
+            margin: EdgeInsets.symmetric(vertical: 8.h),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              children: [
+                // "Todas" chip
+                // Container(
+                //   margin: EdgeInsets.only(right: 8.w),
+                //   child: FilterChip(
+                //     label: Text(
+                //       'Todas',
+                //       style: TextStyle(
+                //         fontSize: 12.sp,
+                //         fontWeight: FontWeight.w500,
+                //         color: selectedMacrocategoria == null 
+                //           ? Colors.white 
+                //           : theme.primaryColor,
+                //       ),
+                //     ),
+                //     selected: selectedMacrocategoria == null,
+                //     onSelected: (selected) {
+                //       _selectMacrocategoria(null);
+                //     },
+                //     backgroundColor: theme.cardColor,
+                //     selectedColor: theme.primaryColor,
+                //     side: BorderSide(
+                //       color: selectedMacrocategoria == null 
+                //         ? theme.primaryColor 
+                //         : theme.primaryColor.withOpacity(0.3),
+                //     ),
+                //   ),
+                // ),
+                // Macrocategorias chips
+                ...macrocategorias.map((macrocategoria) => Container(
+                  margin: EdgeInsets.only(right: 8.w),
+                  child: FilterChip(
+                    label: Text(
+                      macrocategoria,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: selectedMacrocategoria == macrocategoria 
+                          ? Colors.white 
+                          : theme.primaryColor,
+                      ),
+                    ),
+                    selected: selectedMacrocategoria == macrocategoria,
+                    onSelected: (selected) {
+                      _selectMacrocategoria(selected ? macrocategoria : null);
+                    },
+                    backgroundColor: theme.cardColor,
+                    selectedColor: theme.primaryColor,
+                    side: BorderSide(
+                      color: selectedMacrocategoria == macrocategoria 
+                        ? theme.primaryColor 
+                        : theme.primaryColor.withOpacity(0.3),
+                    ),
+                  ),
+                )).toList(),
+              ],
+            ),
+          ),
+          
           Padding(
             padding: EdgeInsets.all(16.w),
             child: TextField(
@@ -827,14 +1017,9 @@ class _CategoryPageState extends State<CategoryPage> {
                             backgroundColor: DefaultColors.grey.withOpacity(
                               .1,
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.all(
-                                8.h,
-                              ),
-                              child: Image.asset(
-                                category['icon'],
-                                height: 26.h,
-                              ),
+                            child: Image.asset(
+                              category['icon'],
+                              height: 50.h,
                             ),
                           ),
                           title: Text(
