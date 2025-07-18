@@ -42,7 +42,7 @@ class SaldoCard extends StatelessWidget {
                   _formatCurrency(
                       saldo), // Removido o .abs() para mostrar valores negativos
                   style: TextStyle(
-                    fontSize: 20.sp,
+                    fontSize: 21.sp,
                     fontWeight: FontWeight.bold,
                     color: saldo < 0
                         ? DefaultColors.red

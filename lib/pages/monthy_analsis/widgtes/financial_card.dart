@@ -38,7 +38,7 @@ class FinancialCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 11.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w600,
               color: DefaultColors.grey20,
             ),
@@ -47,7 +47,7 @@ class FinancialCard extends StatelessWidget {
           Text(
             _formatCurrency(value),
             style: TextStyle(
-              fontSize: 20.sp,
+              fontSize: 17.sp,
               fontWeight: FontWeight.bold,
               color: theme.primaryColor,
             ),
