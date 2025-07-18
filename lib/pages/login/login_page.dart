@@ -26,89 +26,92 @@ class LoginPage extends StatelessWidget {
           horizontal: 30.h,
           vertical: 30.w,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "ORGANIZA+",
-              style: TextStyle(
-                color: DefaultColors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 14.sp,
-              ),
-            ),
-            SizedBox(
-              height: 70.h,
-            ),
-            DefaultTextField(
-              hintText: "Email",
-              prefixIcon: Icon(Iconsax.sms),
-              controller: emailController,
-            ),
-            SizedBox(height: 20.h),
-            DefaultTextField(
-              hintText: "Senha",
-              prefixIcon: Icon(Iconsax.lock),
-              controller: passwordController,
-            ),
-            SizedBox(
-              height: 20.h,
-            ),
-            DefaultButton(
-              text: "Entrar",
-              onTap: () => authController.login(
-                emailController.text,
-                passwordController.text,
-              ),
-            ),
-            SizedBox(
-              height: 20.h,
-            ),
-            DefaultContinueCom(),
-            SizedBox(
-              height: 20.h,
-            ),
-            // UnityBannerAd(
-            //   placementId: 'Banner_Android',
-            //   onLoad: (placementId) => print('Banner loaded: $placementId'),
-            //   onClick: (placementId) => print('Banner clicked: $placementId'),
-            //   onShown: (placementId) => print('Banner shown: $placementId'),
-            //   onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
-            // ),
-            ButtonLoginWithGoogle(
-              text: "Entrar com Google",
-              onTap: () => authController.loginWithGoogle(),
-            ),
-            SizedBox(
-              height: 60.h,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  "Não tem uma conta?",
-                  style: TextStyle(
-                    color: DefaultColors.grey,
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 80.h,),
+              Text(
+                "ORGANIZA+",
+                style: TextStyle(
+                  color: DefaultColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.sp,
                 ),
-                SizedBox(
-                  width: 3.w,
+              ),
+              SizedBox(
+                height: 70.h,
+              ),
+              DefaultTextField(
+                hintText: "Email",
+                prefixIcon: Icon(Iconsax.sms),
+                controller: emailController,
+              ),
+              SizedBox(height: 20.h),
+              DefaultTextField(
+                hintText: "Senha",
+                prefixIcon: Icon(Iconsax.lock),
+                controller: passwordController,
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              DefaultButton(
+                text: "Entrar",
+                onTap: () => authController.login(
+                  emailController.text,
+                  passwordController.text,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/register");
-                  },
-                  child: Text(
-                    "Cadastre-se",
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              DefaultContinueCom(),
+              SizedBox(
+                height: 20.h,
+              ),
+              // UnityBannerAd(
+              //   placementId: 'Banner_Android',
+              //   onLoad: (placementId) => print('Banner loaded: $placementId'),
+              //   onClick: (placementId) => print('Banner clicked: $placementId'),
+              //   onShown: (placementId) => print('Banner shown: $placementId'),
+              //   onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
+              // ),
+              ButtonLoginWithGoogle(
+                text: "Entrar com Google",
+                onTap: () => authController.loginWithGoogle(),
+              ),
+              SizedBox(
+                height: 60.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "Não tem uma conta?",
                     style: TextStyle(
-                      color: DefaultColors.black,
-                      fontWeight: FontWeight.bold,
+                      color: DefaultColors.grey,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  SizedBox(
+                    width: 3.w,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/register");
+                    },
+                    child: Text(
+                      "Cadastre-se",
+                      style: TextStyle(
+                        color: DefaultColors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
