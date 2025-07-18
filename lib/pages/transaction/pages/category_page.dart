@@ -884,14 +884,14 @@ class _CategoryPageState extends State<CategoryPage> {
             child: TextField(
               controller: searchController,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
                 color: theme.primaryColor,
               ),
               decoration: InputDecoration(
                 hintText: 'Pesquisar categoria',
                 hintStyle: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                   color: theme.primaryColor.withOpacity(0.5),
                 ),
