@@ -624,7 +624,7 @@ class FixedAccounts extends StatelessWidget {
                                                                     .primaryColor,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 13.sp,
+                                                            fontSize: 14.sp,
                                                             decoration: isDeactivated
                                                                 ? TextDecoration
                                                                     .lineThrough
@@ -683,7 +683,7 @@ class FixedAccounts extends StatelessWidget {
                                                     style: TextStyle(
                                                       color:
                                                           DefaultColors.grey20,
-                                                      fontSize: 11.sp,
+                                                      fontSize: 12.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                     ),
@@ -705,7 +705,7 @@ class FixedAccounts extends StatelessWidget {
                                                   ? DefaultColors.grey
                                                   : theme.primaryColor,
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 13.sp,
+                                              fontSize: 14.sp,
                                               decoration: isDeactivated
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
@@ -717,7 +717,7 @@ class FixedAccounts extends StatelessWidget {
                                               "${fixedAccount.paymentType}",
                                               style: TextStyle(
                                                 color: DefaultColors.grey20,
-                                                fontSize: 11.sp,
+                                                fontSize: 12.sp,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                               textAlign: TextAlign.end,

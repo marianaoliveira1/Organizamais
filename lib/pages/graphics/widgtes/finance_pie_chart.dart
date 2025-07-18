@@ -147,7 +147,9 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
                   value: totalReceita,
                   formatter: formatter,
                 ),
-                SizedBox(width: 24),
+                SizedBox(
+                  height: 4.h,
+                ),
                 FinanceLegend(
                   title: "Despesas",
                   color: DefaultColors.red,

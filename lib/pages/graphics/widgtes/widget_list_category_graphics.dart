@@ -75,8 +75,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Row(
                     children: [
                       Container(
-                        width: 30.w,
-                        height: 30.h,
+                        width: 36.w,
+                        height: 36.h,
                         decoration: BoxDecoration(
                           color: categoryColor,
                           borderRadius: BorderRadius.circular(8.r),
@@ -84,8 +84,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             categoryIcon ?? 'assets/icons/category.png',
-                            width: 20.w,
-                            height: 20.h,
+                            width: 24.w,
+                            height: 24.h,
                           ),
                         ),
                       ),
@@ -95,11 +95,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 110.w,
+                              width: 120.w,
                               child: Text(
                                 item['name'] as String,
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -111,7 +111,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 12.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -124,7 +124,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           Text(
                             currencyFormatter.format(valor),
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                             ),

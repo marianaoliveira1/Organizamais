@@ -332,7 +332,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               child: Text(
                                 paymentType,
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -343,7 +343,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 12.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -358,7 +358,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             child: Text(
                               currencyFormatter.format(valor),
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w500,
                                 color: theme.primaryColor,
                               ),
