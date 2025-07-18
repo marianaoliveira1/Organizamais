@@ -959,21 +959,19 @@ class _CategoryPageState extends State<CategoryPage> {
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
-                        color: selectedMacrocategoria == macrocategoria 
-                          ? DefaultColors.greenDark
-                          : theme.primaryColor,
+                        color: theme.primaryColor,
                       ),
                     ),
-                    selected: selectedMacrocategoria == macrocategoria,
+                    // selected: selectedMacrocategoria == macrocategoria,
                     onSelected: (selected) {
                       _selectMacrocategoria(selected ? macrocategoria : null);
                     },
-                    backgroundColor: theme.scaffoldBackgroundColor,
-                    selectedColor: theme.primaryColor,
+                    backgroundColor: theme.cardColor,
+                    selectedColor: theme.cardColor,
                     side: BorderSide(
                       color: selectedMacrocategoria == macrocategoria 
-                        ? theme.primaryColor 
-                        : theme.primaryColor.withOpacity(0.3),
+                        ? DefaultColors.greenDark
+                        : theme.cardColor,
                     ),
                   ),
                 )),
@@ -994,7 +992,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   )
                 : ListView.builder(
                     padding: EdgeInsets.symmetric(
-                      vertical: 20.h,
+                      vertical: 2.h,
                       horizontal: 20.w,
                     ),
                     itemCount: filteredCategories.length,
@@ -1027,7 +1025,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           title: Text(
                             category['name'],
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
                               color: theme.primaryColor,
                             ),
