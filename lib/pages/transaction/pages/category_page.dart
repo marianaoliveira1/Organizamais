@@ -960,7 +960,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         color: selectedMacrocategoria == macrocategoria 
-                          ? Colors.white 
+                          ? DefaultColors.greenDark
                           : theme.primaryColor,
                       ),
                     ),
@@ -968,7 +968,7 @@ class _CategoryPageState extends State<CategoryPage> {
                     onSelected: (selected) {
                       _selectMacrocategoria(selected ? macrocategoria : null);
                     },
-                    backgroundColor: theme.cardColor,
+                    backgroundColor: theme.scaffoldBackgroundColor,
                     selectedColor: theme.primaryColor,
                     side: BorderSide(
                       color: selectedMacrocategoria == macrocategoria 
