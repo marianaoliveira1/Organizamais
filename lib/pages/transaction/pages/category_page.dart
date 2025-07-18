@@ -350,7 +350,19 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/eletronicos.png',
     'color': DefaultColors.jungleGreen,
     'macrocategoria': 'Compras',
-    'synonyms': ['tecnologia', 'gadgets', 'computador', 'celular', 'notebook', 'tablet', 'smartphone', 'TV', 'televisão', 'fone', 'headphone']
+    'synonyms': [
+      'tecnologia',
+      'gadgets',
+      'computador',
+      'celular',
+      'notebook',
+      'tablet',
+      'smartphone',
+      'TV',
+      'televisão',
+      'fone',
+      'headphone'
+    ]
   },
   {
     'id': 14,
@@ -748,21 +760,26 @@ Map<String, dynamic>? findCategoryById(int? id) {
   return null;
 }
 
-List<Map<String, dynamic>> getCategoriesByMacrocategoria(String macrocategoria, {bool isIncome = false}) {
-  final List<Map<String, dynamic>> targetCategories = isIncome ? categories_income : categories_expenses;
-  
-  return targetCategories.where((category) => 
-    category['macrocategoria'].toString().toLowerCase() == macrocategoria.toLowerCase()
-  ).toList();
+List<Map<String, dynamic>> getCategoriesByMacrocategoria(String macrocategoria,
+    {bool isIncome = false}) {
+  final List<Map<String, dynamic>> targetCategories =
+      isIncome ? categories_income : categories_expenses;
+
+  return targetCategories
+      .where((category) =>
+          category['macrocategoria'].toString().toLowerCase() ==
+          macrocategoria.toLowerCase())
+      .toList();
 }
 
 List<String> getAllMacrocategorias({bool isIncome = false}) {
-  final List<Map<String, dynamic>> targetCategories = isIncome ? categories_income : categories_expenses;
-  
+  final List<Map<String, dynamic>> targetCategories =
+      isIncome ? categories_income : categories_expenses;
+
   return targetCategories
-    .map((category) => category['macrocategoria'].toString())
-    .toSet()
-    .toList();
+      .map((category) => category['macrocategoria'].toString())
+      .toSet()
+      .toList();
 }
 
 class CategoryPage extends StatefulWidget {
@@ -792,12 +809,11 @@ class _CategoryPageState extends State<CategoryPage> {
             ? categories_income
             : categories_expenses);
     filteredCategories = List<Map<String, dynamic>>.from(allCategories);
-    
+
     // Get all unique macrocategorias
     macrocategorias = getAllMacrocategorias(
-      isIncome: widget.transactionType == TransactionType.receita
-    );
-    
+        isIncome: widget.transactionType == TransactionType.receita);
+
     searchController.addListener(_filterCategories);
   }
 
@@ -813,22 +829,25 @@ class _CategoryPageState extends State<CategoryPage> {
 
     setState(() {
       List<Map<String, dynamic>> categoriesToFilter = allCategories;
-      
+
       // First filter by macrocategoria if selected
       if (selectedMacrocategoria != null) {
-        categoriesToFilter = allCategories.where((category) =>
-          category['macrocategoria'].toString() == selectedMacrocategoria
-        ).toList();
+        categoriesToFilter = allCategories
+            .where((category) =>
+                category['macrocategoria'].toString() == selectedMacrocategoria)
+            .toList();
       }
-      
+
       if (query.isEmpty) {
         // Show filtered categories by macrocategoria or all if none selected
-        filteredCategories = List<Map<String, dynamic>>.from(categoriesToFilter);
+        filteredCategories =
+            List<Map<String, dynamic>>.from(categoriesToFilter);
       } else {
         // Filter categories based on name, synonyms and macrocategoria
         filteredCategories = categoriesToFilter.where((category) {
           final name = category['name'].toString().toLowerCase();
-          final macrocategoria = category['macrocategoria'].toString().toLowerCase();
+          final macrocategoria =
+              category['macrocategoria'].toString().toLowerCase();
           final searchQuery = query.toLowerCase();
 
           // Check if name contains query
@@ -876,11 +895,15 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       body: Column(
         children: [
-          
-             AdsBanner(),
-             SizedBox(height: 10.h,),
+          AdsBanner(),
+          SizedBox(
+            height: 10.h,
+          ),
           Padding(
-            padding:EdgeInsets.symmetric(vertical: 2.h,horizontal: 10.w,),
+            padding: EdgeInsets.symmetric(
+              vertical: 2.h,
+              horizontal: 12.w,
+            ),
             child: TextField(
               controller: searchController,
               style: TextStyle(
@@ -932,8 +955,8 @@ class _CategoryPageState extends State<CategoryPage> {
                 //       style: TextStyle(
                 //         fontSize: 12.sp,
                 //         fontWeight: FontWeight.w500,
-                //         color: selectedMacrocategoria == null 
-                //           ? Colors.white 
+                //         color: selectedMacrocategoria == null
+                //           ? Colors.white
                 //           : theme.primaryColor,
                 //       ),
                 //     ),
@@ -944,41 +967,42 @@ class _CategoryPageState extends State<CategoryPage> {
                 //     backgroundColor: theme.cardColor,
                 //     selectedColor: theme.primaryColor,
                 //     side: BorderSide(
-                //       color: selectedMacrocategoria == null 
-                //         ? theme.primaryColor 
+                //       color: selectedMacrocategoria == null
+                //         ? theme.primaryColor
                 //         : theme.primaryColor.withOpacity(0.3),
                 //     ),
                 //   ),
                 // ),
                 // Macrocategorias chips
                 ...macrocategorias.map((macrocategoria) => Container(
-                  margin: EdgeInsets.only(right: 8.w),
-                  child: FilterChip(
-                    label: Text(
-                      macrocategoria,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: theme.primaryColor,
+                      margin: EdgeInsets.only(right: 8.w),
+                      child: FilterChip(
+                        label: Text(
+                          macrocategoria,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                        // selected: selectedMacrocategoria == macrocategoria,
+                        onSelected: (selected) {
+                          _selectMacrocategoria(
+                              selected ? macrocategoria : null);
+                        },
+                        backgroundColor: theme.cardColor,
+                        selectedColor: theme.cardColor,
+                        side: BorderSide(
+                          color: selectedMacrocategoria == macrocategoria
+                              ? DefaultColors.greenDark
+                              : theme.cardColor,
+                        ),
                       ),
-                    ),
-                    // selected: selectedMacrocategoria == macrocategoria,
-                    onSelected: (selected) {
-                      _selectMacrocategoria(selected ? macrocategoria : null);
-                    },
-                    backgroundColor: theme.cardColor,
-                    selectedColor: theme.cardColor,
-                    side: BorderSide(
-                      color: selectedMacrocategoria == macrocategoria 
-                        ? DefaultColors.greenDark
-                        : theme.cardColor,
-                    ),
-                  ),
-                )),
+                    )),
               ],
             ),
           ),
-       
+
           Expanded(
             child: filteredCategories.isEmpty
                 ? Center(
