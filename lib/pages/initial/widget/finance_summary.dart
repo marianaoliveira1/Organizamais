@@ -53,7 +53,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                   Text(
                     "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)}",
                     style: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 11.sp,
                       color: DefaultColors.grey,
                       fontWeight: FontWeight.w500,
                     ),
@@ -68,7 +68,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                     formatter.format(transactionController.totalReceita -
                         transactionController.totalDespesas),
                     style: TextStyle(
-                      fontSize: 32.sp,
+                      fontSize: 30.sp,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),

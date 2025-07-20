@@ -20,7 +20,7 @@ class CategoryValue extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: 40.h,
+          height: 38.h,
           width: 2.w,
           color: color,
         ),
@@ -31,7 +31,7 @@ class CategoryValue extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 10.sp,
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
@@ -41,7 +41,7 @@ class CategoryValue extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
                 color: theme.primaryColor,
               ),
