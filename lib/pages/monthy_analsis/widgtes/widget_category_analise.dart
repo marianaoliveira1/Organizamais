@@ -72,8 +72,8 @@ class WidgetCategoryAnalise extends StatelessWidget {
                     children: [
                       // Ícone da categoria
                       Container(
-                        width: 36.w,
-                        height: 36.h,
+                        width: 34.w,
+                        height: 34.h,
                         decoration: BoxDecoration(
                           color: categoryColor,
                           borderRadius: BorderRadius.circular(8.r),
@@ -81,8 +81,8 @@ class WidgetCategoryAnalise extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             categoryIcon ?? 'assets/icons/category.png',
-                            width: 24.w,
-                            height: 24.h,
+                            width: 22.w,
+                            height: 22.h,
                           ),
                         ),
                       ),
@@ -98,7 +98,7 @@ class WidgetCategoryAnalise extends StatelessWidget {
                                     ? 'Categoria não encontrada'
                                     : item['name'] as String,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -110,7 +110,7 @@ class WidgetCategoryAnalise extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -123,14 +123,14 @@ class WidgetCategoryAnalise extends StatelessWidget {
                           Text(
                             currencyFormatter.format(valor),
                             style: TextStyle(
-                              fontSize: 14.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                             ),
                           ),
                           Icon(
                             Icons.arrow_forward_ios,
-                            size: 14.sp,
+                            size: 11.sp,
                             color: DefaultColors.grey,
                           ),
                         ],

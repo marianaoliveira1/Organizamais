@@ -222,7 +222,7 @@ class CategoryMonthlyChart extends StatelessWidget {
   Widget _buildAnalysisItem(Map<String, dynamic> item, ThemeData theme) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
         color: item['cardColor'].withOpacity(0.1),
         borderRadius: BorderRadius.circular(8.r),
@@ -235,7 +235,7 @@ class CategoryMonthlyChart extends StatelessWidget {
           Icon(
             item['icon'],
             color: item['cardColor'],
-            size: 20.sp,
+            size: 16.sp,
           ),
           SizedBox(width: 8.w),
           Expanded(
@@ -245,7 +245,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                 Text(
                   item['month'],
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: theme.primaryColor,
                   ),
@@ -254,7 +254,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                 Text(
                   item['analysis'],
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     color: DefaultColors.grey,
                   ),
@@ -263,7 +263,7 @@ class CategoryMonthlyChart extends StatelessWidget {
                 Text(
                   item['message'],
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: item['cardColor'],
                   ),
@@ -911,9 +911,12 @@ class CategoryAnalysisPage extends StatelessWidget {
                               onTap: () => Get.to(
                                 () => TransactionPage(
                                   transaction: transaction,
-                                  overrideTransactionSalvar: (updatedTransaction) {
-                                    final controller = Get.find<TransactionController>();
-                                    controller.updateTransaction(updatedTransaction);
+                                  overrideTransactionSalvar:
+                                      (updatedTransaction) {
+                                    final controller =
+                                        Get.find<TransactionController>();
+                                    controller
+                                        .updateTransaction(updatedTransaction);
                                   },
                                 ),
                               ),
