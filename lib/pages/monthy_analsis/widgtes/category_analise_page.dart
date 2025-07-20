@@ -7,6 +7,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
+import '../../transaction/transaction_page.dart';
 
 import '../../graphics/widgtes/default_text_graphic.dart';
 
@@ -906,65 +907,76 @@ class CategoryAnalysisPage extends StatelessWidget {
                                       )
                                     : "Data não informada";
 
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 12.h),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 150.w,
-                                        child: Text(
-                                          transaction.title,
+                            return InkWell(
+                              onTap: () => Get.to(
+                                () => TransactionPage(
+                                  transaction: transaction,
+                                  overrideTransactionSalvar: (updatedTransaction) {
+                                    final controller = Get.find<TransactionController>();
+                                    controller.updateTransaction(updatedTransaction);
+                                  },
+                                ),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12.h),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: 150.w,
+                                          child: Text(
+                                            transaction.title,
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Get.theme.primaryColor,
+                                            ),
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Text(
+                                          currencyFormatter
+                                              .format(transactionValue),
                                           style: TextStyle(
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w500,
                                             color: Get.theme.primaryColor,
                                           ),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                      Text(
-                                        currencyFormatter
-                                            .format(transactionValue),
-                                        style: TextStyle(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Get.theme.primaryColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        formattedDate,
-                                        style: TextStyle(
-                                          fontSize: 11.sp,
-                                          color: DefaultColors.grey20,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 110.w,
-                                        child: Text(
-                                          transaction.paymentType ?? 'N/A',
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          formattedDate,
                                           style: TextStyle(
                                             fontSize: 11.sp,
                                             color: DefaultColors.grey20,
                                           ),
-                                          textAlign: TextAlign.end,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                    ],
-                                  )
-                                ],
+                                        SizedBox(
+                                          width: 110.w,
+                                          child: Text(
+                                            transaction.paymentType ?? 'N/A',
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              color: DefaultColors.grey20,
+                                            ),
+                                            textAlign: TextAlign.end,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             );
                           },

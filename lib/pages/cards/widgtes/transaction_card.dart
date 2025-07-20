@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../model/transaction_model.dart';
+import '../../../controller/transaction_controller.dart';
+import '../../transaction/transaction_page.dart';
 
 class TransactionCard extends StatelessWidget {
   final TransactionModel transaction;
@@ -27,35 +29,46 @@ class TransactionCard extends StatelessWidget {
 
     final theme = Theme.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(24.r),
+    return InkWell(
+      onTap: () => Get.to(
+        () => TransactionPage(
+          transaction: transaction,
+          overrideTransactionSalvar: (transaction) {
+            final controller = Get.find<TransactionController>();
+            controller.updateTransaction(transaction);
+          },
+        ),
       ),
-      padding: EdgeInsets.symmetric(
-        vertical: 16.h,
-        horizontal: 12.w,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            transaction.title,
-            style: TextStyle(
-              color: theme.primaryColor,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        padding: EdgeInsets.symmetric(
+          vertical: 16.h,
+          horizontal: 12.w,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              transaction.title,
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Text(
-            formattedValue,
-            style: TextStyle(
-              color: theme.primaryColor,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
+            Text(
+              formattedValue,
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

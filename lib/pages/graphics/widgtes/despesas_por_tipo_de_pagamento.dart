@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
+import 'package:organizamais/pages/transaction/transaction_page.dart';
 
 import 'default_text_graphic.dart';
 
@@ -435,55 +436,66 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               )
                             : "Data não informada";
 
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 130.w,
-                                    child: Text(
-                                      transaction.title,
+                        return InkWell(
+                          onTap: () => Get.to(
+                            () => TransactionPage(
+                              transaction: transaction,
+                              overrideTransactionSalvar: (updatedTransaction) {
+                                final controller = Get.find<TransactionController>();
+                                controller.updateTransaction(updatedTransaction);
+                              },
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 130.w,
+                                      child: Text(
+                                        transaction.title,
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.primaryColor,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 6.h,
+                                    ),
+                                    Text(
+                                      formattedDate,
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: DefaultColors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      currencyFormatter.format(transactionValue),
                                       style: TextStyle(
                                         fontSize: 11.sp,
                                         fontWeight: FontWeight.w500,
                                         color: theme.primaryColor,
+                                        letterSpacing: -0.5,
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.end,
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 6.h,
-                                  ),
-                                  Text(
-                                    formattedDate,
-                                    style: TextStyle(
-                                      fontSize: 10.sp,
-                                      color: DefaultColors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    currencyFormatter.format(transactionValue),
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.primaryColor,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ],
-                              )
-                            ],
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         );
                       },

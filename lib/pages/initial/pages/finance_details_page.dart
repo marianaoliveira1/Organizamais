@@ -6,6 +6,8 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
 import '../../../ads_banner/ads_banner.dart';
+import '../../../controller/transaction_controller.dart';
+import '../../transaction/transaction_page.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({
@@ -102,22 +104,8 @@ class FinanceDetailsPage extends StatelessWidget {
                             itemCount: receivedTransactions.length,
                             itemBuilder: (context, index) {
                               final transaction = receivedTransactions[index];
-                              final paymentDate =
-                                  DateTime.parse(transaction.paymentDay!);
-                              final formattedDate =
-                                  DateFormat('dd/MM/yyyy').format(paymentDate);
-                              final double value = double.parse(transaction
-                                  .value
-                                  .replaceAll('.', '')
-                                  .replaceAll(',', '.'));
-
                               return TransactionCard(
-                                title: transaction.title,
-                                value: formatter.format(value),
-                                date: formattedDate,
-                                paymentType: transaction.paymentType ??
-                                    "Não especificado",
-                                categoryId: transaction.category ?? 0,
+                                transaction: transaction,
                               );
                             },
                           ),
@@ -141,22 +129,8 @@ class FinanceDetailsPage extends StatelessWidget {
                             itemCount: expenseTransactions.length,
                             itemBuilder: (context, index) {
                               final transaction = expenseTransactions[index];
-                              final paymentDate =
-                                  DateTime.parse(transaction.paymentDay!);
-                              final formattedDate =
-                                  DateFormat('dd/MM/yyyy').format(paymentDate);
-                              final double value = double.parse(transaction
-                                  .value
-                                  .replaceAll('.', '')
-                                  .replaceAll(',', '.'));
-
                               return TransactionCard(
-                                title: transaction.title,
-                                value: formatter.format(value),
-                                date: formattedDate,
-                                paymentType: transaction.paymentType ??
-                                    "Não especificado",
-                                categoryId: transaction.category ?? 0,
+                                transaction: transaction,
                               );
                             },
                           ),
@@ -197,89 +171,97 @@ class FinanceDetailsPage extends StatelessWidget {
 }
 
 class TransactionCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String date;
-  final String paymentType;
-  final int categoryId;
+  final TransactionModel transaction;
 
   const TransactionCard({
     super.key,
-    required this.title,
-    required this.value,
-    required this.date,
-    required this.paymentType,
-    required this.categoryId,
+    required this.transaction,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
+    final paymentDate = DateTime.parse(transaction.paymentDay!);
+    final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
+    final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
+    final NumberFormat formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12.r),
+    return InkWell(
+      onTap: () => Get.to(
+        () => TransactionPage(
+          transaction: transaction,
+          overrideTransactionSalvar: (updatedTransaction) {
+            final controller = Get.find<TransactionController>();
+            controller.updateTransaction(updatedTransaction);
+          },
+        ),
       ),
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.w,
-        vertical: 16.h,
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 150.w,
-                child: Text(
-                  title,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 16.h,
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 150.w,
+                  child: Text(
+                    transaction.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  formatter.format(value),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12.sp,
                     color: theme.primaryColor,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12.sp,
-                  color: theme.primaryColor,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                date,
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  color: Colors.grey[600],
-                ),
-              ),
-              SizedBox(
-                width: 150.w,
-                child: Text(
-                  paymentType,
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  formattedDate,
                   style: TextStyle(
                     fontSize: 10.sp,
                     color: Colors.grey[600],
                   ),
-                  textAlign: TextAlign.end,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-        ],
+                SizedBox(
+                  width: 150.w,
+                  child: Text(
+                    transaction.paymentType ?? "Não especificado",
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.end,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

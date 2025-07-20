@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/graphics_page.dart';
+import 'package:organizamais/pages/transaction/transaction_page.dart';
 
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -200,11 +201,21 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 )
                               : "Data não informada";
 
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                          return InkWell(
+                            onTap: () => Get.to(
+                              () => TransactionPage(
+                                transaction: transaction,
+                                overrideTransactionSalvar: (updatedTransaction) {
+                                  final controller = Get.find<TransactionController>();
+                                  controller.updateTransaction(updatedTransaction);
+                                },
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -264,6 +275,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   ],
                                 )
                               ],
+                            ),
                             ),
                           );
                         },
