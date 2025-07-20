@@ -72,46 +72,56 @@ class FixedAccountsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Obx(
-                    () {
-                      final fixedAccounts = fixedAccountsController.fixedAccountsWithDeactivated;
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: fixedAccounts.length,
-                        separatorBuilder: (context, index) =>
-                            SizedBox(height: 14.h),
-                        itemBuilder: (context, index) {
-                          final fixedAccount = fixedAccounts[index];
-                          final isDeactivated = fixedAccountsController.isAccountDeactivated(fixedAccount);
-                          
-                          return Opacity(
-                            opacity: isDeactivated ? 0.6 : 1.0,
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(12.r),
-                              child: InkWell(
+                  SingleChildScrollView(
+                    child: Obx(
+                      () {
+                        final fixedAccounts = fixedAccountsController
+                            .fixedAccountsWithDeactivated;
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: fixedAccounts.length,
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: 14.h),
+                          itemBuilder: (context, index) {
+                            final fixedAccount = fixedAccounts[index];
+                            final isDeactivated = fixedAccountsController
+                                .isAccountDeactivated(fixedAccount);
+
+                            return Opacity(
+                              opacity: isDeactivated ? 0.6 : 1.0,
+                              child: Material(
+                                color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(12.r),
-                                onLongPress: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => StatefulBuilder(
-                                      builder: (context, setState) {
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  onLongPress: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => StatefulBuilder(
+                                          builder: (context, setState) {
                                         bool isProcessing = false;
-                                        
+
                                         return AlertDialog(
                                           backgroundColor: theme.cardColor,
                                           title: Row(
                                             children: [
                                               Icon(
-                                                isDeactivated ? Icons.pause_circle : Icons.remove_circle_outline,
-                                                color: isDeactivated ? Colors.orange : theme.primaryColor,
+                                                isDeactivated
+                                                    ? Icons.pause_circle
+                                                    : Icons
+                                                        .remove_circle_outline,
+                                                color: isDeactivated
+                                                    ? Colors.orange
+                                                    : theme.primaryColor,
                                                 size: 20.sp,
                                               ),
                                               SizedBox(width: 8.w),
                                               Expanded(
                                                 child: Text(
-                                                  isDeactivated ? 'Conta Desativada' : 'Remover Conta Fixa',
+                                                  isDeactivated
+                                                      ? 'Conta Desativada'
+                                                      : 'Remover Conta Fixa',
                                                   style: TextStyle(
                                                     color: theme.primaryColor,
                                                     fontSize: 14.sp,
@@ -123,29 +133,44 @@ class FixedAccountsPage extends StatelessWidget {
                                           ),
                                           content: Column(
                                             mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               if (isDeactivated) ...[
                                                 Container(
                                                   padding: EdgeInsets.all(12.h),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.orange.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(8.r),
-                                                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                                                    color: Colors.orange
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.r),
+                                                    border: Border.all(
+                                                        color: Colors.orange
+                                                            .withOpacity(0.3)),
                                                   ),
                                                   child: Column(
                                                     children: [
                                                       Row(
                                                         children: [
-                                                          Icon(Icons.info_outline, color: Colors.orange, size: 16.sp),
+                                                          Icon(
+                                                              Icons
+                                                                  .info_outline,
+                                                              color:
+                                                                  Colors.orange,
+                                                              size: 16.sp),
                                                           SizedBox(width: 8.w),
                                                           Expanded(
                                                             child: Text(
                                                               'Detalhes da Desativação',
                                                               style: TextStyle(
-                                                                color: Colors.orange.shade700,
+                                                                color: Colors
+                                                                    .orange
+                                                                    .shade700,
                                                                 fontSize: 12.sp,
-                                                                fontWeight: FontWeight.bold,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                           ),
@@ -154,46 +179,72 @@ class FixedAccountsPage extends StatelessWidget {
                                                       SizedBox(height: 8.h),
                                                       Container(
                                                         width: double.infinity,
-                                                        padding: EdgeInsets.all(8.h),
-                                                        decoration: BoxDecoration(
-                                                          color: theme.scaffoldBackgroundColor.withOpacity(0.3),
-                                                          borderRadius: BorderRadius.circular(6.r),
+                                                        padding:
+                                                            EdgeInsets.all(8.h),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: theme
+                                                              .scaffoldBackgroundColor
+                                                              .withOpacity(0.3),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      6.r),
                                                         ),
                                                         child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               'Conta: ${fixedAccount.title}',
                                                               style: TextStyle(
-                                                                color: theme.primaryColor,
+                                                                color: theme
+                                                                    .primaryColor,
                                                                 fontSize: 11.sp,
-                                                                fontWeight: FontWeight.w600,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
                                                               ),
                                                             ),
-                                                            SizedBox(height: 4.h),
+                                                            SizedBox(
+                                                                height: 4.h),
                                                             Text(
                                                               'Valor: ${_formatCurrency(fixedAccount.value)}',
                                                               style: TextStyle(
-                                                                color: theme.primaryColor,
+                                                                color: theme
+                                                                    .primaryColor,
                                                                 fontSize: 11.sp,
                                                               ),
                                                             ),
-                                                            SizedBox(height: 4.h),
+                                                            SizedBox(
+                                                                height: 4.h),
                                                             Text(
                                                               'Desativada em: ${fixedAccount.deactivatedAt != null ? '${fixedAccount.deactivatedAt!.day.toString().padLeft(2, '0')}/${fixedAccount.deactivatedAt!.month.toString().padLeft(2, '0')}/${fixedAccount.deactivatedAt!.year}' : ''}',
                                                               style: TextStyle(
-                                                                color: Colors.orange.shade700,
+                                                                color: Colors
+                                                                    .orange
+                                                                    .shade700,
                                                                 fontSize: 11.sp,
-                                                                fontWeight: FontWeight.w500,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
                                                               ),
                                                             ),
-                                                            if (fixedAccount.deactivatedAt != null) ...[
-                                                              SizedBox(height: 4.h),
+                                                            if (fixedAccount
+                                                                    .deactivatedAt !=
+                                                                null) ...[
+                                                              SizedBox(
+                                                                  height: 4.h),
                                                               Text(
                                                                 'Tempo desativada: ${DateTime.now().difference(fixedAccount.deactivatedAt!).inDays} dias',
-                                                                style: TextStyle(
-                                                                  color: DefaultColors.grey,
-                                                                  fontSize: 10.sp,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color:
+                                                                      DefaultColors
+                                                                          .grey,
+                                                                  fontSize:
+                                                                      10.sp,
                                                                 ),
                                                               ),
                                                             ],
@@ -247,53 +298,85 @@ class FixedAccountsPage extends StatelessWidget {
                                                   fontSize: 12.sp,
                                                 ),
                                               ),
-                                              onPressed: () => Navigator.of(context).pop(),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
                                             ),
                                             if (isDeactivated)
                                               TextButton(
-                                                onPressed: isProcessing ? null : () async {
-                                                  setState(() => isProcessing = true);
-                                                  await fixedAccountsController.reactivateFixedAccount(fixedAccount.id!);
-                                                  Navigator.of(context).pop();
-                                                  // Show success feedback
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Row(
+                                                onPressed: isProcessing
+                                                    ? null
+                                                    : () async {
+                                                        setState(() =>
+                                                            isProcessing =
+                                                                true);
+                                                        await fixedAccountsController
+                                                            .reactivateFixedAccount(
+                                                                fixedAccount
+                                                                    .id!);
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        // Show success feedback
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Row(
+                                                              children: [
+                                                                Icon(
+                                                                    Icons
+                                                                        .refresh,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    size:
+                                                                        20.sp),
+                                                                SizedBox(
+                                                                    width: 8.w),
+                                                                Text(
+                                                                    'Conta "${fixedAccount.title}" reativada'),
+                                                              ],
+                                                            ),
+                                                            backgroundColor:
+                                                                Colors.green,
+                                                            duration: Duration(
+                                                                seconds: 3),
+                                                          ),
+                                                        );
+                                                      },
+                                                child: isProcessing
+                                                    ? SizedBox(
+                                                        width: 16.w,
+                                                        height: 16.h,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation<
+                                                                      Color>(
+                                                                  Colors.green),
+                                                        ),
+                                                      )
+                                                    : Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
                                                         children: [
-                                                          Icon(Icons.refresh, color: Colors.white, size: 20.sp),
-                                                          SizedBox(width: 8.w),
-                                                          Text('Conta "${fixedAccount.title}" reativada'),
+                                                          Icon(Icons.refresh,
+                                                              size: 16.sp,
+                                                              color:
+                                                                  Colors.green),
+                                                          SizedBox(width: 4.w),
+                                                          Text(
+                                                            'Reativar',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.green,
+                                                              fontSize: 12.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
                                                         ],
                                                       ),
-                                                      backgroundColor: Colors.green,
-                                                      duration: Duration(seconds: 3),
-                                                    ),
-                                                  );
-                                                },
-                                                child: isProcessing 
-                                                  ? SizedBox(
-                                                      width: 16.w,
-                                                      height: 16.h,
-                                                      child: CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                                                      ),
-                                                    )
-                                                  : Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Icon(Icons.refresh, size: 16.sp, color: Colors.green),
-                                                        SizedBox(width: 4.w),
-                                                        Text(
-                                                          'Reativar',
-                                                          style: TextStyle(
-                                                            color: Colors.green,
-                                                            fontSize: 12.sp,
-                                                            fontWeight: FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
                                               ),
                                             if (!isDeactivated)
                                               TextButton(
@@ -306,7 +389,9 @@ class FixedAccountsPage extends StatelessWidget {
                                                   ),
                                                 ),
                                                 onPressed: () {
-                                                  fixedAccountsController.disableFixedAccount(fixedAccount.id!);
+                                                  fixedAccountsController
+                                                      .disableFixedAccount(
+                                                          fixedAccount.id!);
                                                   Navigator.of(context).pop();
                                                 },
                                               ),
@@ -320,142 +405,183 @@ class FixedAccountsPage extends StatelessWidget {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                fixedAccountsController.deleteFixedAccount(fixedAccount.id!);
+                                                fixedAccountsController
+                                                    .deleteFixedAccount(
+                                                        fixedAccount.id!);
                                                 Navigator.of(context).pop();
                                               },
                                             ),
                                           ],
                                         );
-                                      }
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(10.h),
-                                              decoration: BoxDecoration(
-                                                color: isDeactivated 
-                                                  ? DefaultColors.grey.withOpacity(0.3)
-                                                  : DefaultColors.grey.withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(50.r),
+                                      }),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 8.h, horizontal: 4.w),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(10.h),
+                                                decoration: BoxDecoration(
+                                                  color: isDeactivated
+                                                      ? DefaultColors.grey
+                                                          .withOpacity(0.3)
+                                                      : DefaultColors.grey
+                                                          .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.r),
+                                                ),
+                                                child: Image.asset(
+                                                  categories_expenses
+                                                      .firstWhere((element) =>
+                                                          element['id'] ==
+                                                          fixedAccount
+                                                              .category)['icon'],
+                                                  width: 24.w,
+                                                  height: 24.h,
+                                                  color: isDeactivated
+                                                      ? DefaultColors.grey
+                                                      : null,
+                                                ),
                                               ),
-                                              child: Image.asset(
-                                                categories_expenses.firstWhere(
-                                                    (element) =>
-                                                        element['id'] ==
-                                                        fixedAccount.category)['icon'],
-                                                width: 28.w,
-                                                height: 28.h,
-                                                color: isDeactivated ? DefaultColors.grey : null,
-                                              ),
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          fixedAccount.title,
-                                                          style: TextStyle(
-                                                            color: isDeactivated 
-                                                              ? DefaultColors.grey 
-                                                              : theme.primaryColor,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 14.sp,
-                                                            decoration: isDeactivated 
-                                                              ? TextDecoration.lineThrough 
-                                                              : TextDecoration.none,
-                                                          ),
-                                                          softWrap: true,
-                                                        ),
-                                                      ),
-                                                      if (isDeactivated)
-                                                        Container(
-                                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.red.withOpacity(0.1),
-                                                            borderRadius: BorderRadius.circular(10.r),
-                                                            border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
-                                                          ),
+                                              SizedBox(width: 10.w),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
                                                           child: Text(
-                                                            'DESATIVADA',
+                                                            fixedAccount.title,
                                                             style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 9.sp,
-                                                              fontWeight: FontWeight.bold,
+                                                              color: isDeactivated
+                                                                  ? DefaultColors
+                                                                      .grey
+                                                                  : theme
+                                                                      .primaryColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 12.sp,
+                                                              decoration: isDeactivated
+                                                                  ? TextDecoration
+                                                                      .lineThrough
+                                                                  : TextDecoration
+                                                                      .none,
+                                                            ),
+                                                            maxLines: 2,
+                                                            softWrap: true,
+                                                          ),
+                                                        ),
+                                                        if (isDeactivated)
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        8.w,
+                                                                    vertical:
+                                                                        3.h),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.red
+                                                                  .withOpacity(
+                                                                      0.1),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.r),
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .red
+                                                                      .withOpacity(
+                                                                          0.3),
+                                                                  width: 1),
+                                                            ),
+                                                            child: Text(
+                                                              'DESATIVADA',
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize: 9.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  Text(
-                                                    isDeactivated 
-                                                      ? "Desativada em ${fixedAccount.deactivatedAt != null ? '${fixedAccount.deactivatedAt!.day}/${fixedAccount.deactivatedAt!.month}/${fixedAccount.deactivatedAt!.year}' : ''}"
-                                                      : "Dia ${fixedAccount.paymentDay} de cada mês",
-                                                    style: TextStyle(
-                                                      color: DefaultColors.grey,
-                                                      fontSize: 12.sp,
-                                                      fontWeight: FontWeight.w500,
+                                                      ],
                                                     ),
-                                                  ),
-                                                ],
+                                                    Text(
+                                                      isDeactivated
+                                                          ? "Desativada em ${fixedAccount.deactivatedAt != null ? '${fixedAccount.deactivatedAt!.day}/${fixedAccount.deactivatedAt!.month}/${fixedAccount.deactivatedAt!.year}' : ''}"
+                                                          : "Dia ${fixedAccount.paymentDay} de cada mês",
+                                                      style: TextStyle(
+                                                        color:
+                                                            DefaultColors.grey,
+                                                        fontSize: 10.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              _formatCurrency(
+                                                  fixedAccount.value),
+                                              style: TextStyle(
+                                                color: isDeactivated
+                                                    ? DefaultColors.grey
+                                                    : theme.primaryColor,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.sp,
+                                                decoration: isDeactivated
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 100.w,
+                                              child: Text(
+                                                "${fixedAccount.paymentType}",
+                                                style: TextStyle(
+                                                  color: DefaultColors.grey,
+                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                maxLines: 2,
+                                                textAlign: TextAlign.end,
+                                                softWrap: true,
                                               ),
                                             ),
                                           ],
-                                        ),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            _formatCurrency(fixedAccount.value),
-                                            style: TextStyle(
-                                              color: isDeactivated 
-                                                ? DefaultColors.grey 
-                                                : theme.primaryColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14.sp,
-                                              decoration: isDeactivated 
-                                                ? TextDecoration.lineThrough 
-                                                : TextDecoration.none,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 100.w,
-                                            child: Text(
-                                              "${fixedAccount.paymentType}",
-                                              style: TextStyle(
-                                                color: DefaultColors.grey,
-                                                fontSize: 12.sp,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              textAlign: TextAlign.end,
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
