@@ -20,10 +20,12 @@ class DefaultTextFieldTransaction extends StatefulWidget {
   });
 
   @override
-  State<DefaultTextFieldTransaction> createState() => _DefaultTextFieldTransactionState();
+  State<DefaultTextFieldTransaction> createState() =>
+      _DefaultTextFieldTransactionState();
 }
 
-class _DefaultTextFieldTransactionState extends State<DefaultTextFieldTransaction> {
+class _DefaultTextFieldTransactionState
+    extends State<DefaultTextFieldTransaction> {
   final FocusNode _focusNode = FocusNode();
   bool isFocused = false;
 

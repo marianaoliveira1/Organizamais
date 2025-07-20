@@ -15,6 +15,8 @@ class TextFieldDescriptionTransaction extends StatelessWidget {
 
     return TextField(
       controller: titleController,
+      maxLines: null,
+      keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
         hintText: 'Adicione a descrição',
         hintStyle: TextStyle(
