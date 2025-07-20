@@ -333,7 +333,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               child: Text(
                                 paymentType,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -344,7 +344,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -359,7 +359,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             child: Text(
                               currencyFormatter.format(valor),
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w500,
                                 color: theme.primaryColor,
                               ),
@@ -441,8 +441,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             () => TransactionPage(
                               transaction: transaction,
                               overrideTransactionSalvar: (updatedTransaction) {
-                                final controller = Get.find<TransactionController>();
-                                controller.updateTransaction(updatedTransaction);
+                                final controller =
+                                    Get.find<TransactionController>();
+                                controller
+                                    .updateTransaction(updatedTransaction);
                               },
                             ),
                           ),
@@ -483,7 +485,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      currencyFormatter.format(transactionValue),
+                                      currencyFormatter
+                                          .format(transactionValue),
                                       style: TextStyle(
                                         fontSize: 11.sp,
                                         fontWeight: FontWeight.w500,

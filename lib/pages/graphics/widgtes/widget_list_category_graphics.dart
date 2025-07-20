@@ -76,8 +76,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Row(
                     children: [
                       Container(
-                        width: 36.w,
-                        height: 36.h,
+                        width: 34.w,
+                        height: 34.h,
                         decoration: BoxDecoration(
                           color: categoryColor,
                           borderRadius: BorderRadius.circular(8.r),
@@ -85,8 +85,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             categoryIcon ?? 'assets/icons/category.png',
-                            width: 24.w,
-                            height: 24.h,
+                            width: 22.w,
+                            height: 22.h,
                           ),
                         ),
                       ),
@@ -100,7 +100,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                               child: Text(
                                 item['name'] as String,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -112,7 +112,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -125,7 +125,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           Text(
                             currencyFormatter.format(valor),
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                             ),
@@ -205,77 +205,82 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             onTap: () => Get.to(
                               () => TransactionPage(
                                 transaction: transaction,
-                                overrideTransactionSalvar: (updatedTransaction) {
-                                  final controller = Get.find<TransactionController>();
-                                  controller.updateTransaction(updatedTransaction);
+                                overrideTransactionSalvar:
+                                    (updatedTransaction) {
+                                  final controller =
+                                      Get.find<TransactionController>();
+                                  controller
+                                      .updateTransaction(updatedTransaction);
                                 },
                               ),
                             ),
                             child: Padding(
                               padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      width: 120.w,
-                                      child: Text(
-                                        transaction.title,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 120.w,
+                                        child: Text(
+                                          transaction.title,
+                                          style: TextStyle(
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: theme.primaryColor,
+                                          ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 2.h,
+                                      ),
+                                      Text(
+                                        formattedDate,
+                                        style: TextStyle(
+                                          fontSize: 10.sp,
+                                          color: DefaultColors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        currencyFormatter
+                                            .format(transactionValue),
                                         style: TextStyle(
                                           fontSize: 11.sp,
                                           fontWeight: FontWeight.w500,
                                           color: theme.primaryColor,
-                                        ),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 2.h,
-                                    ),
-                                    Text(
-                                      formattedDate,
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        color: DefaultColors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      currencyFormatter
-                                          .format(transactionValue),
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: theme.primaryColor,
-                                        letterSpacing: -0.5,
-                                      ),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                    SizedBox(
-                                      width: 120.w,
-                                      child: Text(
-                                        transaction.paymentType ?? 'N/A',
-                                        style: TextStyle(
-                                          fontSize: 10.sp,
-                                          color: DefaultColors.grey,
                                           letterSpacing: -0.5,
                                         ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.end,
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
+                                      SizedBox(
+                                        width: 120.w,
+                                        child: Text(
+                                          transaction.paymentType ?? 'N/A',
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                            color: DefaultColors.grey,
+                                            letterSpacing: -0.5,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         },

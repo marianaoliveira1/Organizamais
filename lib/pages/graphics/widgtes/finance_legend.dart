@@ -46,7 +46,7 @@ class FinanceLegend extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: theme.primaryColor,
                   ),
@@ -54,7 +54,7 @@ class FinanceLegend extends StatelessWidget {
                 Text(
                   "${percent.toStringAsFixed(1)}%",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 11.sp,
                     color: DefaultColors.grey,
                   ),
                 ),
@@ -65,7 +65,7 @@ class FinanceLegend extends StatelessWidget {
         Text(
           formatter.format(value),
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 13.sp,
             fontWeight: FontWeight.w500,
             color: theme.primaryColor,
           ),
