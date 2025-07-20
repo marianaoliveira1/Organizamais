@@ -596,8 +596,8 @@ class FixedAccounts extends StatelessWidget {
                                                         element['id'] ==
                                                         fixedAccount
                                                             .category)['icon'],
-                                                width: 20.w,
-                                                height: 20.h,
+                                                width: 18.w,
+                                                height: 18.h,
                                                 color: isDeactivated
                                                     ? DefaultColors.grey
                                                     : null,
@@ -624,7 +624,7 @@ class FixedAccounts extends StatelessWidget {
                                                                     .primaryColor,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 14.sp,
+                                                            fontSize: 13.sp,
                                                             decoration: isDeactivated
                                                                 ? TextDecoration
                                                                     .lineThrough
@@ -683,7 +683,7 @@ class FixedAccounts extends StatelessWidget {
                                                     style: TextStyle(
                                                       color:
                                                           DefaultColors.grey20,
-                                                      fontSize: 12.sp,
+                                                      fontSize: 11.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                     ),
@@ -705,7 +705,7 @@ class FixedAccounts extends StatelessWidget {
                                                   ? DefaultColors.grey
                                                   : theme.primaryColor,
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 14.sp,
+                                              fontSize: 13.sp,
                                               decoration: isDeactivated
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
@@ -717,7 +717,7 @@ class FixedAccounts extends StatelessWidget {
                                               "${fixedAccount.paymentType}",
                                               style: TextStyle(
                                                 color: DefaultColors.grey20,
-                                                fontSize: 12.sp,
+                                                fontSize: 11.sp,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                               textAlign: TextAlign.end,
