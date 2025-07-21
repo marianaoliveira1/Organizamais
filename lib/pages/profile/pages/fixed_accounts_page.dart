@@ -48,32 +48,32 @@ class FixedAccountsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: 10.h,
-          horizontal: 16.w,
-        ),
-        child: Column(
-          children: [
-            AdsBanner(),
-            SizedBox(
-              height: 20.h,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(24.r),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 10.h,
+            horizontal: 16.w,
+          ),
+          child: Column(
+            children: [
+              AdsBanner(),
+              SizedBox(
+                height: 20.h,
               ),
-              padding: EdgeInsets.symmetric(
-                vertical: 10.h,
-                horizontal: 16.w,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SingleChildScrollView(
-                    child: Obx(
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                padding: EdgeInsets.symmetric(
+                  vertical: 10.h,
+                  horizontal: 16.w,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Obx(
                       () {
                         final fixedAccounts = fixedAccountsController
                             .fixedAccountsWithDeactivated;
@@ -582,11 +582,11 @@ class FixedAccountsPage extends StatelessWidget {
                         );
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
