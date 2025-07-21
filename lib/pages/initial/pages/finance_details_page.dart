@@ -6,7 +6,6 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
 import '../../../ads_banner/ads_banner.dart';
-import '../../../controller/transaction_controller.dart';
 import '../../transaction/transaction_page.dart';
 
 class FinanceDetailsPage extends StatelessWidget {

@@ -18,34 +18,6 @@ import 'widget/payment_type.dart';
 import 'widget/textifield_description.dart';
 import 'widget/title_transaction.dart';
 
-/// Formatter para converter a entrada em formato de moeda (R$)
-class CurrencyInputFormatter extends TextInputFormatter {
-  final NumberFormat currencyFormat =
-      NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    // Remove tudo que não for dígito
-    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (newText.isEmpty) {
-      return TextEditingValue(
-        text: "R\$0,00",
-        selection: TextSelection.collapsed(offset: "R\$0,00".length),
-      );
-    }
-
-    // Interpreta o valor como centavos
-    double value = double.parse(newText) / 100;
-    String formattedText = currencyFormat.format(value);
-
-    return TextEditingValue(
-      text: formattedText,
-      selection: TextSelection.collapsed(offset: formattedText.length),
-    );
-  }
-}
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({
@@ -159,7 +131,9 @@ class _TransactionPageState extends State<TransactionPage> {
     super.initState();
     if (widget.transaction != null) {
       titleController.text = widget.transaction!.title;
-      valuecontroller.text = widget.transaction!.value;
+      valuecontroller.text = widget.transaction!.value.startsWith('R\$ ') 
+          ? widget.transaction!.value 
+          : 'R\$ ${widget.transaction!.value}';
       _selectedType = widget.transaction!.type;
       categoryId = widget.transaction!.category;
       _selectedDate = DateTime.parse(widget.transaction!.paymentDay ?? '');
@@ -171,7 +145,6 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     _getTypeColor(_selectedType);
-    final TransactionController transactionController = Get.put(TransactionController());
 
     final theme = Theme.of(context);
 
@@ -772,6 +745,35 @@ class _TransactionPageState extends State<TransactionPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Formatter para converter a entrada em formato de moeda (R$)
+class CurrencyInputFormatter extends TextInputFormatter {
+  final NumberFormat currencyFormat =
+      NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // Remove tudo que não for dígito
+    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (newText.isEmpty) {
+      return TextEditingValue(
+        text: "R\$0,00",
+        selection: TextSelection.collapsed(offset: "R\$0,00".length),
+      );
+    }
+
+    // Interpreta o valor como centavos
+    double value = double.parse(newText) / 100;
+    String formattedText = currencyFormat.format(value);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }
