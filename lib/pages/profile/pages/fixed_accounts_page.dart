@@ -66,7 +66,6 @@ class FixedAccountsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24.r),
                 ),
                 padding: EdgeInsets.symmetric(
-                  vertical: 10.h,
                   horizontal: 16.w,
                 ),
                 child: Column(
@@ -417,8 +416,9 @@ class FixedAccountsPage extends StatelessWidget {
                                     );
                                   },
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 8.h, horizontal: 4.w),
+                                    padding: EdgeInsets.only(
+                                      top: 4.h,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
