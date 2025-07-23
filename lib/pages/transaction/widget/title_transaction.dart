@@ -21,7 +21,7 @@ class DefaultTitleTransaction extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 12.sp,
-            color: DefaultColors.grey,
+            color: DefaultColors.grey20,
           ),
         ),
       ],
