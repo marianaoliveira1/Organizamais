@@ -23,7 +23,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
     Get.put(GoalController());
 
     return ScreenUtilInit(
-      designSize: const Size(360, 690),
+      designSize: Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       child: GetMaterialApp(
