@@ -58,6 +58,11 @@ class FinanceSummaryWidget extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 11.sp,
+                    color: DefaultColors.grey,
+                  ),
                 ],
               ),
               SizedBox(height: 8.h),

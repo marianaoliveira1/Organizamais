@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:organizamais/pages/monthy_analsis/widgtes/category_analise_page.dart'
+import 'package:organizamais/pages/monthy_analsis/widget/category_analise_page.dart'
     show CategoryAnalysisPage;
 
 import 'package:organizamais/utils/color.dart';

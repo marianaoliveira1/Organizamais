@@ -31,7 +31,7 @@ class CategoryValue extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: 12.sp,
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
@@ -41,7 +41,7 @@ class CategoryValue extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
                 color: theme.primaryColor,
               ),

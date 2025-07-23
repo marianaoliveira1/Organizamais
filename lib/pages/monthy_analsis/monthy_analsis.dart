@@ -14,9 +14,9 @@ import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 
-import 'widgtes/financial_summary_cards.dart';
-import 'widgtes/monthly_financial_chart.dart';
-import 'widgtes/widget_category_analise.dart';
+import 'widget/financial_summary_cards.dart';
+import 'widget/monthly_financial_chart.dart';
+import 'widget/widget_category_analise.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
