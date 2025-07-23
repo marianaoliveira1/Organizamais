@@ -23,7 +23,7 @@ class DefaultTitleCard extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            color: DefaultColors.grey,
+            color: DefaultColors.grey20,
             fontWeight: FontWeight.w500,
             fontSize: 10.sp,
           ),
