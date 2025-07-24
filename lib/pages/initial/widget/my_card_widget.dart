@@ -105,8 +105,8 @@ class MyCardsWidget extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8.r),
                               child: Image.asset(
                                 card.iconPath!,
-                                width: 34.w,
-                                height: 34.h,
+                                width: 36.w,
+                                height: 36.h,
                               ),
                             ),
                           SizedBox(
