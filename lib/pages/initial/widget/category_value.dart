@@ -20,11 +20,11 @@ class CategoryValue extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: 38.h,
+          height: 44.h,
           width: 2.w,
           color: color,
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 6.w),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
