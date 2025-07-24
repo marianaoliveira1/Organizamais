@@ -59,8 +59,8 @@ class TransactionItem extends StatelessWidget {
                   children: [
                     Image.asset(
                       category?['icon'] ?? 'assets/icon-category/default.png',
-                      width: 26.w,
-                      height: 26.h,
+                      width: 28.w,
+                      height: 28.h,
                       opacity:
                           isFuture ? const AlwaysStoppedAnimation(0.4) : null,
                     ),
@@ -76,7 +76,7 @@ class TransactionItem extends StatelessWidget {
                               color: isFuture
                                   ? DefaultColors.grey
                                   : theme.primaryColor,
-                              fontSize: 13.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 3,
@@ -94,7 +94,7 @@ class TransactionItem extends StatelessWidget {
                                   color: isFuture
                                       ? DefaultColors.grey.withOpacity(0.6)
                                       : DefaultColors.grey20,
-                                  fontSize: 11.sp,
+                                  fontSize: 12.sp,
                                 ),
                                 maxLines: 2,
                                 softWrap: true,
@@ -140,7 +140,7 @@ class TransactionItem extends StatelessWidget {
                           color: isFuture
                               ? DefaultColors.grey
                               : theme.primaryColor,
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.end,
@@ -154,7 +154,7 @@ class TransactionItem extends StatelessWidget {
                           color: isFuture
                               ? DefaultColors.grey.withOpacity(0.6)
                               : DefaultColors.grey20,
-                          fontSize: 11.sp,
+                          fontSize: 12.sp,
                         ),
                         textAlign: TextAlign.end,
                         maxLines: 2,

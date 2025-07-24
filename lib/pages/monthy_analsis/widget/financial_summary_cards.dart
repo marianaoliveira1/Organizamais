@@ -35,7 +35,7 @@ class FinancialSummaryCards extends StatelessWidget {
             'Resumo Anual ${DateTime.now().year} (até hoje)',
             style: TextStyle(
               fontSize: 12.sp,
-              color: DefaultColors.grey,
+              color: DefaultColors.grey20,
               fontWeight: FontWeight.w500,
             ),
           ),
