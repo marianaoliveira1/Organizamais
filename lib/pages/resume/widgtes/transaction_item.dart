@@ -49,7 +49,7 @@ class TransactionItem extends StatelessWidget {
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              vertical: 8.h,
+              vertical: 12.h,
               horizontal: 12.w,
             ),
             child: Row(
@@ -59,8 +59,8 @@ class TransactionItem extends StatelessWidget {
                   children: [
                     Image.asset(
                       category?['icon'] ?? 'assets/icon-category/default.png',
-                      width: 28.w,
-                      height: 28.h,
+                      width: 26.w,
+                      height: 26.h,
                       opacity:
                           isFuture ? const AlwaysStoppedAnimation(0.4) : null,
                     ),

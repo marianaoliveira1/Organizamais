@@ -572,176 +572,164 @@ class FixedAccounts extends StatelessWidget {
                                         );
                                       },
                                 child: Ink(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: theme.scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12.h,
-                                      vertical: 10.w,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                padding: EdgeInsets.all(10.h),
-                                                decoration: BoxDecoration(
-                                                  color: isDeactivated
-                                                      ? theme.cardColor
-                                                      : theme.cardColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
-                                                ),
-                                                child: Image.asset(
-                                                  categories_expenses
-                                                      .firstWhere((element) =>
-                                                          element['id'] ==
-                                                          fixedAccount
-                                                              .category)['icon'],
-                                                  width: 18.w,
-                                                  height: 18.h,
-                                                  color: isDeactivated
-                                                      ? DefaultColors.grey
-                                                      : null,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 10.w,
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        SizedBox(
-                                                          width: 110.w,
-                                                          child: Text(
-                                                            fixedAccount.title,
-                                                            style: TextStyle(
-                                                                color: isDeactivated
-                                                                    ? DefaultColors
-                                                                        .grey
-                                                                    : theme
-                                                                        .primaryColor,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 11.sp,
-                                                                decoration: isDeactivated
-                                                                    ? TextDecoration
-                                                                        .lineThrough
-                                                                    : TextDecoration
-                                                                        .none),
-                                                            maxLines: 2,
-                                                            softWrap: true,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
-                                                        if (isDeactivated)
-                                                          Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        6.w,
-                                                                    vertical:
-                                                                        2.h),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: Colors.red
-                                                                  .withOpacity(
-                                                                      0.1),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8.r),
-                                                              border: Border.all(
-                                                                  color: Colors
-                                                                      .red
-                                                                      .withOpacity(
-                                                                          0.3),
-                                                                  width: 1),
-                                                            ),
-                                                            child: Text(
-                                                              'DESATIVADA',
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontSize: 8.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      fixedAccount.deactivatedAt !=
-                                                              null
-                                                          ? "Desativada em ${fixedAccount.deactivatedAt != null ? '${fixedAccount.deactivatedAt!.day}/${fixedAccount.deactivatedAt!.month}/${fixedAccount.deactivatedAt!.year}' : ''}"
-                                                          : _buildPaymentScheduleText(
-                                                              fixedAccount),
-                                                      style: TextStyle(
-                                                        color: DefaultColors
-                                                            .grey20,
-                                                        fontSize: 8.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              _formatCurrency(
-                                                  fixedAccount.value),
-                                              style: TextStyle(
+                                            Container(
+                                              padding: EdgeInsets.all(10.h),
+                                              decoration: BoxDecoration(
+                                                color: isDeactivated
+                                                    ? theme
+                                                        .scaffoldBackgroundColor
+                                                    : theme
+                                                        .scaffoldBackgroundColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(50.r),
+                                              ),
+                                              child: Image.asset(
+                                                categories_expenses.firstWhere(
+                                                    (element) =>
+                                                        element['id'] ==
+                                                        fixedAccount
+                                                            .category)['icon'],
+                                                width: 18.w,
+                                                height: 18.h,
                                                 color: isDeactivated
                                                     ? DefaultColors.grey
-                                                    : theme.primaryColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12.sp,
-                                                decoration: isDeactivated
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
+                                                    : null,
                                               ),
                                             ),
                                             SizedBox(
-                                              width: 105.w,
-                                              child: Text(
-                                                "${fixedAccount.paymentType}",
-                                                style: TextStyle(
-                                                  color: DefaultColors.grey20,
-                                                  fontSize: 10.sp,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                                textAlign: TextAlign.end,
-                                                maxLines: 2,
-                                                softWrap: true,
-                                                overflow: TextOverflow.ellipsis,
+                                              width: 10.w,
+                                            ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 110.w,
+                                                        child: Text(
+                                                          fixedAccount.title,
+                                                          style: TextStyle(
+                                                              color: isDeactivated
+                                                                  ? DefaultColors
+                                                                      .grey
+                                                                  : theme
+                                                                      .primaryColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 11.sp,
+                                                              decoration: isDeactivated
+                                                                  ? TextDecoration
+                                                                      .lineThrough
+                                                                  : TextDecoration
+                                                                      .none),
+                                                          maxLines: 2,
+                                                          softWrap: true,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                      if (isDeactivated)
+                                                        Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      6.w,
+                                                                  vertical:
+                                                                      2.h),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.red
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.r),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .red
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                                width: 1),
+                                                          ),
+                                                          child: Text(
+                                                            'DESATIVADA',
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 8.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    fixedAccount.deactivatedAt !=
+                                                            null
+                                                        ? "Desativada em ${fixedAccount.deactivatedAt != null ? '${fixedAccount.deactivatedAt!.day}/${fixedAccount.deactivatedAt!.month}/${fixedAccount.deactivatedAt!.year}' : ''}"
+                                                        : _buildPaymentScheduleText(
+                                                            fixedAccount),
+                                                    style: TextStyle(
+                                                      color:
+                                                          DefaultColors.grey20,
+                                                      fontSize: 8.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
-                                        )
-                                      ],
-                                    ),
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            _formatCurrency(fixedAccount.value),
+                                            style: TextStyle(
+                                              color: isDeactivated
+                                                  ? DefaultColors.grey
+                                                  : theme.primaryColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12.sp,
+                                              decoration: isDeactivated
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 105.w,
+                                            child: Text(
+                                              "${fixedAccount.paymentType}",
+                                              style: TextStyle(
+                                                color: DefaultColors.grey20,
+                                                fontSize: 10.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              textAlign: TextAlign.end,
+                                              maxLines: 2,
+                                              softWrap: true,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),
