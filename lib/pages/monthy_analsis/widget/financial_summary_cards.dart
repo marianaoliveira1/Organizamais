@@ -8,7 +8,6 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
 import 'financial_card.dart';
-import 'saldo_card.dart';
 
 class FinancialSummaryCards extends StatelessWidget {
   const FinancialSummaryCards({super.key});
@@ -31,90 +30,16 @@ class FinancialSummaryCards extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Resumo Anual ${DateTime.now().year} (até hoje)',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: DefaultColors.grey20,
-              fontWeight: FontWeight.w500,
-            ),
+          PortfolioCard(
+            saldo: saldo,
+            valueReceita: totalReceita,
+            valueDespesa: totalDespesas,
+            mediaReceita: mediaReceita,
+            mediaDespesa: mediaDespesa,
           ),
-          SizedBox(height: 6.h),
-
-          // Cards de Receita e Despesa
-          Row(
-            children: [
-              // Card de Receitas
-              Expanded(
-                child: FinancialCard(
-                  title: 'Receitas',
-                  value: totalReceita,
-                  icon: Icons.trending_up,
-                ),
-              ),
-              SizedBox(
-                width: 12.h,
-              ),
-
-              // Card de Despesas
-              Expanded(
-                child: FinancialCard(
-                  title: 'Despesas',
-                  value: totalDespesas,
-                  icon: Icons.trending_down,
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(
-            height: 16.h,
-          ),
-
-          // Cards de Média Mensal
-          Text(
-            'Médias Mensais (meses finalizados)',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: DefaultColors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 10.h),
-
-          Row(
-            children: [
-              // Card de Média de Receitas
-              Expanded(
-                child: FinancialCard(
-                  title: 'Média de Receitas',
-                  value: mediaReceita,
-                  icon: Icons.show_chart,
-                ),
-              ),
-              SizedBox(
-                width: 12.h,
-              ),
-
-              // Card de Média de Despesas
-              Expanded(
-                child: FinancialCard(
-                  title: 'Média de Despesas',
-                  value: mediaDespesa,
-                  icon: Icons.analytics_outlined,
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(
-            height: 16.h,
-          ),
-
-          SaldoCard(saldo: saldo),
           SizedBox(
             height: 20.h,
-          )
+          ),
         ],
       );
     });
@@ -301,5 +226,200 @@ class FinancialSummaryCards extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class PortfolioCard extends StatelessWidget {
+  final double saldo;
+  final double valueReceita;
+  final double valueDespesa;
+  final double mediaDespesa;
+  final double mediaReceita;
+
+  const PortfolioCard(
+      {super.key,
+      required this.saldo,
+      required this.valueReceita,
+      required this.valueDespesa,
+      required this.mediaDespesa,
+      required this.mediaReceita});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 10.h,
+        horizontal: 12.w,
+      ),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Saldo do ano ${DateTime.now().year} (até hoje)',
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w600,
+              color: DefaultColors.grey20,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                _formatCurrency(
+                    saldo), // Removido o .abs() para mostrar valores negativos
+                style: TextStyle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.bold,
+                  color: saldo < 0
+                      ? DefaultColors.red
+                      : DefaultColors.green, // Cor vermelha para saldo negativo
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Receitas',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      _formatCurrency(valueReceita),
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 2.w,
+                height: 40.h,
+                color: theme.scaffoldBackgroundColor,
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Despesas",
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      _formatCurrency(valueDespesa),
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Média de Receitas',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      _formatCurrency(mediaReceita),
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 2.w,
+                height: 40.h,
+                color: theme.scaffoldBackgroundColor,
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Média de Despesas",
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      _formatCurrency(mediaDespesa),
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20.h,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatCurrency(double value) {
+    final isNegative = value < 0;
+    final absValue = value.abs();
+    final formatted =
+        absValue.toStringAsFixed(2).replaceAll('.', ',').replaceAllMapped(
+              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+              (Match m) => '${m[1]}.',
+            );
+
+    return '${isNegative ? '-' : ''}R\$ $formatted';
   }
 }

@@ -178,10 +178,10 @@ class ParcelamentosCard extends StatelessWidget {
                               tituloOriginal,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 color: theme.primaryColor,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -192,7 +192,7 @@ class ParcelamentosCard extends StatelessWidget {
                                   _parseCurrencyValue(parcela.value)),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 color: theme.primaryColor,
                               ),
                               textAlign: TextAlign.end,

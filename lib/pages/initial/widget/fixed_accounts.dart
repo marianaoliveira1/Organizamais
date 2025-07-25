@@ -589,7 +589,7 @@ class FixedAccounts extends StatelessWidget {
                                           child: Row(
                                             children: [
                                               Container(
-                                                padding: EdgeInsets.all(12.h),
+                                                padding: EdgeInsets.all(10.h),
                                                 decoration: BoxDecoration(
                                                   color: isDeactivated
                                                       ? theme.cardColor
@@ -604,8 +604,8 @@ class FixedAccounts extends StatelessWidget {
                                                           element['id'] ==
                                                           fixedAccount
                                                               .category)['icon'],
-                                                  width: 20.w,
-                                                  height: 20.h,
+                                                  width: 18.w,
+                                                  height: 18.h,
                                                   color: isDeactivated
                                                       ? DefaultColors.grey
                                                       : null,
@@ -626,21 +626,20 @@ class FixedAccounts extends StatelessWidget {
                                                           child: Text(
                                                             fixedAccount.title,
                                                             style: TextStyle(
-                                                              color: isDeactivated
-                                                                  ? DefaultColors
-                                                                      .grey
-                                                                  : theme
-                                                                      .primaryColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 13.sp,
-                                                              decoration: isDeactivated
-                                                                  ? TextDecoration
-                                                                      .lineThrough
-                                                                  : TextDecoration
-                                                                      .none,
-                                                            ),
+                                                                color: isDeactivated
+                                                                    ? DefaultColors
+                                                                        .grey
+                                                                    : theme
+                                                                        .primaryColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 11.sp,
+                                                                decoration: isDeactivated
+                                                                    ? TextDecoration
+                                                                        .lineThrough
+                                                                    : TextDecoration
+                                                                        .none),
                                                             maxLines: 2,
                                                             softWrap: true,
                                                             overflow:
@@ -695,7 +694,7 @@ class FixedAccounts extends StatelessWidget {
                                                       style: TextStyle(
                                                         color: DefaultColors
                                                             .grey20,
-                                                        fontSize: 10.sp,
+                                                        fontSize: 8.sp,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                       ),
@@ -718,7 +717,7 @@ class FixedAccounts extends StatelessWidget {
                                                     ? DefaultColors.grey
                                                     : theme.primaryColor,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 13.sp,
+                                                fontSize: 12.sp,
                                                 decoration: isDeactivated
                                                     ? TextDecoration.lineThrough
                                                     : TextDecoration.none,
