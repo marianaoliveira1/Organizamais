@@ -344,7 +344,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 10.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -371,6 +371,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                                 ? Icons.keyboard_arrow_up
                                 : Icons.keyboard_arrow_down,
                             color: DefaultColors.grey,
+                            size: 16.h,
                           ),
                         ],
                       ),
