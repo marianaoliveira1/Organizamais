@@ -58,7 +58,7 @@ class FixedAccounts extends StatelessWidget {
       ];
 
       String monthName = monthNames[fixedAccount.startMonth! - 1];
-      baseText += " (desde $monthName/${fixedAccount.startYear})";
+      baseText += " \n(desde $monthName/${fixedAccount.startYear})";
     }
 
     return baseText;
@@ -578,8 +578,8 @@ class FixedAccounts extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12.r),
                                     ),
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: 8.h,
-                                      vertical: 6.w,
+                                      horizontal: 12.h,
+                                      vertical: 10.w,
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
@@ -695,7 +695,7 @@ class FixedAccounts extends StatelessWidget {
                                                       style: TextStyle(
                                                         color: DefaultColors
                                                             .grey20,
-                                                        fontSize: 11.sp,
+                                                        fontSize: 10.sp,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                       ),
@@ -730,7 +730,7 @@ class FixedAccounts extends StatelessWidget {
                                                 "${fixedAccount.paymentType}",
                                                 style: TextStyle(
                                                   color: DefaultColors.grey20,
-                                                  fontSize: 11.sp,
+                                                  fontSize: 10.sp,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                                 textAlign: TextAlign.end,

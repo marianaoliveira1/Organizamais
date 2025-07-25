@@ -53,14 +53,14 @@ class FinanceSummaryWidget extends StatelessWidget {
                   Text(
                     "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)}",
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 10.sp,
                       color: DefaultColors.grey,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Icon(
                     Icons.arrow_forward_ios,
-                    size: 11.sp,
+                    size: 8.sp,
                     color: DefaultColors.grey,
                   ),
                 ],
