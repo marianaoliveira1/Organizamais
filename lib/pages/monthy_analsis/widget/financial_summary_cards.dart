@@ -296,7 +296,7 @@ class PortfolioCard extends StatelessWidget {
                       'Receitas',
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: DefaultColors.grey20,
                       ),
                     ),
@@ -305,17 +305,17 @@ class PortfolioCard extends StatelessWidget {
                       _formatCurrency(valueReceita),
                       style: TextStyle(
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.green,
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryColor,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                width: 2.w,
+                width: 1.w,
                 height: 40.h,
-                color: theme.scaffoldBackgroundColor,
+                color: DefaultColors.greyLight,
               ),
               SizedBox(width: 16.w),
               Expanded(
@@ -326,7 +326,7 @@ class PortfolioCard extends StatelessWidget {
                       "Despesas",
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: DefaultColors.grey20,
                       ),
                     ),
@@ -335,8 +335,8 @@ class PortfolioCard extends StatelessWidget {
                       _formatCurrency(valueDespesa),
                       style: TextStyle(
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.red,
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryColor,
                       ),
                     ),
                   ],
@@ -344,7 +344,7 @@ class PortfolioCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 16.h),
           Row(
             children: [
               Expanded(
@@ -355,26 +355,26 @@ class PortfolioCard extends StatelessWidget {
                       'Média de Receitas',
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: DefaultColors.grey20,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 2.h),
                     Text(
                       _formatCurrency(mediaReceita),
                       style: TextStyle(
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.green,
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryColor,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                width: 2.w,
+                width: 1.w,
                 height: 40.h,
-                color: theme.scaffoldBackgroundColor,
+                color: DefaultColors.greyLight,
               ),
               SizedBox(width: 16.w),
               Expanded(
@@ -385,7 +385,7 @@ class PortfolioCard extends StatelessWidget {
                       "Média de Despesas",
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: DefaultColors.grey20,
                       ),
                     ),
@@ -394,8 +394,8 @@ class PortfolioCard extends StatelessWidget {
                       _formatCurrency(mediaDespesa),
                       style: TextStyle(
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.red,
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryColor,
                       ),
                     ),
                   ],
@@ -404,7 +404,7 @@ class PortfolioCard extends StatelessWidget {
             ],
           ),
           SizedBox(
-            height: 20.h,
+            height: 10.h,
           ),
         ],
       ),
