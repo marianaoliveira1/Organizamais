@@ -18,7 +18,6 @@ import 'widget/payment_type.dart';
 import 'widget/textifield_description.dart';
 import 'widget/title_transaction.dart';
 
-
 class TransactionPage extends StatefulWidget {
   const TransactionPage({
     super.key,
@@ -131,8 +130,8 @@ class _TransactionPageState extends State<TransactionPage> {
     super.initState();
     if (widget.transaction != null) {
       titleController.text = widget.transaction!.title;
-      valuecontroller.text = widget.transaction!.value.startsWith('R\$ ') 
-          ? widget.transaction!.value 
+      valuecontroller.text = widget.transaction!.value.startsWith('R\$ ')
+          ? widget.transaction!.value
           : 'R\$ ${widget.transaction!.value}';
       _selectedType = widget.transaction!.type;
       categoryId = widget.transaction!.category;
@@ -151,10 +150,10 @@ class _TransactionPageState extends State<TransactionPage> {
     return Scaffold(
       backgroundColor: theme.cardColor,
       body: SingleChildScrollView(
-          child: Column(
-            spacing: 4.h,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: Column(
+          spacing: 4.h,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
               color: _selectedType == TransactionType.receita
@@ -178,7 +177,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       hintStyle: TextStyle(
                         color: DefaultColors.white,
                         fontWeight: FontWeight.w500,
-                        fontSize: 30.sp,
+                        fontSize: 38.sp,
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide.none,
@@ -189,7 +188,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                     style: TextStyle(
                       color: DefaultColors.white,
-                      fontSize: 30.sp,
+                      fontSize: 38.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
@@ -217,7 +216,7 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
             ),
             Divider(
-              color: DefaultColors.grey,
+              color: DefaultColors.grey20,
             ),
             // if (_selectedType != TransactionType.transferencia)
             Column(
@@ -245,7 +244,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ),
                 Divider(
-                  color: DefaultColors.grey,
+                  color: DefaultColors.grey20,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -270,7 +269,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
                 if (_selectedType == TransactionType.despesa)
                   Divider(
-                    color: DefaultColors.grey,
+                    color: DefaultColors.grey20,
                   ),
                 if (_selectedType == TransactionType.despesa)
                   Padding(

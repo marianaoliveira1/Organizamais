@@ -58,7 +58,7 @@ class FixedAccounts extends StatelessWidget {
       ];
 
       String monthName = monthNames[fixedAccount.startMonth! - 1];
-      baseText += " (desde $monthName/${fixedAccount.startYear})";
+      baseText += " \n(desde $monthName/${fixedAccount.startYear})";
     }
 
     return baseText;
@@ -583,10 +583,10 @@ class FixedAccounts extends StatelessWidget {
                                               padding: EdgeInsets.all(10.h),
                                               decoration: BoxDecoration(
                                                 color: isDeactivated
-                                                    ? DefaultColors.grey
-                                                        .withOpacity(0.3)
-                                                    : DefaultColors.grey
-                                                        .withOpacity(0.1),
+                                                    ? theme
+                                                        .scaffoldBackgroundColor
+                                                    : theme
+                                                        .scaffoldBackgroundColor,
                                                 borderRadius:
                                                     BorderRadius.circular(50.r),
                                               ),
@@ -613,24 +613,25 @@ class FixedAccounts extends StatelessWidget {
                                                 children: [
                                                   Row(
                                                     children: [
-                                                      Expanded(
+                                                      SizedBox(
+                                                        width: 110.w,
                                                         child: Text(
                                                           fixedAccount.title,
                                                           style: TextStyle(
-                                                            color: isDeactivated
-                                                                ? DefaultColors
-                                                                    .grey
-                                                                : theme
-                                                                    .primaryColor,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 13.sp,
-                                                            decoration: isDeactivated
-                                                                ? TextDecoration
-                                                                    .lineThrough
-                                                                : TextDecoration
-                                                                    .none,
-                                                          ),
+                                                              color: isDeactivated
+                                                                  ? DefaultColors
+                                                                      .grey
+                                                                  : theme
+                                                                      .primaryColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 11.sp,
+                                                              decoration: isDeactivated
+                                                                  ? TextDecoration
+                                                                      .lineThrough
+                                                                  : TextDecoration
+                                                                      .none),
                                                           maxLines: 2,
                                                           softWrap: true,
                                                           overflow: TextOverflow
@@ -683,7 +684,7 @@ class FixedAccounts extends StatelessWidget {
                                                     style: TextStyle(
                                                       color:
                                                           DefaultColors.grey20,
-                                                      fontSize: 11.sp,
+                                                      fontSize: 8.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                     ),
@@ -705,7 +706,7 @@ class FixedAccounts extends StatelessWidget {
                                                   ? DefaultColors.grey
                                                   : theme.primaryColor,
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 13.sp,
+                                              fontSize: 12.sp,
                                               decoration: isDeactivated
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none,
@@ -717,7 +718,7 @@ class FixedAccounts extends StatelessWidget {
                                               "${fixedAccount.paymentType}",
                                               style: TextStyle(
                                                 color: DefaultColors.grey20,
-                                                fontSize: 11.sp,
+                                                fontSize: 10.sp,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                               textAlign: TextAlign.end,

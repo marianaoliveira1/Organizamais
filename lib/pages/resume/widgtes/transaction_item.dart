@@ -50,7 +50,7 @@ class TransactionItem extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.h,
-              horizontal: 14.w,
+              horizontal: 12.w,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,7 +69,7 @@ class TransactionItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 120.w,
+                          width: 130.w,
                           child: Text(
                             transaction.title,
                             style: TextStyle(
@@ -79,7 +79,7 @@ class TransactionItem extends StatelessWidget {
                               fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
                             ),
-                            maxLines: 3,
+                            maxLines: 2,
                             softWrap: true,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -87,14 +87,14 @@ class TransactionItem extends StatelessWidget {
                         Row(
                           children: [
                             SizedBox(
-                              width: isFuture ? 80.w : 120.w,
+                              width: isFuture ? 100.w : 120.w,
                               child: Text(
                                 category?['name'] ?? 'Categoria não encontrada',
                                 style: TextStyle(
                                   color: isFuture
                                       ? DefaultColors.grey.withOpacity(0.6)
                                       : DefaultColors.grey20,
-                                  fontSize: 11.sp,
+                                  fontSize: 10.sp,
                                 ),
                                 maxLines: 2,
                                 softWrap: true,
@@ -154,7 +154,7 @@ class TransactionItem extends StatelessWidget {
                           color: isFuture
                               ? DefaultColors.grey.withOpacity(0.6)
                               : DefaultColors.grey20,
-                          fontSize: 11.sp,
+                          fontSize: 10.sp,
                         ),
                         textAlign: TextAlign.end,
                         maxLines: 2,

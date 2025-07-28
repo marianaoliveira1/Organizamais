@@ -47,13 +47,17 @@ class DefaultButtonSelectCategory extends StatelessWidget {
             else
               Icon(
                 Iconsax.textalign_justifycenter,
-                color: theme.primaryColor,
+                color: DefaultColors.grey20,
               ),
             SizedBox(width: 10.w),
             Text(
-              selectedCategoryData != null ? selectedCategoryData['name'] : 'Selecione uma categoria',
+              selectedCategoryData != null
+                  ? selectedCategoryData['name']
+                  : 'Selecione uma categoria',
               style: TextStyle(
-                color: selectedCategoryData != null ? theme.primaryColor : DefaultColors.grey20,
+                color: selectedCategoryData != null
+                    ? theme.primaryColor
+                    : DefaultColors.grey20,
                 fontSize: 17.sp,
               ),
             ),

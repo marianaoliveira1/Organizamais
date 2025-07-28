@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
@@ -53,11 +54,11 @@ class MonthlyFinancialChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ChartLegendItem(label: 'Receitas', color: Colors.green),
+                ChartLegendItem(label: 'Receitas', color: DefaultColors.green),
                 SizedBox(
                   width: 20.w,
                 ),
-                ChartLegendItem(label: 'Despesas', color: Colors.red),
+                ChartLegendItem(label: 'Despesas', color: DefaultColors.red),
               ],
             ),
             SizedBox(height: 20.h),
@@ -267,7 +268,7 @@ class MonthlyFinancialChart extends StatelessWidget {
         barRods: [
           BarChartRodData(
             toY: data['receitas']!,
-            color: Colors.green,
+            color: DefaultColors.green,
             width: barWidth,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(barWidth * 0.25),
@@ -276,7 +277,7 @@ class MonthlyFinancialChart extends StatelessWidget {
           ),
           BarChartRodData(
             toY: data['despesas']!,
-            color: Colors.red,
+            color: DefaultColors.red,
             width: barWidth,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(barWidth * 0.25),

@@ -306,8 +306,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                     children: [
                       // Ícone/Cor do tipo de pagamento
                       Container(
-                        width: 20,
-                        height: 20,
+                        width: 22.w,
+                        height: 22.h,
                         decoration: BoxDecoration(
                           color: paymentTypeColor,
                           borderRadius: BorderRadius.circular(12.r),
@@ -333,7 +333,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               child: Text(
                                 paymentType,
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                   color: theme.primaryColor,
                                 ),
@@ -344,7 +344,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             Text(
                               "${percentual.toStringAsFixed(0)}%",
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 10.sp,
                                 color: DefaultColors.grey,
                               ),
                             ),
@@ -359,7 +359,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             child: Text(
                               currencyFormatter.format(valor),
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                                 color: theme.primaryColor,
                               ),
@@ -371,6 +371,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                                 ? Icons.keyboard_arrow_up
                                 : Icons.keyboard_arrow_down,
                             color: DefaultColors.grey,
+                            size: 16.h,
                           ),
                         ],
                       ),

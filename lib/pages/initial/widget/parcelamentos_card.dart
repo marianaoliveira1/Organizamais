@@ -164,7 +164,7 @@ class ParcelamentosCard extends StatelessWidget {
                         'Parcela $parcelaAtual de $totalParcelas',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 10.sp,
+                          fontSize: 9.sp,
                           color: DefaultColors.grey20,
                         ),
                       ),
@@ -173,15 +173,15 @@ class ParcelamentosCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: 115.w,
+                            width: 140.w,
                             child: Text(
                               tituloOriginal,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
+                                fontSize: 12.sp,
                                 color: theme.primaryColor,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -192,7 +192,7 @@ class ParcelamentosCard extends StatelessWidget {
                                   _parseCurrencyValue(parcela.value)),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
+                                fontSize: 12.sp,
                                 color: theme.primaryColor,
                               ),
                               textAlign: TextAlign.end,
@@ -211,7 +211,7 @@ class ParcelamentosCard extends StatelessWidget {
                               ),
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
-                                fontSize: 11.sp,
+                                fontSize: 10.sp,
                                 color: DefaultColors.grey20,
                               ),
                             ),
@@ -223,7 +223,7 @@ class ParcelamentosCard extends StatelessWidget {
                                   parcela.paymentType!,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 11.sp,
+                                    fontSize: 10.sp,
                                     color: DefaultColors.grey20,
                                   ),
                                   textAlign: TextAlign.end,
@@ -254,7 +254,7 @@ class ParcelamentosCard extends StatelessWidget {
               style: TextStyle(
                 color: theme.primaryColor,
                 fontWeight: FontWeight.w500,
-                fontSize: 11.sp,
+                fontSize: 12.sp,
               ),
             ),
           ],
