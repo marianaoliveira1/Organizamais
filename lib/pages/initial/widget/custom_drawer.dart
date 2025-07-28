@@ -63,12 +63,12 @@ class CustomDrawer extends StatelessWidget {
               onTap: () => Get.to(() => const FixedAccountsPage()),
             ),
             _buildDivider(),
-            SettingItem(
-              icon: Iconsax.chart_2,
-              title: 'Metas de Gasto',
-              onTap: () => Get.to(() => SpendingGoalsPage()),
-            ),
-            _buildDivider(),
+            // SettingItem(
+            //   icon: Iconsax.chart_2,
+            //   title: 'Metas de Gasto',
+            //   onTap: () => Get.to(() => SpendingGoalsPage()),
+            // ),
+            // _buildDivider(),
             SettingItem(
               icon: Iconsax.lamp,
               title: 'Dicas',
