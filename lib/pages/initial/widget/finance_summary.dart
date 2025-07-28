@@ -78,7 +78,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                         formatter.format(transactionController.totalReceita -
                             transactionController.totalDespesas),
                         style: TextStyle(
-                          fontSize: 30.sp,
+                          fontSize: 34.sp,
                           fontWeight: FontWeight.bold,
                           color: theme.primaryColor,
                         ),

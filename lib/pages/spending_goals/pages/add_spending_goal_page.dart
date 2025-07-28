@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/spending_goal_controller.dart';
 import '../../../model/spending_goal_model.dart';
 import '../../../model/transaction_model.dart';
@@ -22,7 +23,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
   final SpendingGoalController spendingGoalController = Get.find();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController limitValueController = TextEditingController();
-  
+
   DateTime _selectedDate = DateTime.now();
   int? categoryId;
   bool _isLoading = false;
@@ -32,7 +33,8 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
     super.initState();
     // Define um nome padrão baseado no mês atual
     final monthName = DateFormat.MMMM('pt_BR').format(_selectedDate);
-    nameController.text = 'Meta ${monthName[0].toUpperCase()}${monthName.substring(1)}';
+    nameController.text =
+        'Meta ${monthName[0].toUpperCase()}${monthName.substring(1)}';
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -49,16 +51,17 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
         _selectedDate = picked;
         // Atualiza o nome da meta com o novo mês
         final monthName = DateFormat.MMMM('pt_BR').format(_selectedDate);
-        nameController.text = 'Meta ${monthName[0].toUpperCase()}${monthName.substring(1)}';
+        nameController.text =
+            'Meta ${monthName[0].toUpperCase()}${monthName.substring(1)}';
       });
     }
   }
 
   bool _isFormValid() {
-    return nameController.text.isNotEmpty && 
-           limitValueController.text.isNotEmpty && 
-           categoryId != null &&
-           !_hasExistingGoal();
+    return nameController.text.isNotEmpty &&
+        limitValueController.text.isNotEmpty &&
+        categoryId != null &&
+        !_hasExistingGoal();
   }
 
   bool _hasExistingGoal() {
@@ -72,12 +75,13 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
 
   double _parseLimitValue() {
     return double.tryParse(
-      limitValueController.text
-          .replaceAll('R\$', '')
-          .replaceAll('.', '')
-          .replaceAll(',', '.')
-          .trim(),
-    ) ?? 0.0;
+          limitValueController.text
+              .replaceAll('R\$', '')
+              .replaceAll('.', '')
+              .replaceAll(',', '.')
+              .trim(),
+        ) ??
+        0.0;
   }
 
   Future<void> _saveSpendingGoal() async {
@@ -135,6 +139,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
           spacing: 16.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdsBanner(),
             DefaultTitleTransaction(title: "Nome da Meta"),
             TextField(
               controller: nameController,
@@ -165,7 +170,6 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
               ),
               onChanged: (_) => setState(() {}),
             ),
-
             DefaultTitleTransaction(title: "Limite de Gasto"),
             TextField(
               controller: limitValueController,
@@ -201,7 +205,6 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
               ),
               onChanged: (_) => setState(() {}),
             ),
-
             DefaultTitleTransaction(title: "Mês/Ano"),
             GestureDetector(
               onTap: () => _selectDate(context),
@@ -233,7 +236,6 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
                 ),
               ),
             ),
-
             DefaultTitleTransaction(title: "Categoria"),
             DefaultButtonSelectCategory(
               selectedCategory: categoryId,
@@ -244,7 +246,6 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
               },
               transactionType: TransactionType.despesa,
             ),
-
             if (_hasExistingGoal() && categoryId != null)
               Container(
                 padding: EdgeInsets.all(12.w),
@@ -273,9 +274,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
                   ],
                 ),
               ),
-
             Spacer(),
-            
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -288,7 +287,8 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                 ),
-                onPressed: _isFormValid() && !_isLoading ? _saveSpendingGoal : null,
+                onPressed:
+                    _isFormValid() && !_isLoading ? _saveSpendingGoal : null,
                 child: _isLoading
                     ? SizedBox(
                         height: 20.h,
@@ -320,4 +320,4 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
     limitValueController.dispose();
     super.dispose();
   }
-} 
+}

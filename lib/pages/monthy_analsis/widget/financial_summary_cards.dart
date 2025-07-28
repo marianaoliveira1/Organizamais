@@ -276,7 +276,7 @@ class PortfolioCard extends StatelessWidget {
                 _formatCurrency(
                     saldo), // Removido o .abs() para mostrar valores negativos
                 style: TextStyle(
-                  fontSize: 30.sp,
+                  fontSize: 34.sp,
                   fontWeight: FontWeight.bold,
                   color: saldo < 0
                       ? DefaultColors.red
@@ -352,7 +352,7 @@ class PortfolioCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Média de Receitas',
+                      'Média de Receitas (meses)',
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,

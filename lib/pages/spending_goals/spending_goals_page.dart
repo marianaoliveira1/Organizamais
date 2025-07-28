@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
+import '../../ads_banner/ads_banner.dart';
 import '../../controller/spending_goal_controller.dart';
 import '../../model/spending_goal_model.dart';
 import '../transaction/pages/category_page.dart';
@@ -11,7 +12,8 @@ import 'pages/add_spending_goal_page.dart';
 import 'pages/spending_goal_details_page.dart';
 
 class SpendingGoalsPage extends StatelessWidget {
-  final SpendingGoalController spendingGoalController = Get.put(SpendingGoalController());
+  final SpendingGoalController spendingGoalController =
+      Get.put(SpendingGoalController());
 
   SpendingGoalsPage({super.key});
 
@@ -22,14 +24,21 @@ class SpendingGoalsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 20.w,
-          vertical: 30.h,
+          vertical: 10.h,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -67,8 +76,9 @@ class SpendingGoalsPage extends StatelessWidget {
             SizedBox(height: 20.h),
             Expanded(
               child: Obx(() {
-                final currentGoals = spendingGoalController.getCurrentMonthGoals();
-                
+                final currentGoals =
+                    spendingGoalController.getCurrentMonthGoals();
+
                 if (currentGoals.isEmpty) {
                   return Center(
                     child: Column(
@@ -101,7 +111,7 @@ class SpendingGoalsPage extends StatelessWidget {
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   itemCount: currentGoals.length,
                   itemBuilder: (context, index) {
@@ -120,7 +130,7 @@ class SpendingGoalsPage extends StatelessWidget {
   Widget _buildMonthSelector(ThemeData theme) {
     final now = DateTime.now();
     final monthName = DateFormat.MMMM('pt_BR').format(now);
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
@@ -152,7 +162,8 @@ class SpendingGoalsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalCard(BuildContext context, SpendingGoalModel goal, ThemeData theme) {
+  Widget _buildGoalCard(
+      BuildContext context, SpendingGoalModel goal, ThemeData theme) {
     final category = findCategoryById(goal.categoryId);
     final spentAmount = spendingGoalController.calculateSpentAmount(
       goal.categoryId,
@@ -163,10 +174,10 @@ class SpendingGoalsPage extends StatelessWidget {
     final isExceeded = spendingGoalController.isGoalExceeded(goal);
     final remainingAmount = spendingGoalController.getRemainingAmount(goal);
 
-    Color progressColor = isExceeded 
-        ? Colors.red 
-        : progress > 0.8 
-            ? Colors.orange 
+    Color progressColor = isExceeded
+        ? Colors.red
+        : progress > 0.8
+            ? Colors.orange
             : Colors.green;
 
     return InkWell(
@@ -176,7 +187,7 @@ class SpendingGoalsPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16.r),
-          border: isExceeded 
+          border: isExceeded
               ? Border.all(color: Colors.red.withOpacity(0.3), width: 1.5)
               : null,
         ),
@@ -275,13 +286,14 @@ class SpendingGoalsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isExceeded 
-                        ? 'Limite ultrapassado!' 
+                    isExceeded
+                        ? 'Limite ultrapassado!'
                         : 'Restante: ${spendingGoalController.formatCurrency(remainingAmount)}',
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: isExceeded ? Colors.red : Colors.grey,
-                      fontWeight: isExceeded ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight:
+                          isExceeded ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
                   Text(
@@ -300,4 +312,4 @@ class SpendingGoalsPage extends StatelessWidget {
       ),
     );
   }
-} 
+}
