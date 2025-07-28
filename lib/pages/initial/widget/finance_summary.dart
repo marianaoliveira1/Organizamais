@@ -5,11 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/model/transaction_model.dart';
+import 'package:organizamais/widgetes/percentage_display_widget.dart';
+import 'package:organizamais/widgetes/percentage_explanation_dialog.dart';
 
 import 'package:organizamais/utils/color.dart';
 
 import '../pages/finance_details_page.dart';
-import 'category_value.dart';
+import 'category_value_with_percentage.dart';
 
 class FinanceSummaryWidget extends StatelessWidget {
   const FinanceSummaryWidget({super.key});
@@ -64,30 +67,56 @@ class FinanceSummaryWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    formatter.format(transactionController.totalReceita -
-                        transactionController.totalDespesas),
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        formatter.format(transactionController.totalReceita -
+                            transactionController.totalDespesas),
+                        style: TextStyle(
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.bold,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      PercentageDisplayWidget(
+                        result:
+                            transactionController.monthlyPercentageComparison,
+                        explanationType: PercentageExplanationType.balance,
+                        currentValue: transactionController.totalReceita -
+                            transactionController.totalDespesas,
+                        previousValue:
+                            _getPreviousMonthBalance(transactionController),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 12.h),
                   Row(
                     children: [
-                      CategoryValue(
+                      CategoryValueWithPercentage(
                         title: "Receita",
                         value: formatter
                             .format(transactionController.totalReceita),
                         color: DefaultColors.green,
+                        percentageResult:
+                            transactionController.incomePercentageComparison,
+                        explanationType: PercentageExplanationType.income,
+                        currentValue: transactionController.totalReceita,
+                        previousValue:
+                            _getPreviousMonthIncome(transactionController),
                       ),
                       SizedBox(width: 24.w),
-                      CategoryValue(
+                      CategoryValueWithPercentage(
                         title: "Despesas",
                         value: formatter
                             .format(transactionController.totalDespesas),
                         color: DefaultColors.red,
+                        percentageResult:
+                            transactionController.expensePercentageComparison,
+                        explanationType: PercentageExplanationType.expense,
+                        currentValue: transactionController.totalDespesas,
+                        previousValue:
+                            _getPreviousMonthExpenses(transactionController),
                       ),
                     ],
                   ),
@@ -97,6 +126,71 @@ class FinanceSummaryWidget extends StatelessWidget {
           ),
         ),
       );
+    });
+  }
+
+  double _getPreviousMonthBalance(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller.getBalanceForDateRange(startDate, endDate);
+  }
+
+  double _getPreviousMonthIncome(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.receita)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
+    });
+  }
+
+  double _getPreviousMonthExpenses(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.despesa)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
     });
   }
 
@@ -127,42 +221,76 @@ class FinanceSummaryWidget extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
-          // Shimmer for main balance
-          Shimmer(
-            duration: const Duration(milliseconds: 1400),
-            color: Colors.white.withOpacity(0.6),
-            child: Container(
-              height: 32.h,
-              width: 160.w,
-              decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(8.r),
+          // Shimmer for main balance with percentage indicator
+          Row(
+            children: [
+              Shimmer(
+                duration: const Duration(milliseconds: 1400),
+                color: Colors.white.withValues(alpha: 0.6),
+                child: Container(
+                  height: 32.h,
+                  width: 160.w,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
               ),
-            ),
+              SizedBox(width: 8.w),
+              Shimmer(
+                duration: const Duration(milliseconds: 1400),
+                color: Colors.white.withValues(alpha: 0.6),
+                child: Container(
+                  height: 20.h,
+                  width: 50.w,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 12.h),
-          // Shimmer for income and expenses
+          // Shimmer for income and expenses with percentage indicators
           Row(
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Shimmer(
-                    duration: const Duration(milliseconds: 1400),
-                    color: Colors.white.withOpacity(0.6),
-                    child: Container(
-                      height: 12.h,
-                      width: 50.w,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[400],
-                        borderRadius: BorderRadius.circular(6.r),
+                  Row(
+                    children: [
+                      Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        child: Container(
+                          height: 12.h,
+                          width: 50.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 6.w),
+                      Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        child: Container(
+                          height: 16.h,
+                          width: 35.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 4.h),
                   Shimmer(
                     duration: const Duration(milliseconds: 1400),
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     child: Container(
                       height: 16.h,
                       width: 80.w,
@@ -178,22 +306,39 @@ class FinanceSummaryWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Shimmer(
-                    duration: const Duration(milliseconds: 1400),
-                    color: Colors.white.withOpacity(0.6),
-                    child: Container(
-                      height: 12.h,
-                      width: 60.w,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[400],
-                        borderRadius: BorderRadius.circular(6.r),
+                  Row(
+                    children: [
+                      Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        child: Container(
+                          height: 12.h,
+                          width: 60.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 6.w),
+                      Shimmer(
+                        duration: const Duration(milliseconds: 1400),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        child: Container(
+                          height: 16.h,
+                          width: 35.w,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 4.h),
                   Shimmer(
                     duration: const Duration(milliseconds: 1400),
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     child: Container(
                       height: 16.h,
                       width: 90.w,

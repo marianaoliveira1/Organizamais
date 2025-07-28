@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import '../model/transaction_model.dart';
+import '../model/percentage_result.dart';
+import '../services/percentage_calculation_service.dart';
 
 class TransactionController extends GetxController {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
@@ -321,5 +323,67 @@ class TransactionController extends GetxController {
         .doc(id)
         .delete();
     Get.snackbar('Sucesso', 'Transação removida com sucesso');
+  }
+
+  // Percentage calculation methods
+  PercentageResult get monthlyPercentageComparison {
+    return PercentageCalculationService.calculateMonthlyComparison(
+      transaction,
+      DateTime.now(),
+    );
+  }
+
+  PercentageResult get incomePercentageComparison {
+    return PercentageCalculationService.calculateIncomeComparison(
+      transaction,
+      DateTime.now(),
+    );
+  }
+
+  PercentageResult get expensePercentageComparison {
+    return PercentageCalculationService.calculateExpenseComparison(
+      transaction,
+      DateTime.now(),
+    );
+  }
+
+  double getBalanceForDateRange(DateTime startDate, DateTime endDate) {
+    return transaction.where((t) {
+      if (t.paymentDay == null) return false;
+      
+      try {
+        final paymentDate = DateTime.parse(t.paymentDay!);
+        return paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
+               paymentDate.isBefore(endDate.add(Duration(days: 1)));
+      } catch (e) {
+        return false;
+      }
+    }).fold<double>(0.0, (balance, t) {
+      try {
+        final value = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+        if (t.type == TransactionType.receita) {
+          return balance + value;
+        } else if (t.type == TransactionType.despesa) {
+          return balance - value;
+        }
+        return balance;
+      } catch (e) {
+        return balance;
+      }
+    });
+  }
+
+  List<TransactionModel> getTransactionsForDateRange(DateTime startDate, DateTime endDate) {
+    return transaction.where((t) {
+      if (t.paymentDay == null) return false;
+      
+      try {
+        final paymentDate = DateTime.parse(t.paymentDay!);
+        return paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
+               paymentDate.isBefore(endDate.add(Duration(days: 1)));
+      } catch (e) {
+        return false;
+      }
+    }).toList();
   }
 }

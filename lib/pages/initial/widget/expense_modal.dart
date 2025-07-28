@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 
-class ExpenseModal extends StatelessWidget {
+class ExpenseModal extends StatefulWidget {
+  ExpenseModal({super.key});
+
+  @override
+  State<ExpenseModal> createState() => _ExpenseModalState();
+}
+
+class _ExpenseModalState extends State<ExpenseModal> {
   final FixedAccountsController controller = Get.put(FixedAccountsController());
 
   final TextEditingController nameController = TextEditingController();
@@ -11,7 +18,15 @@ class ExpenseModal extends StatelessWidget {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController paymentMethodController = TextEditingController();
 
-  ExpenseModal({super.key});
+  @override
+  void dispose() {
+    nameController.dispose();
+    dateController.dispose();
+    categoryController.dispose();
+    amountController.dispose();
+    paymentMethodController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

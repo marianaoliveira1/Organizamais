@@ -780,19 +780,19 @@ class FixedAccounts extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (deactivatedAccounts.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(top: 4.h, right: 10.h),
-                    child: Text(
-                      "${deactivatedAccounts.length} conta${deactivatedAccounts.length > 1 ? 's' : ''} desativada${deactivatedAccounts.length > 1 ? 's' : ''}",
-                      style: TextStyle(
-                        color: DefaultColors.grey,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 9.sp,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
+                // if (deactivatedAccounts.isNotEmpty)
+                //   Padding(
+                //     padding: EdgeInsets.only(top: 4.h, right: 10.h),
+                //     child: Text(
+                //       "${deactivatedAccounts.length} conta${deactivatedAccounts.length > 1 ? 's' : ''} desativada${deactivatedAccounts.length > 1 ? 's' : ''}",
+                //       style: TextStyle(
+                //         color: DefaultColors.grey,
+                //         fontWeight: FontWeight.w400,
+                //         fontSize: 9.sp,
+                //         fontStyle: FontStyle.italic,
+                //       ),
+                //     ),
+                //   ),
               ],
             );
           }),

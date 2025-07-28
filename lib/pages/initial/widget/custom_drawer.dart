@@ -8,6 +8,7 @@ import '../../../controller/auth_controller.dart';
 import '../../cards/cards_page.dart';
 import '../../profile/pages/fixed_accounts_page.dart';
 import '../../profile/profile_page.dart';
+import '../../spending_goals/spending_goals_page.dart';
 import 'logout_button.dart';
 import 'logout_confirmation_dialog.dart';
 import 'setting_item.dart';
@@ -60,6 +61,12 @@ class CustomDrawer extends StatelessWidget {
               icon: Iconsax.receipt_1,
               title: 'Minhas Contas Fixas',
               onTap: () => Get.to(() => const FixedAccountsPage()),
+            ),
+            _buildDivider(),
+            SettingItem(
+              icon: Iconsax.chart_2,
+              title: 'Metas de Gasto',
+              onTap: () => Get.to(() => SpendingGoalsPage()),
             ),
             _buildDivider(),
             SettingItem(

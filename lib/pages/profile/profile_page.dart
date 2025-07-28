@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/auth_controller.dart';
+import '../initial/widget/edit_name_dialog.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -43,6 +44,15 @@ class ProfilePage extends StatelessWidget {
       );
     }
 
+    void _showEditNameDialog() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EditNameDialog(authController: authController);
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -61,13 +71,26 @@ class ProfilePage extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
-            Text(
-              "Nome",
-              style: TextStyle(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w500,
-                color: DefaultColors.grey20,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Nome",
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey20,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: _showEditNameDialog,
+                  child: Icon(
+                    Icons.edit,
+                    size: 16.sp,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ],
             ),
             Obx(
               () {

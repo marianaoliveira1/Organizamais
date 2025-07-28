@@ -9,6 +9,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/controller/goal_controller.dart';
+import 'package:organizamais/controller/spending_goal_controller.dart';
 import 'package:organizamais/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
     Get.put(CardController());
     Get.put(TransactionController());
     Get.put(GoalController());
+    Get.put(SpendingGoalController());
 
     return ScreenUtilInit(
       designSize: const Size(360, 690),

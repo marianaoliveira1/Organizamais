@@ -4,13 +4,31 @@ import 'package:get/get.dart';
 
 import 'package:organizamais/controller/auth_controller.dart';
 
-class EditNameDialog extends StatelessWidget {
+class EditNameDialog extends StatefulWidget {
   final AuthController authController;
   const EditNameDialog({super.key, required this.authController});
 
   @override
+  State<EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<EditNameDialog> {
+  late TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController(text: widget.authController.firebaseUser.value?.displayName);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController(text: authController.firebaseUser.value?.displayName);
     return AlertDialog(
       title: const Text('Editar Nome'),
       content: TextField(controller: controller, decoration: const InputDecoration(hintText: 'Novo nome')),
@@ -18,7 +36,7 @@ class EditNameDialog extends StatelessWidget {
         TextButton(onPressed: () => Get.back(), child: const Text('Cancelar')),
         TextButton(
           onPressed: () {
-            authController.updateDisplayName(controller.text);
+            widget.authController.updateDisplayName(controller.text);
             Get.back();
           },
           child: const Text(
