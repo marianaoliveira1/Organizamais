@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import '../ads_banner/ads_banner.dart';
 import '../model/percentage_result.dart';
 import '../utils/color.dart';
 
@@ -58,6 +59,10 @@ class PercentageExplanationDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AdsBanner(),
+          SizedBox(
+            height: 20.h,
+          ),
           // Indicador visual
           Container(
             padding: EdgeInsets.all(12.h),
@@ -90,7 +95,7 @@ class PercentageExplanationDialog extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.h),
-          
+
           // Explicação
           Text(
             _getExplanation(),
@@ -101,7 +106,7 @@ class PercentageExplanationDialog extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.h),
-          
+
           // Comparação de valores
           Container(
             padding: EdgeInsets.all(12.h),
@@ -186,7 +191,7 @@ class PercentageExplanationDialog extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12.h),
-          
+
           // Nota explicativa
           Container(
             padding: EdgeInsets.all(8.h),
@@ -221,7 +226,7 @@ class PercentageExplanationDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            'Entendi',
+            'Ok',
             style: TextStyle(
               color: theme.primaryColor,
               fontSize: 14.sp,
@@ -264,14 +269,14 @@ class PercentageExplanationDialog extends StatelessWidget {
         } else {
           return 'Seu saldo está ${result.percentage.toStringAsFixed(1)}% pior comparado ao mesmo período do mês anterior. Isso pode indicar mais gastos ou menos receitas.';
         }
-      
+
       case PercentageExplanationType.income:
         if (isPositive) {
           return 'Suas receitas aumentaram ${result.percentage.toStringAsFixed(1)}% comparado ao mesmo período do mês anterior. Parabéns! Você está ganhando mais dinheiro.';
         } else {
           return 'Suas receitas diminuíram ${result.percentage.toStringAsFixed(1)}% comparado ao mesmo período do mês anterior. Pode ser útil revisar suas fontes de renda.';
         }
-      
+
       case PercentageExplanationType.expense:
         if (isPositive) {
           return 'Suas despesas diminuíram ${result.percentage.toStringAsFixed(1)}% comparado ao mesmo período do mês anterior. Excelente! Você está gastando menos.';

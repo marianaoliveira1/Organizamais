@@ -7,6 +7,7 @@ import 'package:organizamais/model/transaction_model.dart';
 
 import '../../../ads_banner/ads_banner.dart';
 import '../../transaction/transaction_page.dart';
+import '../widget/porcentage_explanation_widget.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({
@@ -180,11 +181,13 @@ class TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     final paymentDate = DateTime.parse(transaction.paymentDay!);
     final formattedDate = DateFormat('dd/MM/yyyy').format(paymentDate);
-    final double value = double.parse(transaction.value.replaceAll('.', '').replaceAll(',', '.'));
-    final NumberFormat formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final double value = double.parse(
+        transaction.value.replaceAll('.', '').replaceAll(',', '.'));
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
     return InkWell(
       onTap: () => Get.to(
