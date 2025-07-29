@@ -8,6 +8,8 @@ import 'package:organizamais/model/transaction_model.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../transaction/transaction_page.dart';
 import '../widget/porcentage_explanation_widget.dart';
+import '../../../widgetes/percentage_explanation_dialog.dart';
+import '../../../utils/color.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({
@@ -74,6 +76,14 @@ class FinanceDetailsPage extends StatelessWidget {
               dateA); // Ordenação decrescente (mais recente primeiro)
         });
 
+        // Calcula valores para comparação
+        final currentBalance = transactionController.totalReceita -
+            transactionController.totalDespesas;
+        final previousBalance = _getPreviousMonthBalance(transactionController);
+        final previousIncome = _getPreviousMonthIncome(transactionController);
+        final previousExpenses =
+            _getPreviousMonthExpenses(transactionController);
+
         return Column(
           children: [
             AdsBanner(),
@@ -86,6 +96,16 @@ class FinanceDetailsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Saldo total
+                    _buildTotalBalanceSection(
+                      theme,
+                      formatter,
+                      transactionController,
+                      currentBalance,
+                      previousBalance,
+                    ),
+                    SizedBox(height: 24.h),
+
                     Text(
                       "Receitas",
                       style: TextStyle(
@@ -95,6 +115,19 @@ class FinanceDetailsPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.h),
+
+                    // Comparação de receitas
+                    _buildComparisonItem(
+                      theme,
+                      formatter,
+                      "Receitas",
+                      transactionController.totalReceita,
+                      previousIncome,
+                      transactionController.incomePercentageComparison,
+                      PercentageExplanationType.income,
+                    ),
+                    SizedBox(height: 12.h),
+
                     receivedTransactions.isEmpty
                         ? _buildEmptyState(
                             "Nenhuma receita registrada neste mês")
@@ -110,6 +143,8 @@ class FinanceDetailsPage extends StatelessWidget {
                             },
                           ),
 
+                    SizedBox(height: 24.h),
+
                     // Seção de despesas
                     Text(
                       "Despesas",
@@ -120,6 +155,19 @@ class FinanceDetailsPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.h),
+
+                    // Comparação de despesas
+                    _buildComparisonItem(
+                      theme,
+                      formatter,
+                      "Despesas",
+                      transactionController.totalDespesas,
+                      previousExpenses,
+                      transactionController.expensePercentageComparison,
+                      PercentageExplanationType.expense,
+                    ),
+                    SizedBox(height: 12.h),
+
                     expenseTransactions.isEmpty
                         ? _buildEmptyState(
                             "Nenhuma despesa registrada neste mês")
@@ -134,6 +182,37 @@ class FinanceDetailsPage extends StatelessWidget {
                               );
                             },
                           ),
+
+                    SizedBox(height: 24.h),
+
+                    // Nota explicativa
+                    Container(
+                      padding: EdgeInsets.all(12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.blue,
+                            size: 16.sp,
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              'A comparação é feita entre o período de 1º até o dia ${DateTime.now().day} do mês atual versus o mesmo período do mês anterior. Isso garante uma comparação justa entre períodos equivalentes.',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -142,6 +221,254 @@ class FinanceDetailsPage extends StatelessWidget {
         );
       }),
     );
+  }
+
+  Widget _buildTotalBalanceSection(
+    ThemeData theme,
+    NumberFormat formatter,
+    TransactionController controller,
+    double currentBalance,
+    double previousBalance,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(16.h),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: theme.dividerColor.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Saldo Total",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          _buildComparisonItem(
+            theme,
+            formatter,
+            "Saldo",
+            currentBalance,
+            previousBalance,
+            controller.monthlyPercentageComparison,
+            PercentageExplanationType.balance,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComparisonItem(
+    ThemeData theme,
+    NumberFormat formatter,
+    String title,
+    double currentValue,
+    double previousValue,
+    dynamic percentageResult,
+    PercentageExplanationType type,
+  ) {
+    final difference = currentValue - previousValue;
+    final isPositive = difference >= 0;
+
+    return Container(
+      padding: EdgeInsets.all(12.h),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+              if (percentageResult.hasData)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: percentageResult.color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: percentageResult.color.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        percentageResult.icon,
+                        size: 12.sp,
+                        color: percentageResult.color,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        percentageResult.formattedPercentage,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color: percentageResult.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mês anterior:',
+                    style: TextStyle(
+                      color: DefaultColors.grey,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                  Text(
+                    formatter.format(previousValue),
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Mês atual:',
+                    style: TextStyle(
+                      color: DefaultColors.grey,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                  Text(
+                    formatter.format(currentValue),
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Divider(color: DefaultColors.grey.withValues(alpha: 0.3)),
+          SizedBox(height: 8.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Diferença:',
+                style: TextStyle(
+                  color: DefaultColors.grey,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${isPositive ? '+' : ''}${formatter.format(difference)}',
+                style: TextStyle(
+                  color: isPositive ? DefaultColors.green : DefaultColors.red,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  double _getPreviousMonthBalance(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller.getBalanceForDateRange(startDate, endDate);
+  }
+
+  double _getPreviousMonthIncome(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.receita)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
+    });
+  }
+
+  double _getPreviousMonthExpenses(TransactionController controller) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final startDate = DateTime(previousYear, previousMonth, 1);
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final endDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.despesa)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
+    });
   }
 
   Widget _buildEmptyState(String message) {
