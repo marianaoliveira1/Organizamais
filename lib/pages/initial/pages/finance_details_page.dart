@@ -84,6 +84,8 @@ class FinanceDetailsPage extends StatelessWidget {
         final previousExpenses =
             _getPreviousMonthExpenses(transactionController);
 
+        final today = DateTime.now();
+
         return Column(
           children: [
             AdsBanner(),
@@ -106,6 +108,7 @@ class FinanceDetailsPage extends StatelessWidget {
                       previousIncome,
                       previousExpenses,
                     ),
+
                     SizedBox(height: 24.h),
 
                     Text(
@@ -366,6 +369,7 @@ class FinanceDetailsPage extends StatelessWidget {
     double previousIncome,
     double previousExpenses,
   ) {
+    final today = DateTime.now();
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 12.h,
@@ -387,6 +391,15 @@ class FinanceDetailsPage extends StatelessWidget {
           //   ),
           // ),
           // SizedBox(height: 6.h),
+
+          Text(
+            'A comparação é feita entre o período de 1º até o dia ${today.day} do mês atual versus o mesmo período do mês anterior. Isso garante uma comparação justa entre períodos equivalentes.',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           _buildComparisonItem(
             theme,
             formatter,
