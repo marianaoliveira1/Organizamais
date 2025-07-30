@@ -392,14 +392,6 @@ class FinanceDetailsPage extends StatelessWidget {
           // ),
           // SizedBox(height: 6.h),
 
-          Text(
-            'A comparação é feita entre o período de 1º até o dia ${today.day} do mês atual versus o mesmo período do mês anterior. Isso garante uma comparação justa entre períodos equivalentes.',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: DefaultColors.grey20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
           _buildComparisonItem(
             theme,
             formatter,
@@ -428,6 +420,34 @@ class FinanceDetailsPage extends StatelessWidget {
             previousExpenses,
             controller.expensePercentageComparison,
             PercentageExplanationType.expense,
+          ),
+          SizedBox(height: 12.h),
+          Container(
+            padding: EdgeInsets.all(8.h),
+            decoration: BoxDecoration(
+              color: DefaultColors.grey20.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6.r),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: DefaultColors.grey20,
+                  size: 16.sp,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'A comparação é feita entre o período de 1º até o dia ${today.day} do mês atual versus o mesmo período do mês anterior. Isso garante uma comparação justa entre períodos equivalentes.',
+                    style: TextStyle(
+                      color: DefaultColors.grey20,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
