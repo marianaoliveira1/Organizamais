@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class PaymentOption extends StatelessWidget {
   final String title;
@@ -22,30 +23,30 @@ class PaymentOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           16.r,
         ),
-        color: theme.scaffoldBackgroundColor,
+        color: theme.cardColor,
       ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 4,
-        horizontal: 10,
+      padding: EdgeInsets.symmetric(
+        vertical: 2.h,
+        horizontal: 6.w,
       ),
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: 14.h),
       child: ListTile(
         leading: Image.asset(
           assetPath,
-          width: 22,
-          height: 22,
+          width: 22.w,
+          height: 22.h,
         ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 14.sp,
             color: theme.primaryColor,
             fontWeight: FontWeight.w500,
           ),
         ),
         onTap: () {
           controller.text = title;
-          Navigator.pop(context);
+          Get.back();
         },
       ),
     );
