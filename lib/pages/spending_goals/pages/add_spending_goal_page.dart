@@ -11,6 +11,7 @@ import '../../../utils/color.dart';
 import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/title_transaction.dart';
+import '../spending_goals_page.dart';
 
 class AddSpendingGoalPage extends StatefulWidget {
   const AddSpendingGoalPage({super.key});
@@ -60,8 +61,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
   bool _isFormValid() {
     return nameController.text.isNotEmpty &&
         limitValueController.text.isNotEmpty &&
-        categoryId != null &&
-        !_hasExistingGoal();
+        categoryId != null;
   }
 
   bool _hasExistingGoal() {
@@ -101,7 +101,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
       );
 
       await spendingGoalController.addSpendingGoal(spendingGoal);
-      Get.back();
+      Get.offAll(() => SpendingGoalsPage());
     } catch (e) {
       Get.snackbar(
         'Erro',
@@ -246,34 +246,91 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
               },
               transactionType: TransactionType.despesa,
             ),
-            if (_hasExistingGoal() && categoryId != null)
+            if (_hasExistingGoal() && categoryId != null) ...[
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.blue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.warning,
-                      color: Colors.orange,
+                      Icons.info_outline,
+                      color: Colors.blue,
                       size: 20.sp,
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
-                        'Já existe uma meta para esta categoria neste mês',
+                        'Já existe uma meta para esta categoria neste mês. Você pode adicionar múltiplas metas para melhor controle.',
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Colors.orange.shade700,
+                          color: Colors.blue.shade700,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+              SizedBox(height: 12.h),
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border:
+                      Border.all(color: theme.dividerColor.withOpacity(0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Metas existentes para esta categoria:',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    ...spendingGoalController
+                        .getGoalsForMonth(
+                            _selectedDate.month, _selectedDate.year)
+                        .where((goal) => goal.categoryId == categoryId)
+                        .map((goal) => Padding(
+                              padding: EdgeInsets.only(bottom: 4.h),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      goal.name,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    spendingGoalController
+                                        .formatCurrency(goal.limitValue),
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: theme.primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ],
+                ),
+              ),
+            ],
             Spacer(),
             SizedBox(
               width: double.infinity,
@@ -299,7 +356,9 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
                         ),
                       )
                     : Text(
-                        'Criar Meta',
+                        _hasExistingGoal() && categoryId != null
+                            ? 'Adicionar Nova Meta'
+                            : 'Criar Meta',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16.sp,

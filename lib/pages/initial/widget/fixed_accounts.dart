@@ -583,10 +583,10 @@ class FixedAccounts extends StatelessWidget {
                                               padding: EdgeInsets.all(10.h),
                                               decoration: BoxDecoration(
                                                 color: isDeactivated
-                                                    ? theme
-                                                        .scaffoldBackgroundColor
-                                                    : theme
-                                                        .scaffoldBackgroundColor,
+                                                    ? DefaultColors.grey
+                                                        .withOpacity(0.3)
+                                                    : DefaultColors.grey
+                                                        .withOpacity(0.1),
                                                 borderRadius:
                                                     BorderRadius.circular(50.r),
                                               ),

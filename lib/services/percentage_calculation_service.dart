@@ -8,24 +8,34 @@ class PercentageCalculationService {
   ) {
     try {
       // Calculate current month balance up to current day
-      final currentMonthStart = DateTime(currentDate.year, currentDate.month, 1);
-      final currentMonthEnd = DateTime(currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
-      
+      final currentMonthStart =
+          DateTime(currentDate.year, currentDate.month, 1);
+      final currentMonthEnd = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
+
       // Calculate previous month balance up to same day
       final previousMonth = currentDate.month == 1 ? 12 : currentDate.month - 1;
-      final previousYear = currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
+      final previousYear =
+          currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
       final previousMonthStart = DateTime(previousYear, previousMonth, 1);
-      
-      // Use the same day or last day of previous month if current day doesn't exist
-      final daysInPreviousMonth = DateTime(previousYear, previousMonth + 1, 0).day;
-      final previousMonthDay = currentDate.day > daysInPreviousMonth ? daysInPreviousMonth : currentDate.day;
-      final previousMonthEnd = DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final currentBalance = _getBalanceForPeriod(transactions, currentMonthStart, currentMonthEnd);
-      final previousBalance = _getBalanceForPeriod(transactions, previousMonthStart, previousMonthEnd);
+      // Use the same day or last day of previous month if current day doesn't exist
+      final daysInPreviousMonth =
+          DateTime(previousYear, previousMonth + 1, 0).day;
+      final previousMonthDay = currentDate.day > daysInPreviousMonth
+          ? daysInPreviousMonth
+          : currentDate.day;
+      final previousMonthEnd =
+          DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
+
+      final currentBalance = _getBalanceForPeriod(
+          transactions, currentMonthStart, currentMonthEnd);
+      final previousBalance = _getBalanceForPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
 
       // Check if we have data for previous month
-      final hasPreviousData = _hasTransactionsInPeriod(transactions, previousMonthStart, previousMonthEnd);
+      final hasPreviousData = _hasTransactionsInPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
       if (!hasPreviousData) {
         return PercentageResult.noData();
       }
@@ -57,7 +67,8 @@ class PercentageCalculationService {
       }
 
       // Calculate percentage change
-      final percentageChange = ((currentBalance - previousBalance) / previousBalance.abs()) * 100;
+      final percentageChange =
+          ((currentBalance - previousBalance) / previousBalance.abs()) * 100;
 
       // Determine type
       PercentageType type;
@@ -93,12 +104,20 @@ class PercentageCalculationService {
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
-          
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           final value = _parseValue(transaction.value);
-          
+
           if (transaction.type == TransactionType.receita) {
             balance += value;
           } else if (transaction.type == TransactionType.despesa) {
@@ -124,9 +143,18 @@ class PercentageCalculationService {
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           return true;
         }
       } catch (e) {
@@ -143,7 +171,7 @@ class PercentageCalculationService {
           .replaceAll('.', '')
           .replaceAll(',', '.')
           .trim();
-      
+
       return double.parse(cleanValue);
     } catch (e) {
       print('Error parsing value: $value - $e');
@@ -156,21 +184,31 @@ class PercentageCalculationService {
     DateTime currentDate,
   ) {
     try {
-      final currentMonthStart = DateTime(currentDate.year, currentDate.month, 1);
-      final currentMonthEnd = DateTime(currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
-      
+      final currentMonthStart =
+          DateTime(currentDate.year, currentDate.month, 1);
+      final currentMonthEnd = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
+
       final previousMonth = currentDate.month == 1 ? 12 : currentDate.month - 1;
-      final previousYear = currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
+      final previousYear =
+          currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
       final previousMonthStart = DateTime(previousYear, previousMonth, 1);
-      
-      final daysInPreviousMonth = DateTime(previousYear, previousMonth + 1, 0).day;
-      final previousMonthDay = currentDate.day > daysInPreviousMonth ? daysInPreviousMonth : currentDate.day;
-      final previousMonthEnd = DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final currentIncome = _getIncomeForPeriod(transactions, currentMonthStart, currentMonthEnd);
-      final previousIncome = _getIncomeForPeriod(transactions, previousMonthStart, previousMonthEnd);
+      final daysInPreviousMonth =
+          DateTime(previousYear, previousMonth + 1, 0).day;
+      final previousMonthDay = currentDate.day > daysInPreviousMonth
+          ? daysInPreviousMonth
+          : currentDate.day;
+      final previousMonthEnd =
+          DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final hasPreviousData = _hasIncomeInPeriod(transactions, previousMonthStart, previousMonthEnd);
+      final currentIncome =
+          _getIncomeForPeriod(transactions, currentMonthStart, currentMonthEnd);
+      final previousIncome = _getIncomeForPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
+
+      final hasPreviousData = _hasIncomeInPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
       if (!hasPreviousData) {
         return PercentageResult.noData();
       }
@@ -184,7 +222,8 @@ class PercentageCalculationService {
         );
       }
 
-      final percentageChange = ((currentIncome - previousIncome) / previousIncome) * 100;
+      final percentageChange =
+          ((currentIncome - previousIncome) / previousIncome) * 100;
 
       PercentageType type;
       if (percentageChange > 0) {
@@ -212,21 +251,31 @@ class PercentageCalculationService {
     DateTime currentDate,
   ) {
     try {
-      final currentMonthStart = DateTime(currentDate.year, currentDate.month, 1);
-      final currentMonthEnd = DateTime(currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
-      
+      final currentMonthStart =
+          DateTime(currentDate.year, currentDate.month, 1);
+      final currentMonthEnd = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
+
       final previousMonth = currentDate.month == 1 ? 12 : currentDate.month - 1;
-      final previousYear = currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
+      final previousYear =
+          currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
       final previousMonthStart = DateTime(previousYear, previousMonth, 1);
-      
-      final daysInPreviousMonth = DateTime(previousYear, previousMonth + 1, 0).day;
-      final previousMonthDay = currentDate.day > daysInPreviousMonth ? daysInPreviousMonth : currentDate.day;
-      final previousMonthEnd = DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final currentExpenses = _getExpensesForPeriod(transactions, currentMonthStart, currentMonthEnd);
-      final previousExpenses = _getExpensesForPeriod(transactions, previousMonthStart, previousMonthEnd);
+      final daysInPreviousMonth =
+          DateTime(previousYear, previousMonth + 1, 0).day;
+      final previousMonthDay = currentDate.day > daysInPreviousMonth
+          ? daysInPreviousMonth
+          : currentDate.day;
+      final previousMonthEnd =
+          DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final hasPreviousData = _hasExpensesInPeriod(transactions, previousMonthStart, previousMonthEnd);
+      final currentExpenses = _getExpensesForPeriod(
+          transactions, currentMonthStart, currentMonthEnd);
+      final previousExpenses = _getExpensesForPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
+
+      final hasPreviousData = _hasExpensesInPeriod(
+          transactions, previousMonthStart, previousMonthEnd);
       if (!hasPreviousData) {
         return PercentageResult.noData();
       }
@@ -240,22 +289,21 @@ class PercentageCalculationService {
         );
       }
 
-      final percentageChange = ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+      final percentageChange =
+          ((currentExpenses - previousExpenses) / previousExpenses) * 100;
 
-      // For expenses, logic is inverted: less expenses = positive (good)
+      // Para despesas: diminuição = positivo (bom), aumento = negativo (ruim)
       PercentageType type;
-      if (percentageChange > 0) {
-        type = PercentageType.negative; // More expenses = bad
-      } else if (percentageChange < 0) {
-        type = PercentageType.positive; // Less expenses = good
+      if (percentageChange < 0) {
+        // Despesas diminuíram = bom
+        type = PercentageType.positive;
+      } else if (percentageChange > 0) {
+        // Despesas aumentaram = ruim
+        type = PercentageType.negative;
       } else {
         type = PercentageType.neutral;
       }
 
-      // For expenses, we want to show the actual percentage change but with inverted colors
-      // If expenses decreased (percentageChange < 0), show negative percentage in green (good)
-      // If expenses increased (percentageChange > 0), show positive percentage in red (bad)
-      
       return PercentageResult(
         percentage: percentageChange.abs(),
         hasData: true,
@@ -276,13 +324,23 @@ class PercentageCalculationService {
     double income = 0.0;
 
     for (final transaction in transactions) {
-      if (transaction.paymentDay == null || transaction.type != TransactionType.receita) continue;
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.receita) continue;
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           income += _parseValue(transaction.value);
         }
       } catch (e) {
@@ -301,13 +359,23 @@ class PercentageCalculationService {
     double expenses = 0.0;
 
     for (final transaction in transactions) {
-      if (transaction.paymentDay == null || transaction.type != TransactionType.despesa) continue;
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa) continue;
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           expenses += _parseValue(transaction.value);
         }
       } catch (e) {
@@ -324,13 +392,23 @@ class PercentageCalculationService {
     DateTime endDate,
   ) {
     for (final transaction in transactions) {
-      if (transaction.paymentDay == null || transaction.type != TransactionType.receita) continue;
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.receita) continue;
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           return true;
         }
       } catch (e) {
@@ -346,13 +424,23 @@ class PercentageCalculationService {
     DateTime endDate,
   ) {
     for (final transaction in transactions) {
-      if (transaction.paymentDay == null || transaction.type != TransactionType.despesa) continue;
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa) continue;
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        
-        if (paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-            paymentDate.isBefore(endDate.add(Duration(days: 1)))) {
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
           return true;
         }
       } catch (e) {

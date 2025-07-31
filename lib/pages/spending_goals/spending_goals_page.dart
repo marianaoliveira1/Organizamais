@@ -26,6 +26,14 @@ class SpendingGoalsPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        title: Text(
+          'Metas de Gasto',
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -36,14 +44,12 @@ class SpendingGoalsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AdsBanner(),
-            SizedBox(
-              height: 20.h,
-            ),
+            SizedBox(height: 20.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Metas de Gasto',
+                  'Suas Metas',
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
@@ -54,11 +60,15 @@ class SpendingGoalsPage extends StatelessWidget {
                   onTap: () => Get.to(() => AddSpendingGoalPage()),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: theme.cardColor,
+                      color: theme.primaryColor,
                       borderRadius: BorderRadius.circular(60.r),
                     ),
-                    padding: EdgeInsets.all(6.h),
-                    child: Icon(Iconsax.add, size: 16.sp),
+                    padding: EdgeInsets.all(8.h),
+                    child: Icon(
+                      Iconsax.add,
+                      size: 18.sp,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -190,6 +200,13 @@ class SpendingGoalsPage extends StatelessWidget {
           border: isExceeded
               ? Border.all(color: Colors.red.withOpacity(0.3), width: 1.5)
               : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Padding(
           padding: EdgeInsets.all(16.w),
@@ -198,23 +215,30 @@ class SpendingGoalsPage extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  // Ícone da categoria
                   if (category != null)
-                    Image.asset(
-                      category['icon'],
-                      height: 32.h,
-                      width: 32.w,
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Image.asset(
+                        category['icon'],
+                        height: 24.h,
+                        width: 24.w,
+                      ),
                     )
                   else
                     Container(
-                      width: 32.w,
-                      height: 32.h,
+                      padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
-                        shape: BoxShape.circle,
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Icon(
                         Icons.category,
-                        color: Colors.white,
+                        color: Colors.grey.shade600,
                         size: 20.sp,
                       ),
                     ),
@@ -241,47 +265,91 @@ class SpendingGoalsPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (isExceeded)
-                    Icon(
-                      Iconsax.warning_2,
-                      color: Colors.red,
-                      size: 20.sp,
+                  // Data da meta
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
+                    child: Text(
+                      DateFormat('MMM/yy', 'pt_BR')
+                          .format(DateTime(goal.year, goal.month)),
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 16.h),
+
+              // Valores
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    spendingGoalController.formatCurrency(spentAmount),
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: isExceeded ? Colors.red : theme.primaryColor,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Gasto',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        spendingGoalController.formatCurrency(spentAmount),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isExceeded ? Colors.red : theme.primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    spendingGoalController.formatCurrency(goal.limitValue),
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Limite',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        spendingGoalController.formatCurrency(goal.limitValue),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              SizedBox(height: 8.h),
+
+              SizedBox(height: 12.h),
+
+              // Barra de progresso
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
                 child: LinearProgressIndicator(
                   value: progress > 1.0 ? 1.0 : progress,
                   backgroundColor: Colors.grey.shade300,
                   valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                  minHeight: 6.h,
+                  minHeight: 8.h,
                 ),
               ),
+
               SizedBox(height: 8.h),
+
+              // Status e porcentagem
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

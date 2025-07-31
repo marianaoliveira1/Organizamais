@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:organizamais/utils/color.dart';
 
-class DefaultTextField extends StatelessWidget {
+class DefaultTextField extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
   final Widget prefixIcon;
@@ -15,18 +15,45 @@ class DefaultTextField extends StatelessWidget {
   });
 
   @override
+  State<DefaultTextField> createState() => _DefaultTextFieldState();
+}
+
+class _DefaultTextFieldState extends State<DefaultTextField> {
+  bool _obscureText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Se for senha, começa obscurecido
+    _obscureText = widget.hintText.toLowerCase().contains('senha');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      obscureText: hintText == "Senha" ? true : false,
+      controller: widget.controller,
+      obscureText: _obscureText,
       style: TextStyle(
         fontSize: 13.sp,
         fontWeight: FontWeight.w500,
         color: DefaultColors.black,
       ),
       decoration: InputDecoration(
-        prefixIcon: prefixIcon,
-        hintText: hintText,
+        prefixIcon: widget.prefixIcon,
+        suffixIcon: widget.hintText.toLowerCase().contains('senha')
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility : Icons.visibility_off,
+                  color: DefaultColors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
+        hintText: widget.hintText,
         hintStyle: TextStyle(
           fontSize: 13.sp,
           fontWeight: FontWeight.w500,

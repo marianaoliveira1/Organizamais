@@ -77,10 +77,11 @@ class FinanceDetailsPage extends StatelessWidget {
         });
 
         // Calcula valores para comparação
-        final currentBalance = transactionController.totalReceita -
-            transactionController.totalDespesas;
+        final currentBalance = _getCurrentMonthBalance(transactionController);
         final previousBalance = _getPreviousMonthBalance(transactionController);
+        final currentIncome = _getCurrentMonthIncome(transactionController);
         final previousIncome = _getPreviousMonthIncome(transactionController);
+        final currentExpenses = _getCurrentMonthExpenses(transactionController);
         final previousExpenses =
             _getPreviousMonthExpenses(transactionController);
 
@@ -105,7 +106,9 @@ class FinanceDetailsPage extends StatelessWidget {
                       transactionController,
                       currentBalance,
                       previousBalance,
+                      currentIncome,
                       previousIncome,
+                      currentExpenses,
                       previousExpenses,
                     ),
 
@@ -295,6 +298,30 @@ class FinanceDetailsPage extends StatelessWidget {
     );
   }
 
+  double _getCurrentMonthBalance(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return _getBalanceForPeriod(controller.transaction, startDate, endDate);
+  }
+
+  double _getCurrentMonthIncome(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return _getIncomeForPeriod(controller.transaction, startDate, endDate);
+  }
+
+  double _getCurrentMonthExpenses(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return _getExpensesForPeriod(controller.transaction, startDate, endDate);
+  }
+
   double _getPreviousMonthBalance(TransactionController controller) {
     final now = DateTime.now();
     final previousMonth = now.month == 1 ? 12 : now.month - 1;
@@ -303,11 +330,12 @@ class FinanceDetailsPage extends StatelessWidget {
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
-    final endDay =
+    final previousMonthDay =
         now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
-    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+    final endDate =
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-    return controller.getBalanceForDateRange(startDate, endDate);
+    return _getBalanceForPeriod(controller.transaction, startDate, endDate);
   }
 
   double _getPreviousMonthIncome(TransactionController controller) {
@@ -318,46 +346,155 @@ class FinanceDetailsPage extends StatelessWidget {
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
-    final endDay =
+    final previousMonthDay =
         now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
-    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+    final endDate =
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-    return controller
-        .getTransactionsForDateRange(startDate, endDate)
-        .where((t) => t.type == TransactionType.receita)
-        .fold<double>(0.0, (sum, t) {
-      try {
-        return sum +
-            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-      } catch (e) {
-        return sum;
-      }
-    });
+    return _getIncomeForPeriod(controller.transaction, startDate, endDate);
   }
 
   double _getPreviousMonthExpenses(TransactionController controller) {
     final now = DateTime.now();
+    // Corrigindo a lógica: se estamos em julho (mês 7), queremos junho (mês 6)
     final previousMonth = now.month == 1 ? 12 : now.month - 1;
     final previousYear = now.month == 1 ? now.year - 1 : now.year;
 
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
-    final endDay =
+    final previousMonthDay =
         now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
-    final endDate = DateTime(previousYear, previousMonth, endDay, 23, 59, 59);
+    final endDate =
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-    return controller
-        .getTransactionsForDateRange(startDate, endDate)
-        .where((t) => t.type == TransactionType.despesa)
-        .fold<double>(0.0, (sum, t) {
+    return _getExpensesForPeriod(controller.transaction, startDate, endDate);
+  }
+
+  // Métodos auxiliares que usam exatamente a mesma lógica do PercentageCalculationService
+  double _getBalanceForPeriod(
+    List<TransactionModel> transactions,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    double balance = 0.0;
+
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null) continue;
+
       try {
-        return sum +
-            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          final value = _parseValue(transaction.value);
+
+          if (transaction.type == TransactionType.receita) {
+            balance += value;
+          } else if (transaction.type == TransactionType.despesa) {
+            balance -= value;
+          }
+        }
       } catch (e) {
-        return sum;
+        continue;
       }
-    });
+    }
+
+    return balance;
+  }
+
+  double _getIncomeForPeriod(
+    List<TransactionModel> transactions,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    double income = 0.0;
+
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.receita) continue;
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          income += _parseValue(transaction.value);
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return income;
+  }
+
+  double _getExpensesForPeriod(
+    List<TransactionModel> transactions,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    double expenses = 0.0;
+
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa) continue;
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          final value = _parseValue(transaction.value);
+          expenses += value;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return expenses;
+  }
+
+  double _parseValue(String value) {
+    try {
+      String cleanValue = value
+          .replaceAll('R\$', '')
+          .replaceAll('.', '')
+          .replaceAll(',', '.')
+          .trim();
+
+      return double.parse(cleanValue);
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   Widget _buildComparisonSection(
@@ -366,7 +503,9 @@ class FinanceDetailsPage extends StatelessWidget {
     TransactionController controller,
     double currentBalance,
     double previousBalance,
+    double currentIncome,
     double previousIncome,
+    double currentExpenses,
     double previousExpenses,
   ) {
     final today = DateTime.now();
@@ -406,7 +545,7 @@ class FinanceDetailsPage extends StatelessWidget {
             theme,
             formatter,
             "Receitas",
-            controller.totalReceita,
+            currentIncome,
             previousIncome,
             controller.incomePercentageComparison,
             PercentageExplanationType.income,
@@ -416,7 +555,7 @@ class FinanceDetailsPage extends StatelessWidget {
             theme,
             formatter,
             "Despesas",
-            controller.totalDespesas,
+            currentExpenses,
             previousExpenses,
             controller.expensePercentageComparison,
             PercentageExplanationType.expense,

@@ -11,10 +11,10 @@ class TransactionController extends GetxController {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
   final _transaction = <TransactionModel>[].obs;
   final _isLoading = true.obs;
-  
+
   FixedAccountsController get fixedAccountsController =>
       Get.find<FixedAccountsController>();
-  
+
   bool get isLoading => _isLoading.value;
 
   List<TransactionModel> get transaction {
@@ -350,17 +350,28 @@ class TransactionController extends GetxController {
   double getBalanceForDateRange(DateTime startDate, DateTime endDate) {
     return transaction.where((t) {
       if (t.paymentDay == null) return false;
-      
+
       try {
         final paymentDate = DateTime.parse(t.paymentDay!);
-        return paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-               paymentDate.isBefore(endDate.add(Duration(days: 1)));
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        return paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly));
       } catch (e) {
         return false;
       }
     }).fold<double>(0.0, (balance, t) {
       try {
-        final value = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+        final value =
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
         if (t.type == TransactionType.receita) {
           return balance + value;
         } else if (t.type == TransactionType.despesa) {
@@ -373,14 +384,25 @@ class TransactionController extends GetxController {
     });
   }
 
-  List<TransactionModel> getTransactionsForDateRange(DateTime startDate, DateTime endDate) {
+  List<TransactionModel> getTransactionsForDateRange(
+      DateTime startDate, DateTime endDate) {
     return transaction.where((t) {
       if (t.paymentDay == null) return false;
-      
+
       try {
         final paymentDate = DateTime.parse(t.paymentDay!);
-        return paymentDate.isAfter(startDate.subtract(Duration(days: 1))) && 
-               paymentDate.isBefore(endDate.add(Duration(days: 1)));
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        return paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly));
       } catch (e) {
         return false;
       }
