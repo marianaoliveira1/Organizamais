@@ -352,7 +352,7 @@ class PortfolioCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Média de Receitas (meses)',
+                      'Média de Receitas (meses finalizados)',
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
@@ -382,7 +382,7 @@ class PortfolioCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Média de Despesas",
+                      "Média de Despesas (meses finalizados)",
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
