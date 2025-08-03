@@ -7,7 +7,7 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
-import 'financial_card.dart';
+import 'financial_analysis_detail_page.dart';
 
 class FinancialSummaryCards extends StatelessWidget {
   const FinancialSummaryCards({super.key});
@@ -30,12 +30,17 @@ class FinancialSummaryCards extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PortfolioCard(
-            saldo: saldo,
-            valueReceita: totalReceita,
-            valueDespesa: totalDespesas,
-            mediaReceita: mediaReceita,
-            mediaDespesa: mediaDespesa,
+          GestureDetector(
+            // onTap: () {
+            //   Get.to(() => const FinancialAnalysisDetailPage());
+            // },
+            child: PortfolioCard(
+              saldo: saldo,
+              valueReceita: totalReceita,
+              valueDespesa: totalDespesas,
+              mediaReceita: mediaReceita,
+              mediaDespesa: mediaDespesa,
+            ),
           ),
           SizedBox(
             height: 20.h,
@@ -260,13 +265,23 @@ class PortfolioCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Saldo do ano ${DateTime.now().year} (até hoje)',
-            style: TextStyle(
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w600,
-              color: DefaultColors.grey20,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Saldo do ano ${DateTime.now().year} (até hoje)',
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                  color: DefaultColors.grey20,
+                ),
+              ),
+              // Icon(
+              //   Icons.arrow_forward_ios,
+              //   size: 12.sp,
+              //   color: theme.primaryColor.withOpacity(0.6),
+              // ),
+            ],
           ),
           SizedBox(height: 10.h),
           Row(

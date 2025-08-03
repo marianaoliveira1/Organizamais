@@ -224,7 +224,7 @@ class FinanceDetailsPage extends StatelessWidget {
               ),
           ],
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 6.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -271,8 +271,6 @@ class FinanceDetailsPage extends StatelessWidget {
           ],
         ),
         SizedBox(height: 8.h),
-        Divider(color: DefaultColors.grey.withValues(alpha: 0.3)),
-        SizedBox(height: 8.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -294,6 +292,8 @@ class FinanceDetailsPage extends StatelessWidget {
             ),
           ],
         ),
+        SizedBox(height: 8.h),
+        Divider(color: DefaultColors.grey.withValues(alpha: 0.3)),
       ],
     );
   }
