@@ -102,7 +102,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/car.png',
     'color': DefaultColors.indigo,
     'macrocategoria': 'Transporte',
-    'synonyms': ['ônibus', 'metrô', 'combustível', 'táxi']
+    'synonyms': ['ônibus', 'metrô', 'combustível', 'táxi', 'carro']
   },
   {
     'id': 28,
@@ -122,7 +122,7 @@ final List<Map<String, dynamic>> categories_expenses = [
   },
   {
     'id': 71,
-    'name': 'Pedágio',
+    'name': 'Pedágio/Estacionamento',
     'icon': 'assets/icon-category/pedagios.png',
     'color': DefaultColors.slateGrey,
     'macrocategoria': 'Transporte',

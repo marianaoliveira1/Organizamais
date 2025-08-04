@@ -822,7 +822,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                             Text(
                               currencyFormatter.format(totalValue),
                               style: TextStyle(
-                                fontSize: 20.sp,
+                                fontSize: 32.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Get.theme.primaryColor,
                               ),
@@ -1031,15 +1031,15 @@ class CategoryAnalysisPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Análise da Categoria',
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-              color: DefaultColors.grey20,
-            ),
-          ),
-          SizedBox(height: 12.h),
+          // Text(
+          //   'Análise da Categoria',
+          //   style: TextStyle(
+          //     fontSize: 10.sp,
+          //     fontWeight: FontWeight.w500,
+          //     color: DefaultColors.grey20,
+          //   ),
+          // ),
+          // SizedBox(height: 12.h),
           Row(
             children: [
               Expanded(
@@ -1058,7 +1058,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                     Text(
                       currencyFormatter.format(monthlyAverage),
                       style: TextStyle(
-                        fontSize: 18.sp,
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
                         color: categoryColor,
                       ),
@@ -1088,7 +1088,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                     Text(
                       currencyFormatter.format(minSpending),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
                       ),
@@ -1113,7 +1113,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                     Text(
                       currencyFormatter.format(maxSpending),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
