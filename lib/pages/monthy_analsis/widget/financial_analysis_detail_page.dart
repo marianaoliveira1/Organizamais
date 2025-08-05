@@ -52,8 +52,8 @@ class FinancialAnalysisDetailPage extends StatelessWidget {
                           Text(
                             "Evolução Mensal",
                             style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
                               color: theme.primaryColor,
                             ),
                           ),
@@ -65,31 +65,6 @@ class FinancialAnalysisDetailPage extends StatelessWidget {
                     ),
 
                     SizedBox(height: 24.h),
-
-                    // Previsão de Próximas Transações
-                    Container(
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Previsão de Próximas Transações",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: theme.primaryColor,
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          ...nextTransactionPrediction
-                              .map((item) => _buildPredictionItem(item, theme)),
-                        ],
-                      ),
-                    ),
                   ],
                 );
               }),
@@ -111,122 +86,226 @@ class FinancialAnalysisDetailPage extends StatelessWidget {
           color: item['cardColor'].withOpacity(0.3),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Icon(
-            item['icon'],
-            color: item['cardColor'],
-            size: 20.sp,
+          Row(
+            children: [
+              Icon(
+                item['icon'],
+                color: item['cardColor'],
+                size: 20.sp,
+              ),
+              SizedBox(
+                width: 6.w,
+              ),
+              Text(
+                item['month'],
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['month'],
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: theme.primaryColor,
-                  ),
+          Column(
+            children: [
+              Text(
+                item['analysis'],
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: DefaultColors.grey,
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  item['analysis'],
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    color: DefaultColors.grey,
-                  ),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                item['message'],
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w500,
+                  color: item['cardColor'],
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  item['message'],
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
-                    color: item['cardColor'],
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Receitas',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          ),
-                          Text(
-                            _formatCurrency(item['receitas']),
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Despesas',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          ),
-                          Text(
-                            _formatCurrency(item['despesas']),
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Saldo',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          ),
-                          Text(
-                            _formatCurrency(item['saldo']),
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: item['saldo'] >= 0
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Receitas',
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: DefaultColors.grey,
+                    ),
+                  ),
+                  Text(
+                    _formatCurrency(item['receitas']),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Despesas',
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: DefaultColors.grey,
+                    ),
+                  ),
+                  Text(
+                    _formatCurrency(item['despesas']),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Text(
+                'Saldo',
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: DefaultColors.grey,
+                ),
+              ),
+              SizedBox(
+                width: 6.w,
+              ),
+              Text(
+                _formatCurrency(item['saldo']),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: item['saldo'] >= 0 ? Colors.green : Colors.red,
+                ),
+              ),
+            ],
+          )
         ],
       ),
+      // child: Row(
+      //   children: [
+      //     Column(
+      //       children: [
+      //
+      //       ],
+      //     ),
+      //     SizedBox(width: 12.w),
+      //     Expanded(
+      //       child: Column(
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         children: [
+      //           SizedBox(height: 4.h),
+      //           Text(
+      //             item['analysis'],
+      //             style: TextStyle(
+      //               fontSize: 13.sp,
+      //               fontWeight: FontWeight.bold,
+      //               color: DefaultColors.grey,
+      //             ),
+      //           ),
+      //           SizedBox(height: 4.h),
+      //           Text(
+      //             item['message'],
+      //             style: TextStyle(
+      //               fontSize: 11.sp,
+      //               fontWeight: FontWeight.w500,
+      //               color: item['cardColor'],
+      //             ),
+      //           ),
+      //           SizedBox(height: 8.h),
+      //           Row(
+      //             children: [
+      //               Expanded(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     Text(
+      //                       'Receitas',
+      //                       style: TextStyle(
+      //                         fontSize: 10.sp,
+      //                         color: DefaultColors.grey,
+      //                       ),
+      //                     ),
+      //                     Text(
+      //                       _formatCurrency(item['receitas']),
+      //                       style: TextStyle(
+      //                         fontSize: 12.sp,
+      //                         fontWeight: FontWeight.bold,
+      //                         color: Colors.green,
+      //                       ),
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //               Expanded(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     Text(
+      //                       'Despesas',
+      //                       style: TextStyle(
+      //                         fontSize: 10.sp,
+      //                         color: DefaultColors.grey,
+      //                       ),
+      //                     ),
+      //                     Text(
+      //                       _formatCurrency(item['despesas']),
+      //                       style: TextStyle(
+      //                         fontSize: 12.sp,
+      //                         fontWeight: FontWeight.bold,
+      //                         color: Colors.red,
+      //                       ),
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //               Expanded(
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     Text(
+      //                       'Saldo',
+      //                       style: TextStyle(
+      //                         fontSize: 10.sp,
+      //                         color: DefaultColors.grey,
+      //                       ),
+      //                     ),
+      //                     Text(
+      //                       _formatCurrency(item['saldo']),
+      //                       style: TextStyle(
+      //                         fontSize: 12.sp,
+      //                         fontWeight: FontWeight.bold,
+      //                         color: item['saldo'] >= 0
+      //                             ? Colors.green
+      //                             : Colors.red,
+      //                       ),
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
 
