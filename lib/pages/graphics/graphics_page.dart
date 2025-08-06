@@ -62,7 +62,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
     // Estimar a posição do mês atual para centralizar
     final int currentMonthIndex = DateTime.now().month - 1;
     final double itemWidth =
-        80.w; // Ajuste este valor conforme a largura real do seu item
+        78.w; // Ajuste este valor conforme a largura real do seu item
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);

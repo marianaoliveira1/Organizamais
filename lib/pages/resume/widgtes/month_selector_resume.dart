@@ -55,9 +55,10 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
   void _scrollToMonth(int monthIndex) {
     // Estimar a posição do mês para centralizar
     // Isso depende do tamanho do seu item. Ajuste o valor 80.w conforme necessário
-    final double itemWidth = 80.w;
+    final double itemWidth = 78.w;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double offset = monthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+    final double offset =
+        monthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
 
     // Limitar o scroll para não ir além dos limites
     final double maxScroll = _scrollController.position.maxScrollExtent;
@@ -87,7 +88,8 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
         itemCount: _months.length,
         itemBuilder: (context, index) {
           return Obx(() {
-            final bool isSelected = widget.selectedMonth.value == _months[index];
+            final bool isSelected =
+                widget.selectedMonth.value == _months[index];
             return GestureDetector(
               onTap: () {
                 widget.selectedMonth.value = _months[index];
@@ -111,8 +113,11 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
                     _months[index],
                     style: TextStyle(
                       fontSize: 11.sp,
-                      color: isSelected ? Theme.of(context).primaryColor : DefaultColors.grey,
-                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                      color: isSelected
+                          ? Theme.of(context).primaryColor
+                          : DefaultColors.grey,
+                      fontWeight:
+                          isSelected ? FontWeight.w500 : FontWeight.normal,
                     ),
                   ),
                 ),
