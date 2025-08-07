@@ -1059,8 +1059,8 @@ class CategoryAnalysisPage extends StatelessWidget {
                       currencyFormatter.format(monthlyAverage),
                       style: TextStyle(
                         fontSize: 22.sp,
-                        fontWeight: FontWeight.bold,
-                        color: categoryColor,
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor.withOpacity(.8),
                       ),
                     ),
                   ],
