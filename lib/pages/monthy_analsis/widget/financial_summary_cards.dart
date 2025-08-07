@@ -7,7 +7,6 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
-import 'financial_analysis_detail_page.dart';
 
 class FinancialSummaryCards extends StatelessWidget {
   const FinancialSummaryCards({super.key});
