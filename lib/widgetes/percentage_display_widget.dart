@@ -27,7 +27,9 @@ class PercentageDisplayWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (explanationType != null && currentValue != null && previousValue != null) {
+        if (explanationType != null &&
+            currentValue != null &&
+            previousValue != null) {
           showDialog(
             context: context,
             builder: (context) => PercentageExplanationDialog(
@@ -41,14 +43,6 @@ class PercentageDisplayWidget extends StatelessWidget {
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-        decoration: BoxDecoration(
-          color: result.color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: result.color.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -57,7 +51,7 @@ class PercentageDisplayWidget extends StatelessWidget {
               size: 12.sp,
               color: result.color,
             ),
-            SizedBox(width: 4.w),
+            SizedBox(width: 2.w),
             Text(
               result.formattedPercentage,
               style: TextStyle(
