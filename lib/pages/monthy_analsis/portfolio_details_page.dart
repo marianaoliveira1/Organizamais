@@ -125,59 +125,58 @@ class PortfolioDetailsPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
-          Row(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Receitas',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.grey20,
-                      ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Receitas',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.grey20,
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      formatter.format(income),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: DefaultColors.green,
-                      ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    formatter.format(income),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: DefaultColors.grey20,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Despesas',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.grey20,
-                      ),
+              SizedBox(height: 10.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Despesas',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.grey20,
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      formatter.format(expenses),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: DefaultColors.red,
-                      ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    formatter.format(expenses),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: DefaultColors.grey20,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(width: 16.w),
             ],
+          ),
+          SizedBox(
+            height: 10.h,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,7 +184,7 @@ class PortfolioDetailsPage extends StatelessWidget {
               Text(
                 'Saldo',
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: DefaultColors.grey20,
                 ),
