@@ -7,6 +7,7 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
+import '../../../pages/monthy_analsis/portfolio_details_page.dart';
 
 class FinancialSummaryCards extends StatelessWidget {
   const FinancialSummaryCards({super.key});
@@ -30,9 +31,9 @@ class FinancialSummaryCards extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            // onTap: () {
-            //   Get.to(() => const FinancialAnalysisDetailPage());
-            // },
+            onTap: () {
+              Get.to(() => const PortfolioDetailsPage());
+            },
             child: PortfolioCard(
               saldo: saldo,
               valueReceita: totalReceita,
@@ -56,7 +57,7 @@ class FinancialSummaryCards extends StatelessWidget {
         // Shimmer for title
         Shimmer(
           duration: const Duration(milliseconds: 1400),
-          color: Colors.white.withOpacity(0.6),
+          color: Colors.white.withValues(alpha: 0.6),
           child: Container(
             height: 12.h,
             width: 200.w,
@@ -82,7 +83,7 @@ class FinancialSummaryCards extends StatelessWidget {
         // Shimmer for second title
         Shimmer(
           duration: const Duration(milliseconds: 1400),
-          color: Colors.white.withOpacity(0.6),
+          color: Colors.white.withValues(alpha: 0.6),
           child: Container(
             height: 12.h,
             width: 180.w,
@@ -140,7 +141,7 @@ class FinancialSummaryCards extends StatelessWidget {
           // Title shimmer
           Shimmer(
             duration: const Duration(milliseconds: 1400),
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             child: Container(
               height: 14.h,
               width: 80.w,
@@ -154,7 +155,7 @@ class FinancialSummaryCards extends StatelessWidget {
           // Value shimmer
           Shimmer(
             duration: const Duration(milliseconds: 1400),
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             child: Container(
               height: 20.h,
               width: 100.w,
@@ -200,7 +201,7 @@ class FinancialSummaryCards extends StatelessWidget {
                 // Title shimmer
                 Shimmer(
                   duration: const Duration(milliseconds: 1400),
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   child: Container(
                     height: 14.h,
                     width: 60.w,
@@ -214,7 +215,7 @@ class FinancialSummaryCards extends StatelessWidget {
                 // Value shimmer
                 Shimmer(
                   duration: const Duration(milliseconds: 1400),
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   child: Container(
                     height: 20.h,
                     width: 120.w,
@@ -268,18 +269,18 @@ class PortfolioCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Saldo do ano ${DateTime.now().year} (até hoje)',
+                'Análise Mensal (${DateTime.now().year})',
                 style: TextStyle(
                   fontSize: 10.sp,
                   fontWeight: FontWeight.w600,
                   color: DefaultColors.grey20,
                 ),
               ),
-              // Icon(
-              //   Icons.arrow_forward_ios,
-              //   size: 12.sp,
-              //   color: theme.primaryColor.withOpacity(0.6),
-              // ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 8.sp,
+                color: DefaultColors.grey,
+              ),
             ],
           ),
           SizedBox(height: 10.h),
@@ -366,7 +367,7 @@ class PortfolioCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Média de Receitas (meses finalizados)',
+                      'Média de Receitas',
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
@@ -396,7 +397,7 @@ class PortfolioCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Média de Despesas (meses finalizados)",
+                      "Média de Despesas",
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
