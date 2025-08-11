@@ -179,20 +179,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Detalhes das Transações",
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              color: DefaultColors.grey20,
-                            ),
-                          ),
-                          // Comparação com mês anterior
-                          _buildCategoryMonthComparison(categoryId, theme),
-                        ],
+                      _buildCategoryMonthComparison(categoryId, theme),
+                      Text(
+                        "Detalhes das Transações",
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color: DefaultColors.grey20,
+                        ),
                       ),
                       ListView.separated(
                         shrinkWrap: true,
@@ -420,11 +414,12 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     switch (comparison.type) {
       case PercentageType.positive:
         explanationText =
-            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% mês anterior (R\$ ${_formatCurrency(currentValue)}) hoje R\$ ${_formatCurrency(previousValue)})';
+            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+
         break;
       case PercentageType.negative:
         explanationText =
-            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(previousValue)} → R\$ ${_formatCurrency(currentValue)})';
+            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)})';
         break;
       case PercentageType.neutral:
         explanationText =
@@ -439,11 +434,12 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             comparison.icon,
-            size: 12.h,
+            size: 14.h,
             color: comparison.color,
           ),
           SizedBox(width: 4.w),
@@ -451,11 +447,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             child: Text(
               explanationText,
               style: TextStyle(
-                fontSize: 9.sp,
+                fontSize: 10.sp,
                 color: comparison.color,
                 fontWeight: FontWeight.w600,
               ),
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
             ),
           ),
         ],
