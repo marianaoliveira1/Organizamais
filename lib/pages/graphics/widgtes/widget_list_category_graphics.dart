@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/graphics_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
+import 'package:organizamais/services/percentage_calculation_service.dart';
+import 'package:organizamais/model/percentage_result.dart';
 
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -116,6 +118,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 color: DefaultColors.grey,
                               ),
                             ),
+                            // Porcentagem de comparação com mês anterior
+                            _buildMonthComparisonPercentage(
+                              categoryId,
+                              theme,
+                            ),
                           ],
                         ),
                       ),
@@ -172,13 +179,20 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Detalhes das Transações",
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: DefaultColors.grey20,
-                        ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Detalhes das Transações",
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                              color: DefaultColors.grey20,
+                            ),
+                          ),
+                          // Comparação com mês anterior
+                          _buildCategoryMonthComparison(categoryId, theme),
+                        ],
                       ),
                       ListView.separated(
                         shrinkWrap: true,
@@ -340,5 +354,196 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return filteredTransactions
         .where((transaction) => transaction.category == categoryId)
         .toList();
+  }
+
+  Widget _buildMonthComparisonPercentage(int categoryId, ThemeData theme) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+
+    // Calcular a comparação com o mês anterior
+    final comparison =
+        PercentageCalculationService.calculateCategoryExpenseComparison(
+      transactionController.transaction,
+      categoryId,
+      DateTime.now(),
+    );
+
+    if (!comparison.hasData) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          comparison.icon,
+          size: 12.h,
+          color: comparison.color,
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          comparison.displayText,
+          style: TextStyle(
+            fontSize: 9.sp,
+            color: comparison.color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryMonthComparison(int categoryId, ThemeData theme) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+
+    // Calcular a comparação com o mês anterior
+    final comparison =
+        PercentageCalculationService.calculateCategoryExpenseComparison(
+      transactionController.transaction,
+      categoryId,
+      DateTime.now(),
+    );
+
+    if (!comparison.hasData) {
+      return const SizedBox.shrink();
+    }
+
+    // Calcular valores em R$ para comparação
+    final currentValue = _getCategoryExpensesForCurrentPeriod(
+        transactionController.transaction, categoryId);
+    final previousValue = _getCategoryExpensesForPreviousPeriod(
+        transactionController.transaction, categoryId);
+
+    // Criar texto explicativo baseado no tipo de comparação
+    String explanationText = '';
+    switch (comparison.type) {
+      case PercentageType.positive:
+        explanationText =
+            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% mês anterior (R\$ ${_formatCurrency(currentValue)}) hoje R\$ ${_formatCurrency(previousValue)})';
+        break;
+      case PercentageType.negative:
+        explanationText =
+            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(previousValue)} → R\$ ${_formatCurrency(currentValue)})';
+        break;
+      case PercentageType.neutral:
+        explanationText =
+            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)}';
+        break;
+      case PercentageType.newData:
+        explanationText =
+            'Nova categoria - R\$ ${_formatCurrency(currentValue)} (não há dados do mês anterior)';
+        break;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            comparison.icon,
+            size: 12.h,
+            color: comparison.color,
+          ),
+          SizedBox(width: 4.w),
+          Flexible(
+            child: Text(
+              explanationText,
+              style: TextStyle(
+                fontSize: 9.sp,
+                color: comparison.color,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  double _getCategoryExpensesForCurrentPeriod(
+      List<TransactionModel> transactions, int categoryId) {
+    final now = DateTime.now();
+    final currentMonthStart = DateTime(now.year, now.month, 1);
+    final currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return _getCategoryExpensesForPeriod(
+        transactions, categoryId, currentMonthStart, currentMonthEnd);
+  }
+
+  double _getCategoryExpensesForPreviousPeriod(
+      List<TransactionModel> transactions, int categoryId) {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+    final previousMonthStart = DateTime(previousYear, previousMonth, 1);
+
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final previousMonthDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
+    final previousMonthEnd =
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
+
+    return _getCategoryExpensesForPeriod(
+        transactions, categoryId, previousMonthStart, previousMonthEnd);
+  }
+
+  double _getCategoryExpensesForPeriod(
+    List<TransactionModel> transactions,
+    int categoryId,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    double expenses = 0.0;
+
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa ||
+          transaction.category != categoryId) {
+        continue;
+      }
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          expenses += _parseValue(transaction.value);
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return expenses;
+  }
+
+  double _parseValue(String value) {
+    try {
+      String cleanValue = value
+          .replaceAll('R\$', '')
+          .replaceAll('.', '')
+          .replaceAll(',', '.')
+          .trim();
+
+      return double.parse(cleanValue);
+    } catch (e) {
+      return 0.0;
+    }
+  }
+
+  String _formatCurrency(double value) {
+    return value.toStringAsFixed(2).replaceAll('.', ',');
   }
 }

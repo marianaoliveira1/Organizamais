@@ -12,7 +12,8 @@ void main() {
     });
 
     group('calculateMonthlyComparison', () {
-      test('should return positive percentage when current month is better', () {
+      test('should return positive percentage when current month is better',
+          () {
         // Current month: +1000 (1500 receita - 500 despesa)
         testTransactions.addAll([
           TransactionModel(
@@ -239,7 +240,8 @@ void main() {
         );
 
         expect(result.hasData, true);
-        expect(result.percentage, 25.0); // Should ignore invalid value and calculate (1000-800)/800
+        expect(result.percentage,
+            25.0); // Should ignore invalid value and calculate (1000-800)/800
       });
 
       test('should handle invalid payment dates gracefully', () {
@@ -273,7 +275,8 @@ void main() {
         );
 
         expect(result.hasData, true);
-        expect(result.percentage, 25.0); // Should ignore invalid date and calculate (1000-800)/800
+        expect(result.percentage,
+            25.0); // Should ignore invalid date and calculate (1000-800)/800
       });
 
       test('should handle month boundaries correctly', () {
@@ -305,6 +308,124 @@ void main() {
       });
     });
 
+    group('calculateCategoryExpenseComparison', () {
+      test('should return positive percentage when category expenses decreased',
+          () {
+        // Current month expenses for category 1: 300
+        testTransactions.addAll([
+          TransactionModel(
+            id: '1',
+            title: 'Alimentação',
+            value: '300,00',
+            type: TransactionType.despesa,
+            category: 1,
+            paymentDay: '2024-02-15T10:00:00.000Z',
+          ),
+        ]);
 
+        // Previous month expenses for category 1: 500
+        testTransactions.addAll([
+          TransactionModel(
+            id: '2',
+            title: 'Alimentação',
+            value: '500,00',
+            type: TransactionType.despesa,
+            category: 1,
+            paymentDay: '2024-01-15T10:00:00.000Z',
+          ),
+        ]);
+
+        final result =
+            PercentageCalculationService.calculateCategoryExpenseComparison(
+          testTransactions,
+          1, // categoryId
+          DateTime(2024, 2, 15),
+        );
+
+        expect(result.hasData, true);
+        expect(
+            result.type, PercentageType.positive); // Despesas diminuíram = bom
+        expect(result.percentage, 40.0); // (500-300)/500 * 100 = 40%
+      });
+
+      test('should return negative percentage when category expenses increased',
+          () {
+        // Current month expenses for category 1: 600
+        testTransactions.addAll([
+          TransactionModel(
+            id: '1',
+            title: 'Alimentação',
+            value: '600,00',
+            type: TransactionType.despesa,
+            category: 1,
+            paymentDay: '2024-02-15T10:00:00.000Z',
+          ),
+        ]);
+
+        // Previous month expenses for category 1: 400
+        testTransactions.addAll([
+          TransactionModel(
+            id: '2',
+            title: 'Alimentação',
+            value: '400,00',
+            type: TransactionType.despesa,
+            category: 1,
+            paymentDay: '2024-01-15T10:00:00.000Z',
+          ),
+        ]);
+
+        final result =
+            PercentageCalculationService.calculateCategoryExpenseComparison(
+          testTransactions,
+          1, // categoryId
+          DateTime(2024, 2, 15),
+        );
+
+        expect(result.hasData, true);
+        expect(
+            result.type, PercentageType.negative); // Despesas aumentaram = ruim
+        expect(result.percentage, 50.0); // (600-400)/400 * 100 = 50%
+      });
+
+      test(
+          'should return new data when previous month has no expenses for category',
+          () {
+        // Current month expenses for category 1: 300
+        testTransactions.addAll([
+          TransactionModel(
+            id: '1',
+            title: 'Alimentação',
+            value: '300,00',
+            type: TransactionType.despesa,
+            category: 1,
+            paymentDay: '2024-02-15T10:00:00.000Z',
+          ),
+        ]);
+
+        // Previous month has no expenses for category 1
+
+        final result =
+            PercentageCalculationService.calculateCategoryExpenseComparison(
+          testTransactions,
+          1, // categoryId
+          DateTime(2024, 2, 15),
+        );
+
+        expect(result.hasData, true);
+        expect(result.type, PercentageType.newData);
+        expect(result.displayText, 'Novo');
+      });
+
+      test('should return no data when no transactions exist for category', () {
+        final result =
+            PercentageCalculationService.calculateCategoryExpenseComparison(
+          testTransactions,
+          1, // categoryId
+          DateTime(2024, 2, 15),
+        );
+
+        expect(result.hasData, false);
+      });
+    });
   });
 }

@@ -450,6 +450,175 @@ class PercentageCalculationService {
     return false;
   }
 
+  static PercentageResult calculateCategoryExpenseComparison(
+    List<TransactionModel> transactions,
+    int categoryId,
+    DateTime currentDate,
+  ) {
+    try {
+      // Calculate current month expenses for the category up to current day
+      final currentMonthStart =
+          DateTime(currentDate.year, currentDate.month, 1);
+      final currentMonthEnd = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
+
+      // Calculate previous month expenses for the category up to same day
+      final previousMonth = currentDate.month == 1 ? 12 : currentDate.month - 1;
+      final previousYear =
+          currentDate.month == 1 ? currentDate.year - 1 : currentDate.year;
+      final previousMonthStart = DateTime(previousYear, previousMonth, 1);
+
+      // Use the same day or last day of previous month if current day doesn't exist
+      final daysInPreviousMonth =
+          DateTime(previousYear, previousMonth + 1, 0).day;
+      final previousMonthDay = currentDate.day > daysInPreviousMonth
+          ? daysInPreviousMonth
+          : currentDate.day;
+      final previousMonthEnd =
+          DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
+
+      final currentExpenses = _getCategoryExpensesForPeriod(
+          transactions, categoryId, currentMonthStart, currentMonthEnd);
+      final previousExpenses = _getCategoryExpensesForPeriod(
+          transactions, categoryId, previousMonthStart, previousMonthEnd);
+
+      // Check if we have data for previous month
+      final hasPreviousData = _hasCategoryTransactionsInPeriod(
+          transactions, categoryId, previousMonthStart, previousMonthEnd);
+      
+      // Se não há dados do mês anterior, mas há dados do mês atual, é um novo dado
+      if (!hasPreviousData) {
+        final hasCurrentData = _hasCategoryTransactionsInPeriod(
+            transactions, categoryId, currentMonthStart, currentMonthEnd);
+        if (hasCurrentData) {
+          return PercentageResult(
+            percentage: 0.0,
+            hasData: true,
+            type: PercentageType.newData,
+            displayText: 'Novo',
+          );
+        }
+        return PercentageResult.noData();
+      }
+
+      // Handle edge cases
+      if (previousExpenses == 0.0) {
+        if (currentExpenses > 0) {
+          return PercentageResult(
+            percentage: 0.0,
+            hasData: true,
+            type: PercentageType.newData,
+            displayText: 'Novo',
+          );
+        } else {
+          return PercentageResult(
+            percentage: 0.0,
+            hasData: true,
+            type: PercentageType.neutral,
+            displayText: '0.0%',
+          );
+        }
+      }
+
+      // Calculate percentage change
+      final percentageChange =
+          ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+
+      // Determine type
+      PercentageType type;
+      if (percentageChange < 0) {
+        // Despesas diminuíram = bom
+        type = PercentageType.positive;
+      } else if (percentageChange > 0) {
+        // Despesas aumentaram = ruim
+        type = PercentageType.negative;
+      } else {
+        type = PercentageType.neutral;
+      }
+
+      return PercentageResult(
+        percentage: percentageChange.abs(),
+        hasData: true,
+        type: type,
+        displayText: _formatPercentage(percentageChange, type),
+      );
+    } catch (e) {
+      print('Error calculating category expense comparison: $e');
+      return PercentageResult.noData();
+    }
+  }
+
+  static double _getCategoryExpensesForPeriod(
+    List<TransactionModel> transactions,
+    int categoryId,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    double expenses = 0.0;
+
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa ||
+          transaction.category != categoryId) continue;
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          expenses += _parseValue(transaction.value);
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return expenses;
+  }
+
+  static bool _hasCategoryTransactionsInPeriod(
+    List<TransactionModel> transactions,
+    int categoryId,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa ||
+          transaction.category != categoryId) continue;
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Simplificando a lógica de comparação
+        final paymentDateOnly =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateOnly =
+            DateTime(startDate.year, startDate.month, startDate.day);
+        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
+            (paymentDateOnly.isAfter(startDateOnly) &&
+                paymentDateOnly.isBefore(endDateOnly))) {
+          return true;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    return false;
+  }
+
   static String _formatPercentage(double percentage, PercentageType type) {
     switch (type) {
       case PercentageType.positive:
