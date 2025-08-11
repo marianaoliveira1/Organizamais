@@ -362,7 +362,40 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       DateTime.now(),
     );
 
+    // Debug: verificar por que não está funcionando
     if (!comparison.hasData) {
+      // Tentar calcular manualmente para debug
+      final currentValue =
+          PercentageCalculationService.getCategoryExpensesForPeriod(
+              transactionController.transaction,
+              categoryId,
+              DateTime(DateTime.now().year, DateTime.now().month, 1),
+              DateTime(DateTime.now().year, DateTime.now().month,
+                  DateTime.now().day, 23, 59, 59));
+
+      // Se há dados atuais, mostrar como "Novo"
+      if (currentValue > 0) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.fiber_new,
+              size: 12.h,
+              color: DefaultColors.grey,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              'Novo',
+              style: TextStyle(
+                fontSize: 9.sp,
+                color: DefaultColors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        );
+      }
+
       return const SizedBox.shrink();
     }
 
@@ -403,11 +436,33 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Calcular valores em R$ para comparação
-    final currentValue = _getCategoryExpensesForCurrentPeriod(
-        transactionController.transaction, categoryId);
-    final previousValue = _getCategoryExpensesForPreviousPeriod(
-        transactionController.transaction, categoryId);
+    // Calcular valores em R$ para comparação usando o serviço
+    final currentValue =
+        PercentageCalculationService.getCategoryExpensesForPeriod(
+            transactionController.transaction,
+            categoryId,
+            DateTime(DateTime.now().year, DateTime.now().month, 1),
+            DateTime(DateTime.now().year, DateTime.now().month,
+                DateTime.now().day, 23, 59, 59));
+
+    final previousMonth =
+        DateTime.now().month == 1 ? 12 : DateTime.now().month - 1;
+    final previousYear = DateTime.now().month == 1
+        ? DateTime.now().year - 1
+        : DateTime.now().year;
+    final daysInPreviousMonth =
+        DateTime(previousYear, previousMonth + 1, 0).day;
+    final previousMonthDay = DateTime.now().day > daysInPreviousMonth
+        ? daysInPreviousMonth
+        : DateTime.now().day;
+
+    final previousValue =
+        PercentageCalculationService.getCategoryExpensesForPeriod(
+            transactionController.transaction,
+            categoryId,
+            DateTime(previousYear, previousMonth, 1),
+            DateTime(
+                previousYear, previousMonth, previousMonthDay, 23, 59, 59));
 
     // Criar texto explicativo baseado no tipo de comparação
     String explanationText = '';
@@ -415,11 +470,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       case PercentageType.positive:
         explanationText =
             'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
-
         break;
       case PercentageType.negative:
         explanationText =
-            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)})';
+            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
         break;
       case PercentageType.neutral:
         explanationText =
@@ -459,86 +513,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     );
   }
 
-  double _getCategoryExpensesForCurrentPeriod(
-      List<TransactionModel> transactions, int categoryId) {
-    final now = DateTime.now();
-    final currentMonthStart = DateTime(now.year, now.month, 1);
-    final currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    return _getCategoryExpensesForPeriod(
-        transactions, categoryId, currentMonthStart, currentMonthEnd);
-  }
-
-  double _getCategoryExpensesForPreviousPeriod(
-      List<TransactionModel> transactions, int categoryId) {
-    final now = DateTime.now();
-    final previousMonth = now.month == 1 ? 12 : now.month - 1;
-    final previousYear = now.month == 1 ? now.year - 1 : now.year;
-    final previousMonthStart = DateTime(previousYear, previousMonth, 1);
-
-    final daysInPreviousMonth =
-        DateTime(previousYear, previousMonth + 1, 0).day;
-    final previousMonthDay =
-        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
-    final previousMonthEnd =
-        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
-
-    return _getCategoryExpensesForPeriod(
-        transactions, categoryId, previousMonthStart, previousMonthEnd);
-  }
-
-  double _getCategoryExpensesForPeriod(
-    List<TransactionModel> transactions,
-    int categoryId,
-    DateTime startDate,
-    DateTime endDate,
-  ) {
-    double expenses = 0.0;
-
-    for (final transaction in transactions) {
-      if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.despesa ||
-          transaction.category != categoryId) {
-        continue;
-      }
-
-      try {
-        final paymentDate = DateTime.parse(transaction.paymentDay!);
-
-        final paymentDateOnly =
-            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final startDateOnly =
-            DateTime(startDate.year, startDate.month, startDate.day);
-        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
-
-        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
-            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
-            (paymentDateOnly.isAfter(startDateOnly) &&
-                paymentDateOnly.isBefore(endDateOnly))) {
-          expenses += _parseValue(transaction.value);
-        }
-      } catch (e) {
-        continue;
-      }
-    }
-
-    return expenses;
-  }
-
-  double _parseValue(String value) {
-    try {
-      String cleanValue = value
-          .replaceAll('R\$', '')
-          .replaceAll('.', '')
-          .replaceAll(',', '.')
-          .trim();
-
-      return double.parse(cleanValue);
-    } catch (e) {
-      return 0.0;
-    }
-  }
-
+  // Remover os métodos duplicados e usar apenas o serviço
   String _formatCurrency(double value) {
     return value.toStringAsFixed(2).replaceAll('.', ',');
   }

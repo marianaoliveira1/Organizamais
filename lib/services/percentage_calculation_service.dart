@@ -477,20 +477,81 @@ class PercentageCalculationService {
       final previousMonthEnd =
           DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
-      final currentExpenses = _getCategoryExpensesForPeriod(
+      final currentExpenses = getCategoryExpensesForPeriod(
           transactions, categoryId, currentMonthStart, currentMonthEnd);
-      final previousExpenses = _getCategoryExpensesForPeriod(
+      final previousExpenses = getCategoryExpensesForPeriod(
           transactions, categoryId, previousMonthStart, previousMonthEnd);
+
+      // Check if we have data for current month
+      final hasCurrentData = _hasCategoryTransactionsInPeriod(
+          transactions, categoryId, currentMonthStart, currentMonthEnd);
 
       // Check if we have data for previous month
       final hasPreviousData = _hasCategoryTransactionsInPeriod(
           transactions, categoryId, previousMonthStart, previousMonthEnd);
-      
-      // Se não há dados do mês anterior, mas há dados do mês atual, é um novo dado
-      if (!hasPreviousData) {
-        final hasCurrentData = _hasCategoryTransactionsInPeriod(
-            transactions, categoryId, currentMonthStart, currentMonthEnd);
-        if (hasCurrentData) {
+
+      // Debug: imprimir informações para entender o que está acontecendo
+      print(
+          'Category $categoryId - Current: $currentExpenses, Previous: $previousExpenses');
+      print(
+          'Category $categoryId - HasCurrent: $hasCurrentData, HasPrevious: $hasPreviousData');
+      print(
+          'Category $categoryId - Current period: $currentMonthStart to $currentMonthEnd');
+      print(
+          'Category $categoryId - Previous period: $previousMonthStart to $previousMonthEnd');
+
+      // Debug: mostrar transações específicas da categoria
+      print('Category $categoryId - All transactions:');
+      for (final transaction in transactions.where((t) =>
+          t.type == TransactionType.despesa && t.category == categoryId)) {
+        if (transaction.paymentDay != null) {
+          final paymentDate = DateTime.parse(transaction.paymentDay!);
+          print(
+              '  - ${transaction.title}: ${transaction.value} on $paymentDate');
+        }
+      }
+
+      // Debug: mostrar transações no período atual
+      print('Category $categoryId - Current period transactions:');
+      for (final transaction in transactions.where((t) =>
+          t.type == TransactionType.despesa && t.category == categoryId)) {
+        if (transaction.paymentDay != null) {
+          final paymentDate = DateTime.parse(transaction.paymentDay!);
+          if (paymentDate.isAfter(
+                  currentMonthStart.subtract(const Duration(seconds: 1))) &&
+              paymentDate
+                  .isBefore(currentMonthEnd.add(const Duration(seconds: 1)))) {
+            print(
+                '  - CURRENT: ${transaction.title}: ${transaction.value} on $paymentDate');
+          }
+        }
+      }
+
+      // Debug: mostrar transações no período anterior
+      print('Category $categoryId - Previous period transactions:');
+      for (final transaction in transactions.where((t) =>
+          t.type == TransactionType.despesa && t.category == categoryId)) {
+        if (transaction.paymentDay != null) {
+          final paymentDate = DateTime.parse(transaction.paymentDay!);
+          if (paymentDate.isAfter(
+                  previousMonthStart.subtract(const Duration(seconds: 1))) &&
+              paymentDate
+                  .isBefore(previousMonthEnd.add(const Duration(seconds: 1)))) {
+            print(
+                '  - PREVIOUS: ${transaction.title}: ${transaction.value} on $paymentDate');
+          }
+        }
+      }
+
+      // Debug: verificar se há dados em outros meses
+      final hasAnyDataDebug = _hasCategoryTransactionsInAnyPreviousMonth(
+          transactions, categoryId, currentDate);
+      print('Category $categoryId - HasAnyData: $hasAnyDataDebug');
+
+      // Lógica simplificada: se há dados em qualquer mês, calcular a comparação
+      if (hasCurrentData || hasPreviousData) {
+        // Se não há dados do mês anterior, mas há dados do mês atual, é um novo dado
+        if (!hasPreviousData && hasCurrentData && currentExpenses > 0) {
           return PercentageResult(
             percentage: 0.0,
             hasData: true,
@@ -498,57 +559,102 @@ class PercentageCalculationService {
             displayText: 'Novo',
           );
         }
-        return PercentageResult.noData();
-      }
 
-      // Handle edge cases
-      if (previousExpenses == 0.0) {
+        // Se há dados do mês anterior, calcular a comparação
+        if (hasPreviousData) {
+          // Handle edge cases
+          if (previousExpenses == 0.0) {
+            if (currentExpenses > 0) {
+              return PercentageResult(
+                percentage: 0.0,
+                hasData: true,
+                type: PercentageType.newData,
+                displayText: 'Novo',
+              );
+            } else {
+              return PercentageResult(
+                percentage: 0.0,
+                hasData: true,
+                type: PercentageType.neutral,
+                displayText: '0.0%',
+              );
+            }
+          }
+
+          // Calculate percentage change
+          final percentageChange =
+              ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+
+          // Determine type
+          PercentageType type;
+          if (percentageChange < 0) {
+            // Despesas diminuíram = bom
+            type = PercentageType.positive;
+          } else if (percentageChange > 0) {
+            // Despesas aumentaram = ruim
+            type = PercentageType.negative;
+          } else {
+            type = PercentageType.neutral;
+          }
+
+          return PercentageResult(
+            percentage: percentageChange.abs(),
+            hasData: true,
+            type: type,
+            displayText: _formatPercentage(percentageChange, type),
+          );
+        }
+
+        // Se chegou aqui, há dados atuais mas não há dados anteriores
+        // Verificar se é realmente uma categoria nova ou se há parcelamentos
         if (currentExpenses > 0) {
-          return PercentageResult(
-            percentage: 0.0,
-            hasData: true,
-            type: PercentageType.newData,
-            displayText: 'Novo',
-          );
-        } else {
-          return PercentageResult(
-            percentage: 0.0,
-            hasData: true,
-            type: PercentageType.neutral,
-            displayText: '0.0%',
-          );
+          // Verificar se há transações da mesma categoria em outros meses (parcelamentos)
+          final hasAnyPreviousData = _hasCategoryTransactionsInAnyPreviousMonth(
+              transactions, categoryId, currentDate);
+
+          if (hasAnyPreviousData) {
+            // Se há dados em outros meses, não é realmente nova
+            return PercentageResult(
+              percentage: 0.0,
+              hasData: true,
+              type: PercentageType.neutral,
+              displayText: '0.0%',
+            );
+          } else {
+            // É realmente uma categoria nova
+            return PercentageResult(
+              percentage: 0.0,
+              hasData: true,
+              type: PercentageType.newData,
+              displayText: 'Novo',
+            );
+          }
         }
       }
 
-      // Calculate percentage change
-      final percentageChange =
-          ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+      // Se chegou aqui, verificar se há dados em outros meses (parcelamentos antigos)
+      final hasAnyData = _hasCategoryTransactionsInAnyPreviousMonth(
+          transactions, categoryId, currentDate);
 
-      // Determine type
-      PercentageType type;
-      if (percentageChange < 0) {
-        // Despesas diminuíram = bom
-        type = PercentageType.positive;
-      } else if (percentageChange > 0) {
-        // Despesas aumentaram = ruim
-        type = PercentageType.negative;
-      } else {
-        type = PercentageType.neutral;
+      if (hasAnyData) {
+        // Se há dados em outros meses, mostrar como "0.0%" (sem variação)
+        return PercentageResult(
+          percentage: 0.0,
+          hasData: true,
+          type: PercentageType.neutral,
+          displayText: '0.0%',
+        );
       }
 
-      return PercentageResult(
-        percentage: percentageChange.abs(),
-        hasData: true,
-        type: type,
-        displayText: _formatPercentage(percentageChange, type),
-      );
+      // Se chegou aqui, não há dados suficientes
+      return PercentageResult.noData();
     } catch (e) {
       print('Error calculating category expense comparison: $e');
       return PercentageResult.noData();
     }
   }
 
-  static double _getCategoryExpensesForPeriod(
+  static double getCategoryExpensesForPeriod(
     List<TransactionModel> transactions,
     int categoryId,
     DateTime startDate,
@@ -564,17 +670,10 @@ class PercentageCalculationService {
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
 
-        // Simplificando a lógica de comparação
-        final paymentDateOnly =
-            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final startDateOnly =
-            DateTime(startDate.year, startDate.month, startDate.day);
-        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
-
-        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
-            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
-            (paymentDateOnly.isAfter(startDateOnly) &&
-                paymentDateOnly.isBefore(endDateOnly))) {
+        // Lógica de comparação mais precisa - usar datas completas
+        if (paymentDate
+                .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+            paymentDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
           expenses += _parseValue(transaction.value);
         }
       } catch (e) {
@@ -599,17 +698,37 @@ class PercentageCalculationService {
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
 
-        // Simplificando a lógica de comparação
-        final paymentDateOnly =
-            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final startDateOnly =
-            DateTime(startDate.year, startDate.month, startDate.day);
-        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+        // Lógica de comparação mais precisa - usar datas completas
+        if (paymentDate
+                .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+            paymentDate.isBefore(endDate.add(const Duration(seconds: 1)))) {
+          return true;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    return false;
+  }
 
-        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
-            paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
-            (paymentDateOnly.isAfter(startDateOnly) &&
-                paymentDateOnly.isBefore(endDateOnly))) {
+  static bool _hasCategoryTransactionsInAnyPreviousMonth(
+    List<TransactionModel> transactions,
+    int categoryId,
+    DateTime currentDate,
+  ) {
+    // Verificar se há transações da mesma categoria em qualquer mês anterior
+    for (final transaction in transactions) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa ||
+          transaction.category != categoryId) continue;
+
+      try {
+        final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Se a transação é de um mês anterior ao atual
+        if (paymentDate.year < currentDate.year ||
+            (paymentDate.year == currentDate.year &&
+                paymentDate.month < currentDate.month)) {
           return true;
         }
       } catch (e) {
