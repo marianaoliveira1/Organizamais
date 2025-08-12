@@ -14,6 +14,8 @@ import 'package:organizamais/model/percentage_result.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
+import '../../../ads_banner/ads_banner.dart';
+
 class WidgetListCategoryGraphics extends StatelessWidget {
   const WidgetListCategoryGraphics({
     super.key,
@@ -179,6 +181,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      AdsBanner(),
+                      SizedBox(
+                        height: 4.h,
+                      ),
                       _buildCategoryMonthComparison(categoryId, theme),
                       Text(
                         "Detalhes das Transações",
@@ -464,16 +470,19 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             DateTime(
                 previousYear, previousMonth, previousMonthDay, 23, 59, 59));
 
+    // Calcular a diferença absoluta em R$
+    final absoluteDifference = (currentValue - previousValue).abs();
+
     // Criar texto explicativo baseado no tipo de comparação
     String explanationText = '';
     switch (comparison.type) {
       case PercentageType.positive:
         explanationText =
-            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
         break;
       case PercentageType.negative:
         explanationText =
-            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
         break;
       case PercentageType.neutral:
         explanationText =

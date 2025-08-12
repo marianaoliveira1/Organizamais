@@ -77,6 +77,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
+            AdsBanner(),
           ],
         );
       }),

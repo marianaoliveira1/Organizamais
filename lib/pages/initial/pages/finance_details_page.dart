@@ -91,7 +91,7 @@ class FinanceDetailsPage extends StatelessWidget {
           children: [
             AdsBanner(),
             SizedBox(
-              height: 20.h,
+              height: 16.h,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -112,8 +112,11 @@ class FinanceDetailsPage extends StatelessWidget {
                       previousExpenses,
                     ),
 
-                    SizedBox(height: 24.h),
-
+                    SizedBox(height: 14.h),
+                    AdsBanner(),
+                    SizedBox(
+                      height: 20.h,
+                    ),
                     Text(
                       "Receitas",
                       style: TextStyle(
@@ -139,7 +142,10 @@ class FinanceDetailsPage extends StatelessWidget {
                             },
                           ),
 
-                    SizedBox(height: 24.h),
+                    AdsBanner(),
+                    SizedBox(
+                      height: 20.h,
+                    ),
 
                     // Seção de despesas
                     Text(
@@ -541,6 +547,7 @@ class FinanceDetailsPage extends StatelessWidget {
             PercentageExplanationType.balance,
           ),
           SizedBox(height: 12.h),
+
           _buildComparisonItem(
             theme,
             formatter,

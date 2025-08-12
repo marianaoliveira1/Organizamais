@@ -454,7 +454,6 @@ class _GraphicsPageState extends State<GraphicsPage> {
       DateFormat dayFormatter) {
     var sparklineData = getSparklineData(transactionController, dayFormatter);
     List<double> data = sparklineData['data'];
-    List<String> labels = sparklineData['labels'];
 
     if (data.isEmpty) {
       return Container(
@@ -607,20 +606,16 @@ class _GraphicsPageState extends State<GraphicsPage> {
                     // Labels dos dias
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        DateTime(DateTime.now().year, DateTime.now().month + 1,
-                                0)
-                            .day,
-                        (index) {
-                          return Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              fontSize: 6.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          );
-                        },
-                      ),
+                      children:
+                          (sparklineData['labels'] as List<String>).map((day) {
+                        return Text(
+                          day,
+                          style: TextStyle(
+                            fontSize: 6.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
