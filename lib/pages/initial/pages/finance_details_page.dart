@@ -142,11 +142,6 @@ class FinanceDetailsPage extends StatelessWidget {
                             },
                           ),
 
-                    AdsBanner(),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-
                     // Seção de despesas
                     Text(
                       "Despesas",

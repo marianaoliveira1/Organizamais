@@ -141,8 +141,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           ),
                           Icon(
                             selectedCategoryId.value == categoryId
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
+                                ? Icons.keyboard_arrow_down
+                                : Icons.keyboard_arrow_up,
                             color: DefaultColors.grey,
                             size: 16.h,
                           ),
