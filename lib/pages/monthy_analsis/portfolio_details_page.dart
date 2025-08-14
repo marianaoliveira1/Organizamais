@@ -324,11 +324,13 @@ class PortfolioDetailsPage extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      Iconsax.money_send,
-                      size: 16.sp,
+                      balanceVariation >= 0
+                          ? Iconsax.money_send
+                          : Iconsax.arrow_down_2,
                       color: balanceVariation >= 0
                           ? DefaultColors.green
                           : DefaultColors.red,
+                      size: 16.sp,
                     ),
                     SizedBox(width: 4.w),
                     Text(

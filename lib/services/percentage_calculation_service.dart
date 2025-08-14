@@ -741,9 +741,9 @@ class PercentageCalculationService {
   static String _formatPercentage(double percentage, PercentageType type) {
     switch (type) {
       case PercentageType.positive:
-        return '+${percentage.toStringAsFixed(1)}%';
+        return '+${percentage.abs().toStringAsFixed(1)}%';
       case PercentageType.negative:
-        return '${percentage.toStringAsFixed(1)}%';
+        return '-${percentage.abs().toStringAsFixed(1)}%';
       case PercentageType.neutral:
         return '0.0%';
       case PercentageType.newData:
