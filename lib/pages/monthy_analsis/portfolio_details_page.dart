@@ -77,6 +77,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 20.h),
             AdsBanner(),
           ],
         );

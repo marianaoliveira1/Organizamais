@@ -269,7 +269,7 @@ class PortfolioCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Análise Mensal (${DateTime.now().year})',
+                'Análise anual de ${DateTime.now().year}',
                 style: TextStyle(
                   fontSize: 10.sp,
                   fontWeight: FontWeight.w600,

@@ -473,25 +473,29 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     // Calcular a diferença absoluta em R$
     final absoluteDifference = (currentValue - previousValue).abs();
 
-    // Criar texto explicativo baseado no tipo de comparação
+    // Criar texto explicativo baseado na comparação real dos valores
     String explanationText = '';
-    switch (comparison.type) {
-      case PercentageType.positive:
+
+    if (comparison.type == PercentageType.newData) {
+      explanationText =
+          'Nova categoria - R\$ ${_formatCurrency(currentValue)} (não há dados do mês anterior)';
+    } else if (comparison.type == PercentageType.neutral) {
+      explanationText =
+          'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)}';
+    } else {
+      // Para positive e negative, usar a lógica real baseada nos valores
+      if (currentValue < previousValue) {
+        // Despesas diminuíram = bom
         explanationText =
             'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
-        break;
-      case PercentageType.negative:
+      } else if (currentValue > previousValue) {
+        // Despesas aumentaram = ruim
         explanationText =
             'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
-        break;
-      case PercentageType.neutral:
+      } else {
         explanationText =
             'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)}';
-        break;
-      case PercentageType.newData:
-        explanationText =
-            'Nova categoria - R\$ ${_formatCurrency(currentValue)} (não há dados do mês anterior)';
-        break;
+      }
     }
 
     return Container(
