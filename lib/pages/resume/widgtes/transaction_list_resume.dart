@@ -27,7 +27,7 @@ class TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (transactionController.transaction.isEmpty) {
-        return DefaultTextNotTransaction();
+        return const DefaultTextNotTransaction();
       }
 
       // Ordena as transações da mais recente para a mais antiga
@@ -45,6 +45,7 @@ class TransactionsList extends StatelessWidget {
           String date = groupedTransactions.keys.elementAt(index);
           List transactions = groupedTransactions[date]!;
           return DateSectionResume(
+            key: ValueKey('date_$date'),
             date: date,
             transactions: transactions,
             formatter: formatter,

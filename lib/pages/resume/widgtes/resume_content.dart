@@ -9,10 +9,12 @@ import 'transaction_list_resume.dart';
 
 class ResumeContent extends StatelessWidget {
   ResumeContent({super.key});
-  final TransactionController _transactionController =
+
+  static final TransactionController _transactionController =
       Get.put(TransactionController());
-  final RxString _selectedMonth = getAllMonths()[DateTime.now().month - 1].obs;
-  final NumberFormat _formatter =
+  static final RxString _selectedMonth =
+      getAllMonths()[DateTime.now().month - 1].obs;
+  static final NumberFormat _formatter =
       NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   static List<String> getAllMonths() => [

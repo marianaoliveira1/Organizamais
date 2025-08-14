@@ -22,31 +22,72 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    InitialPage(),
-    GraphicsPage(),
+    const InitialPage(),
+    const GraphicsPage(),
     Container(),
-    ResumePage(),
-    MonthlyAnalysisPage(),
+    const ResumePage(),
+    const MonthlyAnalysisPage(),
   ];
 
-  void _onItemTapped(int index) async {
-    if (index == 2) {
-      final result = await Get.to(() => TransactionPage());
+  @override
+  bool get wantKeepAlive => true;
 
-      if (result != null && result is int) {
-        setState(() {
-          _selectedIndex = result;
-        });
-      }
+  void _onItemTapped(int index) {
+    // Evitar rebuilds desnecessários
+    if (_selectedIndex == index) return;
+
+    if (index == 2) {
+      Get.to(() => TransactionPage())?.then((result) {
+        if (result != null && result is int && mounted) {
+          setState(() {
+            _selectedIndex = result;
+          });
+        }
+      });
     } else {
       setState(() {
         _selectedIndex = index;
       });
     }
+  }
+
+  Widget _buildNavItem(
+      int index, IconData icon, String label, ThemeData theme) {
+    final isSelected = _selectedIndex == index;
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? theme.primaryColor : DefaultColors.grey,
+                size: 24,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? theme.primaryColor : DefaultColors.grey,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildOptionButton(
@@ -80,52 +121,43 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: theme.cardColor,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconsaxBold.home,
-            ),
-            label: "Inicio",
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: RepaintBoundary(
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconsaxBold.graph,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(0, IconsaxBold.home, "Inicio", theme),
+                  _buildNavItem(1, IconsaxBold.graph, "Graficos", theme),
+                  const SizedBox(width: 40), // Espaço para o FAB
+                  _buildNavItem(3, IconsaxBold.arrow_swap_horizontal,
+                      "Transações", theme),
+                  _buildNavItem(4, IconsaxBold.status_up, "Analise", theme),
+                ],
+              ),
             ),
-            label: "Graficos",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Iconsax.add,
-              size: 0,
-            ),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconsaxBold.arrow_swap_horizontal,
-            ),
-            label: "Transações",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconsaxBold.status_up,
-            ),
-            label: "Analise",
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: theme.primaryColor,
-        unselectedItemColor: DefaultColors.grey,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: DefaultColors.green,

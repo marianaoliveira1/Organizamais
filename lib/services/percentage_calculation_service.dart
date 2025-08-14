@@ -308,7 +308,7 @@ class PercentageCalculationService {
         percentage: percentageChange.abs(),
         hasData: true,
         type: type,
-        displayText: _formatPercentage(percentageChange, type),
+        displayText: _formatPercentage(percentageChange.abs(), type),
       );
     } catch (e) {
       print('Error calculating expense comparison: $e');
@@ -589,10 +589,10 @@ class PercentageCalculationService {
           PercentageType type;
           if (percentageChange < 0) {
             // Despesas diminuíram = bom
-            type = PercentageType.positive;
+            type = PercentageType.negative;
           } else if (percentageChange > 0) {
             // Despesas aumentaram = ruim
-            type = PercentageType.negative;
+            type = PercentageType.positive;
           } else {
             type = PercentageType.neutral;
           }
@@ -601,7 +601,7 @@ class PercentageCalculationService {
             percentage: percentageChange.abs(),
             hasData: true,
             type: type,
-            displayText: _formatPercentage(percentageChange, type),
+            displayText: _formatPercentage(percentageChange.abs(), type),
           );
         }
 

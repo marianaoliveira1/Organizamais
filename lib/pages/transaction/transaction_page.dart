@@ -494,7 +494,10 @@ class _TransactionPageState extends State<TransactionPage> {
                               transaction,
                               isInstallment: _isInstallment,
                               installments: _installments);
-                          Navigator.pop(context);
+
+                          // Navegar para ResumePage após salvar
+                          Navigator.pop(
+                              context, 3); // Retorna índice 3 (ResumePage)
                         } catch (e) {
                           Get.snackbar(
                             'Erro',
