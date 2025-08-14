@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:iconsax/iconsax.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/utils/color.dart';
@@ -368,8 +369,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                           ),
                           Icon(
                             selectedPaymentType.value == paymentType
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
+                                ? Iconsax.arrow_up_2
+                                : Iconsax.arrow_down_2,
                             color: DefaultColors.grey,
                             size: 16.h,
                           ),

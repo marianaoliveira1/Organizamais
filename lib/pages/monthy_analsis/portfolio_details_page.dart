@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
@@ -194,13 +195,23 @@ class PortfolioDetailsPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Saldo',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: DefaultColors.grey20,
-                ),
+              Row(
+                children: [
+                  Icon(
+                    Iconsax.money_send,
+                    size: 16.sp,
+                    color: DefaultColors.grey20,
+                  ),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'Saldo',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.grey20,
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 4.h),
               Text(
@@ -226,8 +237,8 @@ class PortfolioDetailsPage extends StatelessWidget {
                   children: [
                     Icon(
                       incomeVariation >= 0
-                          ? Icons.trending_up
-                          : Icons.trending_down,
+                          ? Iconsax.arrow_circle_up
+                          : Iconsax.arrow_down_2,
                       color: incomeVariation >= 0
                           ? DefaultColors.green
                           : DefaultColors.red,
@@ -270,8 +281,8 @@ class PortfolioDetailsPage extends StatelessWidget {
                   children: [
                     Icon(
                       expensesVariation <= 0
-                          ? Icons.trending_down
-                          : Icons.trending_up,
+                          ? Iconsax.arrow_down_2
+                          : Iconsax.arrow_circle_up,
                       color: expensesVariation <= 0
                           ? DefaultColors.green
                           : DefaultColors.red,
@@ -313,13 +324,11 @@ class PortfolioDetailsPage extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      balanceVariation >= 0
-                          ? Icons.trending_up
-                          : Icons.trending_down,
+                      Iconsax.money_send,
+                      size: 16.sp,
                       color: balanceVariation >= 0
                           ? DefaultColors.green
                           : DefaultColors.red,
-                      size: 16.sp,
                     ),
                     SizedBox(width: 4.w),
                     Text(

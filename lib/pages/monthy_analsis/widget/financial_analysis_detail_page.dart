@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
@@ -352,15 +353,15 @@ class FinancialAnalysisDetailPage extends StatelessWidget {
 
         if (saldoDiff > 0) {
           cardColor = Colors.green;
-          icon = Icons.arrow_upward;
+          icon = Iconsax.arrow_circle_up;
           message = "Melhoria no saldo!";
         } else if (saldoDiff >= -100) {
           cardColor = Colors.orange;
-          icon = Icons.circle;
+          icon = Iconsax.arrow_right_2;
           message = "Saldo estável";
         } else {
           cardColor = Colors.red;
-          icon = Icons.arrow_downward;
+          icon = Iconsax.arrow_down_2;
           message = "Atenção ao saldo!";
         }
 

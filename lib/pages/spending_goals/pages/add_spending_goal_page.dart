@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -129,7 +130,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
           style: TextStyle(color: theme.primaryColor),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.primaryColor),
+          icon: Icon(Iconsax.arrow_left_2, color: theme.primaryColor),
           onPressed: () => Get.back(),
         ),
       ),

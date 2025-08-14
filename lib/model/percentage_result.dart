@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
-enum PercentageType {
-  positive,
-  negative,
-  neutral,
-  newData
-}
+enum PercentageType { positive, negative, neutral, newData }
 
 class PercentageResult {
   final double percentage;
@@ -37,19 +33,19 @@ class PercentageResult {
   IconData get icon {
     switch (type) {
       case PercentageType.positive:
-        return Icons.trending_up;
+        return Iconsax.arrow_circle_up;
       case PercentageType.negative:
-        return Icons.trending_down;
+        return Iconsax.arrow_down_2;
       case PercentageType.neutral:
-        return Icons.trending_flat;
+        return Iconsax.arrow_right_2;
       case PercentageType.newData:
-        return Icons.fiber_new;
+        return Iconsax.star_1;
     }
   }
 
   String get formattedPercentage {
     if (!hasData) return '';
-    
+
     switch (type) {
       case PercentageType.positive:
         return '+${percentage.toStringAsFixed(1)}%';

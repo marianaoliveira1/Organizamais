@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -304,23 +305,23 @@ class CategoryMonthlyChart extends StatelessWidget {
 
         if (percentChange > 15) {
           cardColor = Colors.red;
-          icon = Icons.arrow_upward;
+          icon = Iconsax.arrow_circle_up;
           message = "Alerta: aumento expressivo!";
         } else if (percentChange >= 5 && percentChange <= 15) {
           cardColor = Colors.orange;
-          icon = Icons.arrow_upward;
+          icon = Iconsax.arrow_circle_up;
           message = "Aumento moderado";
         } else if (percentChange >= -5 && percentChange <= 5) {
           cardColor = Colors.grey;
-          icon = Icons.circle;
+          icon = Iconsax.arrow_right_2;
           message = "Estável";
         } else if (percentChange >= -15 && percentChange <= -5) {
           cardColor = Colors.green;
-          icon = Icons.arrow_downward;
+          icon = Iconsax.arrow_down_2;
           message = "Boa redução!";
         } else {
           cardColor = Colors.green;
-          icon = Icons.arrow_downward;
+          icon = Iconsax.arrow_down_2;
           message = "Economia significativa!";
         }
 
@@ -560,7 +561,7 @@ class CategoryMonthlyChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.lightbulb_outline,
+            Iconsax.lamp_on,
             color: Colors.blue,
             size: 16.sp,
           ),

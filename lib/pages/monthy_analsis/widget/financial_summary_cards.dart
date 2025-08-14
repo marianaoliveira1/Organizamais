@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -277,7 +277,7 @@ class PortfolioCard extends StatelessWidget {
                 ),
               ),
               Icon(
-                Icons.arrow_forward_ios,
+                Iconsax.arrow_right_3,
                 size: 8.sp,
                 color: DefaultColors.grey,
               ),

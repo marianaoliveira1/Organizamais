@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -141,8 +142,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           ),
                           Icon(
                             selectedCategoryId.value == categoryId
-                                ? Icons.keyboard_arrow_down
-                                : Icons.keyboard_arrow_up,
+                                ? Iconsax.arrow_down_2
+                                : Iconsax.arrow_up_2,
                             color: DefaultColors.grey,
                             size: 16.h,
                           ),
@@ -385,7 +386,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.fiber_new,
+              Iconsax.star_1,
               size: 12.h,
               color: DefaultColors.grey,
             ),
