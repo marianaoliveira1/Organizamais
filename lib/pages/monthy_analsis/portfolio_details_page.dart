@@ -31,7 +31,7 @@ class PortfolioDetailsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         title: Text(
-          'Análise Mensal',
+          'Análise Mensal ',
           style: TextStyle(
             color: theme.primaryColor,
             fontSize: 18.sp,
@@ -60,6 +60,15 @@ class PortfolioDetailsPage extends StatelessWidget {
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: theme.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Compração entre os meses",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
                       ),
                     ),
                     SizedBox(height: 12.h),
@@ -119,232 +128,243 @@ class PortfolioDetailsPage extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.symmetric(
-        vertical: 12.h,
-        horizontal: 14.w,
-      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
       ),
+      padding: EdgeInsets.all(9.w),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            monthName,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-              color: DefaultColors.grey20,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            formatter.format(balance),
-            style: TextStyle(
-              fontSize: 32.sp,
-              fontWeight: FontWeight.w600,
-              color: balance >= 0 ? DefaultColors.green : DefaultColors.red,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Receitas',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      color: DefaultColors.slateGrey,
-                    ),
-                    textAlign: TextAlign.start,
-                  ),
-                  Text(
-                    formatter.format(income),
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Despesas',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      color: DefaultColors.slateGrey,
-                    ),
-                    textAlign: TextAlign.end,
-                  ),
-                  Text(
-                    formatter.format(expenses),
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(
-                12.r,
-              ),
-            ),
+          Padding(
             padding: EdgeInsets.symmetric(
-              vertical: 10.h,
-              horizontal: 12.w,
+              vertical: 12.h,
+              horizontal: 6.w,
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Variação das receitas
-                if (previousIncome != 0) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            incomeVariation >= 0
-                                ? Iconsax.arrow_circle_up
-                                : Iconsax.arrow_down_2,
-                            color: incomeVariation >= 0
-                                ? DefaultColors.green
-                                : DefaultColors.red,
-                            size: 16.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            "Receitas: ",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: incomeVariation >= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                            ),
-                          )
-                        ],
-                      ),
-                      Text(
-                        '${incomeVariationPercentage >= 0 ? '+' : ''}${incomeVariationPercentage.toStringAsFixed(1)}% (${incomeVariation >= 0 ? '+' : ''}${formatter.format(incomeVariation)})',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: incomeVariation >= 0
-                              ? DefaultColors.green
-                              : DefaultColors.red,
-                        ),
-                      ),
-                    ],
+                Text(
+                  monthName,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey20,
                   ),
-                ],
-
-                // Variação das despesas
-                if (previousExpenses != 0) ...[
-                  SizedBox(height: 8.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            expensesVariation <= 0
-                                ? Iconsax.arrow_down_2
-                                : Iconsax.arrow_circle_up,
-                            color: expensesVariation <= 0
-                                ? DefaultColors.green
-                                : DefaultColors.red,
-                            size: 16.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'Despesas: ',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: expensesVariation <= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        ' ${expensesVariationPercentage >= 0 ? '+' : ''}${expensesVariationPercentage.toStringAsFixed(1)}% (${expensesVariation >= 0 ? '+' : ''}${formatter.format(expensesVariation)})',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: expensesVariation <= 0
-                              ? DefaultColors.green
-                              : DefaultColors.red,
-                        ),
-                      ),
-                    ],
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  formatter.format(balance),
+                  style: TextStyle(
+                    fontSize: 32.sp,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        balance >= 0 ? DefaultColors.green : DefaultColors.red,
                   ),
-                ],
-
-                // Variação do saldo
-                if (previousBalance != 0) ...[
-                  SizedBox(height: 8.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            balanceVariation >= 0
-                                ? Iconsax.money_send
-                                : Iconsax.arrow_down_2,
-                            color: balanceVariation >= 0
-                                ? DefaultColors.green
-                                : DefaultColors.red,
-                            size: 16.sp,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Receitas',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: DefaultColors.slateGrey,
                           ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'Saldo:',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: balanceVariation >= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        ' ${balanceVariationPercentage >= 0 ? '+' : ''}${balanceVariationPercentage.toStringAsFixed(1)}% (${balanceVariation >= 0 ? '+' : ''}${formatter.format(balanceVariation)})',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: balanceVariation >= 0
-                              ? DefaultColors.green
-                              : DefaultColors.red,
+                          textAlign: TextAlign.start,
                         ),
-                      ),
-                    ],
-                  ),
-                ]
+                        Text(
+                          formatter.format(income),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Despesas',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: DefaultColors.slateGrey,
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                        Text(
+                          formatter.format(expenses),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+          SizedBox(
+            height: 6.h,
+          ),
+          if (previousIncome != 0) ...[
+            Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(
+                  12.r,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                vertical: 10.h,
+                horizontal: 12.w,
+              ),
+              child: Column(
+                children: [
+                  // Variação das receitas
+                  if (previousIncome != 0) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              incomeVariation >= 0
+                                  ? Iconsax.arrow_circle_up
+                                  : Iconsax.arrow_down_2,
+                              color: incomeVariation >= 0
+                                  ? DefaultColors.green
+                                  : DefaultColors.red,
+                              size: 16.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              "Receitas: ",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: incomeVariation >= 0
+                                    ? DefaultColors.green
+                                    : DefaultColors.red,
+                              ),
+                            )
+                          ],
+                        ),
+                        Text(
+                          '${incomeVariationPercentage >= 0 ? '+' : ''}${incomeVariationPercentage.toStringAsFixed(1)}% (${incomeVariation >= 0 ? '+' : ''}${formatter.format(incomeVariation)})',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: incomeVariation >= 0
+                                ? DefaultColors.green
+                                : DefaultColors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  // Variação das despesas
+                  if (previousExpenses != 0) ...[
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              expensesVariation <= 0
+                                  ? Iconsax.arrow_down_2
+                                  : Iconsax.arrow_circle_up,
+                              color: expensesVariation <= 0
+                                  ? DefaultColors.green
+                                  : DefaultColors.red,
+                              size: 16.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Despesas: ',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: expensesVariation <= 0
+                                    ? DefaultColors.green
+                                    : DefaultColors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          ' ${expensesVariationPercentage >= 0 ? '+' : ''}${expensesVariationPercentage.toStringAsFixed(1)}% (${expensesVariation >= 0 ? '+' : ''}${formatter.format(expensesVariation)})',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: expensesVariation <= 0
+                                ? DefaultColors.green
+                                : DefaultColors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  // Variação do saldo
+                  if (previousBalance != 0) ...[
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Iconsax.money_send,
+                              color: balanceVariation >= 0
+                                  ? DefaultColors.green
+                                  : DefaultColors.red,
+                              size: 16.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Saldo:',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                color: balanceVariation >= 0
+                                    ? DefaultColors.green
+                                    : DefaultColors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          ' ${balanceVariationPercentage >= 0 ? '+' : ''}${balanceVariationPercentage.toStringAsFixed(1)}% (${balanceVariation >= 0 ? '+' : ''}${formatter.format(balanceVariation)})',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: balanceVariation >= 0
+                                ? DefaultColors.green
+                                : DefaultColors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ]
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 6.h,
+            ),
+          ]
         ],
       ),
     );
