@@ -81,7 +81,7 @@ class FixedAccountsController extends GetxController {
 
   Future<void> updateFixedAccount(FixedAccountModel fixedAccount) async {
     if (fixedAccount.id == null) {
-      print(fixedAccount.id);
+      // print(fixedAccount.id);
       throw Exception('Fixed account id is null');
     }
     await FirebaseFirestore.instance

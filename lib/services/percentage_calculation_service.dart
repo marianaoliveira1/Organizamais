@@ -491,28 +491,28 @@ class PercentageCalculationService {
           transactions, categoryId, previousMonthStart, previousMonthEnd);
 
       // Debug: imprimir informações para entender o que está acontecendo
-      print(
-          'Category $categoryId - Current: $currentExpenses, Previous: $previousExpenses');
-      print(
-          'Category $categoryId - HasCurrent: $hasCurrentData, HasPrevious: $hasPreviousData');
-      print(
-          'Category $categoryId - Current period: $currentMonthStart to $currentMonthEnd');
-      print(
-          'Category $categoryId - Previous period: $previousMonthStart to $previousMonthEnd');
+      // print(
+      //     'Category $categoryId - Current: $currentExpenses, Previous: $previousExpenses');
+      // print(
+      //     'Category $categoryId - HasCurrent: $hasCurrentData, HasPrevious: $hasPreviousData');
+      // print(
+      //     'Category $categoryId - Current period: $currentMonthStart to $currentMonthEnd');
+      // print(
+      //     'Category $categoryId - Previous period: $previousMonthStart to $previousMonthEnd');
 
       // Debug: mostrar transações específicas da categoria
-      print('Category $categoryId - All transactions:');
+      // print('Category $categoryId - All transactions:');
       for (final transaction in transactions.where((t) =>
           t.type == TransactionType.despesa && t.category == categoryId)) {
         if (transaction.paymentDay != null) {
           final paymentDate = DateTime.parse(transaction.paymentDay!);
-          print(
-              '  - ${transaction.title}: ${transaction.value} on $paymentDate');
+          // print(
+          //     '  - ${transaction.title}: ${transaction.value} on $paymentDate');
         }
       }
 
       // Debug: mostrar transações no período atual
-      print('Category $categoryId - Current period transactions:');
+      // print('Category $categoryId - Current period transactions:');
       for (final transaction in transactions.where((t) =>
           t.type == TransactionType.despesa && t.category == categoryId)) {
         if (transaction.paymentDay != null) {
@@ -521,14 +521,14 @@ class PercentageCalculationService {
                   currentMonthStart.subtract(const Duration(seconds: 1))) &&
               paymentDate
                   .isBefore(currentMonthEnd.add(const Duration(seconds: 1)))) {
-            print(
-                '  - CURRENT: ${transaction.title}: ${transaction.value} on $paymentDate');
+            // print(
+            //     '  - CURRENT: ${transaction.title}: ${transaction.value} on $paymentDate');
           }
         }
       }
 
       // Debug: mostrar transações no período anterior
-      print('Category $categoryId - Previous period transactions:');
+      // print('Category $categoryId - Previous period transactions:');
       for (final transaction in transactions.where((t) =>
           t.type == TransactionType.despesa && t.category == categoryId)) {
         if (transaction.paymentDay != null) {
@@ -537,8 +537,8 @@ class PercentageCalculationService {
                   previousMonthStart.subtract(const Duration(seconds: 1))) &&
               paymentDate
                   .isBefore(previousMonthEnd.add(const Duration(seconds: 1)))) {
-            print(
-                '  - PREVIOUS: ${transaction.title}: ${transaction.value} on $paymentDate');
+            // print(
+            //     '  - PREVIOUS: ${transaction.title}: ${transaction.value} on $paymentDate');
           }
         }
       }
@@ -546,7 +546,7 @@ class PercentageCalculationService {
       // Debug: verificar se há dados em outros meses
       final hasAnyDataDebug = _hasCategoryTransactionsInAnyPreviousMonth(
           transactions, categoryId, currentDate);
-      print('Category $categoryId - HasAnyData: $hasAnyDataDebug');
+      // print('Category $categoryId - HasAnyData: $hasAnyDataDebug');
 
       // Lógica simplificada: se há dados em qualquer mês, calcular a comparação
       if (hasCurrentData || hasPreviousData) {

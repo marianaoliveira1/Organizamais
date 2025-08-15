@@ -141,9 +141,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            selectedCategoryId.value == categoryId
-                                ? Iconsax.arrow_down_2
-                                : Iconsax.arrow_up_2,
+                            Iconsax.arrow_square_down,
+                            // selectedCategoryId.value == categoryId
+                            //     ? Iconsax.arrow_down_2
+                            //     : Iconsax.arrow_up_2,
                             color: DefaultColors.grey,
                             size: 16.h,
                           ),
