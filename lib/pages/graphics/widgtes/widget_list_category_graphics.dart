@@ -141,7 +141,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            Iconsax.arrow_square_down,
+                            Iconsax.arrow_down5,
                             // selectedCategoryId.value == categoryId
                             //     ? Iconsax.arrow_down_2
                             //     : Iconsax.arrow_up_2,

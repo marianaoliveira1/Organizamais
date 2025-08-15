@@ -10,6 +10,7 @@ import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import 'default_text_graphic.dart';
 
 class DespesasPorTipoDePagamento extends StatelessWidget {
@@ -368,9 +369,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            selectedPaymentType.value == paymentType
-                                ? Iconsax.arrow_up_2
-                                : Iconsax.arrow_down_2,
+                            Iconsax.arrow_down5,
                             color: DefaultColors.grey,
                             size: 16.h,
                           ),
@@ -408,6 +407,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    AdsBanner(),
+                    SizedBox(
+                      height: 4.h,
+                    ),
                     Text(
                       "Detalhes das Transações",
                       style: TextStyle(
