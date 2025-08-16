@@ -199,6 +199,13 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                   ],
                 ),
               ),
+              Text(
+                "para que os gráficos sejam exibidos de maneira mais equilibrada",
+                style: TextStyle(
+                  color: DefaultColors.grey20,
+                  fontSize: 9.sp,
+                ),
+              ),
               DefaultTitleTransaction(
                 title: "Categoria",
               ),

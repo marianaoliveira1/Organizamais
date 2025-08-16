@@ -95,6 +95,177 @@ class PortfolioDetailsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildPredictionSection(
+    ThemeData theme,
+    NumberFormat formatter,
+    List<Map<String, dynamic>> monthlyData,
+  ) {
+    // Filtra meses com algum dado e pega os 3 mais recentes
+    final List<Map<String, dynamic>> relevant = monthlyData
+        .where(
+            (m) => (m['income'] as double) > 0 || (m['expenses'] as double) > 0)
+        .toList();
+
+    if (relevant.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    relevant.sort((a, b) {
+      if (a['year'] != b['year']) {
+        return a['year'].compareTo(b['year']);
+      }
+      return a['month'].compareTo(b['month']);
+    });
+
+    final List<Map<String, dynamic>> lastThree =
+        relevant.reversed.take(3).toList();
+
+    final int count = lastThree.length;
+    final double avgIncome =
+        lastThree.fold(0.0, (sum, m) => sum + (m['income'] as double)) / count;
+    final double avgExpenses =
+        lastThree.fold(0.0, (sum, m) => sum + (m['expenses'] as double)) /
+            count;
+    final double avgBalance = avgIncome - avgExpenses;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      padding: EdgeInsets.all(12.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Previsão',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            'Com base nas últimas 3 entradas, suas próximas receitas/despesas serão:',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Iconsax.arrow_circle_up,
+                        color: DefaultColors.green,
+                        size: 16.sp,
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        'Receitas previstas',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: DefaultColors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    formatter.format(avgIncome),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Iconsax.arrow_down_2,
+                        color: DefaultColors.red,
+                        size: 16.sp,
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        'Despesas previstas',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: DefaultColors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    formatter.format(avgExpenses),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Iconsax.money_send,
+                    color: avgBalance >= 0
+                        ? DefaultColors.green
+                        : DefaultColors.red,
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'Total previsto',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: avgBalance >= 0
+                          ? DefaultColors.green
+                          : DefaultColors.red,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                formatter.format(avgBalance),
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMonthCard(
     ThemeData theme,
     NumberFormat formatter,
@@ -376,12 +547,17 @@ class PortfolioDetailsPage extends StatelessWidget {
     final int currentYear = currentDate.year;
     final int currentMonth = currentDate.month;
 
-    // Agrupa transações por mês até o mês atual
+    // Agrupa transações por mês até o mês atual (apenas ano 2025)
     for (final transaction in controller.transaction) {
       if (transaction.paymentDay == null) continue;
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
+
+        // Exibir apenas dados do ano de 2025
+        if (paymentDate.year != 2025) {
+          continue;
+        }
 
         // Filtra apenas transações até o mês atual
         if (paymentDate.year > currentYear ||
@@ -446,6 +622,15 @@ class PortfolioDetailsPage extends StatelessWidget {
     if (previousMonth == 0) {
       previousMonth = 12;
       previousYear = year - 1;
+    }
+
+    // Para esta página, não considerar dados fora de 2025
+    if (previousYear != 2025) {
+      return {
+        'income': 0.0,
+        'expenses': 0.0,
+        'balance': 0.0,
+      };
     }
 
     double income = 0.0;

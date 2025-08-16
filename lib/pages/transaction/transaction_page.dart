@@ -138,6 +138,10 @@ class _TransactionPageState extends State<TransactionPage> {
       _selectedDate = DateTime.parse(widget.transaction!.paymentDay ?? '');
       dayOfTheMonthController.text = _getFormattedDate(_selectedDate!);
       paymentTypeController.text = widget.transaction!.paymentType ?? '';
+    } else {
+      // Data padrão: hoje
+      _selectedDate = DateTime.now();
+      dayOfTheMonthController.text = _getFormattedDate(_selectedDate!);
     }
   }
 

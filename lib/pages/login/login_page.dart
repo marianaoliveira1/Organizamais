@@ -43,7 +43,9 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 80.h,),
+              SizedBox(
+                height: 80.h,
+              ),
               Text(
                 "ORGANIZA+",
                 style: TextStyle(
@@ -83,13 +85,6 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 20.h,
               ),
-              // UnityBannerAd(
-              //   placementId: 'Banner_Android',
-              //   onLoad: (placementId) => print('Banner loaded: $placementId'),
-              //   onClick: (placementId) => print('Banner clicked: $placementId'),
-              //   onShown: (placementId) => print('Banner shown: $placementId'),
-              //   onFailed: (placementId, error, message) => print('Banner Ad $placementId failed: $error $message'),
-              // ),
               ButtonLoginWithGoogle(
                 text: "Entrar com Google",
                 onTap: () => authController.loginWithGoogle(),

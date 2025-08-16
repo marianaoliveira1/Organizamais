@@ -370,30 +370,50 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       DateTime.now(),
     );
 
-    // Debug: verificar por que não está funcionando
+    // Fallback: se não houver dados comparáveis, verificar histórico do mês anterior completo
     if (!comparison.hasData) {
-      // Tentar calcular manualmente para debug
+      final now = DateTime.now();
       final currentValue =
           PercentageCalculationService.getCategoryExpensesForPeriod(
-              transactionController.transaction,
-              categoryId,
-              DateTime(DateTime.now().year, DateTime.now().month, 1),
-              DateTime(DateTime.now().year, DateTime.now().month,
-                  DateTime.now().day, 23, 59, 59));
+        transactionController.transaction,
+        categoryId,
+        DateTime(now.year, now.month, 1),
+        DateTime(now.year, now.month, now.day, 23, 59, 59),
+      );
 
-      // Se há dados atuais, mostrar como "Novo"
-      if (currentValue > 0) {
+      if (currentValue <= 0) {
+        return const SizedBox.shrink();
+      }
+
+      final previousMonth = now.month == 1 ? 12 : now.month - 1;
+      final previousYear = now.month == 1 ? now.year - 1 : now.year;
+      final previousMonthStart = DateTime(previousYear, previousMonth, 1);
+      final lastDayPreviousMonth =
+          DateTime(previousYear, previousMonth + 1, 0).day;
+      final previousMonthEnd = DateTime(
+          previousYear, previousMonth, lastDayPreviousMonth, 23, 59, 59);
+
+      final previousFullMonthValue =
+          PercentageCalculationService.getCategoryExpensesForPeriod(
+        transactionController.transaction,
+        categoryId,
+        previousMonthStart,
+        previousMonthEnd,
+      );
+
+      if (previousFullMonthValue > 0) {
+        // Já houve transações no mês anterior (em qualquer dia) => não é "Novo"
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Iconsax.star_1,
+              Iconsax.arrow_right_2,
               size: 12.h,
               color: DefaultColors.grey,
             ),
             SizedBox(width: 4.w),
             Text(
-              'Novo',
+              '0.0%',
               style: TextStyle(
                 fontSize: 9.sp,
                 color: DefaultColors.grey,
@@ -404,7 +424,26 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         );
       }
 
-      return const SizedBox.shrink();
+      // Sem histórico no mês anterior -> "Novo"
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Iconsax.star_1,
+            size: 12.h,
+            color: DefaultColors.grey,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            'Novo',
+            style: TextStyle(
+              fontSize: 9.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      );
     }
 
     return Row(

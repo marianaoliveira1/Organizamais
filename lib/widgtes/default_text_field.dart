@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
 class DefaultTextField extends StatefulWidget {
@@ -43,7 +44,7 @@ class _DefaultTextFieldState extends State<DefaultTextField> {
         suffixIcon: widget.hintText.toLowerCase().contains('senha')
             ? IconButton(
                 icon: Icon(
-                  _obscureText ? Icons.visibility : Icons.visibility_off,
+                  _obscureText ? Iconsax.eye : Iconsax.eye_slash,
                   color: DefaultColors.grey,
                 ),
                 onPressed: () {
