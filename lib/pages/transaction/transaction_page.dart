@@ -444,6 +444,11 @@ class _TransactionPageState extends State<TransactionPage> {
               color: DefaultColors.grey,
             ),
 
+            AdsBanner(),
+            SizedBox(
+              height: 20.h,
+            ),
+
             Padding(
               padding: EdgeInsets.all(2.h),
               child: Row(
