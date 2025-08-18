@@ -32,7 +32,7 @@ class OnboardingCardIntroPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Agora vamos colocar seu cartão para ficar mais fácil na hora das transações',
+              'Agora, adicione seu cartão para acompanhar seus gastos automaticamente 💳',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,

@@ -19,7 +19,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Salvo com sucesso!\nAgora vamos para as contas fixas',
+              'Show! Agora vamos cadastrar uma conta fixa (tipo aluguel, internet, academia...) 📅',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,

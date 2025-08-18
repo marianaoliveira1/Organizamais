@@ -20,12 +20,22 @@ class OnboardingWelcomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Bem vindo ao Organiza+\nO jeito mais simples e completo de controlar as finanças',
+              'Bem vindo(a) ao Organiza+, o seu novo jeito de organizar as finanças simples e completa ✨',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
-                fontSize: 18.sp,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 14.h),
+            Text(
+              'Vamos começar com alguns passos simples.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w400,
               ),
             ),
             SizedBox(height: 32.h),

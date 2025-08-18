@@ -20,7 +20,7 @@ class OnboardingFixedSuccessPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Tudo certo!',
+              'Tudo pronto! 🎯 Agora é só acompanhar seus gastos e ver seu saldo crescer.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
