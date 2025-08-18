@@ -45,6 +45,15 @@ final List<Map<String, dynamic>> categories_expenses = [
     'synonyms': ['reforma', 'conserto', 'reparo', 'serviços domésticos']
   },
 
+  {
+    'id': 90,
+    'name': 'Condomínio',
+    'icon': 'assets/icon-category/condominio.png',
+    'color': DefaultColors.azure,
+    'macrocategoria': 'Moradia e Casa',
+    'synonyms': ['taxa condominial', 'condomínio', 'síndico']
+  },
+
   // ========== ALIMENTAÇÃO ==========
   {
     'id': 1,
@@ -121,6 +130,22 @@ final List<Map<String, dynamic>> categories_expenses = [
     'synonyms': ['aplicativo de transporte', 'carona']
   },
   {
+    'id': 92,
+    'name': 'Manutenção do carro',
+    'icon': 'assets/icon-category/manutencao.png',
+    'color': DefaultColors.steelBlue,
+    'macrocategoria': 'Transporte',
+    'synonyms': ['revisão', 'oficina', 'mecânico', 'troca de óleo']
+  },
+  {
+    'id': 93,
+    'name': 'Transporte público',
+    'icon': 'assets/icon-category/transprote-puiblico.png',
+    'color': DefaultColors.cerulean,
+    'macrocategoria': 'Transporte',
+    'synonyms': ['ônibus', 'metrô', 'trem', 'bilhete']
+  },
+  {
     'id': 71,
     'name': 'Pedágio/Estacionamento',
     'icon': 'assets/icon-category/pedagios.png',
@@ -189,10 +214,26 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 87, // NOVA
     'name': 'Consultas Médicas',
-    'icon': 'assets/icon-category/consultas.png',
+    'icon': 'assets/icon-category/consultas-medicas.png',
     'color': DefaultColors.indigoLight,
     'macrocategoria': 'Saúde e Bem-estar',
     'synonyms': ['médico', 'dentista', 'psicólogo', 'terapia']
+  },
+  {
+    'id': 97,
+    'name': 'Psicólogo / Terapia',
+    'icon': 'assets/icon-category/consultas.png',
+    'color': DefaultColors.aquamarine,
+    'macrocategoria': 'Saúde e Bem-estar',
+    'synonyms': ['psicólogo', 'terapia', 'psicoterapia']
+  },
+  {
+    'id': 98,
+    'name': 'Dentista',
+    'icon': 'assets/icon-category/dentinsta.png',
+    'color': DefaultColors.jade,
+    'macrocategoria': 'Saúde e Bem-estar',
+    'synonyms': ['odontologia', 'dentário', 'tratamento dental']
   },
   {
     'id': 88, // NOVA
@@ -235,6 +276,22 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.earthBrown,
     'macrocategoria': 'Educação',
     'synonyms': ['leitura', 'biblioteca', 'ebook']
+  },
+  {
+    'id': 94,
+    'name': 'Escola / Material escolar',
+    'icon': 'assets/icon-category/escola.png',
+    'color': DefaultColors.periwinkle,
+    'macrocategoria': 'Educação',
+    'synonyms': ['material escolar', 'uniforme', 'mensalidade escolar']
+  },
+  {
+    'id': 96,
+    'name': 'Atividades extracurriculares (curso, esporte, música)',
+    'icon': 'assets/icon-category/atividade-extracurriculares.png',
+    'color': DefaultColors.orchid,
+    'macrocategoria': 'Educação',
+    'synonyms': ['curso', 'esporte', 'música', 'aula particular']
   },
 
   // ========== LAZER E ENTRETENIMENTO ==========
@@ -382,6 +439,14 @@ final List<Map<String, dynamic>> categories_expenses = [
     'macrocategoria': 'Pets',
     'synonyms': ['animal', 'veterinário', 'pet shop']
   },
+  {
+    'id': 99,
+    'name': 'Veterinário',
+    'icon': 'assets/icon-category/veterinario.png',
+    'color': DefaultColors.moss,
+    'macrocategoria': 'Pets',
+    'synonyms': ['consulta pet', 'clínica veterinária']
+  },
   // {
   //   'id': 78,
   //   'name': 'Pet (Veterinário/Ração)',
@@ -399,6 +464,14 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.grey,
     'macrocategoria': 'Finanças',
     'synonyms': ['IPTU', 'IRPF', 'tributo']
+  },
+  {
+    'id': 91,
+    'name': 'IPTU',
+    'icon': 'assets/icon-category/iptu.png',
+    'color': DefaultColors.vermilion,
+    'macrocategoria': 'Finanças',
+    'synonyms': ['imposto imobiliário', 'tributo municipal']
   },
   {
     'id': 37,
@@ -423,6 +496,14 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.magenta,
     'macrocategoria': 'Finanças',
     'synonyms': ['tarifa', 'anuidade', 'juros']
+  },
+  {
+    'id': 101,
+    'name': 'Cartão de crédito (fatura) Juros',
+    'icon': 'assets/icon-category/fatura.png',
+    'color': DefaultColors.charcoal,
+    'macrocategoria': 'Finanças',
+    'synonyms': ['cartão de crédito', 'fatura', 'juros', 'encargos', 'anuidade']
   },
   {
     'id': 2,
@@ -465,6 +546,22 @@ final List<Map<String, dynamic>> categories_expenses = [
     'color': DefaultColors.rosyPink,
     'macrocategoria': 'Família',
     'synonyms': ['ONG', 'solidariedade', 'contribuição']
+  },
+  {
+    'id': 95,
+    'name': 'Creche / Baba',
+    'icon': 'assets/icon-category/escola.png',
+    'color': DefaultColors.cinnamon,
+    'macrocategoria': 'Família',
+    'synonyms': ['creche', 'cuidado infantil']
+  },
+  {
+    'id': 100,
+    'name': 'Brinquedos e acessórios',
+    'icon': 'assets/icon-category/gift.png',
+    'color': DefaultColors.saffron,
+    'macrocategoria': 'Família',
+    'synonyms': ['brinquedos', 'acessórios infantis', 'jogos']
   },
 
   // ========== TRABALHO ==========
@@ -587,7 +684,7 @@ final List<Map<String, dynamic>> categories_income = [
   },
   {
     'id': 54,
-    'name': 'Transfrencia bancária',
+    'name': 'Transferências / PIX / TED',
     'icon': 'assets/icon-category/transfer.png',
     'color': Colors.blue,
     'macrocategoria': 'Transferências',

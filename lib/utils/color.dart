@@ -139,4 +139,18 @@ class DefaultColors {
   static const slateGrey = Color(0xFF708090);
   static const earthBrown = Color(0xFF6B4226);
   static const rosyPink = Color(0xFFFF66CC);
+
+  // Additional custom category colors (unique for new categories)
+  static const azure = Color(0xFF007FFF);
+  static const vermilion = Color(0xFFE34234);
+  static const periwinkle = Color(0xFFCCCCFF);
+  static const moss = Color(0xFF8A9A5B);
+  static const saffron = Color(0xFFF4C430);
+  static const jade = Color(0xFF00A86B);
+  static const steelBlue = Color(0xFF4682B4);
+  static const charcoal = Color(0xFF36454F);
+  static const cinnamon = Color(0xFF7B3F00);
+  static const orchid = Color(0xFFDA70D6);
+  static const aquamarine = Color(0xFF7FFFD4);
+  static const cerulean = Color(0xFF2A52BE);
 }
