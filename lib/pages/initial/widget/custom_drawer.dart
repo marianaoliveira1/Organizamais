@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/pages/initial/pages/economic_types_page.dart';
+import 'package:organizamais/pages/initial/pages/contact_us_page.dart';
 
 import '../../../controller/auth_controller.dart';
 import '../../cards/cards_page.dart';
 import '../../profile/pages/fixed_accounts_page.dart';
 import '../../profile/profile_page.dart';
-import '../../spending_goals/spending_goals_page.dart';
 import 'logout_button.dart';
 import 'logout_confirmation_dialog.dart';
 import 'setting_item.dart';
@@ -73,6 +73,12 @@ class CustomDrawer extends StatelessWidget {
               icon: Iconsax.lamp,
               title: 'Dicas',
               onTap: () => Get.to(() => const EconomicTipsPage()),
+            ),
+            _buildDivider(),
+            SettingItem(
+              icon: Iconsax.message,
+              title: 'Fale conosco',
+              onTap: () => Get.to(() => const ContactUsPage()),
             ),
             const Spacer(),
             LogoutButton(

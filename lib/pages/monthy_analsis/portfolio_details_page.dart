@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
@@ -10,6 +11,7 @@ import '../../ads_banner/ads_banner.dart';
 import '../transaction/transaction_page.dart';
 
 import '../../utils/color.dart';
+import '../graphics/widgtes/finance_legend.dart';
 
 class PortfolioDetailsPage extends StatelessWidget {
   const PortfolioDetailsPage({
@@ -92,177 +94,6 @@ class PortfolioDetailsPage extends StatelessWidget {
           ],
         );
       }),
-    );
-  }
-
-  Widget _buildPredictionSection(
-    ThemeData theme,
-    NumberFormat formatter,
-    List<Map<String, dynamic>> monthlyData,
-  ) {
-    // Filtra meses com algum dado e pega os 3 mais recentes
-    final List<Map<String, dynamic>> relevant = monthlyData
-        .where(
-            (m) => (m['income'] as double) > 0 || (m['expenses'] as double) > 0)
-        .toList();
-
-    if (relevant.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    relevant.sort((a, b) {
-      if (a['year'] != b['year']) {
-        return a['year'].compareTo(b['year']);
-      }
-      return a['month'].compareTo(b['month']);
-    });
-
-    final List<Map<String, dynamic>> lastThree =
-        relevant.reversed.take(3).toList();
-
-    final int count = lastThree.length;
-    final double avgIncome =
-        lastThree.fold(0.0, (sum, m) => sum + (m['income'] as double)) / count;
-    final double avgExpenses =
-        lastThree.fold(0.0, (sum, m) => sum + (m['expenses'] as double)) /
-            count;
-    final double avgBalance = avgIncome - avgExpenses;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      padding: EdgeInsets.all(12.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Previsão',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: theme.primaryColor,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            'Com base nas últimas 3 entradas, suas próximas receitas/despesas serão:',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: DefaultColors.grey20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Iconsax.arrow_circle_up,
-                        color: DefaultColors.green,
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        'Receitas previstas',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: DefaultColors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    formatter.format(avgIncome),
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Iconsax.arrow_down_2,
-                        color: DefaultColors.red,
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        'Despesas previstas',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: DefaultColors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    formatter.format(avgExpenses),
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Iconsax.money_send,
-                    color: avgBalance >= 0
-                        ? DefaultColors.green
-                        : DefaultColors.red,
-                    size: 16.sp,
-                  ),
-                  SizedBox(width: 6.w),
-                  Text(
-                    'Total previsto',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                      color: avgBalance >= 0
-                          ? DefaultColors.green
-                          : DefaultColors.red,
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                formatter.format(avgBalance),
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -387,6 +218,86 @@ class PortfolioDetailsPage extends StatelessWidget {
           SizedBox(
             height: 6.h,
           ),
+          if ((income + expenses) > 0) ...[
+            Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              padding: EdgeInsets.symmetric(
+                vertical: 10.h,
+                horizontal: 12.w,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Receitas x Despesas',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.slateGrey,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  SizedBox(
+                    height: 160.h,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 34.r,
+                        sections: [
+                          PieChartSectionData(
+                            value: income,
+                            color: DefaultColors.green,
+                            showTitle: false,
+                            radius: 50.r,
+                          ),
+                          PieChartSectionData(
+                            value: expenses,
+                            color: DefaultColors.red,
+                            showTitle: false,
+                            radius: 50.r,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Builder(builder: (context) {
+                    final double total = (income + expenses);
+                    final double incomePercent =
+                        total == 0 ? 0 : (income / total) * 100;
+                    final double expensesPercent =
+                        total == 0 ? 0 : (expenses / total) * 100;
+
+                    return Column(
+                      children: [
+                        FinanceLegend(
+                          title: 'Receita',
+                          color: DefaultColors.green,
+                          percent: incomePercent,
+                          value: income,
+                          formatter: formatter,
+                        ),
+                        SizedBox(height: 4.h),
+                        FinanceLegend(
+                          title: 'Despesas',
+                          color: DefaultColors.red,
+                          percent: expensesPercent,
+                          value: expenses,
+                          formatter: formatter,
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 20.h,
+            ),
+          ],
           if (previousIncome != 0) ...[
             Container(
               decoration: BoxDecoration(
