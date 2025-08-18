@@ -18,6 +18,10 @@ import '../pages/register/register_page.dart';
 import '../pages/resume/resume_page.dart';
 import '../pages/transaction/pages/category_page.dart';
 import '../pages/transaction/transaction_page.dart';
+import '../pages/onboarding/onboarding_welcome_page.dart';
+import '../pages/onboarding/onboarding_card_intro_page.dart';
+import '../pages/onboarding/onboarding_card_success_page.dart';
+import '../pages/onboarding/onboarding_fixed_success_page.dart';
 
 class Routes {
   static const LOGIN = '/login';
@@ -33,6 +37,10 @@ class Routes {
   static const FIXED_ACCOUNTS_PAGE = '/fixed-accounts-page';
   static const PROFILE = '/profile';
   static const ADDGOALPAGE = '/add-goal';
+  static const ONBOARD_WELCOME = '/onboard-welcome';
+  static const CARD_INTRO = '/card-intro';
+  static const CARD_SUCCESS = '/card-success';
+  static const FIXED_SUCCESS = '/fixed-success';
 }
 
 class AppPages {
@@ -52,6 +60,17 @@ class AppPages {
     GetPage(
         name: Routes.FIXED_ACCOUNTS_PAGE,
         page: () => const FixedAccountsPage()),
+    GetPage(
+        name: Routes.ONBOARD_WELCOME,
+        page: () => const OnboardingWelcomePage()),
+    GetPage(
+        name: Routes.CARD_INTRO, page: () => const OnboardingCardIntroPage()),
+    GetPage(
+        name: Routes.CARD_SUCCESS,
+        page: () => const OnboardingCardSuccessPage()),
+    GetPage(
+        name: Routes.FIXED_SUCCESS,
+        page: () => const OnboardingFixedSuccessPage()),
     // GetPage(name: Routes.ADDGOALPAGE, page: () => AddGoalPage()),
   ];
 

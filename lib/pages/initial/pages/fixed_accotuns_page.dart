@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/routes/route.dart';
+import 'package:organizamais/routes/route.dart' as app_routes;
 import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../model/fixed_account_model.dart';
@@ -19,8 +20,10 @@ import '../widget/text_filed_value_fixed_accotuns.dart';
 class AddFixedAccountsFormPage extends StatefulWidget {
   final FixedAccountModel? fixedAccount;
   final Function(FixedAccountModel fixedAccount)? onSave;
+  final bool fromOnboarding;
 
-  const AddFixedAccountsFormPage({super.key, this.fixedAccount, this.onSave});
+  const AddFixedAccountsFormPage(
+      {super.key, this.fixedAccount, this.onSave, this.fromOnboarding = false});
 
   @override
   State<AddFixedAccountsFormPage> createState() =>
@@ -315,7 +318,11 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                             startMonth: selectedMonth,
                             startYear: selectedYear,
                           ));
-                          Get.offAllNamed(Routes.HOME);
+                          if (widget.fromOnboarding) {
+                            Get.offAllNamed(app_routes.Routes.FIXED_SUCCESS);
+                          } else {
+                            Get.offAllNamed(Routes.HOME);
+                          }
                           return;
                         }
                         fixedAccountsController
@@ -328,7 +335,11 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                           startMonth: selectedMonth,
                           startYear: selectedYear,
                         ));
-                        Get.offAllNamed(Routes.HOME);
+                        if (widget.fromOnboarding) {
+                          Get.offAllNamed(app_routes.Routes.FIXED_SUCCESS);
+                        } else {
+                          Get.offAllNamed(Routes.HOME);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,

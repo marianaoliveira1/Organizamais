@@ -13,15 +13,18 @@ import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/card_controller.dart';
 import '../../../model/cards_model.dart';
 import 'select_icon_page.dart';
+import '../../../routes/route.dart';
 
 class AddCardPage extends StatefulWidget {
   final bool isEditing;
   final CardsModel? card;
+  final bool fromOnboarding;
 
   const AddCardPage({
     super.key,
     required this.isEditing,
     this.card,
+    this.fromOnboarding = false,
   });
 
   @override
@@ -255,7 +258,11 @@ class _AddCardPageState extends State<AddCardPage> {
                   cardController.addCard(cardData);
                 }
 
-                Get.back();
+                if (widget.fromOnboarding) {
+                  Get.offAllNamed(Routes.CARD_SUCCESS);
+                } else {
+                  Get.back();
+                }
               },
             ),
           ],

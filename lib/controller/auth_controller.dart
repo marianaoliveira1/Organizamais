@@ -18,6 +18,7 @@ class AuthController extends GetxController {
   Rx<User?> firebaseUser = Rx<User?>(null);
   var isLoading = false.obs;
   var loadedOtherControllers = false;
+  var isOnboarding = false;
 
   @override
   void onReady() {
@@ -49,6 +50,8 @@ class AuthController extends GetxController {
         Get.offAllNamed(Routes.LOGIN);
       }
     } else {
+      // Skip auto-redirect while onboarding
+      if (isOnboarding) return;
       if (Get.currentRoute != Routes.HOME) {
         Get.offAllNamed(Routes.HOME);
       }
@@ -99,8 +102,33 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
       _showLoadingDialog();
+      final String trimmedName = name.trim();
+      final String trimmedEmail = email.trim();
+      final String trimmedPassword = password.trim();
 
-      var methods = await _auth.fetchSignInMethodsForEmail(email);
+      if (trimmedName.isEmpty ||
+          trimmedEmail.isEmpty ||
+          trimmedPassword.isEmpty) {
+        _hideLoadingDialog();
+        Get.snackbar(
+          "Campos obrigatórios",
+          "Preencha nome, e-mail e senha",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      if (trimmedPassword.length < 6) {
+        _hideLoadingDialog();
+        Get.snackbar(
+          "Senha fraca",
+          "A senha deve conter pelo menos 6 caracteres",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      var methods = await _auth.fetchSignInMethodsForEmail(trimmedEmail);
       if (methods.isNotEmpty) {
         throw FirebaseAuthException(
           code: 'email-already-in-use',
@@ -108,18 +136,21 @@ class AuthController extends GetxController {
         );
       }
 
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: trimmedEmail,
+        password: trimmedPassword,
       );
 
       await _firestore.collection("users").doc(userCredential.user!.uid).set({
-        "name": name,
-        "email": email,
+        "name": trimmedName,
+        "email": trimmedEmail,
         "uid": userCredential.user!.uid,
       });
 
       _hideLoadingDialog();
+      isOnboarding = true;
+      Get.offAllNamed(Routes.ONBOARD_WELCOME);
     } on FirebaseAuthException catch (e) {
       _hideLoadingDialog();
       Get.snackbar(
@@ -174,14 +205,19 @@ class AuthController extends GetxController {
         throw Exception("Login cancelado pelo usuário");
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
-      DocumentSnapshot userDoc = await _firestore.collection("users").doc(userCredential.user!.uid).get();
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      DocumentSnapshot userDoc = await _firestore
+          .collection("users")
+          .doc(userCredential.user!.uid)
+          .get();
 
       if (!userDoc.exists) {
         await _firestore.collection("users").doc(userCredential.user!.uid).set({
@@ -189,6 +225,10 @@ class AuthController extends GetxController {
           "email": googleUser.email,
           "uid": userCredential.user!.uid,
         });
+        isOnboarding = true;
+        _hideLoadingDialog();
+        Get.offAllNamed(Routes.ONBOARD_WELCOME);
+        return;
       }
       _hideLoadingDialog();
     } on FirebaseAuthException catch (e) {
