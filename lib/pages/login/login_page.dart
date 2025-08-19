@@ -61,12 +61,20 @@ class _LoginPageState extends State<LoginPage> {
                 hintText: "Email",
                 prefixIcon: Icon(Iconsax.sms),
                 controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                onSubmitted: (_) => FocusScope.of(context).nextFocus(),
               ),
               SizedBox(height: 20.h),
               DefaultTextField(
                 hintText: "Senha",
                 prefixIcon: Icon(Iconsax.lock),
                 controller: passwordController,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => authController.login(
+                  emailController.text,
+                  passwordController.text,
+                ),
               ),
               SizedBox(
                 height: 20.h,

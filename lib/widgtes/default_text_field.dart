@@ -7,12 +7,18 @@ class DefaultTextField extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
   final Widget prefixIcon;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputType? keyboardType;
 
   const DefaultTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.prefixIcon,
+    this.textInputAction,
+    this.onSubmitted,
+    this.keyboardType,
   });
 
   @override
@@ -34,6 +40,9 @@ class _DefaultTextFieldState extends State<DefaultTextField> {
     return TextField(
       controller: widget.controller,
       obscureText: _obscureText,
+      textInputAction: widget.textInputAction,
+      onSubmitted: widget.onSubmitted,
+      keyboardType: widget.keyboardType,
       style: TextStyle(
         fontSize: 13.sp,
         fontWeight: FontWeight.w500,

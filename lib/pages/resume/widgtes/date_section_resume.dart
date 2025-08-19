@@ -20,6 +20,23 @@ class DateSectionResume extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calcular totais por dia
+    double totalReceita = 0.0;
+    double totalDespesa = 0.0;
+
+    for (final t in transactions) {
+      try {
+        final String raw = t.value as String;
+        final double valor =
+            double.parse(raw.replaceAll('.', '').replaceAll(',', '.'));
+        if (t.type.toString().contains('receita')) {
+          totalReceita += valor;
+        } else if (t.type.toString().contains('despesa')) {
+          totalDespesa += valor;
+        }
+      } catch (_) {}
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,7 +48,31 @@ class DateSectionResume extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 2.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (totalReceita > 0)
+              Text(
+                'Receitas: ${formatter.format(totalReceita)}',
+                style: TextStyle(
+                  color: DefaultColors.greenDark,
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            if (totalReceita > 0) SizedBox(width: 8.w),
+            Text(
+              'Despesas: ${formatter.format(totalDespesa)}',
+              style: TextStyle(
+                color: DefaultColors.redDark,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 6.h),
         ...transactions.map(
           (transaction) => TransactionItem(
             transaction: transaction,

@@ -362,12 +362,34 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final TransactionController transactionController =
         Get.find<TransactionController>();
 
-    // Calcular a comparação com o mês anterior
+    // Escolher a data base conforme o mês selecionado
+    final now = DateTime.now();
+    final months = getAllMonths();
+    final selectedIndex = monthName.isNotEmpty ? months.indexOf(monthName) : -1;
+    final bool isCurrentMonthSelected =
+        monthName.isEmpty || selectedIndex == (now.month - 1);
+
+    DateTime effectiveCurrentDate;
+    if (isCurrentMonthSelected) {
+      // Mês atual: comparar até hoje vs mesmo dia do mês anterior
+      effectiveCurrentDate = now;
+    } else {
+      // Mês passado selecionado: comparar mês cheio vs mês cheio anterior
+      final selectedMonth =
+          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
+      final selectedYear = now.year;
+      final lastDaySelectedMonth =
+          DateTime(selectedYear, selectedMonth + 1, 0).day;
+      effectiveCurrentDate = DateTime(
+          selectedYear, selectedMonth, lastDaySelectedMonth, 23, 59, 59);
+    }
+
+    // Calcular a comparação com o mês anterior usando a data base correta
     final comparison =
         PercentageCalculationService.calculateCategoryExpenseComparison(
       transactionController.transaction,
       categoryId,
-      DateTime.now(),
+      effectiveCurrentDate,
     );
 
     // Fallback: se não houver dados comparáveis, verificar histórico do mês anterior completo
@@ -471,45 +493,74 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final TransactionController transactionController =
         Get.find<TransactionController>();
 
-    // Calcular a comparação com o mês anterior
+    // Definir datas conforme o mês selecionado
+    final now = DateTime.now();
+    final months = getAllMonths();
+    DateTime currentMonthStart;
+    DateTime currentMonthEnd;
+    DateTime previousMonthStart;
+    DateTime previousMonthEnd;
+
+    final selectedIndex = monthName.isNotEmpty ? months.indexOf(monthName) : -1;
+    final bool isCurrentMonthSelected =
+        monthName.isEmpty || selectedIndex == (now.month - 1);
+
+    if (isCurrentMonthSelected) {
+      // Mês atual até o dia de hoje; mês anterior até o mesmo dia
+      currentMonthStart = DateTime(now.year, now.month, 1);
+      currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+      final prevMonth = now.month == 1 ? 12 : now.month - 1;
+      final prevYear = now.month == 1 ? now.year - 1 : now.year;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrevMonth = DateTime(prevYear, prevMonth + 1, 0).day;
+      final prevDay = now.day > daysInPrevMonth ? daysInPrevMonth : now.day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, prevDay, 23, 59, 59);
+    } else {
+      // Mês selecionado inteiro; mês anterior inteiro
+      final selectedMonth =
+          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
+      final selectedYear = now.year;
+
+      currentMonthStart = DateTime(selectedYear, selectedMonth, 1);
+      final daysInSelected = DateTime(selectedYear, selectedMonth + 1, 0).day;
+      currentMonthEnd =
+          DateTime(selectedYear, selectedMonth, daysInSelected, 23, 59, 59);
+
+      final prevMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
+      final prevYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, daysInPrev, 23, 59, 59);
+    }
+
+    // Calcular a comparação com base na data efetiva (fim do período atual)
+    final effectiveCurrentDate = currentMonthEnd;
     final comparison =
         PercentageCalculationService.calculateCategoryExpenseComparison(
       transactionController.transaction,
       categoryId,
-      DateTime.now(),
+      effectiveCurrentDate,
     );
 
     if (!comparison.hasData) {
       return const SizedBox.shrink();
     }
 
-    // Calcular valores em R$ para comparação usando o serviço
+    // Calcular valores em R$ para comparação usando as janelas definidas
     final currentValue =
         PercentageCalculationService.getCategoryExpensesForPeriod(
             transactionController.transaction,
             categoryId,
-            DateTime(DateTime.now().year, DateTime.now().month, 1),
-            DateTime(DateTime.now().year, DateTime.now().month,
-                DateTime.now().day, 23, 59, 59));
-
-    final previousMonth =
-        DateTime.now().month == 1 ? 12 : DateTime.now().month - 1;
-    final previousYear = DateTime.now().month == 1
-        ? DateTime.now().year - 1
-        : DateTime.now().year;
-    final daysInPreviousMonth =
-        DateTime(previousYear, previousMonth + 1, 0).day;
-    final previousMonthDay = DateTime.now().day > daysInPreviousMonth
-        ? daysInPreviousMonth
-        : DateTime.now().day;
+            currentMonthStart,
+            currentMonthEnd);
 
     final previousValue =
         PercentageCalculationService.getCategoryExpensesForPeriod(
             transactionController.transaction,
             categoryId,
-            DateTime(previousYear, previousMonth, 1),
-            DateTime(
-                previousYear, previousMonth, previousMonthDay, 23, 59, 59));
+            previousMonthStart,
+            previousMonthEnd);
 
     // Calcular a diferença absoluta em R$
     final absoluteDifference = (currentValue - previousValue).abs();

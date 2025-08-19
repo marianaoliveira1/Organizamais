@@ -150,7 +150,7 @@ class AuthController extends GetxController {
 
       _hideLoadingDialog();
       isOnboarding = true;
-      Get.offAllNamed(Routes.ONBOARD_WELCOME);
+      Get.offAllNamed(Routes.HOME);
     } on FirebaseAuthException catch (e) {
       _hideLoadingDialog();
       Get.snackbar(

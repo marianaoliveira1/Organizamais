@@ -20,9 +20,9 @@ class PercentageResult {
   Color get color {
     switch (type) {
       case PercentageType.positive:
-        return DefaultColors.green;
+        return DefaultColors.greenDark;
       case PercentageType.negative:
-        return DefaultColors.red;
+        return DefaultColors.redDark;
       case PercentageType.neutral:
         return DefaultColors.grey;
       case PercentageType.newData:
