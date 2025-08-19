@@ -226,7 +226,6 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
         return DefaultColors.orangeDark;
       case 'pix':
         return DefaultColors.greenDark;
-        {}
       case 'boleto':
         return DefaultColors.brown;
       case 'transferência':
@@ -464,7 +463,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                                     SizedBox(
                                       width: 130.w,
                                       child: Text(
-                                        transaction.title,
+                                        _withInstallmentLabel(
+                                            transaction,
+                                            Get.find<TransactionController>()
+                                                .transaction),
                                         style: TextStyle(
                                           fontSize: 11.sp,
                                           fontWeight: FontWeight.w500,
@@ -529,6 +531,21 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final match = regex.firstMatch(t.title);
+    if (match == null) return t.title;
+    final current = int.tryParse(match.group(1) ?? '') ?? 0;
+    final baseTitle = match.group(2) ?? '';
+    final total = all.where((x) {
+      final m = regex.firstMatch(x.title);
+      if (m == null) return false;
+      return (m.group(2) ?? '') == baseTitle;
+    }).length;
+    if (total <= 0) return t.title;
+    return 'Parcela $current de $total — $baseTitle';
   }
 
   // Função para obter a primeira letra do tipo de pagamento

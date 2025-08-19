@@ -39,7 +39,34 @@ class FixedAccounts extends StatelessWidget {
   }
 
   String _buildPaymentScheduleText(fixedAccount) {
-    String baseText = "Dia ${fixedAccount.paymentDay} de cada mês";
+    String baseText;
+    final String? frequency = fixedAccount.frequency;
+
+    if (frequency == 'quinzenal' &&
+        fixedAccount.biweeklyDays != null &&
+        fixedAccount.biweeklyDays.length >= 2) {
+      baseText =
+          "Dias ${fixedAccount.biweeklyDays[0]} e ${fixedAccount.biweeklyDays[1]} de cada mês";
+    } else if (frequency == 'semanal' && fixedAccount.weeklyWeekday != null) {
+      const weekdays = [
+        '',
+        'Segunda-feira',
+        'Terça-feira',
+        'Quarta-feira',
+        'Quinta-feira',
+        'Sexta-feira',
+        'Sábado',
+        'Domingo'
+      ];
+      final weekdayName = weekdays[fixedAccount.weeklyWeekday];
+      baseText = "Toda ${weekdayName}";
+    } else if (frequency == 'bimestral') {
+      baseText = "Dia ${fixedAccount.paymentDay} a cada 2 meses";
+    } else if (frequency == 'trimestral') {
+      baseText = "Dia ${fixedAccount.paymentDay} a cada 3 meses";
+    } else {
+      baseText = "Dia ${fixedAccount.paymentDay} de cada mês";
+    }
 
     if (fixedAccount.startMonth != null && fixedAccount.startYear != null) {
       List<String> monthNames = [
@@ -747,10 +774,10 @@ class FixedAccounts extends StatelessWidget {
                 .where((account) =>
                     !fixedAccountsController.isAccountDeactivated(account))
                 .toList();
-            final deactivatedAccounts = currentFixedAccounts
-                .where((account) =>
-                    fixedAccountsController.isAccountDeactivated(account))
-                .toList();
+            // final deactivatedAccounts = currentFixedAccounts
+            //     .where((account) =>
+            //         fixedAccountsController.isAccountDeactivated(account))
+            //     .toList();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,

@@ -23,12 +23,18 @@ class TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = findCategoryById(transaction.category);
     final theme = Theme.of(context);
+    final controller = Get.find<TransactionController>();
 
     // Verificar se é uma transação futura
     final transactionDate = DateTime.parse(transaction.paymentDay!);
     final today = DateTime.now();
     final isToday = DateUtils.isSameDay(transactionDate, today);
     final isFuture = transactionDate.isAfter(today) && !isToday;
+
+    final String? installmentLabel = _computeInstallmentLabel(
+      controller.transaction,
+      transaction.title,
+    );
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -48,122 +54,83 @@ class TransactionItem extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 12.w,
-            ),
+            padding: EdgeInsets.all(14.w),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Image.asset(
-                      category?['icon'] ?? 'assets/icon-category/default.png',
-                      width: 26.w,
-                      height: 26.h,
-                      opacity:
-                          isFuture ? const AlwaysStoppedAnimation(0.4) : null,
-                    ),
-                    SizedBox(width: 16.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 130.w,
-                          child: Text(
-                            transaction.title,
-                            style: TextStyle(
-                              color: isFuture
-                                  ? DefaultColors.grey
-                                  : theme.primaryColor,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 2,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: isFuture ? 100.w : 120.w,
-                              child: Text(
-                                category?['name'] ?? 'Categoria não encontrada',
-                                style: TextStyle(
-                                  color: isFuture
-                                      ? DefaultColors.grey.withOpacity(0.6)
-                                      : DefaultColors.grey20,
-                                  fontSize: 10.sp,
-                                ),
-                                maxLines: 2,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (isFuture) ...[
-                              SizedBox(width: 4.w),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 4.w,
-                                  vertical: 1.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: DefaultColors.grey.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(6.r),
-                                ),
-                                child: Text(
-                                  'Em breve',
-                                  style: TextStyle(
-                                    color: DefaultColors.grey,
-                                    fontSize: 7.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                if (isFuture) Container( padding: EdgeInsets.symmetric( horizontal: 4.w, vertical: 1.h, ), decoration: BoxDecoration( color: DefaultColors.grey.withOpacity(0.3), borderRadius: BorderRadius.circular(6.r), ), child: Text( 'Em breve', style: TextStyle( color: DefaultColors.grey, fontSize: 7.sp, fontWeight: FontWeight.w500, ), ), ), ], ),
+                // Ícone redondo
+                Center(
+                  child: Image.asset(
+                    category?['icon'] ?? 'assets/icon-category/default.png',
+                    width: 22.w,
+                    height: 22.h,
+                    opacity:
+                        isFuture ? const AlwaysStoppedAnimation(0.4) : null,
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 115.w,
-                      child: Text(
-                        _formatValue(transaction.value),
+
+                SizedBox(width: 16.w),
+
+                // Título + Categoria/descrição
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _titleWithInstallment(
+                            transaction.title, controller.transaction),
                         style: TextStyle(
                           color: isFuture
                               ? DefaultColors.grey
                               : theme.primaryColor,
                           fontSize: 13.sp,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
-                        textAlign: TextAlign.end,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    SizedBox(
-                      width: 100.w,
-                      child: Text(
-                        transaction.paymentType,
+                      SizedBox(height: 3.h),
+                      Text(
+                        category?['name'] ?? 'Categoria não encontrada',
                         style: TextStyle(
                           color: isFuture
                               ? DefaultColors.grey.withOpacity(0.6)
                               : DefaultColors.grey20,
-                          fontSize: 10.sp,
+                          fontSize: 11.sp,
                         ),
-                        textAlign: TextAlign.end,
-                        maxLines: 2,
-                        softWrap: true,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Valor + PaymentType (ou percentual se quiser)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      _formatValue(transaction.value),
+                      style: TextStyle(
+                        color:
+                            isFuture ? DefaultColors.grey : theme.primaryColor,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 3.h),
+                    Text(
+                      transaction.paymentType,
+                      style: TextStyle(
+                        color: isFuture
+                            ? DefaultColors.grey.withOpacity(0.6)
+                            : DefaultColors.grey20,
+                        fontSize: 11.sp,
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -223,5 +190,39 @@ class TransactionItem extends StatelessWidget {
       return formatter.format(value);
     }
     return formatter.format(0);
+  }
+
+  // Gera o rótulo "Parcela X de Y" quando aplicável, baseado no padrão do título
+  String? _computeInstallmentLabel(
+      List<dynamic> allTransactions, String? title) {
+    if (title == null) return null;
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final match = regex.firstMatch(title);
+    if (match == null) return null;
+    final current = int.tryParse(match.group(1) ?? '') ?? 0;
+    final baseTitle = match.group(2) ?? '';
+
+    // Total de parcelas: conta quantas transações existem para o mesmo produto/baseTitle
+    final total = allTransactions.where((t) {
+      final String? tTitle = (t as dynamic).title as String?;
+      if (tTitle == null) return false;
+      final m = regex.firstMatch(tTitle);
+      if (m == null) return false;
+      final tBase = m.group(2) ?? '';
+      return tBase == baseTitle;
+    }).length;
+    if (total <= 0) return null;
+    return 'Parcela $current de $total';
+  }
+
+  String _titleWithInstallment(String? title, List<dynamic> all) {
+    final label = _computeInstallmentLabel(all, title);
+    if (label == null) return title ?? '';
+    // Se o título já é "Parcela N: Nome", substitui por "Parcela N de Y — Nome"
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final match = title != null ? regex.firstMatch(title) : null;
+    if (match == null) return title ?? '';
+    final baseTitle = match.group(2) ?? '';
+    return '$label — $baseTitle';
   }
 }

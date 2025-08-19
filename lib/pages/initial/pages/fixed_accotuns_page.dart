@@ -16,6 +16,7 @@ import '../../transaction/widget/payment_type.dart';
 import '../../transaction/widget/text_field_transaction.dart';
 import '../../transaction/widget/title_transaction.dart';
 import '../widget/text_filed_value_fixed_accotuns.dart';
+import 'periodicity_selection_page.dart';
 
 class AddFixedAccountsFormPage extends StatefulWidget {
   final FixedAccountModel? fixedAccount;
@@ -38,6 +39,68 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
   final TextEditingController valueController = TextEditingController();
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
+  final TextEditingController biweeklyDay1Controller = TextEditingController();
+  final TextEditingController biweeklyDay2Controller = TextEditingController();
+  String selectedFrequency = 'mensal';
+  int? selectedWeeklyWeekday; // 1=Monday .. 7=Sunday
+  bool isSaving = false;
+
+  String _frequencyLabel(String value) {
+    switch (value) {
+      case 'mensal':
+        return 'Periodicidade: Mensal';
+      case 'quinzenal':
+        return 'Periodicidade: Quinzenal';
+      case 'semanal':
+        return 'Periodicidade: Semanal';
+      case 'bimestral':
+        return 'Periodicidade: Bimestral';
+      case 'trimestral':
+        return 'Periodicidade: Trimestral';
+      default:
+        return 'Periodicidade';
+    }
+  }
+
+  String _frequencySummary() {
+    switch (selectedFrequency) {
+      case 'mensal':
+        return dayOfTheMonthController.text.isNotEmpty
+            ? 'Mensal no dia ${dayOfTheMonthController.text}'
+            : 'Mensal (defina o dia ao tocar)';
+      case 'bimestral':
+        return dayOfTheMonthController.text.isNotEmpty
+            ? 'Bimestral no dia ${dayOfTheMonthController.text}'
+            : 'Bimestral (defina o dia ao tocar)';
+      case 'trimestral':
+        return dayOfTheMonthController.text.isNotEmpty
+            ? 'Trimestral no dia ${dayOfTheMonthController.text}'
+            : 'Trimestral (defina o dia ao tocar)';
+      case 'quinzenal':
+        if (biweeklyDay1Controller.text.isNotEmpty &&
+            biweeklyDay2Controller.text.isNotEmpty) {
+          return 'Quinzenal nos dias ${biweeklyDay1Controller.text} e ${biweeklyDay2Controller.text}';
+        }
+        return 'Quinzenal (defina os dias ao tocar)';
+      case 'semanal':
+        if (selectedWeeklyWeekday != null) {
+          const weekdays = [
+            '',
+            'Segunda-feira',
+            'Terça-feira',
+            'Quarta-feira',
+            'Quinta-feira',
+            'Sexta-feira',
+            'Sábado',
+            'Domingo'
+          ];
+          return 'Semanal toda ${weekdays[selectedWeeklyWeekday!]}';
+        }
+        return 'Semanal (defina o dia ao tocar)';
+      default:
+        return '';
+    }
+  }
 
   @override
   void initState() {
@@ -50,6 +113,17 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
       categoryId = widget.fixedAccount!.category;
       selectedMonth = widget.fixedAccount!.startMonth ?? DateTime.now().month;
       selectedYear = widget.fixedAccount!.startYear ?? DateTime.now().year;
+      selectedFrequency = widget.fixedAccount!.frequency ?? 'mensal';
+      if (widget.fixedAccount!.biweeklyDays != null &&
+          widget.fixedAccount!.biweeklyDays!.isNotEmpty) {
+        biweeklyDay1Controller.text =
+            widget.fixedAccount!.biweeklyDays![0].toString();
+        if (widget.fixedAccount!.biweeklyDays!.length > 1) {
+          biweeklyDay2Controller.text =
+              widget.fixedAccount!.biweeklyDays![1].toString();
+        }
+      }
+      selectedWeeklyWeekday = widget.fixedAccount!.weeklyWeekday;
     }
   }
 
@@ -210,6 +284,86 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 ),
               ),
               DefaultTitleTransaction(
+                title: "Periodicidade",
+              ),
+              GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PeriodicitySelectionPage(
+                        initialFrequency: selectedFrequency,
+                        initialMonthlyDay:
+                            dayOfTheMonthController.text.isNotEmpty
+                                ? dayOfTheMonthController.text
+                                : null,
+                        initialBiweeklyDays:
+                            (biweeklyDay1Controller.text.isNotEmpty &&
+                                    biweeklyDay2Controller.text.isNotEmpty)
+                                ? [
+                                    int.parse(biweeklyDay1Controller.text),
+                                    int.parse(biweeklyDay2Controller.text)
+                                  ]
+                                : null,
+                        initialWeeklyWeekday: selectedWeeklyWeekday,
+                      ),
+                    ),
+                  );
+                  if (result is Map) {
+                    setState(() {
+                      selectedFrequency =
+                          result['frequency'] as String? ?? selectedFrequency;
+                      if (selectedFrequency == 'mensal' ||
+                          selectedFrequency == 'bimestral' ||
+                          selectedFrequency == 'trimestral') {
+                        dayOfTheMonthController.text =
+                            (result['monthlyDay'] as String?) ?? '';
+                        biweeklyDay1Controller.clear();
+                        biweeklyDay2Controller.clear();
+                        selectedWeeklyWeekday = null;
+                      } else if (selectedFrequency == 'quinzenal') {
+                        final days =
+                            (result['biweeklyDays'] as List?)?.cast<int>();
+                        if (days != null && days.length >= 2) {
+                          biweeklyDay1Controller.text = days[0].toString();
+                          biweeklyDay2Controller.text = days[1].toString();
+                        }
+                        dayOfTheMonthController.clear();
+                        selectedWeeklyWeekday = null;
+                      } else if (selectedFrequency == 'semanal') {
+                        selectedWeeklyWeekday = result['weeklyWeekday'] as int?;
+                        dayOfTheMonthController.clear();
+                        biweeklyDay1Controller.clear();
+                        biweeklyDay2Controller.clear();
+                      }
+                    });
+                  }
+                },
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border:
+                        Border.all(color: theme.primaryColor.withOpacity(.5)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _frequencyLabel(selectedFrequency),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                      Icon(Icons.chevron_right, color: theme.primaryColor),
+                    ],
+                  ),
+                ),
+              ),
+              DefaultTitleTransaction(
                 title: "Categoria",
               ),
               DefaultButtonSelectCategory(
@@ -221,62 +375,19 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                   });
                 },
               ),
-              DefaultTitleTransaction(
-                title: "Dia do pagamento ",
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: TextField(
-                  controller: dayOfTheMonthController,
-                  cursorColor: theme.primaryColor,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: theme.primaryColor,
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter
-                        .digitsOnly, // Aceita apenas números
-                    _MaxNumberInputFormatter(28), // Restringe a 31
-                  ],
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        12.r,
-                      ),
-                      borderSide: BorderSide(
-                        color: theme.primaryColor.withOpacity(.5),
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        12.r,
-                      ),
-                      borderSide: BorderSide(
-                        color: theme.primaryColor.withOpacity(.5),
-                      ),
-                    ),
-                    focusColor: theme.primaryColor,
-                    hintText: 'ex: 5',
-                    hintStyle: TextStyle(
-                      fontSize: 14.sp,
+              // Resumo da periodicidade selecionada
+              if (selectedFrequency.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 8.h),
+                  child: Text(
+                    _frequencySummary(),
+                    style: TextStyle(
+                      color: DefaultColors.grey20,
+                      fontSize: 11.sp,
                       fontWeight: FontWeight.w500,
-                      color: theme.primaryColor.withOpacity(.5),
                     ),
                   ),
                 ),
-              ),
-              Text(
-                "Máximo permitido: até 28, pois alguns meses têm no máximo 28 dias. Se for um número maior, a cobrança ocorrerá no dia 28.",
-                style: TextStyle(
-                  color: DefaultColors.grey20,
-                  fontSize: 9.sp,
-                ),
-              ),
               DefaultTitleTransaction(
                 title: "Tipo de pagamento",
               ),
@@ -288,59 +399,126 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Verificação se todos os campos estão preenchidos
-                        if (titleController.text.isEmpty ||
-                            valueController.text.isEmpty ||
-                            dayOfTheMonthController.text.isEmpty ||
-                            paymentTypeController.text.isEmpty ||
-                            categoryId == null) {
-                          // Mostrar mensagem de erro se algum campo estiver vazio
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text("Por favor, preencha todos os campos"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setState(() {
+                                isSaving = true;
+                              });
+                              // Verificação se todos os campos estão preenchidos
+                              bool invalid = false;
+                              if (titleController.text.isEmpty ||
+                                  valueController.text.isEmpty ||
+                                  paymentTypeController.text.isEmpty ||
+                                  categoryId == null) {
+                                invalid = true;
+                              }
+                              if (!invalid) {
+                                if ((selectedFrequency == 'mensal' ||
+                                        selectedFrequency == 'bimestral' ||
+                                        selectedFrequency == 'trimestral') &&
+                                    dayOfTheMonthController.text.isEmpty) {
+                                  invalid = true;
+                                } else if (selectedFrequency == 'quinzenal' &&
+                                    (biweeklyDay1Controller.text.isEmpty ||
+                                        biweeklyDay2Controller.text.isEmpty)) {
+                                  invalid = true;
+                                } else if (selectedFrequency == 'semanal' &&
+                                    selectedWeeklyWeekday == null) {
+                                  invalid = true;
+                                }
+                              }
+                              if (invalid) {
+                                // Mostrar mensagem de erro se algum campo estiver vazio
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        "Por favor, preencha todos os campos"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                setState(() {
+                                  isSaving = false;
+                                });
+                                return;
+                              }
 
-                        // Se todos os campos estiverem preenchidos, continua com o salvamento
-                        if (widget.onSave != null) {
-                          widget.onSave!(FixedAccountModel(
-                            id: widget.fixedAccount?.id,
-                            title: titleController.text,
-                            value: valueController.text,
-                            category: categoryId ?? 0,
-                            paymentDay: dayOfTheMonthController.text,
-                            paymentType: paymentTypeController.text,
-                            startMonth: selectedMonth,
-                            startYear: selectedYear,
-                          ));
-                          if (widget.fromOnboarding) {
-                            Get.offAllNamed(app_routes.Routes.FIXED_SUCCESS);
-                          } else {
-                            Get.offAllNamed(Routes.HOME);
-                          }
-                          return;
-                        }
-                        fixedAccountsController
-                            .addFixedAccount(FixedAccountModel(
-                          title: titleController.text,
-                          value: valueController.text,
-                          category: categoryId ?? 0,
-                          paymentDay: dayOfTheMonthController.text,
-                          paymentType: paymentTypeController.text,
-                          startMonth: selectedMonth,
-                          startYear: selectedYear,
-                        ));
-                        if (widget.fromOnboarding) {
-                          Get.offAllNamed(app_routes.Routes.FIXED_SUCCESS);
-                        } else {
-                          Get.offAllNamed(Routes.HOME);
-                        }
-                      },
+                              // Se todos os campos estiverem preenchidos, continua com o salvamento
+                              if (widget.onSave != null) {
+                                widget.onSave!(FixedAccountModel(
+                                  id: widget.fixedAccount?.id,
+                                  title: titleController.text,
+                                  value: valueController.text,
+                                  category: categoryId ?? 0,
+                                  paymentDay: (selectedFrequency == 'mensal' ||
+                                          selectedFrequency == 'bimestral' ||
+                                          selectedFrequency == 'trimestral')
+                                      ? dayOfTheMonthController.text
+                                      : (selectedFrequency == 'quinzenal'
+                                          ? biweeklyDay1Controller.text
+                                          : '1'),
+                                  paymentType: paymentTypeController.text,
+                                  startMonth: selectedMonth,
+                                  startYear: selectedYear,
+                                  frequency: selectedFrequency,
+                                  biweeklyDays: selectedFrequency == 'quinzenal'
+                                      ? [
+                                          int.parse(
+                                              biweeklyDay1Controller.text),
+                                          int.parse(biweeklyDay2Controller.text)
+                                        ]
+                                      : null,
+                                  weeklyWeekday: selectedFrequency == 'semanal'
+                                      ? selectedWeeklyWeekday
+                                      : null,
+                                ));
+                                if (widget.fromOnboarding) {
+                                  Get.offAllNamed(
+                                      app_routes.Routes.FIXED_SUCCESS);
+                                } else {
+                                  Get.offAllNamed(Routes.HOME);
+                                }
+                                setState(() {
+                                  isSaving = false;
+                                });
+                                return;
+                              }
+                              await fixedAccountsController
+                                  .addFixedAccount(FixedAccountModel(
+                                title: titleController.text,
+                                value: valueController.text,
+                                category: categoryId ?? 0,
+                                paymentDay: (selectedFrequency == 'mensal' ||
+                                        selectedFrequency == 'bimestral' ||
+                                        selectedFrequency == 'trimestral')
+                                    ? dayOfTheMonthController.text
+                                    : (selectedFrequency == 'quinzenal'
+                                        ? biweeklyDay1Controller.text
+                                        : '1'),
+                                paymentType: paymentTypeController.text,
+                                startMonth: selectedMonth,
+                                startYear: selectedYear,
+                                frequency: selectedFrequency,
+                                biweeklyDays: selectedFrequency == 'quinzenal'
+                                    ? [
+                                        int.parse(biweeklyDay1Controller.text),
+                                        int.parse(biweeklyDay2Controller.text)
+                                      ]
+                                    : null,
+                                weeklyWeekday: selectedFrequency == 'semanal'
+                                    ? selectedWeeklyWeekday
+                                    : null,
+                              ));
+                              setState(() {
+                                isSaving = false;
+                              });
+                              if (widget.fromOnboarding) {
+                                Get.offAllNamed(
+                                    app_routes.Routes.FIXED_SUCCESS);
+                              } else {
+                                Get.offAllNamed(Routes.HOME);
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,
                         padding: EdgeInsets.all(15.h),
@@ -348,13 +526,24 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
-                      child: Text(
-                        "Salvar",
-                        style: TextStyle(
-                          color: theme.cardColor,
-                          fontSize: 14.sp,
-                        ),
-                      ),
+                      child: isSaving
+                          ? SizedBox(
+                              width: 20.h,
+                              height: 20.h,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.cardColor,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              "Salvar",
+                              style: TextStyle(
+                                color: theme.cardColor,
+                                fontSize: 14.sp,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -368,20 +557,4 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
 }
 
 // Formatter para limitar o número máximo
-class _MaxNumberInputFormatter extends TextInputFormatter {
-  final int max;
-
-  _MaxNumberInputFormatter(this.max);
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) return newValue;
-
-    final int? value = int.tryParse(newValue.text);
-    if (value == null || value > max) {
-      return oldValue; // Retorna o valor anterior se for inválido
-    }
-    return newValue;
-  }
-}
+// Removed unused formatter in this page (now lives in periodicity page)

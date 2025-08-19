@@ -22,57 +22,121 @@ class TransactionController extends GetxController {
     final today = DateTime.now();
 
     for (final e in fixedAccountsController.allFixedAccounts) {
-      for (var i = 0; i < 2400; i++) {
-        // 200 years * 12 months = 2400 months
-        final transactionMonth = today.month -
-            1200 +
-            i; // Center around current date (100 years back, 100 years forward)
-        final transactionYear = today.year +
-            (transactionMonth > 12
-                ? (transactionMonth - 1) ~/ 12
-                : transactionMonth < 1
-                    ? (transactionMonth - 12) ~/ 12
-                    : 0);
-        final normalizedMonth = ((transactionMonth - 1) % 12) + 1;
-        final adjustedNormalizedMonth =
-            normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
-        final adjustedYear =
-            normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
-
-        final todayWithRightDay = DateTime(
-            adjustedYear, adjustedNormalizedMonth, int.parse(e.paymentDay));
-
-        // Skip if account was deactivated before this transaction date
-        if (e.deactivatedAt != null) {
-          if (e.deactivatedAt!.isBefore(todayWithRightDay)) {
+      final frequency = e.frequency ?? 'mensal';
+      if (frequency == 'semanal') {
+        // Generate weekly entries across a wide date range (approx 5 years past/future)
+        final int weekday = (e.weeklyWeekday ?? 1).clamp(1, 7);
+        // from 5 years ago to 5 years ahead
+        final DateTime start = DateTime(today.year - 5, today.month, today.day);
+        final DateTime end = DateTime(today.year + 5, today.month, today.day);
+        // Find first occurrence on/after start matching weekday
+        DateTime cursor = start;
+        while (cursor.weekday != weekday) {
+          cursor = cursor.add(const Duration(days: 1));
+        }
+        while (!cursor.isAfter(end)) {
+          // Apply startMonth/startYear filter
+          if (e.startMonth != null && e.startYear != null) {
+            final startDate = DateTime(e.startYear!, e.startMonth!, 1);
+            if (cursor.isBefore(startDate)) {
+              cursor = cursor.add(const Duration(days: 7));
+              continue;
+            }
+          }
+          // Skip if deactivated before this date
+          if (e.deactivatedAt != null && e.deactivatedAt!.isBefore(cursor)) {
+            cursor = cursor.add(const Duration(days: 7));
             continue;
           }
+          fakeTransactionsFromFixed.add(TransactionModel(
+            id: e.id,
+            value: e.value.split('\$')[1],
+            type: TransactionType.despesa,
+            paymentDay: cursor.toString(),
+            title: "Conta fixa: ${e.title}",
+            paymentType: e.paymentType,
+            category: e.category,
+          ));
+          cursor = cursor.add(const Duration(days: 7));
         }
+      } else {
+        // mensal or quinzenal handled monthly over a wide range
+        // limit to a narrower window to improve performance (~10 years range)
+        for (var i = -120; i <= 120; i++) {
+          final transactionMonth = today.month + i;
+          final transactionYear = today.year +
+              (transactionMonth > 12
+                  ? (transactionMonth - 1) ~/ 12
+                  : transactionMonth < 1
+                      ? (transactionMonth - 12) ~/ 12
+                      : 0);
+          final normalizedMonth = ((transactionMonth - 1) % 12) + 1;
+          final adjustedNormalizedMonth =
+              normalizedMonth <= 0 ? normalizedMonth + 12 : normalizedMonth;
+          final adjustedYear =
+              normalizedMonth <= 0 ? transactionYear - 1 : transactionYear;
 
-        if (e.startMonth != null && e.startYear != null) {
-          final startDate =
-              DateTime(e.startYear!, e.startMonth!, int.parse(e.paymentDay));
-          if (todayWithRightDay.isBefore(startDate)) {
-            continue;
+          List<int> days = [];
+          if (frequency == 'quinzenal' &&
+              e.biweeklyDays != null &&
+              e.biweeklyDays!.length >= 2) {
+            days = e.biweeklyDays!;
+          } else {
+            days = [int.tryParse(e.paymentDay) ?? 1];
+          }
+
+          for (final d in days) {
+            final int requestedDay = d.clamp(1, 31);
+            // For bimestral and trimestral, only generate on specific month intervals
+            bool shouldGenerate = true;
+            if (frequency == 'bimestral') {
+              final startRefMonth = e.startMonth ?? adjustedNormalizedMonth;
+              final startRefYear = e.startYear ?? adjustedYear;
+              final diff = ((adjustedYear - startRefYear) * 12) +
+                  (adjustedNormalizedMonth - startRefMonth);
+              shouldGenerate = diff % 2 == 0;
+            } else if (frequency == 'trimestral') {
+              final startRefMonth = e.startMonth ?? adjustedNormalizedMonth;
+              final startRefYear = e.startYear ?? adjustedYear;
+              final diff = ((adjustedYear - startRefYear) * 12) +
+                  (adjustedNormalizedMonth - startRefMonth);
+              shouldGenerate = diff % 3 == 0;
+            }
+            if (!shouldGenerate) {
+              continue;
+            }
+            // fallback to last valid day of the month if requested day doesn't exist
+            final int lastDayOfMonth =
+                DateTime(adjustedYear, adjustedNormalizedMonth + 1, 0).day;
+            final int effectiveDay =
+                requestedDay <= lastDayOfMonth ? requestedDay : lastDayOfMonth;
+            final date =
+                DateTime(adjustedYear, adjustedNormalizedMonth, effectiveDay);
+
+            // Skip if deactivated before this transaction date
+            if (e.deactivatedAt != null && e.deactivatedAt!.isBefore(date)) {
+              continue;
+            }
+
+            if (e.startMonth != null && e.startYear != null) {
+              final startDate =
+                  DateTime(e.startYear!, e.startMonth!, effectiveDay);
+              if (date.isBefore(startDate)) {
+                continue;
+              }
+            }
+
+            fakeTransactionsFromFixed.add(TransactionModel(
+              id: e.id,
+              value: e.value.split('\$')[1],
+              type: TransactionType.despesa,
+              paymentDay: date.toString(),
+              title: "Conta fixa: ${e.title}",
+              paymentType: e.paymentType,
+              category: e.category,
+            ));
           }
         }
-
-        // Skip if transaction date is before the account was created
-        // if (e.createdAt != null) {
-        //   if (todayWithRightDay.isBefore(e.createdAt!)) {
-        //     continue;
-        //   }
-        // }
-
-        fakeTransactionsFromFixed.add(TransactionModel(
-          id: e.id,
-          value: e.value.split('\$')[1],
-          type: TransactionType.despesa,
-          paymentDay: todayWithRightDay.toString(),
-          title: "Conta fixa: ${e.title}",
-          paymentType: e.paymentType,
-          category: e.category,
-        ));
       }
     }
 

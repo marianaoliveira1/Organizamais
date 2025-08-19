@@ -244,7 +244,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       SizedBox(
                                         width: 120.w,
                                         child: Text(
-                                          transaction.title,
+                                          _withInstallmentLabel(
+                                              transaction,
+                                              Get.find<TransactionController>()
+                                                  .transaction),
                                           style: TextStyle(
                                             fontSize: 11.sp,
                                             fontWeight: FontWeight.w500,
@@ -356,6 +359,21 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return filteredTransactions
         .where((transaction) => transaction.category == categoryId)
         .toList();
+  }
+
+  String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final match = regex.firstMatch(t.title);
+    if (match == null) return t.title;
+    final current = int.tryParse(match.group(1) ?? '') ?? 0;
+    final baseTitle = match.group(2) ?? '';
+    final total = all.where((x) {
+      final m = regex.firstMatch(x.title);
+      if (m == null) return false;
+      return (m.group(2) ?? '') == baseTitle;
+    }).length;
+    if (total <= 0) return t.title;
+    return 'Parcela $current de $total — $baseTitle';
   }
 
   Widget _buildMonthComparisonPercentage(int categoryId, ThemeData theme) {
