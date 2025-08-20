@@ -93,10 +93,10 @@ class MyCardsWidget extends StatelessWidget {
           final double usagePercent = (spent / limit) * 100.0;
           final double ratio = (usagePercent / 100).clamp(0.0, 1.0);
           final Color progressColor = usagePercent <= 30
-              ? const Color(0xFF4CAF50) // Verde (Saudável)
+              ? DefaultColors.greenDark // Verde (Saudável)
               : (usagePercent <= 70
-                  ? const Color(0xFFFFC107) // Laranja/Amarelo (Atenção)
-                  : const Color(0xFFF44336)); // Vermelho (Crítico)
+                  ? DefaultColors.orange // Laranja/Amarelo (Atenção)
+                  : DefaultColors.redDark); // Vermelho (Crítico)
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
           final String statusLabel = usagePercent <= 30
               ? 'Até 30% do limite → Saudável / Ideal ✅'
