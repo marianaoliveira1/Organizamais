@@ -58,8 +58,7 @@ class TransactionItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (isFuture) Container( padding: EdgeInsets.symmetric( horizontal: 4.w, vertical: 1.h, ), decoration: BoxDecoration( color: DefaultColors.grey.withOpacity(0.3), borderRadius: BorderRadius.circular(6.r), ), child: Text( 'Em breve', style: TextStyle( color: DefaultColors.grey, fontSize: 7.sp, fontWeight: FontWeight.w500, ), ), ), ], ),
-                // Ícone redondo
+                // Ícone circular
                 Center(
                   child: Image.asset(
                     category?['icon'] ?? 'assets/icon-category/default.png',
@@ -70,13 +69,14 @@ class TransactionItem extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(width: 16.w),
+                SizedBox(width: 12.w),
 
-                // Título + Categoria/descrição
+                // Título + Categoria/descrição (+ Em breve)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // título
                       Text(
                         _titleWithInstallment(
                             transaction.title, controller.transaction),
@@ -87,26 +87,57 @@ class TransactionItem extends StatelessWidget {
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 3.h),
-                      Text(
-                        category?['name'] ?? 'Categoria não encontrada',
-                        style: TextStyle(
-                          color: isFuture
-                              ? DefaultColors.grey.withOpacity(0.6)
-                              : DefaultColors.grey20,
-                          fontSize: 11.sp,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      SizedBox(height: 4.h),
+
+                      // linha com categoria + chip "Em breve"
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              category?['name'] ?? 'Categoria não encontrada',
+                              style: TextStyle(
+                                color: isFuture
+                                    ? DefaultColors.grey.withOpacity(0.6)
+                                    : DefaultColors.grey20,
+                                fontSize: 11.sp,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isFuture) ...[
+                            SizedBox(width: 6.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w, vertical: 2.h),
+                              decoration: BoxDecoration(
+                                color: DefaultColors.grey.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Text(
+                                'Em breve',
+                                style: TextStyle(
+                                  color: DefaultColors.grey,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),
                 ),
+                SizedBox(
+                  width: 12.w,
+                ),
 
-                // Valor + PaymentType (ou percentual se quiser)
+                // Valor + paymentType (à direita)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
