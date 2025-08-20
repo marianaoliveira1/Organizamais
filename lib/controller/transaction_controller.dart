@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/controller/card_controller.dart';
+import '../model/cards_model.dart';
 import '../model/transaction_model.dart';
 import '../model/percentage_result.dart';
 import '../services/percentage_calculation_service.dart';
@@ -142,6 +144,9 @@ class TransactionController extends GetxController {
 
     return [..._transaction, ...fakeTransactionsFromFixed];
   }
+
+  // Exposição reativa para rebuilds em UI que precisam reagir a alterações de transações
+  RxList<TransactionModel> get transactionRx => _transaction;
 
   get isFirstDay {
     final today = DateTime.now();

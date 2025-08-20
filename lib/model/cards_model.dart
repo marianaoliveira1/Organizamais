@@ -6,6 +6,7 @@ class CardsModel {
   final String? iconPath;
   final String? bankName;
   final String? userId;
+  final int? closingDay;
 
   CardsModel({
     this.id,
@@ -14,6 +15,7 @@ class CardsModel {
     this.iconPath,
     this.bankName,
     this.userId,
+    this.closingDay,
   });
 
   factory CardsModel.fromMap(Map<String, dynamic> map) {
@@ -23,6 +25,8 @@ class CardsModel {
       iconPath: map['iconPath'],
       bankName: map['bankName'],
       userId: map['userId'],
+      closingDay:
+          map['closingDay'] != null ? (map['closingDay'] as num).toInt() : null,
     );
   }
 
@@ -33,6 +37,7 @@ class CardsModel {
       'iconPath': iconPath,
       'bankName': bankName,
       'userId': userId,
+      'closingDay': closingDay,
     };
   }
 
@@ -43,6 +48,7 @@ class CardsModel {
     String? iconPath,
     String? bankName,
     String? userId,
+    int? closingDay,
   }) {
     return CardsModel(
       id: id ?? this.id,
@@ -51,6 +57,7 @@ class CardsModel {
       iconPath: iconPath ?? this.iconPath,
       bankName: bankName ?? this.bankName,
       userId: userId ?? this.userId,
+      closingDay: closingDay ?? this.closingDay,
     );
   }
 }

@@ -220,10 +220,6 @@ class PortfolioDetailsPage extends StatelessWidget {
           ),
           if ((income + expenses) > 0) ...[
             Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
               padding: EdgeInsets.symmetric(
                 vertical: 10.h,
                 horizontal: 12.w,
@@ -231,14 +227,6 @@ class PortfolioDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Receitas x Despesas',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      color: DefaultColors.slateGrey,
-                    ),
-                  ),
                   SizedBox(height: 8.h),
                   SizedBox(
                     height: 160.h,
@@ -298,51 +286,37 @@ class PortfolioDetailsPage extends StatelessWidget {
               height: 20.h,
             ),
           ],
-          if (previousIncome != 0) ...[
-            Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(
-                  12.r,
-                ),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(
+                12.r,
               ),
-              padding: EdgeInsets.symmetric(
-                vertical: 10.h,
-                horizontal: 12.w,
-              ),
-              child: Column(
-                children: [
-                  // Variação das receitas
-                  if (previousIncome != 0) ...[
+            ),
+            padding: EdgeInsets.symmetric(
+              vertical: 10.h,
+              horizontal: 12.w,
+            ),
+            child: Column(
+              children: [
+                // Variação das receitas
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              incomeVariation >= 0
-                                  ? Iconsax.arrow_circle_up
-                                  : Iconsax.arrow_down_2,
-                              color: incomeVariation >= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              "Receitas: ",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: incomeVariation >= 0
-                                    ? DefaultColors.green
-                                    : DefaultColors.red,
-                              ),
-                            )
-                          ],
+                        Icon(
+                          incomeVariation >= 0
+                              ? Iconsax.arrow_circle_up
+                              : Iconsax.arrow_down_2,
+                          color: incomeVariation >= 0
+                              ? DefaultColors.green
+                              : DefaultColors.red,
+                          size: 16.sp,
                         ),
+                        SizedBox(width: 4.w),
                         Text(
-                          '${incomeVariationPercentage >= 0 ? '+' : ''}${incomeVariationPercentage.toStringAsFixed(1)}% (${incomeVariation >= 0 ? '+' : ''}${formatter.format(incomeVariation)})',
+                          "Receitas: ",
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
@@ -350,43 +324,41 @@ class PortfolioDetailsPage extends StatelessWidget {
                                 ? DefaultColors.green
                                 : DefaultColors.red,
                           ),
-                        ),
+                        )
                       ],
                     ),
+                    Text(
+                      '${incomeVariationPercentage >= 0 ? '+' : ''}${incomeVariationPercentage.toStringAsFixed(1)}% (${incomeVariation >= 0 ? '+' : ''}${formatter.format(incomeVariation)})',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: incomeVariation >= 0
+                            ? DefaultColors.green
+                            : DefaultColors.red,
+                      ),
+                    ),
                   ],
+                ),
 
-                  // Variação das despesas
-                  if (previousExpenses != 0) ...[
-                    SizedBox(height: 8.h),
+                // Variação das despesas
+                SizedBox(height: 8.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              expensesVariation <= 0
-                                  ? Iconsax.arrow_down_2
-                                  : Iconsax.arrow_circle_up,
-                              color: expensesVariation <= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              'Despesas: ',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: expensesVariation <= 0
-                                    ? DefaultColors.green
-                                    : DefaultColors.red,
-                              ),
-                            ),
-                          ],
+                        Icon(
+                          expensesVariation <= 0
+                              ? Iconsax.arrow_down_2
+                              : Iconsax.arrow_circle_up,
+                          color: expensesVariation <= 0
+                              ? DefaultColors.green
+                              : DefaultColors.red,
+                          size: 16.sp,
                         ),
+                        SizedBox(width: 4.w),
                         Text(
-                          ' ${expensesVariationPercentage >= 0 ? '+' : ''}${expensesVariationPercentage.toStringAsFixed(1)}% (${expensesVariation >= 0 ? '+' : ''}${formatter.format(expensesVariation)})',
+                          'Despesas: ',
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
@@ -397,38 +369,36 @@ class PortfolioDetailsPage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    Text(
+                      ' ${expensesVariationPercentage >= 0 ? '+' : ''}${expensesVariationPercentage.toStringAsFixed(1)}% (${expensesVariation >= 0 ? '+' : ''}${formatter.format(expensesVariation)})',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: expensesVariation <= 0
+                            ? DefaultColors.green
+                            : DefaultColors.red,
+                      ),
+                    ),
                   ],
+                ),
 
-                  // Variação do saldo
-                  if (previousBalance != 0) ...[
-                    SizedBox(height: 8.h),
+                // Variação do saldo
+                SizedBox(height: 8.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Iconsax.money_send,
-                              color: balanceVariation >= 0
-                                  ? DefaultColors.green
-                                  : DefaultColors.red,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              'Saldo:',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: balanceVariation >= 0
-                                    ? DefaultColors.green
-                                    : DefaultColors.red,
-                              ),
-                            ),
-                          ],
+                        Icon(
+                          Iconsax.money_send,
+                          color: balanceVariation >= 0
+                              ? DefaultColors.green
+                              : DefaultColors.red,
+                          size: 16.sp,
                         ),
+                        SizedBox(width: 4.w),
                         Text(
-                          ' ${balanceVariationPercentage >= 0 ? '+' : ''}${balanceVariationPercentage.toStringAsFixed(1)}% (${balanceVariation >= 0 ? '+' : ''}${formatter.format(balanceVariation)})',
+                          'Saldo:',
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
@@ -439,14 +409,24 @@ class PortfolioDetailsPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ]
-                ],
-              ),
+                    Text(
+                      ' ${balanceVariationPercentage >= 0 ? '+' : ''}${balanceVariationPercentage.toStringAsFixed(1)}% (${balanceVariation >= 0 ? '+' : ''}${formatter.format(balanceVariation)})',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: balanceVariation >= 0
+                            ? DefaultColors.green
+                            : DefaultColors.red,
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
-            SizedBox(
-              height: 6.h,
-            ),
-          ]
+          ),
+          SizedBox(
+            height: 6.h,
+          ),
         ],
       ),
     );

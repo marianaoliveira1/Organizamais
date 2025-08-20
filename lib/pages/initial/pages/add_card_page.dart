@@ -14,6 +14,7 @@ import '../../../controller/card_controller.dart';
 import '../../../model/cards_model.dart';
 import 'select_icon_page.dart';
 import '../../../routes/route.dart';
+import '../../../widgetes/currency_ipunt_formated.dart';
 
 class AddCardPage extends StatefulWidget {
   final bool isEditing;
@@ -34,6 +35,7 @@ class AddCardPage extends StatefulWidget {
 class _AddCardPageState extends State<AddCardPage> {
   final nameController = TextEditingController();
   final limitController = TextEditingController();
+  final closingDayController = TextEditingController();
   String? selectedIconPath;
   String? selectedBankName;
   final CardController cardController = Get.find();
@@ -43,9 +45,10 @@ class _AddCardPageState extends State<AddCardPage> {
     super.initState();
     if (widget.isEditing && widget.card != null) {
       nameController.text = widget.card!.name;
-      limitController.text = widget.card!.limit.toString();
+      limitController.text = widget.card!.limit?.toString() ?? '';
       selectedIconPath = widget.card!.iconPath;
       selectedBankName = widget.card!.bankName;
+      closingDayController.text = widget.card!.closingDay?.toString() ?? '';
     }
   }
 
@@ -123,38 +126,74 @@ class _AddCardPageState extends State<AddCardPage> {
             SizedBox(
               height: 10.h,
             ),
-            // DefaultTitleTransaction(title: "Limite do cartão"),
-            // TextField(
-            //   controller: limitController,
-            //   style: TextStyle(
-            //     fontSize: 14.sp,
-            //     color: theme.primaryColor,
-            //   ),
-            //   decoration: InputDecoration(
-            //     hintText: 'Limtie do cartão',
-            //     hintStyle: TextStyle(
-            //       color: theme.primaryColor.withOpacity(0.5),
-            //       fontSize: 14.sp,
-            //     ),
-            //     border: OutlineInputBorder(
-            //       borderRadius: BorderRadius.circular(
-            //         8.r,
-            //       ),
-            //       borderSide: BorderSide(
-            //         color: theme.primaryColor.withOpacity(0.5),
-            //       ),
-            //     ),
-            //     focusedBorder: OutlineInputBorder(
-            //       borderRadius: BorderRadius.circular(
-            //         8.r,
-            //       ),
-            //       borderSide: BorderSide(
-            //         color: theme.primaryColor.withOpacity(0.5),
-            //       ),
-            //     ),
-            //   ),
-            //   keyboardType: TextInputType.numberWithOptions(decimal: true),
-            // ),
+            DefaultTitleTransaction(title: "Limite do cartão"),
+            TextField(
+              controller: limitController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: theme.primaryColor,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Limite do cartão (R\$)',
+                hintStyle: TextStyle(
+                  color: theme.primaryColor.withOpacity(0.5),
+                  fontSize: 14.sp,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+              ),
+              inputFormatters: [
+                CurrencyInputFormatter(),
+              ],
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 10.h),
+            DefaultTitleTransaction(title: "Fecha no dia"),
+            TextField(
+              controller: closingDayController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: theme.primaryColor,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Dia de fechamento (1 a 31)',
+                hintStyle: TextStyle(
+                  color: theme.primaryColor.withOpacity(0.5),
+                  fontSize: 14.sp,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
             SizedBox(height: 16),
             InkWell(
               onTap: () {
@@ -244,12 +283,33 @@ class _AddCardPageState extends State<AddCardPage> {
                   return;
                 }
 
+                // Validação do dia de fechamento
+                final closingDay = int.tryParse(closingDayController.text);
+                if (closingDay == null || closingDay < 1 || closingDay > 31) {
+                  Get.snackbar(
+                      'Erro', 'Informe o dia de fechamento entre 1 e 31',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                  return;
+                }
+
+                // Converter o texto formatado em double
+                final String rawLimit = limitController.text
+                    .replaceAll('R\$', '')
+                    .replaceAll('.', '')
+                    .replaceAll(',', '.')
+                    .trim();
+                final double? parsedLimit = double.tryParse(rawLimit);
+
                 final cardData = CardsModel(
                   id: widget.isEditing ? widget.card!.id : null,
                   name: nameController.text,
                   iconPath: selectedIconPath,
                   bankName: selectedBankName,
                   userId: widget.isEditing ? widget.card!.userId : null,
+                  limit: parsedLimit,
+                  closingDay: closingDay,
                 );
 
                 if (widget.isEditing) {
