@@ -90,8 +90,21 @@ class MyCardsWidget extends StatelessWidget {
             );
           }
 
-          final double ratio = (spent / limit).clamp(0.0, 1.0);
+          final double usagePercent = (spent / limit) * 100.0;
+          final double ratio = (usagePercent / 100).clamp(0.0, 1.0);
+          final Color progressColor = usagePercent <= 30
+              ? const Color(0xFF4CAF50) // Verde (Saudável)
+              : (usagePercent <= 70
+                  ? const Color(0xFFFFC107) // Laranja/Amarelo (Atenção)
+                  : const Color(0xFFF44336)); // Vermelho (Crítico)
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
+          final String statusLabel = usagePercent <= 30
+              ? 'Até 30% do limite → Saudável / Ideal ✅'
+              : (usagePercent <= 70
+                  ? 'Entre 30% e 70% → Aceitável, mas atenção ⚠️'
+                  : (usagePercent < 100
+                      ? 'Acima de 70% → Arriscado 🚨'
+                      : '100% ou mais → Crítico ❌'));
 
           return GestureDetector(
             onTap: () {
@@ -122,118 +135,128 @@ class MyCardsWidget extends StatelessWidget {
                 ),
               );
             },
-            child: Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // header
-                  Row(
-                    children: [
-                      Center(
-                        child: card.iconPath != null
-                            ? Image.asset(
-                                card.iconPath!,
-                                width: 32.w,
-                                height: 32.h,
-                              )
-                            : Icon(Icons.credit_card, size: 20.sp),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Text(
-                          card.name,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 32.h),
-
-                  // 🔥 Barra de progresso igual ao print
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final barWidth = constraints.maxWidth;
-                      final progressWidth = barWidth * ratio;
-
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          // fundo da barra
-                          Container(
-                            height: 10.h,
-                            width: barWidth,
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                          ),
-                          // progresso preenchido
-                          Container(
-                            height: 10.h,
-                            width: progressWidth,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF4CAF50),
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                          ),
-                          // bolha do percentual
-                          Positioned(
-                            left: (progressWidth - 20).clamp(0, barWidth - 40),
-                            top: -24.h,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 6.w, vertical: 2.h),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                              child: Text(
-                                percentLabel,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 12.h),
-
-                  // valores dinâmicos
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        formatter.format(spent),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // header
+                Row(
+                  children: [
+                    Center(
+                      child: card.iconPath != null
+                          ? Image.asset(
+                              card.iconPath!,
+                              width: 32.w,
+                              height: 32.h,
+                            )
+                          : Icon(Icons.credit_card, size: 20.sp),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        card.name,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
                           color: theme.primaryColor,
-                          fontWeight: FontWeight.w500,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        'de ${formatter.format(limit)}',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: DefaultColors.grey20,
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 30.h),
+
+                // 🔥 Barra de progresso igual ao print
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final barWidth = constraints.maxWidth;
+                    final progressWidth = barWidth * ratio;
+
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // fundo da barra
+                        Container(
+                          height: 10.h,
+                          width: barWidth,
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
                         ),
+                        // progresso preenchido
+                        Container(
+                          height: 10.h,
+                          width: progressWidth,
+                          decoration: BoxDecoration(
+                            color: progressColor,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                        ),
+                        // bolha do percentual
+                        Positioned(
+                          left: (progressWidth - 20).clamp(0, barWidth - 40),
+                          top: -24.h,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 6.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            child: Text(
+                              percentLabel,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
+                SizedBox(height: 12.h),
+
+                // status do uso por faixa
+                // Text(
+                //   statusLabel,
+                //   style: TextStyle(
+                //     fontSize: 11.sp,
+                //     color: progressColor,
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
+
+                // SizedBox(height: 8.h),
+
+                // valores dinâmicos
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      formatter.format(spent),
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    Text(
+                      'de ${formatter.format(limit)}',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: DefaultColors.grey20,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           );
         },
