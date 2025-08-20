@@ -127,7 +127,7 @@ final List<Map<String, dynamic>> categories_expenses = [
     'icon': 'assets/icon-category/taxi.png',
     'color': DefaultColors.deepPurple,
     'macrocategoria': 'Transporte',
-    'synonyms': ['aplicativo de transporte', 'carona']
+    'synonyms': ['aplicativo de transporte', 'carona', 'uber', '99', 'inDrive']
   },
   {
     'id': 92,
