@@ -62,8 +62,8 @@ class TransactionItem extends StatelessWidget {
                 Center(
                   child: Image.asset(
                     category?['icon'] ?? 'assets/icon-category/default.png',
-                    width: 22.w,
-                    height: 22.h,
+                    width: 24.w,
+                    height: 24.h,
                     opacity:
                         isFuture ? const AlwaysStoppedAnimation(0.4) : null,
                   ),
@@ -87,7 +87,7 @@ class TransactionItem extends StatelessWidget {
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 2,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 4.h),
