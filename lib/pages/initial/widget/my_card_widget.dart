@@ -29,6 +29,32 @@ class MyCardsWidget extends StatelessWidget {
       final cards = cardController.card;
       final transactions = transactionController.transaction;
 
+      // Cálculo do total gasto no mês em todos os cartões de crédito
+      final DateTime now = DateTime.now();
+      final Set<String> cardNames = cards.map((c) => c.name).toSet();
+      final double totalSpent = transactions.where((t) {
+        if (t.paymentDay == null) return false;
+        if (t.type != TransactionType.despesa) return false;
+        if (!cardNames.contains(t.paymentType ?? '')) return false;
+        try {
+          final d = DateTime.parse(t.paymentDay!);
+          return d.year == now.year && d.month == now.month;
+        } catch (_) {
+          return false;
+        }
+      }).fold<double>(0.0, (sum, t) {
+        try {
+          final v = double.parse(t.value
+              .replaceAll('R\$', '')
+              .trim()
+              .replaceAll('.', '')
+              .replaceAll(',', '.'));
+          return sum + v;
+        } catch (_) {
+          return sum;
+        }
+      });
+
       if (cards.isEmpty) {
         return Center(
           child: Text(
@@ -45,13 +71,40 @@ class MyCardsWidget extends StatelessWidget {
       return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: cards.length,
+        itemCount: cards.length + 1,
         separatorBuilder: (_, __) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
+          // Rodapé com total gasto no crédito
+          if (index == cards.length) {
+            return Padding(
+              padding: EdgeInsets.only(top: 4.h, bottom: 4.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total no crédito',
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                  Text(
+                    formatter.format(totalSpent),
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
           final card = cards[index];
 
           // calcular gasto atual do mês
-          final DateTime now = DateTime.now();
           double spent = transactions.where((t) {
             if (t.paymentDay == null) return false;
             if (t.type != TransactionType.despesa) return false;
@@ -98,13 +151,6 @@ class MyCardsWidget extends StatelessWidget {
                   ? DefaultColors.orange // Laranja/Amarelo (Atenção)
                   : DefaultColors.redDark); // Vermelho (Crítico)
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
-          final String statusLabel = usagePercent <= 30
-              ? 'Até 30% do limite → Saudável / Ideal ✅'
-              : (usagePercent <= 70
-                  ? 'Entre 30% e 70% → Aceitável, mas atenção ⚠️'
-                  : (usagePercent < 100
-                      ? 'Acima de 70% → Arriscado 🚨'
-                      : '100% ou mais → Crítico ❌'));
 
           return GestureDetector(
             onTap: () {
@@ -203,13 +249,13 @@ class MyCardsWidget extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 6.w, vertical: 2.h),
                             decoration: BoxDecoration(
-                              color: Colors.black,
+                              color: theme.scaffoldBackgroundColor,
                               borderRadius: BorderRadius.circular(6.r),
                             ),
                             child: Text(
                               percentLabel,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: theme.primaryColor,
                                 fontSize: 10.sp,
                                 fontWeight: FontWeight.bold,
                               ),

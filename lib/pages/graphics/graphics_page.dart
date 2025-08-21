@@ -17,6 +17,7 @@ import '../../ads_banner/ads_banner.dart';
 import 'widgtes/default_text_graphic.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
+import 'pages/select_categories_page.dart';
 
 List<String> getAllMonths() {
   final months = [
@@ -46,6 +47,7 @@ class GraphicsPage extends StatefulWidget {
 class _GraphicsPageState extends State<GraphicsPage> {
   late ScrollController _monthScrollController;
   String selectedMonth = getAllMonths()[DateTime.now().month - 1];
+  Set<int> _selectedCategoryIds = {};
 
   @override
   void initState() {
@@ -193,6 +195,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
       ),
     );
   }
+
+  // removido seletor por modal (substituído por página dedicada)
 
   Widget _buildShimmerContent(ThemeData theme) {
     return Column(
@@ -705,17 +709,57 @@ class _GraphicsPageState extends State<GraphicsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTextGraphic(text: "Despesas por categoria"),
+          Row(
+            children: [
+              Expanded(
+                  child: DefaultTextGraphic(text: "Despesas por categoria")),
+              IconButton(
+                icon: Icon(Icons.chevron_right, color: theme.primaryColor),
+                onPressed: () async {
+                  final result = await Navigator.of(context).push<Set<int>>(
+                    MaterialPageRoute(
+                      builder: (_) => SelectCategoriesPage(
+                        data: data,
+                        initialSelected: _selectedCategoryIds,
+                      ),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _selectedCategoryIds = result;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
           SizedBox(height: 16.h),
           Center(
-            child: SizedBox(
-              height: 180.h,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 0,
-                  centerSpaceRadius: 26,
-                  centerSpaceColor: theme.cardColor,
-                  sections: chartData,
+            child: GestureDetector(
+              onTap: () async {
+                final result = await Navigator.of(context).push<Set<int>>(
+                  MaterialPageRoute(
+                    builder: (_) => SelectCategoriesPage(
+                      data: data,
+                      initialSelected: _selectedCategoryIds,
+                    ),
+                  ),
+                );
+                if (result != null) {
+                  setState(() {
+                    _selectedCategoryIds = result;
+                  });
+                }
+              },
+              child: SizedBox(
+                height: 180.h,
+                child: PieChart(
+                  PieChartData(
+                    sectionsSpace: 0,
+                    centerSpaceRadius: 26,
+                    centerSpaceColor: theme.cardColor,
+                    sections: chartData,
+                  ),
                 ),
               ),
             ),
