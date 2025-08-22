@@ -390,13 +390,26 @@ class _GraphicsPageState extends State<GraphicsPage> {
               color: theme.cardColor,
               borderRadius: BorderRadius.circular(16.r),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DefaultTextGraphic(
-                  text: 'Relatório de compração com o mês anterior',
+                Text(
+                  "📊 Relatório Mensal",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                Icon(Icons.chevron_right, color: theme.primaryColor),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    DefaultTextGraphic(
+                      text: 'Comparativo com mês anterior',
+                    ),
+                    Icon(Icons.chevron_right, color: theme.primaryColor),
+                  ],
+                ),
               ],
             ),
           ),
