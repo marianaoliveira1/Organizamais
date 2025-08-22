@@ -25,6 +25,63 @@ class PercentageDisplayWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    // Derive an effective result using current/previous values when available
+    PercentageResult effectiveResult = result;
+    if (explanationType != null &&
+        currentValue != null &&
+        previousValue != null) {
+      final double prev = previousValue!;
+      final double curr = currentValue!;
+
+      if (prev != 0) {
+        final double computedPercent = ((curr - prev) / prev.abs()) * 100.0;
+
+        PercentageType type;
+        if (explanationType == PercentageExplanationType.expense) {
+          // Expense: decrease is positive (good), increase is negative (bad)
+          if (computedPercent < 0) {
+            type = PercentageType.positive;
+          } else if (computedPercent > 0) {
+            type = PercentageType.negative;
+          } else {
+            type = PercentageType.neutral;
+          }
+        } else {
+          // Income/balance: increase is positive, decrease is negative
+          if (computedPercent > 0) {
+            type = PercentageType.positive;
+          } else if (computedPercent < 0) {
+            type = PercentageType.negative;
+          } else {
+            type = PercentageType.neutral;
+          }
+        }
+
+        String displayText;
+        switch (type) {
+          case PercentageType.positive:
+            displayText = '+${computedPercent.abs().toStringAsFixed(1)}%';
+            break;
+          case PercentageType.negative:
+            displayText = '-${computedPercent.abs().toStringAsFixed(1)}%';
+            break;
+          case PercentageType.neutral:
+            displayText = '0.0%';
+            break;
+          case PercentageType.newData:
+            displayText = 'Novo';
+            break;
+        }
+
+        effectiveResult = PercentageResult(
+          percentage: computedPercent.abs(),
+          hasData: true,
+          type: type,
+          displayText: displayText,
+        );
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         if (explanationType != null &&
@@ -33,7 +90,7 @@ class PercentageDisplayWidget extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) => PercentageExplanationDialog(
-              result: result,
+              result: effectiveResult,
               type: explanationType!,
               currentValue: currentValue!,
               previousValue: previousValue!,
@@ -47,17 +104,17 @@ class PercentageDisplayWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              result.icon,
+              effectiveResult.icon,
               size: 12.sp,
-              color: result.color,
+              color: effectiveResult.color,
             ),
             SizedBox(width: 2.w),
             Text(
-              result.formattedPercentage,
+              effectiveResult.formattedPercentage,
               style: TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
-                color: result.color,
+                color: effectiveResult.color,
               ),
             ),
           ],

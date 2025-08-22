@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -18,6 +19,7 @@ import 'widgtes/default_text_graphic.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
+import 'pages/category_report_page.dart';
 
 List<String> getAllMonths() {
   final months = [
@@ -368,6 +370,37 @@ class _GraphicsPageState extends State<GraphicsPage> {
         // Pie Chart - Despesas por categoria
         _buildCategoryChart(theme, transactionController, selectedCategoryId,
             currencyFormatter, dateFormatter),
+
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => CategoryReportPage(
+                  selectedMonth: selectedMonth,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: 12.h,
+              horizontal: 14.w,
+            ),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DefaultTextGraphic(
+                  text: 'Relatório de compração com o mês anterior',
+                ),
+                Icon(Icons.chevron_right, color: theme.primaryColor),
+              ],
+            ),
+          ),
+        ),
 
         // Outros gráficos
         DespesasPorTipoDePagamento(selectedMonth: selectedMonth),

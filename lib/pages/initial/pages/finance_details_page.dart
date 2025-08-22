@@ -85,8 +85,6 @@ class FinanceDetailsPage extends StatelessWidget {
         final previousExpenses =
             _getPreviousMonthExpenses(transactionController);
 
-        final today = DateTime.now();
-
         return Column(
           children: [
             AdsBanner(),
@@ -302,8 +300,7 @@ class FinanceDetailsPage extends StatelessWidget {
   double _getCurrentMonthBalance(TransactionController controller) {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDay, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     return _getBalanceForPeriod(controller.transaction, startDate, endDate);
   }
@@ -311,8 +308,7 @@ class FinanceDetailsPage extends StatelessWidget {
   double _getCurrentMonthIncome(TransactionController controller) {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDay, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     return _getIncomeForPeriod(controller.transaction, startDate, endDate);
   }
@@ -320,8 +316,7 @@ class FinanceDetailsPage extends StatelessWidget {
   double _getCurrentMonthExpenses(TransactionController controller) {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDay, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     return _getExpensesForPeriod(controller.transaction, startDate, endDate);
   }
@@ -334,8 +329,10 @@ class FinanceDetailsPage extends StatelessWidget {
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
+    final previousMonthDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
     final endDate =
-        DateTime(previousYear, previousMonth, daysInPreviousMonth, 23, 59, 59);
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
     return _getBalanceForPeriod(controller.transaction, startDate, endDate);
   }
@@ -348,8 +345,10 @@ class FinanceDetailsPage extends StatelessWidget {
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
+    final previousMonthDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
     final endDate =
-        DateTime(previousYear, previousMonth, daysInPreviousMonth, 23, 59, 59);
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
     return _getIncomeForPeriod(controller.transaction, startDate, endDate);
   }
@@ -363,8 +362,10 @@ class FinanceDetailsPage extends StatelessWidget {
     final startDate = DateTime(previousYear, previousMonth, 1);
     final daysInPreviousMonth =
         DateTime(previousYear, previousMonth + 1, 0).day;
+    final previousMonthDay =
+        now.day > daysInPreviousMonth ? daysInPreviousMonth : now.day;
     final endDate =
-        DateTime(previousYear, previousMonth, daysInPreviousMonth, 23, 59, 59);
+        DateTime(previousYear, previousMonth, previousMonthDay, 23, 59, 59);
 
     return _getExpensesForPeriod(controller.transaction, startDate, endDate);
   }
