@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -50,31 +49,60 @@ class _GraphicsPageState extends State<GraphicsPage> {
   late ScrollController _monthScrollController;
   String selectedMonth = getAllMonths()[DateTime.now().month - 1];
   Set<int> _selectedCategoryIds = {};
+  final Set<int> _essentialCategoryIds = {
+    // Moradia / Aluguel / Financiamento / Condomínio / Contas / Manutenção
+    5, // Moradia
+    37, // Financiamento
+    90, // Condomínio
+    26, // Contas (água, luz, gás, internet)
+    19, // Manutenção e reparos
+    // Alimentação (Supermercado/Feira/Padaria)
+    1, // Alimentação
+    29, // Mercado
+    69, // Padaria
+    // Transporte (essencial)
+    17, // Transporte
+    28, // Combustível
+    93, // Transporte público
+    22, // Transporte por Aplicativo
+    71, // Pedágio/Estacionamento
+    70, // IPVA
+    32, // Seguro do Carro
+    92, // Manutenção do carro
+    // Saúde
+    15, // Saúde
+    36, // Plano de Saúde/Seguro de vida
+    24, // Farmácia
+    86, // Exames
+    87, // Consultas Médicas
+    // Educação
+    9, // Educação
+    94, // Escola / Material escolar
+    96, // Cursos
+    // Seguros e Obrigações
+    80, // Seguros
+    35, // Impostos
+    91, // IPTU
+  };
+  bool _showWeekly = false;
 
   @override
   void initState() {
     super.initState();
     _monthScrollController = ScrollController();
-
-    // Centralizar o mês atual após a construção do widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentMonth();
     });
   }
 
   void _scrollToCurrentMonth() {
-    // Estimar a posição do mês atual para centralizar
     final int currentMonthIndex = DateTime.now().month - 1;
-    final double itemWidth =
-        78.w; // Ajuste este valor conforme a largura real do seu item
+    final double itemWidth = 78.w;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
-
-    // Limitar o scroll para não ir além dos limites
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
     final double scrollPosition = offset.clamp(0.0, maxScroll);
-
     _monthScrollController.animateTo(
       scrollPosition,
       duration: const Duration(milliseconds: 300),
@@ -108,6 +136,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
     // Variável observável para controlar a categoria selecionada
     final selectedCategoryId = RxnInt(null);
 
+    // já centraliza no initState
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -132,7 +162,6 @@ class _GraphicsPageState extends State<GraphicsPage> {
                               SizedBox(width: 8.w),
                           itemBuilder: (context, index) {
                             final month = getAllMonths()[index];
-
                             return GestureDetector(
                               onTap: () {
                                 if (selectedMonth == month) {
@@ -366,10 +395,17 @@ class _GraphicsPageState extends State<GraphicsPage> {
         // Line Chart - Despesas diárias
         _buildLineChart(
             theme, transactionController, currencyFormatter, dayFormatter),
-
+        AdsBanner(),
+        SizedBox(height: 20.h),
         // Pie Chart - Despesas por categoria
         _buildCategoryChart(theme, transactionController, selectedCategoryId,
             currencyFormatter, dateFormatter),
+
+        SizedBox(height: 16.h),
+        _buildEssentialsVsNonEssentialsChart(
+            theme, transactionController, currencyFormatter),
+        AdsBanner(),
+        SizedBox(height: 20.h),
 
         InkWell(
           onTap: () {
@@ -418,9 +454,216 @@ class _GraphicsPageState extends State<GraphicsPage> {
         // Outros gráficos
         DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
         SizedBox(height: 30.h),
+
+        AdsBanner(),
+        SizedBox(height: 20.h),
+
         GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
         SizedBox(height: 20.h),
       ],
+    );
+  }
+
+  Widget _buildEssentialsVsNonEssentialsChart(
+      ThemeData theme,
+      TransactionController transactionController,
+      NumberFormat currencyFormatter) {
+    final filteredTransactions = getFilteredTransactions(transactionController);
+
+    double essentialTotal = 0.0;
+    double nonEssentialTotal = 0.0;
+    final Set<int> usedEssentialCategoryIds = {};
+    final Set<int> usedNonEssentialCategoryIds = {};
+    for (var t in filteredTransactions) {
+      final double value =
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      final int? categoryId = t.category;
+      if (categoryId != null && _essentialCategoryIds.contains(categoryId)) {
+        essentialTotal += value;
+        usedEssentialCategoryIds.add(categoryId);
+      } else {
+        nonEssentialTotal += value;
+        if (categoryId != null) usedNonEssentialCategoryIds.add(categoryId);
+      }
+    }
+
+    final double total = essentialTotal + nonEssentialTotal;
+    if (total <= 0) {
+      return Container(
+        margin: EdgeInsets.only(bottom: 16.h),
+        padding: EdgeInsets.symmetric(
+          vertical: 12.h,
+          horizontal: 14.w,
+        ),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Center(
+          child: Text(
+            "Sem dados para Essenciais x Não essenciais",
+            style: TextStyle(
+              color: DefaultColors.grey,
+              fontSize: 12.sp,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final double essentialPct = (essentialTotal / total) * 100.0;
+    final double nonEssentialPct = (nonEssentialTotal / total) * 100.0;
+    final List<String> essentialNames = usedEssentialCategoryIds
+        .map((id) => findCategoryById(id)?['name'] as String?)
+        .where((name) => name != null && name.isNotEmpty)
+        .cast<String>()
+        .toList()
+      ..sort();
+    final List<String> nonEssentialNames = usedNonEssentialCategoryIds
+        .map((id) => findCategoryById(id)?['name'] as String?)
+        .where((name) => name != null && name.isNotEmpty)
+        .cast<String>()
+        .toList()
+      ..sort();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.symmetric(
+        vertical: 12.h,
+        horizontal: 14.w,
+      ),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DefaultTextGraphic(text: "Essenciais x Não essenciais"),
+          SizedBox(height: 16.h),
+          SizedBox(
+            height: 180.h,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 0,
+                centerSpaceRadius: 26,
+                centerSpaceColor: theme.cardColor,
+                sections: [
+                  PieChartSectionData(
+                    value: essentialTotal,
+                    color: DefaultColors.green,
+                    title: '',
+                    radius: 50,
+                    showTitle: false,
+                  ),
+                  PieChartSectionData(
+                    value: nonEssentialTotal,
+                    color: DefaultColors.redDark,
+                    title: '',
+                    radius: 50,
+                    showTitle: false,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 12.h),
+          Column(
+            children: [
+              _buildLegendItem(
+                color: DefaultColors.green,
+                label: 'Essenciais',
+                amount: currencyFormatter.format(essentialTotal),
+                percent: essentialPct,
+                theme: theme,
+              ),
+              if (essentialNames.isNotEmpty) ...[
+                _buildCategoryChips(essentialNames, theme, DefaultColors.green),
+              ],
+              SizedBox(
+                height: 10.h,
+              ),
+              _buildLegendItem(
+                color: DefaultColors.redDark,
+                label: 'Não essenciais',
+                amount: currencyFormatter.format(nonEssentialTotal),
+                percent: nonEssentialPct,
+                theme: theme,
+              ),
+            ],
+          ),
+          if (nonEssentialNames.isNotEmpty) ...[
+            _buildCategoryChips(
+                nonEssentialNames, theme, DefaultColors.redDark),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem({
+    required Color color,
+    required String label,
+    required String amount,
+    required double percent,
+    required ThemeData theme,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 14.w,
+          height: 14.w,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3.r),
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                '$amount  ·  ${percent.toStringAsFixed(1)}%',
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: DefaultColors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryChips(List<String> names, ThemeData theme, Color color) {
+    return Wrap(
+      spacing: 6.w,
+      runSpacing: 6.h,
+      children: names
+          .map(
+            (name) => Container(
+              padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -430,6 +673,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
         .where((e) => e.type == TransactionType.despesa)
         .toList();
 
+    final String selectedMonth = this.selectedMonth;
     if (selectedMonth.isNotEmpty) {
       final int currentYear = DateTime.now().year;
       return despesas.where((transaction) {
@@ -448,6 +692,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
       TransactionController transactionController, DateFormat dayFormatter) {
     var filteredTransactions = getFilteredTransactions(transactionController);
 
+    final String selectedMonth = this.selectedMonth;
     int selectedMonthIndex = selectedMonth.isEmpty
         ? DateTime.now().month - 1
         : getAllMonths().indexOf(selectedMonth);
@@ -505,21 +750,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
     var sparklineData = getSparklineData(transactionController, dayFormatter);
     List<double> data = sparklineData['data'];
 
-    if (data.isEmpty) {
-      return Container(
-        margin: EdgeInsets.only(bottom: 20.h),
-        child: Center(
-          child: Text(
-            "",
-            style: TextStyle(
-              color: DefaultColors.grey,
-              fontSize: 14.sp,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+    final weeklyTotals = _getWeeklyTotals(transactionController);
+    final weekRangeLabels = _getWeekRangeLabels();
 
     return Container(
       margin: EdgeInsets.only(bottom: 24.h),
@@ -534,148 +766,435 @@ class _GraphicsPageState extends State<GraphicsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTextGraphic(text: "Despesas diárias"),
-          SizedBox(height: 16.h),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Coluna com os valores (vertical)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: List.generate(5, (index) {
-                  double maxValue = data.isNotEmpty
-                      ? data.reduce((a, b) => a > b ? a : b)
-                      : 0;
-                  double stepValue = maxValue / 4;
-                  double value = maxValue - (stepValue * index);
-
-                  return Container(
-                    height: 24.h,
-                    alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(bottom: index == 4 ? 0 : 4.h),
-                    child: Text(
-                      currencyFormatter.format(value),
-                      style: TextStyle(
-                        fontSize: 8.sp,
-                        color: DefaultColors.grey,
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    if (_showWeekly) {
+                      setState(() => _showWeekly = false);
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: !_showWeekly
+                            ? DefaultColors.green
+                            : DefaultColors.grey.withOpacity(0.3),
                       ),
                     ),
-                  );
-                }),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Despesas diárias',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: !_showWeekly
+                            ? theme.primaryColor
+                            : DefaultColors.grey,
+                      ),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(width: 8.w),
-              // Área principal do gráfico
               Expanded(
-                child: Column(
-                  children: [
-                    // Gráfico LineChart com fl_chart
-                    SizedBox(
-                      height: 120.h,
-                      child: LineChart(
-                        LineChartData(
-                          lineTouchData: LineTouchData(
-                            handleBuiltInTouches: true,
-                            touchTooltipData: LineTouchTooltipData(
-                              getTooltipColor: (touchedSpot) =>
-                                  DefaultColors.green.withOpacity(0.8),
-                              getTooltipItems: (touchedSpots) {
-                                return touchedSpots.map((touchedSpot) {
-                                  return LineTooltipItem(
-                                    currencyFormatter.format(touchedSpot.y),
-                                    TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8.sp,
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                              tooltipPadding: EdgeInsets.symmetric(
-                                horizontal: 6.w,
-                                vertical: 4.h,
-                              ),
-                              tooltipRoundedRadius: 4.r,
-                            ),
-                          ),
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: false,
-                            horizontalInterval: data.isNotEmpty
-                                ? (data.reduce((a, b) => a > b ? a : b) > 0
-                                    ? data.reduce((a, b) => a > b ? a : b) / 4
-                                    : 1)
-                                : 1,
-                            getDrawingHorizontalLine: (value) {
-                              return FlLine(
-                                color: DefaultColors.grey.withOpacity(0.2),
-                                strokeWidth: 1,
-                              );
-                            },
-                          ),
-                          titlesData: FlTitlesData(show: false),
-                          borderData: FlBorderData(show: false),
-                          minX: 0,
-                          maxX: (data.length - 1).toDouble(),
-                          minY: 0,
-                          maxY: data.isNotEmpty &&
-                                  data.reduce((a, b) => a > b ? a : b) > 0
-                              ? data.reduce((a, b) => a > b ? a : b) * 1.2
-                              : 100,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: data.asMap().entries.map((entry) {
-                                return FlSpot(
-                                  entry.key.toDouble(),
-                                  entry.value,
-                                );
-                              }).toList(),
-                              isCurved: true,
-                              curveSmoothness: 0.3,
-                              color: DefaultColors.green,
-                              barWidth: 3,
-                              isStrokeCapRound: true,
-                              dotData: FlDotData(show: false),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    DefaultColors.green.withOpacity(0.3),
-                                    DefaultColors.green.withOpacity(0.1),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        duration: const Duration(milliseconds: 250),
+                child: GestureDetector(
+                  onTap: () {
+                    if (!_showWeekly) {
+                      setState(() => _showWeekly = true);
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: _showWeekly
+                            ? DefaultColors.green
+                            : DefaultColors.grey.withOpacity(0.3),
                       ),
                     ),
-                    SizedBox(height: 8.h),
-                    // Labels dos dias
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:
-                          (sparklineData['labels'] as List<String>).map((day) {
-                        return Text(
-                          day,
-                          style: TextStyle(
-                            fontSize: 6.sp,
-                            color: DefaultColors.grey,
-                          ),
-                        );
-                      }).toList(),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Despesas semanais',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: _showWeekly
+                            ? theme.primaryColor
+                            : DefaultColors.grey,
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
+          SizedBox(height: 16.h),
+          if (!_showWeekly)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Coluna com os valores (vertical)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: List.generate(5, (index) {
+                    double maxValue = data.isNotEmpty
+                        ? data.reduce((a, b) => a > b ? a : b)
+                        : 0;
+                    double stepValue = maxValue / 4;
+                    double value = maxValue - (stepValue * index);
+
+                    return Container(
+                      height: 24.h,
+                      alignment: Alignment.centerRight,
+                      margin: EdgeInsets.only(bottom: index == 4 ? 0 : 4.h),
+                      child: Text(
+                        currencyFormatter.format(value),
+                        style: TextStyle(
+                          fontSize: 8.sp,
+                          color: DefaultColors.grey,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(width: 8.w),
+                // Área principal do gráfico
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Gráfico LineChart com fl_chart
+                      SizedBox(
+                        height: 120.h,
+                        child: LineChart(
+                          LineChartData(
+                            lineTouchData: LineTouchData(
+                              handleBuiltInTouches: true,
+                              touchTooltipData: LineTouchTooltipData(
+                                getTooltipColor: (touchedSpot) =>
+                                    DefaultColors.green.withOpacity(0.8),
+                                getTooltipItems: (touchedSpots) {
+                                  return touchedSpots.map((touchedSpot) {
+                                    return LineTooltipItem(
+                                      currencyFormatter.format(touchedSpot.y),
+                                      TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 8.sp,
+                                      ),
+                                    );
+                                  }).toList();
+                                },
+                                tooltipPadding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 4.h,
+                                ),
+                                tooltipRoundedRadius: 4.r,
+                              ),
+                            ),
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              horizontalInterval: data.isNotEmpty
+                                  ? (data.reduce((a, b) => a > b ? a : b) > 0
+                                      ? data.reduce((a, b) => a > b ? a : b) / 4
+                                      : 1)
+                                  : 1,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: DefaultColors.grey.withOpacity(0.2),
+                                  strokeWidth: 1,
+                                );
+                              },
+                            ),
+                            titlesData: FlTitlesData(show: false),
+                            borderData: FlBorderData(show: false),
+                            minX: 0,
+                            maxX: (data.length - 1).toDouble(),
+                            minY: 0,
+                            maxY: data.isNotEmpty &&
+                                    data.reduce((a, b) => a > b ? a : b) > 0
+                                ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                                : 100,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: data.asMap().entries.map((entry) {
+                                  return FlSpot(
+                                    entry.key.toDouble(),
+                                    entry.value,
+                                  );
+                                }).toList(),
+                                isCurved: true,
+                                curveSmoothness: 0.3,
+                                color: DefaultColors.green,
+                                barWidth: 3,
+                                isStrokeCapRound: true,
+                                dotData: FlDotData(show: false),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      DefaultColors.green.withOpacity(0.3),
+                                      DefaultColors.green.withOpacity(0.1),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          duration: const Duration(milliseconds: 250),
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      // Labels dos dias
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: (sparklineData['labels'] as List<String>)
+                            .map((day) {
+                          return Text(
+                            day,
+                            style: TextStyle(
+                              fontSize: 6.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          if (_showWeekly)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 180.h,
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: (weeklyTotals.isNotEmpty
+                                  ? weeklyTotals.reduce((a, b) => a > b ? a : b)
+                                  : 0) >
+                              0
+                          ? weeklyTotals.reduce((a, b) => a > b ? a : b) * 1.2
+                          : 100,
+                      titlesData: FlTitlesData(
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 32,
+                            getTitlesWidget: (value, meta) {
+                              String label;
+                              if (value >= 1000) {
+                                label = '${(value / 1000).round()}k';
+                              } else {
+                                label = value.round().toString();
+                              }
+                              return Padding(
+                                padding: EdgeInsets.only(right: 4.w),
+                                child: Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: 9.sp,
+                                    color: DefaultColors.grey,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) {
+                              final idx = value.toInt();
+                              if (idx < 0 || idx >= weeklyTotals.length) {
+                                return const SizedBox.shrink();
+                              }
+                              return Padding(
+                                padding: EdgeInsets.only(top: 4.h),
+                                child: Text(
+                                  weekRangeLabels[idx],
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: DefaultColors.grey,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        horizontalInterval: (weeklyTotals.isNotEmpty
+                                    ? weeklyTotals
+                                        .reduce((a, b) => a > b ? a : b)
+                                    : 0) >
+                                0
+                            ? (weeklyTotals.reduce((a, b) => a > b ? a : b) / 4)
+                            : 1,
+                        getDrawingHorizontalLine: (value) => FlLine(
+                          color: DefaultColors.grey.withOpacity(0.15),
+                          strokeWidth: 1,
+                        ),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      barGroups: List.generate(weeklyTotals.length, (i) {
+                        final y = weeklyTotals[i];
+                        return BarChartGroupData(
+                          x: i,
+                          barRods: [
+                            BarChartRodData(
+                              toY: y,
+                              color: DefaultColors.green,
+                              borderRadius: BorderRadius.circular(4.r),
+                              width: 14.w,
+                            ),
+                          ],
+                        );
+                      }),
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipColor: (group) =>
+                              DefaultColors.green.withOpacity(0.85),
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            return BarTooltipItem(
+                              currencyFormatter.format(rod.toY),
+                              TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ...List.generate(weeklyTotals.length, (index) {
+                      final value = weeklyTotals[index];
+                      if (value <= 0) return const SizedBox.shrink();
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 2.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              weekRangeLabels[index],
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w500,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                            Text(
+                              currencyFormatter.format(value),
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    SizedBox(height: 10.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total: ',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                        Text(
+                          currencyFormatter
+                              .format(weeklyTotals.fold(0.0, (s, v) => s + v)),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
+
+  List<double> _getWeeklyTotals(TransactionController transactionController) {
+    final filteredTransactions = getFilteredTransactions(transactionController);
+    final List<double> weeklyTotals = List<double>.filled(5, 0.0);
+    for (var t in filteredTransactions) {
+      if (t.paymentDay == null) continue;
+      final DateTime date = DateTime.parse(t.paymentDay!);
+      final int day = date.day;
+      final int weekIndex = ((day - 1) ~/ 7).clamp(0, 4);
+      final double value =
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      weeklyTotals[weekIndex] += value;
+    }
+    return weeklyTotals;
+  }
+
+  // Colors for potential future multi-series weekly charts (kept minimal)
+  // Using DefaultColors.green for single-series expenses bars
+
+  List<String> _getWeekRangeLabels() {
+    final String monthName = selectedMonth;
+    final int year = DateTime.now().year;
+    int month = DateTime.now().month;
+    if (monthName.isNotEmpty) {
+      final idx = getAllMonths().indexOf(monthName);
+      if (idx >= 0) month = idx + 1;
+    }
+    final int daysInMonth = DateTime(year, month + 1, 0).day;
+    String pad(int d) => d.toString().padLeft(1, '0');
+    final List<List<int>> ranges = [
+      [1, 7],
+      [8, 14],
+      [15, 21],
+      [22, 28],
+      [29, daysInMonth],
+    ];
+    return ranges
+        .map((r) => '${pad(r[0])}-${pad(r[1])}')
+        .toList(growable: false);
+  }
+
+  // Removed old week label function (using ordinal labels to match requested style)
 
   Widget _buildCategoryChart(
       ThemeData theme,
