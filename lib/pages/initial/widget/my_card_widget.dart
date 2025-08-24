@@ -271,218 +271,226 @@ class MyCardsWidget extends StatelessWidget {
                 ),
               );
             },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // header
-                Row(
-                  children: [
-                    Center(
-                      child: card.iconPath != null
-                          ? Image.asset(
-                              card.iconPath!,
-                              width: 32.w,
-                              height: 32.h,
-                            )
-                          : Icon(Icons.credit_card, size: 20.sp),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Text(
-                        card.name,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: theme.primaryColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                vertical: 12.h,
+                horizontal: 14.w,
+              ),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // header
+                  Row(
+                    children: [
+                      Center(
+                        child: card.iconPath != null
+                            ? Image.asset(
+                                card.iconPath!,
+                                width: 32.w,
+                                height: 32.h,
+                              )
+                            : Icon(Icons.credit_card, size: 20.sp),
                       ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 30.h),
-
-                // 🔥 Barra de progresso (ou dica para definir limite)
-                if (hasLimit)
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final barWidth = constraints.maxWidth;
-                      final progressWidth = barWidth * ratio;
-
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          // fundo da barra
-                          Container(
-                            height: 10.h,
-                            width: barWidth,
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Text(
+                          card.name,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: theme.primaryColor,
                           ),
-                          // progresso preenchido
-                          Container(
-                            height: 10.h,
-                            width: progressWidth,
-                            decoration: BoxDecoration(
-                              color: progressColor,
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                          ),
-                          // bolha do percentual
-                          Positioned(
-                            left: (progressWidth - 20).clamp(0, barWidth - 40),
-                            top: -24.h,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 6.w, vertical: 2.h),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 30.h),
+
+                  // 🔥 Barra de progresso (ou dica para definir limite)
+                  if (hasLimit)
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final barWidth = constraints.maxWidth;
+                        final progressWidth = barWidth * ratio;
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            // fundo da barra
+                            Container(
+                              height: 10.h,
+                              width: barWidth,
                               decoration: BoxDecoration(
-                                color: theme.scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(6.r),
+                                color: theme.primaryColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(20.r),
                               ),
-                              child: Text(
-                                percentLabel,
-                                style: TextStyle(
-                                  color: theme.primaryColor,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.bold,
+                            ),
+                            // progresso preenchido
+                            Container(
+                              height: 10.h,
+                              width: progressWidth,
+                              decoration: BoxDecoration(
+                                color: progressColor,
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                            ),
+                            // bolha do percentual
+                            Positioned(
+                              left:
+                                  (progressWidth - 20).clamp(0, barWidth - 40),
+                              top: -24.h,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 6.w, vertical: 2.h),
+                                decoration: BoxDecoration(
+                                  color: theme.scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(6.r),
+                                ),
+                                child: Text(
+                                  percentLabel,
+                                  style: TextStyle(
+                                    color: theme.primaryColor,
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                else
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6.h),
-                    child: Text(
-                      'Defina o limite para acompanhar o uso',
-                      style: TextStyle(
-                        color: DefaultColors.grey20,
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w500,
+                          ],
+                        );
+                      },
+                    )
+                  else
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 6.h),
+                      child: Text(
+                        'Defina o limite para acompanhar o uso',
+                        style: TextStyle(
+                          color: DefaultColors.grey20,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
 
-                SizedBox(height: 12.h),
+                  SizedBox(height: 12.h),
 
-                // status do uso por faixa
-                // Text(
-                //   statusLabel,
-                //   style: TextStyle(
-                //     fontSize: 11.sp,
-                //     color: progressColor,
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
+                  // status do uso por faixa
+                  // Text(
+                  //   statusLabel,
+                  //   style: TextStyle(
+                  //     fontSize: 11.sp,
+                  //     color: progressColor,
+                  //     fontWeight: FontWeight.w600,
+                  //   ),
+                  // ),
 
-                // SizedBox(height: 8.h),
+                  // SizedBox(height: 8.h),
 
-                // valores dinâmicos
-                if (hasLimit)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        formatter.format(spent),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w500,
+                  // valores dinâmicos
+                  if (hasLimit)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          formatter.format(spent),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'de ${formatter.format(limit)}',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: DefaultColors.grey20,
+                        Text(
+                          'de ${formatter.format(limit)}',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                SizedBox(height: 8.h),
+                  SizedBox(height: 8.h),
 
-                // Status e valores por ciclo
-                if (invoiceClosed) ...[
-                  // Fatura fechada (entre fechamento e pagamento)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Fatura fechada',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
+                  // Status e valores por ciclo
+                  if (invoiceClosed) ...[
+                    // Fatura fechada (entre fechamento e pagamento)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Fatura fechada',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      Text(
-                        formatter.format(closedAmount),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
+                        Text(
+                          formatter.format(closedAmount),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Próxima fatura',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: DefaultColors.grey20,
-                          fontWeight: FontWeight.w500,
+                      ],
+                    ),
+                    SizedBox(height: 4.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Próxima fatura',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        formatter.format(nextAmount),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: DefaultColors.grey20,
-                          fontWeight: FontWeight.w500,
+                        Text(
+                          formatter.format(nextAmount),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Fatura do mês',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
+                      ],
+                    ),
+                  ] else ...[
+                    // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Fatura do mês',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      Text(
-                        formatter.format(nextAmount),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
+                        Text(
+                          formatter.format(nextAmount),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 6.h),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
+                      ],
+                    ),
+                    SizedBox(height: 10.h),
+                    InkWell(
+                      onTap: () {
                         // Quando não está fechado, mostrar ciclo aberto (próxima fatura)
                         Get.to(() => InvoiceDetailsPage(
                               cardName: card.name,
@@ -494,39 +502,44 @@ class MyCardsWidget extends StatelessWidget {
                       child: Text(
                         'Ver fatura',
                         style: TextStyle(
-                          color: DefaultColors.green,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.end,
                       ),
                     ),
-                  ),
-                ],
+                  ],
 
-                if (invoiceClosed) ...[
-                  SizedBox(height: 6.h),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Quando fechado, mostrar a fatura fechada
-                        Get.to(() => InvoiceDetailsPage(
-                              cardName: card.name,
-                              periodStart: cycle.closedStart,
-                              periodEnd: cycle.closedEnd,
-                              title: 'Fatura fechada',
-                            ));
-                      },
-                      child: Text(
-                        'Ver fatura',
-                        style: TextStyle(
-                          color: DefaultColors.green,
-                          fontWeight: FontWeight.w700,
+                  if (invoiceClosed) ...[
+                    SizedBox(height: 6.h),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          // Quando fechado, mostrar a fatura fechada
+                          Get.to(() => InvoiceDetailsPage(
+                                cardName: card.name,
+                                periodStart: cycle.closedStart,
+                                periodEnd: cycle.closedEnd,
+                                title: 'Fatura fechada',
+                              ));
+                        },
+                        child: Text(
+                          'Ver fatura',
+                          style: TextStyle(
+                            color: DefaultColors.green,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+                  SizedBox(
+                    height: 10.h,
+                  )
                 ],
-              ],
+              ),
             ),
           );
         },
