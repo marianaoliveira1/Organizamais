@@ -45,29 +45,6 @@ class _SelectCategoriesPageState extends State<SelectCategoriesPage> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         title: const Text('Selecione as categorias'),
-        actions: [
-          IconButton(
-            tooltip: 'Selecionar todos',
-            icon: Icon(Icons.done_all, color: theme.primaryColor),
-            onPressed: () {
-              setState(() {
-                _tempSelected =
-                    widget.data.map((e) => e['category'] as int).toSet();
-                _showResult = true;
-              });
-            },
-          ),
-          IconButton(
-            tooltip: 'Limpar seleção',
-            icon: Icon(Icons.clear_all, color: theme.primaryColor),
-            onPressed: () {
-              setState(() {
-                _tempSelected.clear();
-                _showResult = false;
-              });
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),

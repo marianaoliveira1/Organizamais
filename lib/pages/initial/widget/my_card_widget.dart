@@ -465,6 +465,28 @@ class MyCardsWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Fecha dia $closingDay',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Paga dia $paymentDay',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ] else ...[
                     // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
                     Row(
@@ -489,6 +511,28 @@ class MyCardsWidget extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 10.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Fecha dia $closingDay',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Paga dia $paymentDay',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
                     InkWell(
                       onTap: () {
                         // Quando não está fechado, mostrar ciclo aberto (próxima fatura)
@@ -499,14 +543,19 @@ class MyCardsWidget extends StatelessWidget {
                               title: 'Próxima fatura',
                             ));
                       },
-                      child: Text(
-                        'Ver fatura',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.end,
+                      child: Row(
+                        children: [
+                          Text(
+                            'Ver fatura',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                          Icon(Icons.chevron_right, color: theme.primaryColor),
+                        ],
                       ),
                     ),
                   ],
