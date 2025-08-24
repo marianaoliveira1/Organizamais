@@ -84,6 +84,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
     35, // Impostos
     91, // IPTU
   };
+  // Mapa para armazenar seleção de essenciais por mês (chave YYYY-MM)
+  final Map<String, Set<int>> _monthEssentialCategoryIds = {};
   bool _showWeekly = false;
 
   @override
@@ -469,6 +471,9 @@ class _GraphicsPageState extends State<GraphicsPage> {
       TransactionController transactionController,
       NumberFormat currencyFormatter) {
     final filteredTransactions = getFilteredTransactions(transactionController);
+    final String monthKey = _getMonthKey();
+    final Set<int> effectiveEssentialIds =
+        _monthEssentialCategoryIds[monthKey] ?? _essentialCategoryIds;
 
     double essentialTotal = 0.0;
     double nonEssentialTotal = 0.0;
@@ -478,7 +483,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
       final double value =
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       final int? categoryId = t.category;
-      if (categoryId != null && _essentialCategoryIds.contains(categoryId)) {
+      if (categoryId != null && effectiveEssentialIds.contains(categoryId)) {
         essentialTotal += value;
         usedEssentialCategoryIds.add(categoryId);
       } else {
@@ -526,6 +531,34 @@ class _GraphicsPageState extends State<GraphicsPage> {
         .toList()
       ..sort();
 
+    // Monta lista de categorias usadas no mês para o seletor
+    final List<int> monthUsedCategories = filteredTransactions
+        .map((e) => e.category)
+        .where((e) => e != null)
+        .toSet()
+        .toList()
+        .cast<int>();
+
+    final List<Map<String, dynamic>> data = monthUsedCategories
+        .map((e) => {
+              "category": e,
+              "value": filteredTransactions
+                  .where((element) => element.category == e)
+                  .fold<double>(
+                0.0,
+                (previousValue, element) {
+                  return previousValue +
+                      double.parse(element.value
+                          .replaceAll('.', '')
+                          .replaceAll(',', '.'));
+                },
+              ),
+              "name": findCategoryById(e)?['name'],
+              "color": findCategoryById(e)?['color'],
+              "icon": findCategoryById(e)?['icon'],
+            })
+        .toList();
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.symmetric(
@@ -539,7 +572,35 @@ class _GraphicsPageState extends State<GraphicsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTextGraphic(text: "Essenciais x Não essenciais"),
+          Row(
+            children: [
+              Expanded(
+                child: DefaultTextGraphic(text: "Essenciais x Não essenciais"),
+              ),
+              IconButton(
+                icon: Icon(Icons.tune, color: theme.primaryColor),
+                onPressed: () async {
+                  final Set<int> initialSelected = {
+                    ...effectiveEssentialIds
+                        .where((id) => monthUsedCategories.contains(id))
+                  };
+                  final result = await Navigator.of(context).push<Set<int>>(
+                    MaterialPageRoute(
+                      builder: (_) => SelectCategoriesPage(
+                        data: data,
+                        initialSelected: initialSelected,
+                      ),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _monthEssentialCategoryIds[monthKey] = result;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
           SizedBox(height: 16.h),
           SizedBox(
             height: 180.h,
@@ -599,6 +660,19 @@ class _GraphicsPageState extends State<GraphicsPage> {
         ],
       ),
     );
+  }
+
+  String _getMonthKey() {
+    int month;
+    if (selectedMonth.isEmpty) {
+      month = DateTime.now().month;
+    } else {
+      month = getAllMonths().indexOf(selectedMonth) + 1;
+      if (month <= 0) month = DateTime.now().month;
+    }
+    final int year = DateTime.now().year;
+    final String monthStr = month.toString().padLeft(2, '0');
+    return '$year-$monthStr';
   }
 
   Widget _buildLegendItem({

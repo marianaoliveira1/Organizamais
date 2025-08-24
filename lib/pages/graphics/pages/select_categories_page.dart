@@ -45,6 +45,29 @@ class _SelectCategoriesPageState extends State<SelectCategoriesPage> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         title: const Text('Selecione as categorias'),
+        actions: [
+          IconButton(
+            tooltip: 'Selecionar todos',
+            icon: Icon(Icons.done_all, color: theme.primaryColor),
+            onPressed: () {
+              setState(() {
+                _tempSelected =
+                    widget.data.map((e) => e['category'] as int).toSet();
+                _showResult = true;
+              });
+            },
+          ),
+          IconButton(
+            tooltip: 'Limpar seleção',
+            icon: Icon(Icons.clear_all, color: theme.primaryColor),
+            onPressed: () {
+              setState(() {
+                _tempSelected.clear();
+                _showResult = false;
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -53,6 +76,60 @@ class _SelectCategoriesPageState extends State<SelectCategoriesPage> {
           children: [
             AdsBanner(),
             SizedBox(height: 20.h),
+            // Botão "Todas" com checkbox para selecionar/limpar todas
+            Builder(builder: (context) {
+              final Set<int> allIds =
+                  widget.data.map((e) => e['category'] as int).toSet();
+              final bool allSelected = allIds.isNotEmpty &&
+                  _tempSelected.length == allIds.length &&
+                  allIds.every((id) => _tempSelected.contains(id));
+
+              return Container(
+                padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
+                margin: EdgeInsets.only(bottom: 12.h),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          if (!allSelected) {
+                            _tempSelected = Set<int>.from(allIds);
+                          } else {
+                            _tempSelected.clear();
+                          }
+                        });
+                      },
+                      child: Text(
+                        'Todas',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                    ),
+                    Checkbox(
+                      value: allSelected,
+                      onChanged: (checked) {
+                        setState(() {
+                          if (checked == true) {
+                            _tempSelected = Set<int>.from(allIds);
+                          } else {
+                            _tempSelected.clear();
+                          }
+                        });
+                      },
+                      activeColor: DefaultColors.green,
+                    ),
+                  ],
+                ),
+              );
+            }),
             if (_showResult) ...[
               Container(
                 width: double.infinity,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 import 'package:organizamais/pages/transaction/widget/title_transaction.dart';
 
@@ -36,6 +37,7 @@ class _AddCardPageState extends State<AddCardPage> {
   final nameController = TextEditingController();
   final limitController = TextEditingController();
   final closingDayController = TextEditingController();
+  final paymentDayController = TextEditingController();
   String? selectedIconPath;
   String? selectedBankName;
   final CardController cardController = Get.find();
@@ -45,10 +47,16 @@ class _AddCardPageState extends State<AddCardPage> {
     super.initState();
     if (widget.isEditing && widget.card != null) {
       nameController.text = widget.card!.name;
-      limitController.text = widget.card!.limit?.toString() ?? '';
+      if (widget.card!.limit != null) {
+        final currency = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+        limitController.text = currency.format(widget.card!.limit);
+      } else {
+        limitController.text = '';
+      }
       selectedIconPath = widget.card!.iconPath;
       selectedBankName = widget.card!.bankName;
       closingDayController.text = widget.card!.closingDay?.toString() ?? '';
+      paymentDayController.text = widget.card!.paymentDay?.toString() ?? '';
     }
   }
 
@@ -194,6 +202,39 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
               keyboardType: TextInputType.number,
             ),
+            SizedBox(height: 10.h),
+            DefaultTitleTransaction(title: "Paga no dia"),
+            TextField(
+              controller: paymentDayController,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: theme.primaryColor,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Dia de pagamento (1 a 31)',
+                hintStyle: TextStyle(
+                  color: theme.primaryColor.withOpacity(0.5),
+                  fontSize: 14.sp,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    8.r,
+                  ),
+                  borderSide: BorderSide(
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
             SizedBox(height: 16),
             InkWell(
               onTap: () {
@@ -294,13 +335,30 @@ class _AddCardPageState extends State<AddCardPage> {
                   return;
                 }
 
+                // Validação do dia de pagamento
+                final paymentDay = int.tryParse(paymentDayController.text);
+                if (paymentDay == null || paymentDay < 1 || paymentDay > 31) {
+                  Get.snackbar(
+                      'Erro', 'Informe o dia de pagamento entre 1 e 31',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                  return;
+                }
+
                 // Converter o texto formatado em double
-                final String rawLimit = limitController.text
-                    .replaceAll('R\$', '')
-                    .replaceAll('.', '')
-                    .replaceAll(',', '.')
-                    .trim();
-                final double? parsedLimit = double.tryParse(rawLimit);
+                String limitText = limitController.text.trim();
+                String rawLimit = limitText.replaceAll('R\$', '').trim();
+                double? parsedLimit;
+                if (rawLimit.contains(',')) {
+                  // Formato BR: 12.345,67
+                  rawLimit = rawLimit.replaceAll('.', '').replaceAll(',', '.');
+                  parsedLimit = double.tryParse(rawLimit);
+                } else {
+                  // Formato numérico simples: 12345.67
+                  rawLimit = rawLimit.replaceAll(' ', '');
+                  parsedLimit = double.tryParse(rawLimit);
+                }
 
                 final cardData = CardsModel(
                   id: widget.isEditing ? widget.card!.id : null,
@@ -310,6 +368,7 @@ class _AddCardPageState extends State<AddCardPage> {
                   userId: widget.isEditing ? widget.card!.userId : null,
                   limit: parsedLimit,
                   closingDay: closingDay,
+                  paymentDay: paymentDay,
                 );
 
                 if (widget.isEditing) {
