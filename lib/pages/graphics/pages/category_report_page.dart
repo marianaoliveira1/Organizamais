@@ -9,10 +9,29 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../transaction/pages/category_page.dart';
 
-class CategoryReportPage extends StatelessWidget {
+class CategoryReportPage extends StatefulWidget {
   final String selectedMonth;
+  final bool selectionMode;
+  final Set<int>? initialSelected;
 
-  const CategoryReportPage({super.key, required this.selectedMonth});
+  const CategoryReportPage(
+      {super.key,
+      required this.selectedMonth,
+      this.selectionMode = false,
+      this.initialSelected});
+
+  @override
+  State<CategoryReportPage> createState() => _CategoryReportPageState();
+}
+
+class _CategoryReportPageState extends State<CategoryReportPage> {
+  late Set<int> _tempSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _tempSelected = Set<int>.from(widget.initialSelected ?? {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +41,9 @@ class CategoryReportPage extends StatelessWidget {
     final TransactionController controller = Get.find<TransactionController>();
 
     final int currentYear = DateTime.now().year;
-    final int currentMonthIndex = selectedMonth.isEmpty
+    final int currentMonthIndex = widget.selectedMonth.isEmpty
         ? DateTime.now().month
-        : (getAllMonths().indexOf(selectedMonth) + 1);
+        : (getAllMonths().indexOf(widget.selectedMonth) + 1);
 
     final DateTime currentStart = DateTime(currentYear, currentMonthIndex, 1);
     final int lastDayCurrent =
@@ -89,6 +108,142 @@ class CategoryReportPage extends StatelessWidget {
 
     final int newCount = diffs.where((d) => d.badge == 'Nova no mês').length;
     final int unusedCount = diffs.where((d) => d.badge == 'Não usada').length;
+
+    if (widget.selectionMode) {
+      final List<int> usedCategories = currentByCategory.keys.toList()..sort();
+
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Selecione as categorias'),
+          backgroundColor: theme.scaffoldBackgroundColor,
+        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AdsBanner(),
+              SizedBox(height: 20.h),
+              Expanded(
+                child: usedCategories.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Sem categorias para selecionar neste mês.',
+                          style: TextStyle(
+                            color: DefaultColors.grey,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: usedCategories.length,
+                        separatorBuilder: (_, __) => Divider(
+                          height: 1,
+                          color: DefaultColors.grey.withOpacity(0.2),
+                        ),
+                        itemBuilder: (context, index) {
+                          final int catId = usedCategories[index];
+                          final info = findCategoryById(catId);
+                          final String name =
+                              info?['name'] ?? 'Categoria $catId';
+                          final Color color =
+                              info?['color'] ?? theme.primaryColor;
+                          final String? iconPath = info?['icon'];
+                          final bool isSelected = _tempSelected.contains(catId);
+
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  _tempSelected.remove(catId);
+                                } else {
+                                  _tempSelected.add(catId);
+                                }
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10.h),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(8.w),
+                                    decoration: BoxDecoration(
+                                      color: color.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    child: iconPath != null
+                                        ? Image.asset(iconPath,
+                                            width: 18.w, height: 18.h)
+                                        : Icon(Icons.category,
+                                            color: color, size: 18.sp),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.primaryColor,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Checkbox(
+                                    value: isSelected,
+                                    onChanged: (checked) {
+                                      setState(() {
+                                        if (checked == true) {
+                                          _tempSelected.add(catId);
+                                        } else {
+                                          _tempSelected.remove(catId);
+                                        }
+                                      });
+                                    },
+                                    activeColor: DefaultColors.green,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 12.h),
+            child: SizedBox(
+              width: double.infinity,
+              height: 44.h,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(_tempSelected);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: DefaultColors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                child: Text(
+                  'Ver resultado',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

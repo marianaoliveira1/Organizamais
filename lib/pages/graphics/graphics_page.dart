@@ -539,25 +539,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
         .toList()
         .cast<int>();
 
-    final List<Map<String, dynamic>> data = monthUsedCategories
-        .map((e) => {
-              "category": e,
-              "value": filteredTransactions
-                  .where((element) => element.category == e)
-                  .fold<double>(
-                0.0,
-                (previousValue, element) {
-                  return previousValue +
-                      double.parse(element.value
-                          .replaceAll('.', '')
-                          .replaceAll(',', '.'));
-                },
-              ),
-              "name": findCategoryById(e)?['name'],
-              "color": findCategoryById(e)?['color'],
-              "icon": findCategoryById(e)?['icon'],
-            })
-        .toList();
+    // removed: detailed data list not needed for selection mode
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -586,8 +568,9 @@ class _GraphicsPageState extends State<GraphicsPage> {
                   };
                   final result = await Navigator.of(context).push<Set<int>>(
                     MaterialPageRoute(
-                      builder: (_) => SelectCategoriesPage(
-                        data: data,
+                      builder: (_) => CategoryReportPage(
+                        selectedMonth: selectedMonth,
+                        selectionMode: true,
                         initialSelected: initialSelected,
                       ),
                     ),
