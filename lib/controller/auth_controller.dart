@@ -148,6 +148,12 @@ class AuthController extends GetxController {
         "uid": userCredential.user!.uid,
       });
 
+      // Ensure Firebase Auth displayName is set so UI (Profile) shows the name
+      await userCredential.user?.updateProfile(displayName: trimmedName);
+      await userCredential.user?.reload();
+      // Update local observable to reflect the new displayName immediately
+      firebaseUser.value = _auth.currentUser;
+
       _hideLoadingDialog();
       isOnboarding = true;
       Get.offAllNamed(Routes.HOME);

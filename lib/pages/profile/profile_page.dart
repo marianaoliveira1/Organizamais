@@ -1,5 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_print
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
@@ -92,19 +93,35 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-            Obx(
-              () {
-                final user = authController.firebaseUser.value;
-                return Text(
-                  user?.displayName ?? "",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: theme.primaryColor,
-                  ),
-                );
-              },
-            ),
+            Obx(() {
+              final user = authController.firebaseUser.value;
+              if (user == null) {
+                return const SizedBox.shrink();
+              }
+              return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user.uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  final firestoreName =
+                      snapshot.data?.data()?['name'] as String?;
+                  final effectiveName =
+                      (firestoreName != null && firestoreName.trim().isNotEmpty)
+                          ? firestoreName
+                          : (user.displayName ?? '');
+
+                  return Text(
+                    effectiveName,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: theme.primaryColor,
+                    ),
+                  );
+                },
+              );
+            }),
             SizedBox(
               height: 20.h,
             ),
