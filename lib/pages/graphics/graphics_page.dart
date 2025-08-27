@@ -19,6 +19,7 @@ import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
 import 'pages/category_report_page.dart';
+import 'pages/spending_shift_balance_page.dart';
 
 List<String> getAllMonths() {
   final months = [
@@ -408,6 +409,53 @@ class _GraphicsPageState extends State<GraphicsPage> {
             theme, transactionController, currencyFormatter),
         AdsBanner(),
         SizedBox(height: 20.h),
+
+        // Botão: Balanço de troca de gastos (alimentação)
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SpendingShiftBalancePage(
+                  selectedMonth: selectedMonth,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: 12.h,
+              horizontal: 14.w,
+            ),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "📊 Balanço de Gastos por Categoria",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    DefaultTextGraphic(
+                      text: 'Todas as categorias usadas no mês',
+                    ),
+                  ],
+                ),
+                Icon(Icons.chevron_right, color: theme.primaryColor),
+              ],
+            ),
+          ),
+        ),
+
+        SizedBox(height: 16.h),
 
         InkWell(
           onTap: () {
