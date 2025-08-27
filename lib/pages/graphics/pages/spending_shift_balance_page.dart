@@ -54,7 +54,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
-        title: const Text('Balanço de Gastos por Categoria'),
+        title: const Text('Balanço de Gastos'),
       ),
       body: SafeArea(
         child: Padding(
@@ -91,25 +91,14 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
           Text(
             'Balanço geral (mês atual vs anterior)',
             style: TextStyle(
-              fontSize: 14.sp,
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w700,
+              fontSize: 12.sp,
+              color: DefaultColors.grey20,
+              fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 6.h),
-          Text(
-            saved
-                ? 'Você economizou ${currencyFormatter.format(netDelta.abs())} em alimentação.'
-                : 'Você gastou ${currencyFormatter.format(netDelta)} a mais em alimentação.',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: saved ? DefaultColors.green : DefaultColors.redDark,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSummaryPill(
                 theme,
@@ -134,11 +123,6 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       {required String label, required String value, required Color color}) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.25)),
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -152,9 +136,9 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
           ),
           SizedBox(width: 8.w),
           Text(
-            label,
+            "$label:",
             style: TextStyle(
-              fontSize: 11.sp,
+              fontSize: 16.sp,
               color: theme.primaryColor,
               fontWeight: FontWeight.w600,
             ),
@@ -163,8 +147,8 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
           Text(
             value,
             style: TextStyle(
-              fontSize: 11.sp,
-              color: DefaultColors.grey,
+              fontSize: 16.sp,
+              color: theme.primaryColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -422,9 +406,8 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
           margin: EdgeInsets.only(top: 10.h),
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           decoration: BoxDecoration(
-            color: macroColor.withOpacity(0.08),
+            color: theme.scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: macroColor.withOpacity(0.25)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,12 +415,12 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               Text(
                 header,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   color: theme.primaryColor,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 6.h),
+              SizedBox(height: 10.h),
               ...items.map((item) {
                 final double delta = item.current - item.previous;
                 final bool saved = delta < 0;
@@ -460,7 +443,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                             Text(
                               item.name,
                               style: TextStyle(
-                                  fontSize: 12.sp,
+                                  fontSize: 14.sp,
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.w600),
                             ),
@@ -468,28 +451,29 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                             Text(
                               '${currencyFormatter.format(item.previous)} → ${currencyFormatter.format(item.current)}',
                               style: TextStyle(
-                                  fontSize: 11.sp, color: DefaultColors.grey),
+                                  fontSize: 12.sp, color: DefaultColors.grey),
+                            ),
+                            Text(
+                              saved
+                                  ? 'Economizou ${currencyFormatter.format(delta.abs())}'
+                                  : 'Gastou a mais ${currencyFormatter.format(delta)}',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: saved
+                                    ? DefaultColors.green
+                                    : DefaultColors.redDark,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
-                        ),
-                      ),
-                      Text(
-                        saved
-                            ? 'Economizou\n${currencyFormatter.format(delta.abs())}'
-                            : 'Gastou a mais\n${currencyFormatter.format(delta)}',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: saved
-                              ? DefaultColors.green
-                              : DefaultColors.redDark,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
                 );
               }).toList(),
+              SizedBox(height: 6.h),
               SizedBox(height: 6.h),
               Builder(builder: (_) {
                 final List<_FoodItemShift> decreased = items
@@ -521,7 +505,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                   lines.add(Text(
                     'Você economizou nas categorias:',
                     style: TextStyle(
-                      fontSize: 10.sp,
+                      fontSize: 11.sp,
                       color: DefaultColors.grey,
                       fontWeight: FontWeight.w600,
                     ),
@@ -531,7 +515,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                         child: Text(
                           '- ${it.name}: -${currencyFormatter.format((it.previous - it.current).abs())}',
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 11.sp,
                             color: DefaultColors.grey,
                           ),
                         ),
@@ -543,7 +527,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     child: Text(
                       'Você gastou mais nas categorias:',
                       style: TextStyle(
-                        fontSize: 10.sp,
+                        fontSize: 11.sp,
                         color: DefaultColors.grey,
                         fontWeight: FontWeight.w600,
                       ),
@@ -554,7 +538,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                         child: Text(
                           '- ${it.name}: +${fmtDiff(it)}',
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 11.sp,
                             color: DefaultColors.grey,
                           ),
                         ),
