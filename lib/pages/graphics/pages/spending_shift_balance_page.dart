@@ -205,11 +205,11 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
 
     // Title
     rows.add(Text(
-      '📊 Compensações de gastos',
+      ' Compensações de gastos',
       style: TextStyle(
-        fontSize: 16.sp,
-        color: theme.primaryColor,
-        fontWeight: FontWeight.w700,
+        fontSize: 12.sp,
+        color: DefaultColors.grey20,
+        fontWeight: FontWeight.w500,
       ),
     ));
     rows.add(SizedBox(height: 10.h));
@@ -466,7 +466,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       double incomeCurrent,
       double saldoCurrent) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
@@ -492,10 +492,14 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               fontSize: 32.sp,
             ),
           ),
+          SizedBox(
+            height: 6.h,
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildSummaryPill(
                     theme,
@@ -546,30 +550,36 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 8.h, horizontal: 10.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              insightTop,
+                              "$insightTop $insightSave",
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            if (insightSave != null) ...[
-                              SizedBox(height: 4.h),
-                              Text(
-                                insightSave,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: DefaultColors.grey,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ]
+                            // Text(
+                            //   insightTop,
+                            //   style: TextStyle(
+                            //     fontSize: 12.sp,
+                            //     color: theme.primaryColor,
+                            //     fontWeight: FontWeight.w600,
+                            //   ),
+                            // ),
+                            // if (insightSave != null) ...[
+                            //   SizedBox(height: 4.h),
+                            //   Text(
+                            //     insightSave,
+                            //     style: TextStyle(
+                            //       fontSize: 12.sp,
+                            //       color: DefaultColors.grey,
+                            //       fontWeight: FontWeight.w600,
+                            //     ),
+                            //   ),
+                            // ]
                           ],
                         ),
                       ),
@@ -636,30 +646,28 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
 
   Widget _buildSummaryPill(ThemeData theme,
       {required String label, required String value, required Color color}) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: DefaultColors.grey,
-              fontWeight: FontWeight.w500,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: DefaultColors.grey,
+            fontWeight: FontWeight.w500,
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: color,
+            fontWeight: FontWeight.w600,
           ),
-          SizedBox(width: 6.w),
-        ],
-      ),
+        ),
+        SizedBox(width: 6.w),
+      ],
     );
   }
 
