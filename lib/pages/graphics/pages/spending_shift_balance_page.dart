@@ -475,38 +475,43 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Balanço geral (mês atual vs anterior)',
+            "Saldo",
             style: TextStyle(
               fontSize: 12.sp,
-              color: DefaultColors.grey20,
               fontWeight: FontWeight.w500,
+              color: DefaultColors.grey,
             ),
           ),
-          SizedBox(height: 6.h),
+          Text(
+            currencyFormatter.format(saldoCurrent),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: saldoCurrent >= 0
+                  ? DefaultColors.greenDark
+                  : DefaultColors.redDark,
+              fontSize: 32.sp,
+            ),
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSummaryPill(
-                theme,
-                label: 'Receita ',
-                value: currencyFormatter.format(incomeCurrent),
-                color: DefaultColors.green,
-              ),
-              _buildSummaryPill(
-                theme,
-                label: 'Despesas',
-                value: currencyFormatter.format(data.totalCurrent),
-                color: DefaultColors.red,
+              Row(
+                children: [
+                  _buildSummaryPill(
+                    theme,
+                    label: 'Receita ',
+                    value: currencyFormatter.format(incomeCurrent),
+                    color: DefaultColors.greenDark,
+                  ),
+                  _buildSummaryPill(
+                    theme,
+                    label: 'Despesas',
+                    value: currencyFormatter.format(data.totalCurrent),
+                    color: DefaultColors.redDark,
+                  ),
+                ],
               ),
               SizedBox(height: 4.h),
-              _buildSummaryPill(
-                theme,
-                label: 'Saldo do mês',
-                value: currencyFormatter.format(saldoCurrent),
-                color: saldoCurrent >= 0
-                    ? DefaultColors.green
-                    : DefaultColors.redDark,
-              ),
               Builder(builder: (_) {
                 if (data.items.isEmpty || data.totalCurrent <= 0) {
                   return const SizedBox.shrink();
@@ -543,10 +548,6 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                       Container(
                         padding: EdgeInsets.symmetric(
                             vertical: 8.h, horizontal: 10.w),
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -606,7 +607,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Participação por categoria (mês atual)',
+                        'Participação por categoria',
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: DefaultColors.grey,
@@ -637,35 +638,26 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       {required String label, required String value, required Color color}) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 10.w,
-            height: 10.w,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(3.r),
-            ),
-          ),
-          SizedBox(width: 8.w),
           Text(
-            "$label:",
+            label,
             style: TextStyle(
-              fontSize: 16.sp,
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w600,
+              fontSize: 12.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(width: 6.w),
           Text(
             value,
             style: TextStyle(
               fontSize: 16.sp,
-              color: theme.primaryColor,
+              color: color,
               fontWeight: FontWeight.w600,
             ),
           ),
+          SizedBox(width: 6.w),
         ],
       ),
     );
