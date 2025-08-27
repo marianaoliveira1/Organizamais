@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +25,38 @@ class SpendingShiftBalancePage extends StatefulWidget {
 
 class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
   // Todas as categorias do mês serão coletadas dinamicamente
+  final Map<String, String> _macroToHeader = const {
+    'Moradia e Casa': '🏠 Moradia',
+    'Alimentação': '🍎 Alimentação',
+    'Transporte': '🚗 Transporte',
+    'Saúde e Bem-estar': '🏥 Saúde & Bem-estar',
+    'Educação': '📚 Educação',
+    'Lazer e Entretenimento': '🎭 Lazer & Entretenimento',
+    'Compras': '🛍️ Compras & Estilo',
+    'Pets': '🐾 Pets',
+    'Finanças': '💰 Finanças & Impostos',
+    'Impostos': '💰 Finanças & Impostos',
+    'Família': '👨‍👩‍👧‍👦 Família & Social',
+    'Trabalho': '💼 Trabalho',
+    'Imprevistos': '🚨 Imprevistos',
+    'Outros': '❓ Outros',
+  };
+
+  final List<String> _headerOrder = const [
+    '🏠 Moradia',
+    '🍎 Alimentação',
+    '🚗 Transporte',
+    '🏥 Saúde & Bem-estar',
+    '📚 Educação',
+    '🎭 Lazer & Entretenimento',
+    '🛍️ Compras & Estilo',
+    '🐾 Pets',
+    '💰 Finanças & Impostos',
+    '👨‍👩‍👧‍👦 Família & Social',
+    '💼 Trabalho',
+    '🚨 Imprevistos',
+    '❓ Outros',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +82,21 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     final double netDelta = data.totalCurrent - data.totalPrevious;
     final bool saved = netDelta < 0;
 
+    // Receita e saldo (mês atual)
+    final int _cy = currentYearMonth ~/ 100;
+    final int _cm = currentYearMonth % 100;
+    double incomeCurrent = 0.0;
+    for (final t in transactionController.transaction) {
+      if (t.paymentDay == null) continue;
+      if (t.type != TransactionType.receita) continue;
+      final DateTime d = DateTime.parse(t.paymentDay!);
+      if (d.year == _cy && d.month == _cm) {
+        incomeCurrent +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+    final double saldoCurrent = incomeCurrent - data.totalCurrent;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -65,10 +112,10 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               children: [
                 AdsBanner(),
                 SizedBox(height: 16.h),
-                _buildSummaryCard(
-                    theme, currencyFormatter, netDelta, saved, data),
+                _buildSummaryCard(theme, currencyFormatter, netDelta, saved,
+                    data, incomeCurrent, saldoCurrent),
                 SizedBox(height: 16.h),
-                _buildDetailsList(theme, currencyFormatter, data),
+                _buildCompensationsSection(theme, currencyFormatter, data),
               ],
             ),
           ),
@@ -77,8 +124,347 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     );
   }
 
-  Widget _buildSummaryCard(ThemeData theme, NumberFormat currencyFormatter,
-      double netDelta, bool saved, _FoodShiftData data) {
+  Widget _buildCompensationsSection(
+      ThemeData theme, NumberFormat currencyFormatter, _FoodShiftData data) {
+    if (data.items.isEmpty) return const SizedBox.shrink();
+
+    // Index by category name to aggregate curated comparisons
+    final Map<String, _FoodItemShift> _byName = {
+      for (final it in data.items) it.name: it
+    };
+
+    // Group items by macro header and build savings/increases lists per header
+    final Map<String, List<_FoodItemShift>> decByHeader = {};
+    final Map<String, List<_FoodItemShift>> incByHeader = {};
+    for (final it in data.items) {
+      final info = findCategoryById(it.id);
+      final String macro = (info?['macrocategoria'] as String?) ?? 'Outros';
+      final String header = _macroToHeader[macro] ?? macro;
+      if (it.current < it.previous) {
+        decByHeader.putIfAbsent(header, () => <_FoodItemShift>[]).add(it);
+      } else if (it.current > it.previous) {
+        incByHeader.putIfAbsent(header, () => <_FoodItemShift>[]).add(it);
+      }
+    }
+    decByHeader.forEach((_, list) => list.sort(
+        (a, b) => (b.previous - b.current).compareTo(a.previous - a.current)));
+    incByHeader.forEach((_, list) => list.sort(
+        (a, b) => (b.current - b.previous).compareTo(a.current - a.previous)));
+
+    if (decByHeader.isEmpty && incByHeader.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Create pairs within the same header where possible
+    final List<({String header, _FoodItemShift saveIt, _FoodItemShift incIt})>
+        pairs = [];
+    final Set<_FoodItemShift> usedDec = {};
+    final Set<_FoodItemShift> usedInc = {};
+    // Pair using preferred order first
+    for (final header in _headerOrder) {
+      final List<_FoodItemShift> decs = decByHeader[header] ?? const [];
+      final List<_FoodItemShift> incs = incByHeader[header] ?? const [];
+      final int cnt = decs.length < incs.length ? decs.length : incs.length;
+      for (int k = 0; k < cnt; k++) {
+        final _FoodItemShift d = decs[k];
+        final _FoodItemShift i = incs[k];
+        pairs.add((header: header, saveIt: d, incIt: i));
+        usedDec.add(d);
+        usedInc.add(i);
+      }
+    }
+    // Pair for any remaining headers not in preferred order
+    final Set<String> allHeaders = {
+      ...decByHeader.keys,
+      ...incByHeader.keys,
+    };
+    for (final header in allHeaders) {
+      if (_headerOrder.contains(header)) continue;
+      final List<_FoodItemShift> decs = decByHeader[header] ?? const [];
+      final List<_FoodItemShift> incs = incByHeader[header] ?? const [];
+      final int cnt = decs.length < incs.length ? decs.length : incs.length;
+      for (int k = 0; k < cnt; k++) {
+        final _FoodItemShift d = decs[k];
+        final _FoodItemShift i = incs[k];
+        pairs.add((header: header, saveIt: d, incIt: i));
+        usedDec.add(d);
+        usedInc.add(i);
+      }
+    }
+
+    final List<_FoodItemShift> leftoverInc = incByHeader.values
+        .expand((l) => l)
+        .where((it) => !usedInc.contains(it))
+        .toList();
+    final List<_FoodItemShift> leftoverDec = decByHeader.values
+        .expand((l) => l)
+        .where((it) => !usedDec.contains(it))
+        .toList();
+
+    final List<Widget> rows = [];
+
+    // Title
+    rows.add(Text(
+      '📊 Compensações de gastos',
+      style: TextStyle(
+        fontSize: 16.sp,
+        color: theme.primaryColor,
+        fontWeight: FontWeight.w700,
+      ),
+    ));
+    rows.add(SizedBox(height: 10.h));
+
+    // Curated comparisons that make sense
+    final List<({String header, List<String> left, List<String> right})>
+        curated = [
+      (
+        header: '🏠 Moradia',
+        left: ['Coisas para Casa'],
+        right: ['Manutenção e reparos'],
+      ),
+      (
+        header: '🍎 Alimentação',
+        left: ['Restaurantes'],
+        right: ['Delivery'],
+      ),
+      (
+        header: '🍎 Alimentação',
+        left: ['Mercado'],
+        right: ['Restaurantes', 'Delivery'],
+      ),
+      (
+        header: '🍎 Alimentação',
+        left: ['Lanches'],
+        right: ['Padaria'],
+      ),
+      (
+        header: '🚗 Transporte',
+        left: ['Transporte por Aplicativo'],
+        right: ['Combustível'],
+      ),
+      (
+        header: '🚗 Transporte',
+        left: ['Pedágio/Estacionamento'],
+        right: ['Transporte por Aplicativo'],
+      ),
+      (
+        header: '🚗 Transporte',
+        left: ['Seguro do Carro'],
+        right: ['Multas', 'IPVA'],
+      ),
+      (
+        header: '🏥 Saúde & Bem-estar',
+        left: ['Farmácia'],
+        right: ['Consultas Médicas', 'Exames'],
+      ),
+      (
+        header: '🏥 Saúde & Bem-estar',
+        left: ['Academia'],
+        right: ['Cuidados pessoais', 'Salão/Barbearia'],
+      ),
+      (
+        header: '🎭 Lazer & Entretenimento',
+        left: ['Cinema'],
+        right: ['Streaming'],
+      ),
+      (
+        header: '🎭 Lazer & Entretenimento',
+        left: ['Viagens'],
+        right: ['Passeios'],
+      ),
+      (
+        header: '🎭 Lazer & Entretenimento',
+        left: ['Bares'],
+        right: ['Restaurantes', 'Lanches'],
+      ),
+      (
+        header: '🛍️ Compras & Estilo',
+        left: ['Roupas e acessórios'],
+        right: ['Eletrônicos', 'Presentes'],
+      ),
+      (
+        header: '🛍️ Compras & Estilo',
+        left: ['Compras'],
+        right: ['Vestuário'],
+      ),
+      (
+        header: '🐾 Pets',
+        left: ['Pets'],
+        right: ['Veterinário'],
+      ),
+      (
+        header: '💰 Finanças & Impostos',
+        left: ['Assinaturas e serviços'],
+        right: ['Streaming', 'Aplicativos'],
+      ),
+      (
+        header: '💰 Finanças & Impostos',
+        left: ['Financiamento'],
+        right: ['Empréstimos'],
+      ),
+      (
+        header: '👨‍👩‍👧‍👦 Família & Social',
+        left: ['Família e filhos'],
+        right: ['Doações/Caridade'],
+      ),
+    ];
+
+    // Removed _sumPrev: now comparisons use only current month totals
+
+    double _sumCurr(List<String> names) {
+      double s = 0.0;
+      for (final n in names) {
+        final it = _byName[n];
+        if (it != null) s += it.current;
+      }
+      return s;
+    }
+
+    String _label(List<String> names) => names.join('/');
+
+    double _netSum = 0.0;
+    double _baseSum = 0.0;
+    for (final rule in curated) {
+      final double lc = _sumCurr(rule.left);
+      final double rc = _sumCurr(rule.right);
+
+      if (lc == 0 && rc == 0) continue;
+
+      final double diff = rc - lc; // >0: gastou mais à direita; <0: à esquerda
+      final bool neutral = diff.abs() < 0.5;
+      final bool positive = diff > 0.5;
+      final String impacto = neutral
+          ? 'Impacto final: neutro'
+          : 'Impacto final: ${diff.isNegative ? '-' : '+'}${currencyFormatter.format(diff.abs())}';
+      final double base = (lc + rc);
+      final double? diffPct = base > 0 ? (diff.abs() / base) * 100.0 : null;
+      final double leftShare = base > 0 ? (lc / base) * 100.0 : 0.0;
+      final double rightShare = base > 0 ? (rc / base) * 100.0 : 0.0;
+
+      _netSum += diff;
+      _baseSum += base;
+
+      rows.add(Container(
+        margin: EdgeInsets.only(bottom: 8.h),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_label(rule.left)} ${currencyFormatter.format(lc)}',
+                    softWrap: true,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Icon(
+                  Iconsax.arrow_swap_horizontal,
+                  size: 16.sp,
+                  color: DefaultColors.grey,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    '${_label(rule.right)} ${currencyFormatter.format(rc)}',
+                    softWrap: true,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              'Participação no par: ${leftShare.toStringAsFixed(0)}% ↔️ ${rightShare.toStringAsFixed(0)}%',
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: DefaultColors.grey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              diffPct == null
+                  ? impacto
+                  : '$impacto (${diff.isNegative ? '-' : '+'}${diffPct.toStringAsFixed(1)}%)',
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: neutral
+                    ? DefaultColors.grey
+                    : (positive ? DefaultColors.redDark : DefaultColors.green),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ));
+    }
+
+    // Paired items grouped by header
+    for (final pair in pairs) {
+      final _FoodItemShift saveIt = pair.saveIt;
+      final _FoodItemShift incIt = pair.incIt;
+      final double save = (saveIt.previous - saveIt.current);
+      final double extra = (incIt.current - incIt.previous);
+      final double net = extra - save;
+      final bool neutral = net.abs() < 0.5;
+      final bool positive = net > 0.5;
+      final String impacto = neutral
+          ? 'Impacto final: neutro'
+          : 'Impacto final: ${net.isNegative ? '-' : '+'}${currencyFormatter.format(net.abs())}';
+    }
+
+    final double netDelta = _netSum;
+    final bool netPositive = netDelta > 0.5;
+    final bool netNeutral = netDelta.abs() < 0.5;
+    final String resumo = netNeutral
+        ? 'No conjunto dessas comparações, ficou elas por elas neste mês.'
+        : (netPositive
+            ? 'No conjunto dessas comparações, o saldo foi de +${currencyFormatter.format(netDelta.abs())} neste mês.'
+            : 'No conjunto dessas comparações, o saldo foi de -${currencyFormatter.format(netDelta.abs())} neste mês.');
+
+    rows.add(SizedBox(height: 6.h));
+
+    rows.add(SizedBox(height: 8.h));
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: rows,
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(
+      ThemeData theme,
+      NumberFormat currencyFormatter,
+      double netDelta,
+      bool saved,
+      _FoodShiftData data,
+      double incomeCurrent,
+      double saldoCurrent) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
       decoration: BoxDecoration(
@@ -102,16 +488,144 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
             children: [
               _buildSummaryPill(
                 theme,
-                label: 'Mês anterior',
-                value: currencyFormatter.format(data.totalPrevious),
-                color: DefaultColors.grey.withOpacity(0.7),
+                label: 'Receita ',
+                value: currencyFormatter.format(incomeCurrent),
+                color: DefaultColors.green,
               ),
               _buildSummaryPill(
                 theme,
-                label: 'Mês atual',
+                label: 'Despesas',
                 value: currencyFormatter.format(data.totalCurrent),
-                color: DefaultColors.green,
+                color: DefaultColors.red,
               ),
+              SizedBox(height: 4.h),
+              _buildSummaryPill(
+                theme,
+                label: 'Saldo do mês',
+                value: currencyFormatter.format(saldoCurrent),
+                color: saldoCurrent >= 0
+                    ? DefaultColors.green
+                    : DefaultColors.redDark,
+              ),
+              Builder(builder: (_) {
+                if (data.items.isEmpty || data.totalCurrent <= 0) {
+                  return const SizedBox.shrink();
+                }
+
+                // Insight 1: maior gasto (participação no mês atual)
+                final _FoodItemShift top =
+                    data.items.reduce((a, b) => a.current >= b.current ? a : b);
+                final double topShare =
+                    (top.current / data.totalCurrent) * 100.0;
+                final String insightTop =
+                    'Seu maior gasto foi com ${top.name}, representando ${topShare.toStringAsFixed(0)}% do total.';
+
+                // Insight 2: onde mais economizou (maior queda absoluta)
+                _FoodItemShift? bestSaveItem;
+                double bestSaveValue = 0.0;
+                for (final it in data.items) {
+                  final double save = it.previous - it.current;
+                  if (save > bestSaveValue) {
+                    bestSaveValue = save;
+                    bestSaveItem = it;
+                  }
+                }
+                final String? insightSave =
+                    bestSaveValue > 0 && bestSaveItem != null
+                        ? 'Você economizou mais em ${bestSaveItem.name}.'
+                        : null;
+
+                return Padding(
+                  padding: EdgeInsets.only(top: 8.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.h, horizontal: 10.w),
+                        decoration: BoxDecoration(
+                          color: theme.scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              insightTop,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (insightSave != null) ...[
+                              SizedBox(height: 4.h),
+                              Text(
+                                insightSave,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: DefaultColors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ]
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              Builder(builder: (_) {
+                if (data.items.isEmpty || data.totalCurrent <= 0) {
+                  return const SizedBox.shrink();
+                }
+
+                final List<_FoodItemShift> sorted =
+                    List<_FoodItemShift>.from(data.items)
+                      ..sort((a, b) => b.current.compareTo(a.current));
+                final int showCount = sorted.length >= 5 ? 5 : sorted.length;
+                final List<_FoodItemShift> topItems =
+                    sorted.take(showCount).toList();
+                final List<String> parts = topItems.map((it) {
+                  final double pct = (it.current / data.totalCurrent) * 100.0;
+                  return '${it.name} ${pct.toStringAsFixed(0)}%';
+                }).toList();
+                final double othersShare = 100.0 -
+                    topItems.fold(
+                        0.0,
+                        (s, it) =>
+                            s + ((it.current / data.totalCurrent) * 100.0));
+                if (sorted.length > showCount && othersShare > 0.5) {
+                  parts.add('Outras ${othersShare.toStringAsFixed(0)}%');
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(top: 8.h, left: 2.w, right: 2.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Participação por categoria (mês atual)',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: DefaultColors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        parts.join(', '),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
         ],
@@ -157,219 +671,12 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     );
   }
 
-  Widget _buildGroupedBarChart(
-      ThemeData theme, NumberFormat currencyFormatter, _FoodShiftData data) {
-    final List<String> categoryNames = data.items.map((e) => e.name).toList();
-    final double maxY = [
-      ...data.items.map((e) => e.current),
-      ...data.items.map((e) => e.previous),
-    ].fold<double>(0.0, (prev, v) => v > prev ? v : prev);
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Comparativo por categoria',
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: 12.h),
-          SizedBox(
-            height: 220.h,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: (data.items.length.toDouble() * 40.w) + 80.w,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: maxY > 0 ? maxY * 1.2 : 100,
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: maxY > 0 ? maxY / 4 : 1,
-                      getDrawingHorizontalLine: (value) => FlLine(
-                        color: DefaultColors.grey.withOpacity(0.15),
-                        strokeWidth: 1,
-                      ),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      topTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 32,
-                          getTitlesWidget: (value, meta) {
-                            String label;
-                            if (value >= 1000) {
-                              label = '${(value / 1000).round()}k';
-                            } else {
-                              label = value.round().toString();
-                            }
-                            return Padding(
-                              padding: EdgeInsets.only(right: 4.w),
-                              child: Text(
-                                label,
-                                style: TextStyle(
-                                    fontSize: 9.sp, color: DefaultColors.grey),
-                                textAlign: TextAlign.right,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final idx = value.toInt();
-                            if (idx < 0 || idx >= categoryNames.length) {
-                              return const SizedBox.shrink();
-                            }
-                            return Padding(
-                              padding: EdgeInsets.only(top: 4.h),
-                              child: Text(
-                                categoryNames[idx],
-                                style: TextStyle(
-                                    fontSize: 10.sp, color: DefaultColors.grey),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    barGroups: List.generate(data.items.length, (i) {
-                      final item = data.items[i];
-                      final Color currentColor = item.color;
-                      final Color previousColor =
-                          DefaultColors.grey.withOpacity(0.6);
-                      return BarChartGroupData(
-                        x: i,
-                        barsSpace: 6.w,
-                        barRods: [
-                          BarChartRodData(
-                            toY: item.previous,
-                            color: previousColor,
-                            borderRadius: BorderRadius.circular(4.r),
-                            width: 12.w,
-                          ),
-                          BarChartRodData(
-                            toY: item.current,
-                            color: currentColor,
-                            borderRadius: BorderRadius.circular(4.r),
-                            width: 12.w,
-                          ),
-                        ],
-                      );
-                    }),
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        getTooltipColor: (grp) =>
-                            DefaultColors.green.withOpacity(0.85),
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          final label =
-                              rodIndex == 0 ? 'Mês anterior' : 'Mês atual';
-                          return BarTooltipItem(
-                            '$label\n${currencyFormatter.format(rod.toY)}',
-                            TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Row(
-            children: [
-              _buildLegend(
-                  theme, DefaultColors.grey.withOpacity(0.6), 'Mês anterior'),
-              SizedBox(width: 12.w),
-              _buildLegend(theme, DefaultColors.green, 'Mês atual'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLegend(ThemeData theme, Color color, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 14.w,
-          height: 14.w,
-          decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(3.r)),
-        ),
-        SizedBox(width: 6.w),
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 11.sp,
-              color: theme.primaryColor,
-              fontWeight: FontWeight.w600),
-        ),
-      ],
-    );
-  }
-
   Widget _buildDetailsList(
       ThemeData theme, NumberFormat currencyFormatter, _FoodShiftData data) {
     // Mapeia macrocategorias do modelo -> cabeçalhos com emojis
-    final Map<String, String> macroToHeader = {
-      'Moradia e Casa': '🏠 Moradia',
-      'Alimentação': '🍎 Alimentação',
-      'Transporte': '🚗 Transporte',
-      'Saúde e Bem-estar': '🏥 Saúde & Bem-estar',
-      'Educação': '📚 Educação',
-      'Lazer e Entretenimento': '🎭 Lazer & Entretenimento',
-      'Compras': '🛍️ Compras & Estilo',
-      'Pets': '🐾 Pets',
-      'Finanças': '💰 Finanças & Impostos',
-      'Impostos': '💰 Finanças & Impostos',
-      'Família': '👨‍👩‍👧‍👦 Família & Social',
-      'Trabalho': '💼 Trabalho',
-      'Imprevistos': '🚨 Imprevistos',
-      'Outros': '❓ Outros',
-    };
+    final Map<String, String> macroToHeader = _macroToHeader;
 
-    final List<String> headerOrder = [
-      '🏠 Moradia',
-      '🍎 Alimentação',
-      '🚗 Transporte',
-      '🏥 Saúde & Bem-estar',
-      '📚 Educação',
-      '🎭 Lazer & Entretenimento',
-      '🛍️ Compras & Estilo',
-      '🐾 Pets',
-      '💰 Finanças & Impostos',
-      '👨‍👩‍👧‍👦 Família & Social',
-      '💼 Trabalho',
-      '🚨 Imprevistos',
-      '❓ Outros',
-    ];
+    final List<String> headerOrder = _headerOrder;
 
     // Agrupa itens por cabeçalho
     final Map<String, List<_FoodItemShift>> groups = {};
@@ -400,7 +707,6 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
 
     for (final header in finalHeaders) {
       final items = groups[header]!;
-      final Color macroColor = items.first.color;
       children.add(
         Container(
           margin: EdgeInsets.only(top: 10.h),
@@ -424,6 +730,9 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               ...items.map((item) {
                 final double delta = item.current - item.previous;
                 final bool saved = delta < 0;
+                final double share = data.totalCurrent > 0
+                    ? (item.current / data.totalCurrent) * 100.0
+                    : 0.0;
                 return Padding(
                   padding: EdgeInsets.symmetric(vertical: 6.h),
                   child: Row(
@@ -452,6 +761,15 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                               '${currencyFormatter.format(item.previous)} → ${currencyFormatter.format(item.current)}',
                               style: TextStyle(
                                   fontSize: 12.sp, color: DefaultColors.grey),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              'Participação no mês: ${share.toStringAsFixed(0)}% do total',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             Text(
                               saved
