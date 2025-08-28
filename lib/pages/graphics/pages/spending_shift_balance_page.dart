@@ -404,8 +404,8 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
+                          color: DefaultColors.textGrey,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(height: 2.h),
@@ -414,8 +414,8 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: DefaultColors.grey,
-                          fontWeight: FontWeight.w600,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
