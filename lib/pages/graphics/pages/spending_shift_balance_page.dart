@@ -115,7 +115,11 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 _buildSummaryCard(theme, currencyFormatter, netDelta, saved,
                     data, incomeCurrent, saldoCurrent),
                 SizedBox(height: 16.h),
+                AdsBanner(),
+                SizedBox(height: 16.h),
                 _buildCompensationsSection(theme, currencyFormatter, data),
+                SizedBox(height: 16.h),
+                AdsBanner(),
               ],
             ),
           ),
@@ -358,15 +362,29 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Text(
-                    '${_label(rule.left)} ${currencyFormatter.format(lc)}',
-                    softWrap: true,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _label(rule.left),
+                        softWrap: true,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: DefaultColors.textGrey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        currencyFormatter.format(lc),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(width: 8.w),
@@ -377,15 +395,30 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
-                  child: Text(
-                    '${_label(rule.right)} ${currencyFormatter.format(rc)}',
-                    softWrap: true,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        _label(rule.right),
+                        softWrap: true,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        currencyFormatter.format(rc),
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: DefaultColors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -546,44 +579,30 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
 
                 return Padding(
                   padding: EdgeInsets.only(top: 8.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$insightTop $insightSave",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            // Text(
-                            //   insightTop,
-                            //   style: TextStyle(
-                            //     fontSize: 12.sp,
-                            //     color: theme.primaryColor,
-                            //     fontWeight: FontWeight.w600,
-                            //   ),
-                            // ),
-                            // if (insightSave != null) ...[
-                            //   SizedBox(height: 4.h),
-                            //   Text(
-                            //     insightSave,
-                            //     style: TextStyle(
-                            //       fontSize: 12.sp,
-                            //       color: DefaultColors.grey,
-                            //       fontWeight: FontWeight.w600,
-                            //     ),
-                            //   ),
-                            // ]
-                          ],
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: insightTop,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                        if (insightSave != null)
+                          TextSpan(
+                            text: ' ' + insightSave,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                      ],
+                    ),
+                    softWrap: true,
+                    textAlign: TextAlign.start,
                   ),
                 );
               }),
@@ -661,7 +680,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 18.sp,
             color: color,
             fontWeight: FontWeight.w600,
           ),
