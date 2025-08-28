@@ -155,4 +155,7 @@ class DefaultColors {
   static const orchid = Color(0xFFDA70D6);
   static const aquamarine = Color(0xFF7FFFD4);
   static const cerulean = Color(0xFF2A52BE);
+
+  // Custom unique color for car accessories category
+  static const graphite = Color(0xFF2F3A40);
 }

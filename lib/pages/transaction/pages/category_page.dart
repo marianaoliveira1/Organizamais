@@ -132,10 +132,24 @@ final List<Map<String, dynamic>> categories_expenses = [
   {
     'id': 92,
     'name': 'Manutenção do carro',
-    'icon': 'assets/icon-category/manutencao.png',
+    'icon': 'assets/icon-category/manutencao-carro.png',
     'color': DefaultColors.steelBlue,
     'macrocategoria': 'Transporte',
     'synonyms': ['revisão', 'oficina', 'mecânico', 'troca de óleo']
+  },
+  {
+    'id': 102,
+    'name': 'Acessórios para o carro',
+    'icon': 'assets/icon-category/acessorios-carro.png',
+    'color': DefaultColors.graphite,
+    'macrocategoria': 'Transporte',
+    'synonyms': [
+      'acessório de carro',
+      'tapete',
+      'capa',
+      'calha de chuva',
+      'organizador'
+    ]
   },
   {
     'id': 93,

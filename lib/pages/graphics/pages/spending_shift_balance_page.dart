@@ -218,7 +218,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     ));
     rows.add(SizedBox(height: 10.h));
 
-    // Curated comparisons that make sense
+    // Curated comparisons that make sense (lists will be expanded em pares 1x1)
     final List<({String header, List<String> left, List<String> right})>
         curated = [
       (
@@ -324,13 +324,23 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       return s;
     }
 
-    String _label(List<String> names) => names.join('/');
+    // Expande cada regra em pares 1x1 (uma categoria vs outra)
+    final List<({String header, String left, String right})> pairRules = [];
+    for (final rule in curated) {
+      for (final l in rule.left) {
+        for (final r in rule.right) {
+          pairRules.add((header: rule.header, left: l, right: r));
+        }
+      }
+    }
 
     double _netSum = 0.0;
     double _baseSum = 0.0;
-    for (final rule in curated) {
-      final double lc = _sumCurr(rule.left);
-      final double rc = _sumCurr(rule.right);
+    for (final pr in pairRules) {
+      final String leftName = pr.left;
+      final String rightName = pr.right;
+      final double lc = _sumCurr([leftName]);
+      final double rc = _sumCurr([rightName]);
 
       if (lc == 0 && rc == 0) continue;
 
@@ -366,7 +376,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _label(rule.left),
+                        leftName,
                         softWrap: true,
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -399,7 +409,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _label(rule.right),
+                        rightName,
                         softWrap: true,
                         textAlign: TextAlign.right,
                         style: TextStyle(
