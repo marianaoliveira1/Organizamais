@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -88,6 +89,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
   // Mapa para armazenar seleção de essenciais por mês (chave YYYY-MM)
   final Map<String, Set<int>> _monthEssentialCategoryIds = {};
   bool _showWeekly = false;
+  bool _showBarCategoryChart = false;
 
   @override
   void initState() {
@@ -1382,7 +1384,8 @@ class _GraphicsPageState extends State<GraphicsPage> {
           Row(
             children: [
               Expanded(
-                  child: DefaultTextGraphic(text: "Despesas por categoria")),
+                child: DefaultTextGraphic(text: "Despesas por categoria"),
+              ),
               IconButton(
                 icon: Icon(Icons.chevron_right, color: theme.primaryColor),
                 onPressed: () async {
@@ -1403,37 +1406,179 @@ class _GraphicsPageState extends State<GraphicsPage> {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          Center(
-            child: GestureDetector(
-              onTap: () async {
-                final result = await Navigator.of(context).push<Set<int>>(
-                  MaterialPageRoute(
-                    builder: (_) => SelectCategoriesPage(
-                      data: data,
-                      initialSelected: _selectedCategoryIds,
+          SizedBox(height: 6.h),
+          Row(
+            children: [
+              // Pizza toggle with bordered container
+              GestureDetector(
+                onTap: () {
+                  if (_showBarCategoryChart) {
+                    setState(() => _showBarCategoryChart = false);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(
+                      color: !_showBarCategoryChart
+                          ? theme.primaryColor
+                          : DefaultColors.grey.withOpacity(0.3),
                     ),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                );
-                if (result != null) {
-                  setState(() {
-                    _selectedCategoryIds = result;
-                  });
-                }
-              },
-              child: SizedBox(
-                height: 180.h,
-                child: PieChart(
-                  PieChartData(
-                    sectionsSpace: 0,
-                    centerSpaceRadius: 26,
-                    centerSpaceColor: theme.cardColor,
-                    sections: chartData,
+                  child: Icon(
+                    Icons.pie_chart_rounded,
+                    color: !_showBarCategoryChart
+                        ? theme.primaryColor
+                        : DefaultColors.grey,
+                    size: 18.sp,
                   ),
                 ),
               ),
-            ),
+              SizedBox(width: 8.w),
+              // Bar toggle with card-colored background and border
+              GestureDetector(
+                onTap: () {
+                  if (!_showBarCategoryChart) {
+                    setState(() => _showBarCategoryChart = true);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    border: Border.all(
+                      color: _showBarCategoryChart
+                          ? theme.primaryColor
+                          : DefaultColors.grey.withOpacity(0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(
+                    Iconsax.chart_2,
+                    color: _showBarCategoryChart
+                        ? theme.primaryColor
+                        : DefaultColors.grey,
+                    size: 18.sp,
+                  ),
+                ),
+              ),
+            ],
           ),
+          SizedBox(height: 16.h),
+          if (!_showBarCategoryChart)
+            Center(
+              child: GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.of(context).push<Set<int>>(
+                    MaterialPageRoute(
+                      builder: (_) => SelectCategoriesPage(
+                        data: data,
+                        initialSelected: _selectedCategoryIds,
+                      ),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _selectedCategoryIds = result;
+                    });
+                  }
+                },
+                child: SizedBox(
+                  height: 180.h,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 0,
+                      centerSpaceRadius: 26,
+                      centerSpaceColor: theme.cardColor,
+                      sections: chartData,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 220.h,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: (data.isNotEmpty
+                              ? (data
+                                  .map((e) => e['value'] as double)
+                                  .reduce((a, b) => a > b ? a : b))
+                              : 0) >
+                          0
+                      ? (data
+                              .map((e) => e['value'] as double)
+                              .reduce((a, b) => a > b ? a : b) *
+                          1.2)
+                      : 100,
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final int idx = value.toInt();
+                          if (idx < 0 || idx >= data.length) {
+                            return const SizedBox.shrink();
+                          }
+                          final String name =
+                              (data[idx]['name'] ?? '') as String;
+                          final String abbr =
+                              name.length <= 3 ? name : name.substring(0, 3);
+                          return Padding(
+                            padding: EdgeInsets.only(top: 4.h),
+                            child: Text(
+                              abbr,
+                              style: TextStyle(
+                                fontSize: 9.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 1,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: DefaultColors.grey.withOpacity(0.15),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: List.generate(data.length, (i) {
+                    final double v = data[i]['value'] as double;
+                    return BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: v,
+                          width: 12.w,
+                          color: (data[i]['color'] as Color?) ??
+                              theme.primaryColor,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            ),
           WidgetListCategoryGraphics(
             data: data,
             totalValue: totalValue,

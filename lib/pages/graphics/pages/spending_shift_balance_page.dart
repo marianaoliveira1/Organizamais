@@ -86,6 +86,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     final int _cy = currentYearMonth ~/ 100;
     final int _cm = currentYearMonth % 100;
     double incomeCurrent = 0.0;
+    double incomePrevious = 0.0;
     for (final t in transactionController.transaction) {
       if (t.paymentDay == null) continue;
       if (t.type != TransactionType.receita) continue;
@@ -94,8 +95,15 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
         incomeCurrent +=
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       }
+      final int _py = previousYearMonth ~/ 100;
+      final int _pm = previousYearMonth % 100;
+      if (d.year == _py && d.month == _pm) {
+        incomePrevious +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
     }
     final double saldoCurrent = incomeCurrent - data.totalCurrent;
+    final double saldoPrevious = incomePrevious - data.totalPrevious;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -112,12 +120,25 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               children: [
                 AdsBanner(),
                 SizedBox(height: 16.h),
-                _buildSummaryCard(theme, currencyFormatter, netDelta, saved,
-                    data, incomeCurrent, saldoCurrent),
+                _buildSummaryCard(
+                    theme,
+                    currencyFormatter,
+                    netDelta,
+                    saved,
+                    data,
+                    incomeCurrent,
+                    incomePrevious,
+                    saldoCurrent,
+                    saldoPrevious,
+                    _months()[(previousYearMonth % 100) - 1]),
                 SizedBox(height: 16.h),
                 AdsBanner(),
                 SizedBox(height: 16.h),
                 _buildCompensationsSection(theme, currencyFormatter, data),
+                SizedBox(height: 16.h),
+                // _buildMonthComparisonCard(theme, currencyFormatter, data),
+                // SizedBox(height: 16.h),
+                _buildHighlightsCard(theme, data),
                 SizedBox(height: 16.h),
                 AdsBanner(),
               ],
@@ -131,6 +152,11 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
   Widget _buildCompensationsSection(
       ThemeData theme, NumberFormat currencyFormatter, _FoodShiftData data) {
     if (data.items.isEmpty) return const SizedBox.shrink();
+
+    // Nome do mês anterior com base na seleção da tela
+    final int _ym = _resolveYearMonth(widget.selectedMonth);
+    final int _pym = _previousYearMonth(_ym);
+    final String _prevMonthName = _months()[(_pym % 100) - 1];
 
     // Index by category name to aggregate curated comparisons
     final Map<String, _FoodItemShift> _byName = {
@@ -435,7 +461,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
             ),
             SizedBox(height: 2.h),
             Text(
-              'Participação no par: ${leftShare.toStringAsFixed(0)}% ↔️ ${rightShare.toStringAsFixed(0)}%',
+              '$_prevMonthName vs atual: ${currencyFormatter.format(lc)} ↔️ ${currencyFormatter.format(rc)}',
               style: TextStyle(
                 fontSize: 11.sp,
                 color: DefaultColors.grey,
@@ -443,18 +469,58 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               ),
             ),
             SizedBox(height: 2.h),
-            Text(
-              diffPct == null
-                  ? impacto
-                  : '$impacto (${diff.isNegative ? '-' : '+'}${diffPct.toStringAsFixed(1)}%)',
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: neutral
-                    ? DefaultColors.grey
-                    : (positive ? DefaultColors.redDark : DefaultColors.green),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Builder(builder: (_) {
+              final double leftPrev = (_byName[leftName]?.previous ?? 0.0);
+              final double leftCurr = lc;
+              final double rightPrev = (_byName[rightName]?.previous ?? 0.0);
+              final double rightCurr = rc;
+
+              final double leftDelta =
+                  leftCurr - leftPrev; // >0 aumentou, <0 economizou
+              final double rightDelta = rightCurr - rightPrev; // >0 aumentou
+              final double netDeltaPair =
+                  (leftCurr + rightCurr) - (leftPrev + rightPrev);
+
+              final String partLeft =
+                  'No mês passado você gastou ${currencyFormatter.format(leftPrev)} em $leftName e este mês ${currencyFormatter.format(leftCurr)}';
+              final String partLeftChange = leftDelta < -0.5
+                  ? ', economizando ${currencyFormatter.format((-leftDelta).abs())}'
+                  : (leftDelta > 0.5
+                      ? ', gastando ${currencyFormatter.format(leftDelta.abs())} a mais'
+                      : ', mantendo praticamente igual');
+
+              String partRight;
+              if (rightDelta > 0.5) {
+                partRight =
+                    ', porém essa economia foi compensada pelo aumento em $rightName, que passou de ${currencyFormatter.format(rightPrev)} no mês passado para ${currencyFormatter.format(rightCurr)} (+${currencyFormatter.format(rightDelta.abs())}).';
+              } else if (rightDelta < -0.5) {
+                partRight =
+                    ', além disso, houve redução em $rightName: de ${currencyFormatter.format(rightPrev)} para ${currencyFormatter.format(rightCurr)} (-${currencyFormatter.format((-rightDelta).abs())}).';
+              } else {
+                partRight = ', enquanto em $rightName ficou estável.';
+              }
+
+              String conclusion;
+              if (netDeltaPair.abs() < 0.5) {
+                conclusion =
+                    ' Ou seja, apesar das mudanças, o gasto total não diminuiu.';
+              } else if (netDeltaPair > 0.5) {
+                conclusion =
+                    ' Ou seja, mesmo com a redução, o gasto combinado aumentou ${currencyFormatter.format(netDeltaPair.abs())}.';
+              } else {
+                conclusion =
+                    ' Ou seja, o gasto combinado diminuiu ${currencyFormatter.format(netDeltaPair.abs())}.';
+              }
+
+              return Text(
+                partLeft + partLeftChange + partRight + conclusion,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            }),
           ],
         ),
       ));
@@ -507,7 +573,10 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       bool saved,
       _FoodShiftData data,
       double incomeCurrent,
-      double saldoCurrent) {
+      double incomePrevious,
+      double saldoCurrent,
+      double saldoPrevious,
+      String prevMonthName) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
       decoration: BoxDecoration(
@@ -544,20 +613,87 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildSummaryPill(
-                    theme,
-                    label: 'Receita ',
-                    value: currencyFormatter.format(incomeCurrent),
-                    color: DefaultColors.greenDark,
+                  Row(
+                    children: [
+                      // Text(
+                      //   incomeCurrent >= incomePrevious ? '📈' : '📉',
+                      //   style: TextStyle(fontSize: 14.sp),
+                      // ),
+                      // SizedBox(width: 6.w),
+                      _buildSummaryPill(
+                        theme,
+                        label: 'Receita ',
+                        value: currencyFormatter.format(incomeCurrent),
+                        color: DefaultColors.greenDark,
+                      ),
+                    ],
                   ),
-                  _buildSummaryPill(
-                    theme,
-                    label: 'Despesas',
-                    value: currencyFormatter.format(data.totalCurrent),
-                    color: DefaultColors.redDark,
+                  Row(
+                    children: [
+                      // Text(
+                      //   data.totalCurrent >= data.totalPrevious ? '📈' : '📉',
+                      //   style: TextStyle(fontSize: 14.sp),
+                      // ),
+                      // SizedBox(width: 6.w),
+                      _buildSummaryPill(
+                        theme,
+                        label: 'Despesas',
+                        value: currencyFormatter.format(data.totalCurrent),
+                        color: DefaultColors.redDark,
+                      ),
+                    ],
                   ),
                 ],
               ),
+              SizedBox(height: 6.h),
+              Builder(builder: (_) {
+                String pct(double prev, double curr) {
+                  if (prev <= 0 && curr <= 0) return '0%';
+                  if (prev <= 0 && curr > 0) return '+100%';
+                  final double p = ((curr - prev) / prev) * 100.0;
+                  final String sign = p >= 0.5 ? '+' : '';
+                  return '$sign${p.toStringAsFixed(1)}%';
+                }
+
+                final receitaPct = pct(incomePrevious, incomeCurrent);
+                final despesaPct = pct(data.totalPrevious, data.totalCurrent);
+                final double saldoDelta = saldoCurrent - saldoPrevious;
+                final String saldoTxt = saldoDelta >= 0 ? 'melhorou' : 'piorou';
+                final double receitaDelta = incomeCurrent - incomePrevious;
+                final double despesaDelta =
+                    data.totalCurrent - data.totalPrevious;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Receita: $receitaPct (${receitaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(receitaDelta.abs())}) em relação a $prevMonthName',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Despesas: $despesaPct (${despesaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(despesaDelta.abs())}) em relação a $prevMonthName',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Saldo: $saldoTxt em ${currencyFormatter.format(saldoDelta.abs())}',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: saldoDelta >= 0
+                            ? DefaultColors.greenDark
+                            : DefaultColors.redDark,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                );
+              }),
               SizedBox(height: 4.h),
               Builder(builder: (_) {
                 if (data.items.isEmpty || data.totalCurrent <= 0) {
@@ -668,6 +804,279 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               }),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMonthComparisonCard(
+      ThemeData theme, NumberFormat currencyFormatter, _FoodShiftData data) {
+    if (data.items.isEmpty) return const SizedBox.shrink();
+
+    // Determinar máximos para escala
+    final double maxValue = data.items.fold<double>(0.0,
+        (m, e) => [m, e.previous, e.current].reduce((a, b) => a > b ? a : b));
+    final double safeMax = maxValue <= 0 ? 1.0 : maxValue;
+
+    // Encontrar maior aumento e maior economia
+    _FoodItemShift? incItem;
+    double incPct = -1e9;
+    _FoodItemShift? decItem;
+    double decPct = -1e9;
+    for (final it in data.items) {
+      final double prev = it.previous;
+      final double curr = it.current;
+      double pctChange;
+      if (prev <= 0 && curr > 0) {
+        pctChange = 100.0;
+      } else if (prev <= 0 && curr <= 0) {
+        pctChange = 0.0;
+      } else {
+        pctChange = ((curr - prev) / prev) * 100.0;
+      }
+      if (pctChange > incPct) {
+        incPct = pctChange;
+        incItem = it;
+      }
+      if (-pctChange > decPct) {
+        decPct = -pctChange;
+        decItem = it;
+      }
+    }
+
+    String buildInsight() {
+      String left = '';
+      if (decItem != null && decPct > 0.5) {
+        left =
+            'Você gastou ${decPct.toStringAsFixed(0)}% menos em ${decItem!.name} em relação ao mês passado';
+      }
+      String right = '';
+      if (incItem != null && incPct > 0.5) {
+        right = 'aumentou ${incPct.toStringAsFixed(0)}% em ${incItem!.name}';
+      }
+      if (left.isEmpty && right.isEmpty) {
+        return 'Seus gastos ficaram estáveis em relação ao mês passado.';
+      }
+      if (left.isNotEmpty && right.isNotEmpty) return '$left, mas $right.';
+      return left.isNotEmpty ? '$left.' : 'Você $right.';
+    }
+
+    List<Widget> lines = [];
+    lines.add(Text(
+      'Comparação por categoria (mês atual x mês anterior)',
+      style: TextStyle(
+        fontSize: 12.sp,
+        color: DefaultColors.grey,
+        fontWeight: FontWeight.w600,
+      ),
+    ));
+    lines.add(SizedBox(height: 8.h));
+
+    // Legenda
+    lines.add(Row(
+      children: [
+        Container(width: 12.w, height: 6.h, color: DefaultColors.blueGrey),
+        SizedBox(width: 6.w),
+        Text('Mês anterior',
+            style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
+        SizedBox(width: 16.w),
+        Container(width: 12.w, height: 6.h, color: DefaultColors.greenDark),
+        SizedBox(width: 6.w),
+        Text('Mês atual',
+            style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
+      ],
+    ));
+    lines.add(SizedBox(height: 8.h));
+
+    for (final it in data.items) {
+      lines.add(Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              it.name,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: theme.primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 6.h),
+            LayoutBuilder(builder: (context, constraints) {
+              final double full = constraints.maxWidth;
+              final double prevW = (it.previous / safeMax) * full;
+              final double currW = (it.current / safeMax) * full;
+              return Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 10.h,
+                      decoration: BoxDecoration(
+                        color: DefaultColors.blueGrey,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      width: prevW.clamp(0, full),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Container(
+                      height: 10.h,
+                      decoration: BoxDecoration(
+                        color: DefaultColors.greenDark,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      width: currW.clamp(0, full),
+                    ),
+                  ),
+                ],
+              );
+            }),
+            SizedBox(height: 4.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Anterior: ${currencyFormatter.format(it.previous)}',
+                    style:
+                        TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
+                Text('Atual: ${currencyFormatter.format(it.current)}',
+                    style:
+                        TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
+              ],
+            ),
+            SizedBox(height: 2.h),
+            Builder(builder: (_) {
+              final double diff = it.current - it.previous;
+              double pctChange;
+              if (it.previous <= 0 && it.current > 0) {
+                pctChange = 100.0;
+              } else if (it.previous <= 0 && it.current <= 0) {
+                pctChange = 0.0;
+              } else {
+                pctChange = ((it.current - it.previous) / it.previous) * 100.0;
+              }
+              final bool up = diff > 0.5;
+              final String sign = diff >= 0 ? '+' : '-';
+              return Text(
+                'Variação: $sign${currencyFormatter.format(diff.abs())} (${up ? '+' : ''}${pctChange.toStringAsFixed(1)}%)',
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: up ? DefaultColors.redDark : DefaultColors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            }),
+          ],
+        ),
+      ));
+    }
+
+    // Insight textual
+    lines.add(SizedBox(height: 8.h));
+    lines.add(Text(
+      buildInsight(),
+      style: TextStyle(
+        fontSize: 12.sp,
+        color: theme.primaryColor,
+        fontWeight: FontWeight.w600,
+      ),
+    ));
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: lines,
+      ),
+    );
+  }
+
+  Widget _buildHighlightsCard(ThemeData theme, _FoodShiftData data) {
+    if (data.items.isEmpty) return const SizedBox.shrink();
+    _FoodItemShift? incItem;
+    double incPct = -1e9;
+    _FoodItemShift? decItem;
+    double decPct = -1e9;
+    for (final it in data.items) {
+      final double prev = it.previous;
+      final double curr = it.current;
+      double pctChange;
+      if (prev <= 0 && curr > 0) {
+        pctChange = 100.0;
+      } else if (prev <= 0 && curr <= 0) {
+        pctChange = 0.0;
+      } else {
+        pctChange = ((curr - prev) / prev) * 100.0;
+      }
+      if (pctChange > incPct) {
+        incPct = pctChange;
+        incItem = it;
+      }
+      if (-pctChange > decPct) {
+        decPct = -pctChange;
+        decItem = it;
+      }
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Destaques',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          if (incItem != null)
+            Row(
+              children: [
+                Text('📈', style: TextStyle(fontSize: 14.sp)),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'Maior aumento: ${incItem!.name} (+${incPct.toStringAsFixed(0)}%)',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          if (decItem != null) ...[
+            SizedBox(height: 6.h),
+            Row(
+              children: [
+                Text('📉', style: TextStyle(fontSize: 14.sp)),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'Maior economia: ${decItem!.name} (-${decPct.toStringAsFixed(0)}%)',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
