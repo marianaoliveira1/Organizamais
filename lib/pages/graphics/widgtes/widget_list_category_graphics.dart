@@ -653,7 +653,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     return Container(
-      // padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: DefaultColors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
