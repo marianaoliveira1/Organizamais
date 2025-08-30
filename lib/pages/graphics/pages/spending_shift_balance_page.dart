@@ -577,36 +577,127 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       double saldoCurrent,
       double saldoPrevious,
       String prevMonthName) {
+    // Cálculos de variações
+    final String receitaPct = (() {
+      if (incomePrevious <= 0 && incomeCurrent <= 0) return '0%';
+      if (incomePrevious <= 0 && incomeCurrent > 0) return '+100%';
+      final double p =
+          ((incomeCurrent - incomePrevious) / incomePrevious) * 100.0;
+      final String sign = p >= 0.5 ? '+' : '';
+      return '$sign${p.toStringAsFixed(1)}%';
+    })();
+
+    final String despesaPct = (() {
+      if (data.totalPrevious <= 0 && data.totalCurrent <= 0) return '0%';
+      if (data.totalPrevious <= 0 && data.totalCurrent > 0) return '+100%';
+      final double p =
+          ((data.totalCurrent - data.totalPrevious) / data.totalPrevious) *
+              100.0;
+      final String sign = p >= 0.5 ? '+' : '';
+      return '$sign${p.toStringAsFixed(1)}%';
+    })();
+
+    final double saldoDelta = saldoCurrent - saldoPrevious;
+    final String saldoTxt = saldoDelta >= 0 ? 'melhorou' : 'piorou';
+    final double receitaDelta = incomeCurrent - incomePrevious;
+    final double despesaDelta = data.totalCurrent - data.totalPrevious;
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border:
+            Border.all(color: theme.primaryColor.withOpacity(0.06), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Saldo",
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-              color: DefaultColors.grey,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Saldo",
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: DefaultColors.grey,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: theme.primaryColor.withOpacity(0.12),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'vs $prevMonthName',
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
+          SizedBox(height: 4.h),
           Text(
             currencyFormatter.format(saldoCurrent),
             style: TextStyle(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: saldoCurrent >= 0
                   ? DefaultColors.greenDark
                   : DefaultColors.redDark,
-              fontSize: 32.sp,
+              fontSize: 30.sp,
             ),
           ),
-          SizedBox(
-            height: 6.h,
+          SizedBox(height: 6.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: (saldoDelta >= 0
+                      ? DefaultColors.greenDark
+                      : DefaultColors.redDark)
+                  .withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  saldoDelta >= 0 ? Icons.trending_up : Icons.trending_down,
+                  size: 14.sp,
+                  color: saldoDelta >= 0
+                      ? DefaultColors.greenDark
+                      : DefaultColors.redDark,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  'Saldo $saldoTxt em ${currencyFormatter.format(saldoDelta.abs())}',
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    color: saldoDelta >= 0
+                        ? DefaultColors.greenDark
+                        : DefaultColors.redDark,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
+          SizedBox(height: 10.h),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -615,86 +706,62 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 children: [
                   Row(
                     children: [
-                      // Text(
-                      //   incomeCurrent >= incomePrevious ? '📈' : '📉',
-                      //   style: TextStyle(fontSize: 14.sp),
-                      // ),
-                      // SizedBox(width: 6.w),
                       _buildSummaryPill(
                         theme,
-                        label: 'Receita ',
+                        label: 'Receita',
                         value: currencyFormatter.format(incomeCurrent),
                         color: DefaultColors.greenDark,
+                        icon: Icons.attach_money,
+                        deltaText:
+                            '$receitaPct (${receitaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(receitaDelta.abs())})',
+                        isIncrease: incomeCurrent >= incomePrevious,
                       ),
                     ],
                   ),
                   Row(
                     children: [
-                      // Text(
-                      //   data.totalCurrent >= data.totalPrevious ? '📈' : '📉',
-                      //   style: TextStyle(fontSize: 14.sp),
-                      // ),
-                      // SizedBox(width: 6.w),
                       _buildSummaryPill(
                         theme,
                         label: 'Despesas',
                         value: currencyFormatter.format(data.totalCurrent),
                         color: DefaultColors.redDark,
+                        icon: Icons.receipt_long,
+                        deltaText:
+                            '$despesaPct (${despesaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(despesaDelta.abs())})',
+                        isIncrease: data.totalCurrent >= data.totalPrevious,
                       ),
                     ],
                   ),
                 ],
               ),
               SizedBox(height: 6.h),
-              Builder(builder: (_) {
-                String pct(double prev, double curr) {
-                  if (prev <= 0 && curr <= 0) return '0%';
-                  if (prev <= 0 && curr > 0) return '+100%';
-                  final double p = ((curr - prev) / prev) * 100.0;
-                  final String sign = p >= 0.5 ? '+' : '';
-                  return '$sign${p.toStringAsFixed(1)}%';
-                }
-
-                final receitaPct = pct(incomePrevious, incomeCurrent);
-                final despesaPct = pct(data.totalPrevious, data.totalCurrent);
-                final double saldoDelta = saldoCurrent - saldoPrevious;
-                final String saldoTxt = saldoDelta >= 0 ? 'melhorou' : 'piorou';
-                final double receitaDelta = incomeCurrent - incomePrevious;
-                final double despesaDelta =
-                    data.totalCurrent - data.totalPrevious;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Receita: $receitaPct (${receitaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(receitaDelta.abs())}) em relação a $prevMonthName',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Despesas: $despesaPct (${despesaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(despesaDelta.abs())}) em relação a $prevMonthName',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Saldo: $saldoTxt em ${currencyFormatter.format(saldoDelta.abs())}',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: saldoDelta >= 0
-                            ? DefaultColors.greenDark
-                            : DefaultColors.redDark,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-              SizedBox(height: 4.h),
+              Text(
+                'Receita: $receitaPct (${receitaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(receitaDelta.abs())}) em relação a $prevMonthName',
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'Despesas: $despesaPct (${despesaDelta >= 0 ? '+' : '-'}${currencyFormatter.format(despesaDelta.abs())}) em relação a $prevMonthName',
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'Saldo: $saldoTxt em ${currencyFormatter.format(saldoDelta.abs())}',
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: saldoDelta >= 0
+                      ? DefaultColors.greenDark
+                      : DefaultColors.redDark,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 6.h),
               Builder(builder: (_) {
                 if (data.items.isEmpty || data.totalCurrent <= 0) {
                   return const SizedBox.shrink();
@@ -1082,30 +1149,87 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     );
   }
 
-  Widget _buildSummaryPill(ThemeData theme,
-      {required String label, required String value, required Color color}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: DefaultColors.grey,
-            fontWeight: FontWeight.w500,
+  Widget _buildSummaryPill(
+    ThemeData theme, {
+    required String label,
+    required String value,
+    required Color color,
+    required String deltaText,
+    required bool isIncrease,
+    IconData? icon,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: color.withOpacity(0.14), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Container(
+              width: 26.w,
+              height: 26.w,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 14.sp, color: color),
+            ),
+          if (icon != null) SizedBox(width: 10.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: DefaultColors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                decoration: BoxDecoration(
+                  color: (isIncrease ? color : DefaultColors.greenDark)
+                      .withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isIncrease ? Icons.north_east : Icons.south_east,
+                      size: 12.sp,
+                      color: isIncrease ? color : DefaultColors.greenDark,
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      deltaText,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        color: isIncrease ? color : DefaultColors.greenDark,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18.sp,
-            color: color,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(width: 6.w),
-      ],
+        ],
+      ),
     );
   }
 

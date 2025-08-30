@@ -183,11 +183,16 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _buildCategoryMonthComparison(categoryId, theme),
+                      SizedBox(
+                        height: 4.h,
+                      ),
                       AdsBanner(),
                       SizedBox(
                         height: 4.h,
                       ),
-                      _buildCategoryMonthComparison(categoryId, theme),
+                      _buildExpenseOverIncomeLine(categoryId, theme),
+                      SizedBox(height: 6.h),
                       Text(
                         "Detalhes das Transações",
                         style: TextStyle(
@@ -374,6 +379,45 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }).length;
     if (total <= 0) return t.title;
     return 'Parcela $current de $total — $baseTitle';
+  }
+
+  Widget _buildExpenseOverIncomeLine(int categoryId, ThemeData theme) {
+    final TransactionController controller = Get.find<TransactionController>();
+
+    // Receita total do mês selecionado
+    double totalReceitaMes = 0.0;
+    for (final t in controller.transaction) {
+      if (t.paymentDay == null) continue;
+      if (t.type != TransactionType.receita) continue;
+      final d = DateTime.parse(t.paymentDay!);
+      final String mName = getAllMonths()[d.month - 1];
+      if (mName != monthName || d.year != DateTime.now().year) continue;
+      totalReceitaMes +=
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+    }
+
+    if (totalReceitaMes <= 0) return const SizedBox.shrink();
+
+    // Despesa total da categoria no mês selecionado
+    double totalCategoria = 0.0;
+    final txs = getTransactionsByCategoryAndMonth(categoryId, monthName);
+    for (final t in txs) {
+      totalCategoria +=
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+    }
+
+    if (totalCategoria <= 0) return const SizedBox.shrink();
+
+    final pct = (totalCategoria / totalReceitaMes) * 100.0;
+
+    return Text(
+      'Esta categoria corresponde a ${pct.toStringAsFixed(1)}% da sua receita mensal.',
+      style: TextStyle(
+        fontSize: 11.sp,
+        color: theme.primaryColor,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 
   Widget _buildMonthComparisonPercentage(int categoryId, ThemeData theme) {
@@ -609,14 +653,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      // padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             comparison.icon,
-            size: 14.h,
+            size: 15.h,
             color: comparison.color,
           ),
           SizedBox(width: 4.w),
@@ -624,7 +668,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             child: Text(
               explanationText,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: 11.sp,
                 color: comparison.color,
                 fontWeight: FontWeight.w600,
               ),
