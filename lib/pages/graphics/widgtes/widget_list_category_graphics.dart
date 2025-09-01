@@ -185,11 +185,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                     children: [
                       _buildCategoryMonthComparison(categoryId, theme),
                       SizedBox(
-                        height: 4.h,
+                        height: 10.h,
                       ),
                       AdsBanner(),
                       SizedBox(
-                        height: 4.h,
+                        height: 10.h,
                       ),
                       _buildExpenseOverIncomeLine(categoryId, theme),
                       SizedBox(height: 6.h),

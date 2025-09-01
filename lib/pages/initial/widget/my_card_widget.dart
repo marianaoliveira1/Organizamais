@@ -26,13 +26,39 @@ class _CycleDates {
   });
 }
 
-class MyCardsWidget extends StatelessWidget {
+class MyCardsWidget extends StatefulWidget {
   const MyCardsWidget({
     super.key,
     required this.cardController,
   });
 
   final CardController cardController;
+
+  @override
+  State<MyCardsWidget> createState() => _MyCardsWidgetState();
+}
+
+class _MyCardsWidgetState extends State<MyCardsWidget> {
+  final Set<String> _paidInvoiceKeys = <String>{};
+
+  String _invoiceKey(String? cardIdOrNull, String cardName, _CycleDates cycle) {
+    final String cardKey = cardIdOrNull ?? cardName;
+    return '${cardKey}-${cycle.paymentDate.year}-${cycle.paymentDate.month}';
+  }
+
+  bool _isInvoicePaid(
+      String? cardIdOrNull, String cardName, _CycleDates cycle) {
+    return _paidInvoiceKeys
+        .contains(_invoiceKey(cardIdOrNull, cardName, cycle));
+  }
+
+  void _markInvoicePaid(
+      String? cardIdOrNull, String cardName, _CycleDates cycle) {
+    setState(() {
+      _paidInvoiceKeys.add(_invoiceKey(cardIdOrNull, cardName, cycle));
+    });
+    Get.snackbar('Sucesso', 'Fatura marcada como paga');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,33 +69,11 @@ class MyCardsWidget extends StatelessWidget {
         NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
     return Obx(() {
-      final cards = cardController.card;
+      final cards = widget.cardController.card;
       final transactions = transactionController.transaction;
 
-      // Cálculo do total gasto no mês em todos os cartões de crédito
+      // Data de referência
       final DateTime now = DateTime.now();
-      final Set<String> cardNames = cards.map((c) => c.name).toSet();
-      double _parseAmountGlobal(String raw) {
-        String s = raw.replaceAll('R\$', '').trim();
-        if (s.contains(',')) {
-          s = s.replaceAll('.', '').replaceAll(',', '.');
-          return double.tryParse(s) ?? 0.0;
-        }
-        s = s.replaceAll(' ', '');
-        return double.tryParse(s) ?? 0.0;
-      }
-
-      final double totalSpent = transactions.where((t) {
-        if (t.paymentDay == null) return false;
-        if (t.type != TransactionType.despesa) return false;
-        if (!cardNames.contains(t.paymentType ?? '')) return false;
-        try {
-          final d = DateTime.parse(t.paymentDay!);
-          return d.year == now.year && d.month == now.month;
-        } catch (_) {
-          return false;
-        }
-      }).fold<double>(0.0, (sum, t) => sum + _parseAmountGlobal(t.value));
 
       if (cards.isEmpty) {
         return Center(
@@ -90,8 +94,114 @@ class MyCardsWidget extends StatelessWidget {
         itemCount: cards.length + 1,
         separatorBuilder: (_, __) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
-          // Rodapé com total gasto no crédito
+          // Rodapé com total gasto no crédito (dinâmico conforme estado da fatura)
           if (index == cards.length) {
+            // Helpers locais para somar por período e calcular ciclo
+            DateTime _safeDate(String iso) {
+              try {
+                return DateTime.parse(iso);
+              } catch (_) {
+                return DateTime(1900);
+              }
+            }
+
+            double _sumTransactionsInRangeFooter(
+              Iterable<TransactionModel> all,
+              String cardName,
+              DateTime start,
+              DateTime end,
+            ) {
+              double _parseAmountString(String raw) {
+                String s = raw.replaceAll('R\$', '').trim();
+                if (s.contains(',')) {
+                  s = s.replaceAll('.', '').replaceAll(',', '.');
+                  return double.tryParse(s) ?? 0.0;
+                }
+                s = s.replaceAll(' ', '');
+                return double.tryParse(s) ?? 0.0;
+              }
+
+              return all.where((t) {
+                if (t.paymentDay == null) return false;
+                if (t.type != TransactionType.despesa) return false;
+                if ((t.paymentType ?? '') != cardName) return false;
+                final d = _safeDate(t.paymentDay!);
+                return !d.isBefore(start) && !d.isAfter(end);
+              }).fold<double>(
+                  0.0, (sum, t) => sum + _parseAmountString(t.value));
+            }
+
+            _CycleDates _computeCycleDatesFooter(
+                DateTime ref, int closingDay, int paymentDay) {
+              DateTime _dateWithDay(int year, int month, int day) {
+                final int lastDayOfMonth = DateTime(year, month + 1, 0).day;
+                final int safeDay =
+                    day > lastDayOfMonth ? lastDayOfMonth : (day < 1 ? 1 : day);
+                return DateTime(year, month, safeDay);
+              }
+
+              final DateTime closingThisMonth =
+                  _dateWithDay(ref.year, ref.month, closingDay);
+              final bool afterOrOnClosingThisMonth =
+                  !ref.isBefore(closingThisMonth);
+              final DateTime lastClosingEvent = afterOrOnClosingThisMonth
+                  ? closingThisMonth
+                  : _dateWithDay(ref.year, ref.month - 1, closingDay);
+              final DateTime previousClosingEvent = _dateWithDay(
+                  lastClosingEvent.year,
+                  lastClosingEvent.month - 1,
+                  closingDay);
+              final DateTime nextClosingEvent = _dateWithDay(
+                  lastClosingEvent.year,
+                  lastClosingEvent.month + 1,
+                  closingDay);
+              final DateTime closedStart =
+                  previousClosingEvent.add(const Duration(days: 1));
+              final DateTime closedEnd =
+                  lastClosingEvent.subtract(const Duration(days: 1));
+              final DateTime openStart = lastClosingEvent;
+              final DateTime openEnd =
+                  nextClosingEvent.subtract(const Duration(days: 1));
+              final DateTime paymentDate = paymentDay > closingDay
+                  ? _dateWithDay(
+                      lastClosingEvent.year, lastClosingEvent.month, paymentDay)
+                  : _dateWithDay(lastClosingEvent.year,
+                      lastClosingEvent.month + 1, paymentDay);
+              return _CycleDates(
+                closedStart: closedStart,
+                closedEnd: closedEnd,
+                openStart: openStart,
+                openEnd: openEnd,
+                paymentDate: paymentDate,
+              );
+            }
+
+            double totalCredit = 0.0;
+            for (final c in cards) {
+              final int cClosing = c.closingDay ?? 1;
+              final int cPayment = c.paymentDay ?? 1;
+              final _CycleDates cyc =
+                  _computeCycleDatesFooter(now, cClosing, cPayment);
+              final double cClosed = _sumTransactionsInRangeFooter(
+                transactions,
+                c.name,
+                cyc.closedStart,
+                cyc.closedEnd,
+              );
+              final double cNext = _sumTransactionsInRangeFooter(
+                transactions,
+                c.name,
+                cyc.openStart,
+                cyc.openEnd,
+              );
+              final bool cInvoiceClosed =
+                  !now.isBefore(cyc.openStart) && !now.isAfter(cyc.paymentDate);
+              final bool cWasPaid = _isInvoicePaid(c.id, c.name, cyc);
+              final bool cShowClosed = cInvoiceClosed && !cWasPaid;
+              final double cSpent = cShowClosed ? cClosed : cNext;
+              totalCredit += cSpent;
+            }
+
             return Padding(
               padding: EdgeInsets.only(top: 4.h, bottom: 4.h),
               child: Row(
@@ -106,7 +216,7 @@ class MyCardsWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    formatter.format(totalSpent),
+                    formatter.format(totalCredit),
                     style: TextStyle(
                       color: theme.primaryColor,
                       fontWeight: FontWeight.w500,
@@ -158,30 +268,47 @@ class MyCardsWidget extends StatelessWidget {
 
           _CycleDates _computeCycleDates(
               DateTime ref, int closingDay, int paymentDay) {
-            // Ajuste de ciclo: compras no dia do fechamento pertencem à próxima fatura
-            final DateTime lastMonth = DateTime(ref.year, ref.month - 1, 1);
-            final DateTime thisClosing =
-                DateTime(ref.year, ref.month, closingDay);
-            final DateTime prevClosing =
-                DateTime(lastMonth.year, lastMonth.month, closingDay);
+            // Função para criar datas garantindo o último dia do mês quando necessário
+            DateTime _dateWithDay(int year, int month, int day) {
+              final int lastDayOfMonth = DateTime(year, month + 1, 0).day;
+              final int safeDay =
+                  day > lastDayOfMonth ? lastDayOfMonth : (day < 1 ? 1 : day);
+              return DateTime(year, month, safeDay);
+            }
 
-            // Fatura fechada (ciclo anterior): (prevClosing+1) .. (thisClosing-1)
+            // Determina o último evento de fechamento relativo a 'ref'
+            final DateTime closingThisMonth =
+                _dateWithDay(ref.year, ref.month, closingDay);
+            final bool afterOrOnClosingThisMonth =
+                !ref.isBefore(closingThisMonth);
+
+            final DateTime lastClosingEvent = afterOrOnClosingThisMonth
+                ? closingThisMonth
+                : _dateWithDay(ref.year, ref.month - 1, closingDay);
+
+            final DateTime previousClosingEvent = _dateWithDay(
+                lastClosingEvent.year, lastClosingEvent.month - 1, closingDay);
+            final DateTime nextClosingEvent = _dateWithDay(
+                lastClosingEvent.year, lastClosingEvent.month + 1, closingDay);
+
+            // Compras no dia do fechamento pertencem à próxima fatura
             final DateTime closedStart =
-                prevClosing.add(const Duration(days: 1));
+                previousClosingEvent.add(const Duration(days: 1));
             final DateTime closedEnd =
-                thisClosing.subtract(const Duration(days: 1));
+                lastClosingEvent.subtract(const Duration(days: 1));
 
-            // Próxima fatura (ciclo aberto): thisClosing .. (nextClosing-1)
-            final DateTime openStart = thisClosing;
-            final DateTime nextMonth = DateTime(ref.year, ref.month + 1, 1);
-            final DateTime nextClosing =
-                DateTime(nextMonth.year, nextMonth.month, closingDay);
+            // Próxima fatura (ciclo aberto pós-fechamento)
+            final DateTime openStart = lastClosingEvent;
             final DateTime openEnd =
-                nextClosing.subtract(const Duration(days: 1));
+                nextClosingEvent.subtract(const Duration(days: 1));
 
-            // Data de pagamento referente à fatura fechada deste mês
-            final DateTime paymentDate =
-                DateTime(ref.year, ref.month, paymentDay);
+            // Data de pagamento referente ao fechamento mais recente
+            // Regra: se paymentDay > closingDay, pagamento ocorre no MESMO mês do fechamento; caso contrário, no mês SEGUINTE
+            final DateTime paymentDate = paymentDay > closingDay
+                ? _dateWithDay(
+                    lastClosingEvent.year, lastClosingEvent.month, paymentDay)
+                : _dateWithDay(lastClosingEvent.year,
+                    lastClosingEvent.month + 1, paymentDay);
 
             return _CycleDates(
               closedStart: closedStart,
@@ -213,14 +340,17 @@ class MyCardsWidget extends StatelessWidget {
             cycle.openEnd,
           );
 
-          // Estado atual: se estamos após fechamento e antes/do pagamento, a fatura está fechada
-          final bool isAfterClosing = now.isAfter(cycle.closedEnd);
+          // Estado atual: se estamos entre o fechamento (inclusive) e o pagamento (inclusive), fatura está fechada
+          final bool isAfterOrOnClosingEvent = !now.isBefore(cycle.openStart);
           final bool isBeforeOrOnPayment = !now.isAfter(cycle.paymentDate);
-          final bool invoiceClosed = isAfterClosing && isBeforeOrOnPayment;
+          final bool invoiceClosed =
+              isAfterOrOnClosingEvent && isBeforeOrOnPayment;
+          final bool wasMarkedPaid = _isInvoicePaid(card.id, card.name, cycle);
+          final bool showClosedSection = invoiceClosed && !wasMarkedPaid;
 
           // Valor ativo usado na barra: antes do pagamento e após fechamento usa-se o fechado,
           // caso contrário usa-se o valor do ciclo em aberto (acumulando para a próxima fatura)
-          final double spent = invoiceClosed ? closedAmount : nextAmount;
+          final double spent = showClosedSection ? closedAmount : nextAmount;
 
           double _normalizeLimit(double rawLimit) {
             // Normalização simples: se parece ter 1 zero a mais, divide por 10.
@@ -241,6 +371,31 @@ class MyCardsWidget extends StatelessWidget {
                   ? DefaultColors.orange // Laranja/Amarelo (Atenção)
                   : DefaultColors.redDark); // Vermelho (Crítico)
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
+          final String statusText = wasMarkedPaid
+              ? 'Paga'
+              : (showClosedSection ? 'Fechada' : 'Em aberto');
+          final Color statusColor = wasMarkedPaid
+              ? DefaultColors.green
+              : (showClosedSection ? DefaultColors.orange : theme.primaryColor);
+          // Labels de data e vencimento no estilo "upcoming payment"
+          String _formatMonthDay(DateTime d) =>
+              DateFormat('d MMM', 'pt_BR').format(d).toLowerCase();
+          final DateTime today = DateTime(now.year, now.month, now.day);
+          final int daysUntilDue = cycle.paymentDate.difference(today).inDays;
+          String dueChipText;
+          if (daysUntilDue < 0) {
+            dueChipText =
+                'vencida há ${daysUntilDue.abs()} dia${daysUntilDue.abs() == 1 ? '' : 's'}';
+          } else if (daysUntilDue == 0) {
+            dueChipText = 'vence hoje';
+          } else if (daysUntilDue == 1) {
+            dueChipText = 'vence amanhã';
+          } else {
+            dueChipText = 'vence em $daysUntilDue dias';
+          }
+          final Color dueChipColor = daysUntilDue < 0
+              ? DefaultColors.redDark
+              : (daysUntilDue <= 2 ? DefaultColors.orange : theme.primaryColor);
 
           return GestureDetector(
             onTap: () {
@@ -261,7 +416,7 @@ class MyCardsWidget extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        cardController.deleteCard(card.id!);
+                        widget.cardController.deleteCard(card.id!);
                         Navigator.of(context).pop();
                       },
                       child: Text('Excluir',
@@ -277,8 +432,18 @@ class MyCardsWidget extends StatelessWidget {
                 horizontal: 14.w,
               ),
               decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: theme.primaryColor.withOpacity(0.06),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withOpacity(0.06),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,22 +455,79 @@ class MyCardsWidget extends StatelessWidget {
                         child: card.iconPath != null
                             ? Image.asset(
                                 card.iconPath!,
-                                width: 32.w,
-                                height: 32.h,
+                                width: 36.w,
+                                height: 36.h,
                               )
                             : Icon(Icons.credit_card, size: 20.sp),
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
-                        child: Text(
-                          card.name,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              card.name,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: theme.primaryColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (card.bankName != null &&
+                                (card.bankName ?? '')
+                                    .toString()
+                                    .trim()
+                                    .isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 2.h),
+                                child: Text(
+                                  card.bankName!,
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: DefaultColors.grey20,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border:
+                              Border.all(color: statusColor.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6.r,
+                              height: 6.r,
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -337,7 +559,12 @@ class MyCardsWidget extends StatelessWidget {
                               height: 10.h,
                               width: progressWidth,
                               decoration: BoxDecoration(
-                                color: progressColor,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    progressColor.withOpacity(0.85),
+                                    progressColor,
+                                  ],
+                                ),
                                 borderRadius: BorderRadius.circular(20.r),
                               ),
                             ),
@@ -350,8 +577,19 @@ class MyCardsWidget extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 6.w, vertical: 2.h),
                                 decoration: BoxDecoration(
-                                  color: theme.scaffoldBackgroundColor,
+                                  color: theme.cardColor,
                                   borderRadius: BorderRadius.circular(6.r),
+                                  border: Border.all(
+                                    color: theme.primaryColor.withOpacity(0.08),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          theme.shadowColor.withOpacity(0.05),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Text(
                                   percentLabel,
@@ -420,69 +658,244 @@ class MyCardsWidget extends StatelessWidget {
                   SizedBox(height: 8.h),
 
                   // Status e valores por ciclo
-                  if (invoiceClosed) ...[
-                    // Fatura fechada (entre fechamento e pagamento)
+                  if (showClosedSection) ...[
+                    // Cabeçalho tipo "upcoming payment"
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Fatura fechada',
+                          _formatMonthDay(cycle.paymentDate),
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: theme.primaryColor,
+                            color: DefaultColors.grey20,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Text(
-                          formatter.format(closedAmount),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w600,
+                        const Spacer(),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: dueChipColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                                color: dueChipColor.withOpacity(0.3)),
+                          ),
+                          child: Text(
+                            dueChipText,
+                            style: TextStyle(
+                              color: dueChipColor,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 12.h),
+                    Text(
+                      'Próximo pagamento',
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Próxima fatura',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                formatter.format(closedAmount),
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                'total da fatura',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: DefaultColors.grey20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          formatter.format(nextAmount),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                formatter.format(nextAmount),
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                'próxima fatura',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: DefaultColors.grey20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 16.h),
+                    // Datas
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Fecha dia $closingDay',
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatMonthDay(cycle.paymentDate),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              'vencimento',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              _formatMonthDay(cycle.openStart),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              'fechou em',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    // Botão primário "Pagar agora"
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: theme.scaffoldBackgroundColor,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              backgroundColor: theme.cardColor,
+                              title: Text(
+                                'Confirmar pagamento',
+                                style: TextStyle(color: theme.primaryColor),
+                              ),
+                              content: Text(
+                                'Sua fatura foi paga?',
+                                style: TextStyle(color: DefaultColors.grey20),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: Text('Não',
+                                      style:
+                                          TextStyle(color: theme.primaryColor)),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: Text('Sim',
+                                      style: TextStyle(
+                                          color: DefaultColors.green)),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true) {
+                            _markInvoicePaid(card.id, card.name, cycle);
+                          }
+                        },
+                        child: Text(
+                          'Pagar agora',
                           style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14.sp,
                           ),
                         ),
-                        Text(
-                          'Paga dia $paymentDay',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    // Links secundários
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => InvoiceDetailsPage(
+                                  cardName: card.name,
+                                  periodStart: cycle.closedStart,
+                                  periodEnd: cycle.closedEnd,
+                                  title: 'Fatura anterior',
+                                ));
+                          },
+                          child: Text(
+                            'Ver fatura anterior',
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => InvoiceDetailsPage(
+                                  cardName: card.name,
+                                  periodStart: cycle.openStart,
+                                  periodEnd: cycle.openEnd,
+                                  title: 'Próxima fatura',
+                                ));
+                          },
+                          child: Text(
+                            'Próxima fatura',
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -560,30 +973,7 @@ class MyCardsWidget extends StatelessWidget {
                     ),
                   ],
 
-                  if (invoiceClosed) ...[
-                    SizedBox(height: 6.h),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          // Quando fechado, mostrar a fatura fechada
-                          Get.to(() => InvoiceDetailsPage(
-                                cardName: card.name,
-                                periodStart: cycle.closedStart,
-                                periodEnd: cycle.closedEnd,
-                                title: 'Fatura fechada',
-                              ));
-                        },
-                        child: Text(
-                          'Ver fatura',
-                          style: TextStyle(
-                            color: DefaultColors.green,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  if (showClosedSection) ...[SizedBox(height: 0)],
                   SizedBox(
                     height: 10.h,
                   )

@@ -1406,67 +1406,6 @@ class _GraphicsPageState extends State<GraphicsPage> {
               ),
             ],
           ),
-          // SizedBox(height: 6.h),
-          // Row(
-          //   children: [
-          //     // Pizza toggle with bordered container
-          //     GestureDetector(
-          //       onTap: () {
-          //         if (_showBarCategoryChart) {
-          //           setState(() => _showBarCategoryChart = false);
-          //         }
-          //       },
-          //       child: Container(
-          //         padding: EdgeInsets.all(6.w),
-          //         decoration: BoxDecoration(
-          //           color: Colors.transparent,
-          //           border: Border.all(
-          //             color: !_showBarCategoryChart
-          //                 ? theme.primaryColor
-          //                 : DefaultColors.grey.withOpacity(0.3),
-          //           ),
-          //           borderRadius: BorderRadius.circular(10.r),
-          //         ),
-          //         child: Icon(
-          //           Icons.pie_chart_rounded,
-          //           color: !_showBarCategoryChart
-          //               ? theme.primaryColor
-          //               : DefaultColors.grey,
-          //           size: 18.sp,
-          //         ),
-          //       ),
-          //     ),
-          //     SizedBox(width: 8.w),
-          //     // Bar toggle with card-colored background and border
-          //     GestureDetector(
-          //       onTap: () {
-          //         if (!_showBarCategoryChart) {
-          //           setState(() => _showBarCategoryChart = true);
-          //         }
-          //       },
-          //       child: Container(
-          //         padding: EdgeInsets.all(6.w),
-          //         decoration: BoxDecoration(
-          //           color: theme.cardColor,
-          //           border: Border.all(
-          //             color: _showBarCategoryChart
-          //                 ? theme.primaryColor
-          //                 : DefaultColors.grey.withOpacity(0.3),
-          //           ),
-          //           borderRadius: BorderRadius.circular(10.r),
-          //         ),
-          //         child: Icon(
-          //           Iconsax.chart_2,
-          //           color: _showBarCategoryChart
-          //               ? theme.primaryColor
-          //               : DefaultColors.grey,
-          //           size: 18.sp,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // SizedBox(height: 16.h),
           if (!_showBarCategoryChart)
             Center(
               child: GestureDetector(
