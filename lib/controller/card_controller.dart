@@ -28,7 +28,8 @@ class CardController extends GetxController {
   }
 
   Future<void> addCard(CardsModel card) async {
-    var cardWithUserId = card.copyWith(userId: Get.find<AuthController>().firebaseUser.value?.uid);
+    var cardWithUserId = card.copyWith(
+        userId: Get.find<AuthController>().firebaseUser.value?.uid);
     await FirebaseFirestore.instance.collection('cards').add(
           cardWithUserId.toMap(),
         );
@@ -46,5 +47,13 @@ class CardController extends GetxController {
   Future<void> deleteCard(String id) async {
     await FirebaseFirestore.instance.collection('cards').doc(id).delete();
     Get.snackbar('Sucesso', 'Cartão removido com sucesso');
+  }
+
+  Future<void> markInvoicePaid(
+      {required String cardId, required String invoiceKey}) async {
+    final doc = FirebaseFirestore.instance.collection('cards').doc(cardId);
+    await doc.update({
+      'paidInvoices': FieldValue.arrayUnion([invoiceKey])
+    });
   }
 }

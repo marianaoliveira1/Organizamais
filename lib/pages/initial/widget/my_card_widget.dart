@@ -48,17 +48,37 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
   }
 
   bool _isInvoicePaid(
-      String? cardIdOrNull, String cardName, _CycleDates cycle) {
-    return _paidInvoiceKeys
-        .contains(_invoiceKey(cardIdOrNull, cardName, cycle));
+    String? cardIdOrNull,
+    String cardName,
+    _CycleDates cycle, [
+    List<String>? persistedPaidKeys,
+  ]) {
+    final String key = _invoiceKey(cardIdOrNull, cardName, cycle);
+    return _paidInvoiceKeys.contains(key) ||
+        (persistedPaidKeys?.contains(key) ?? false);
   }
 
-  void _markInvoicePaid(
-      String? cardIdOrNull, String cardName, _CycleDates cycle) {
+  Future<void> _markInvoicePaid(
+    String? cardIdOrNull,
+    String cardName,
+    _CycleDates cycle,
+  ) async {
+    final String key = _invoiceKey(cardIdOrNull, cardName, cycle);
     setState(() {
-      _paidInvoiceKeys.add(_invoiceKey(cardIdOrNull, cardName, cycle));
+      _paidInvoiceKeys.add(key);
     });
-    Get.snackbar('Sucesso', 'Fatura marcada como paga');
+    try {
+      if (cardIdOrNull != null) {
+        await widget.cardController
+            .markInvoicePaid(cardId: cardIdOrNull, invoiceKey: key);
+      }
+      Get.snackbar('Sucesso', 'Fatura marcada como paga');
+    } catch (e) {
+      setState(() {
+        _paidInvoiceKeys.remove(key);
+      });
+      Get.snackbar('Erro', 'Não foi possível salvar. Tente novamente.');
+    }
   }
 
   @override
@@ -346,7 +366,8 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           final bool isBeforeOrOnPayment = !now.isAfter(cycle.paymentDate);
           final bool invoiceClosed =
               isAfterOrOnClosingEvent && isBeforeOrOnPayment;
-          final bool wasMarkedPaid = _isInvoicePaid(card.id, card.name, cycle);
+          final bool wasMarkedPaid =
+              _isInvoicePaid(card.id, card.name, cycle, card.paidInvoices);
           final bool showClosedSection = invoiceClosed && !wasMarkedPaid;
 
           // Valor ativo usado na barra: antes do pagamento e após fechamento usa-se o fechado,
@@ -372,12 +393,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                   ? DefaultColors.orange // Laranja/Amarelo (Atenção)
                   : DefaultColors.redDark); // Vermelho (Crítico)
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
-          final String statusText = wasMarkedPaid
-              ? 'Paga'
-              : (showClosedSection ? 'Fechada' : 'Em aberto');
-          final Color statusColor = wasMarkedPaid
-              ? DefaultColors.green
-              : (showClosedSection ? DefaultColors.orange : theme.primaryColor);
+          final String? statusText = showClosedSection ? 'Fechada' : null;
           // Labels de data e vencimento no estilo "upcoming payment"
           String _formatMonthDay(DateTime d) =>
               DateFormat('d MMM', 'pt_BR').format(d).toLowerCase();
@@ -496,39 +512,40 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 8.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          // color: DefaultColors.redDark.withOpacity(.9),
-                          borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(
-                            color: DefaultColors.redDark.withOpacity(.9),
+                      if (statusText != null) ...[
+                        SizedBox(width: 8.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: DefaultColors.redDark.withOpacity(.9),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Iconsax.info_circle,
+                                color: DefaultColors.redDark,
+                                size: 12.h,
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                statusText,
+                                style: TextStyle(
+                                  color: DefaultColors.redDark,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Iconsax.info_circle,
-                              color: DefaultColors.redDark,
-                              size: 12.h,
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              statusText,
-                              style: TextStyle(
-                                color: DefaultColors.redDark,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ],
                   ),
 
@@ -842,7 +859,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                           }
                         },
                         child: Text(
-                          'Pagar agora',
+                          'Já foi paga?',
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 12.sp,

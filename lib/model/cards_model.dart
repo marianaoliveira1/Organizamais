@@ -8,6 +8,7 @@ class CardsModel {
   final String? userId;
   final int? closingDay;
   final int? paymentDay;
+  final List<String>? paidInvoices; // keys "YYYY-M" ou similares
 
   CardsModel({
     this.id,
@@ -18,6 +19,7 @@ class CardsModel {
     this.userId,
     this.closingDay,
     this.paymentDay,
+    this.paidInvoices,
   });
 
   factory CardsModel.fromMap(Map<String, dynamic> map) {
@@ -31,6 +33,8 @@ class CardsModel {
           map['closingDay'] != null ? (map['closingDay'] as num).toInt() : null,
       paymentDay:
           map['paymentDay'] != null ? (map['paymentDay'] as num).toInt() : null,
+      paidInvoices:
+          (map['paidInvoices'] as List?)?.map((e) => e.toString()).toList(),
     );
   }
 
@@ -43,6 +47,7 @@ class CardsModel {
       'userId': userId,
       'closingDay': closingDay,
       'paymentDay': paymentDay,
+      'paidInvoices': paidInvoices,
     };
   }
 
@@ -55,6 +60,7 @@ class CardsModel {
     String? userId,
     int? closingDay,
     int? paymentDay,
+    List<String>? paidInvoices,
   }) {
     return CardsModel(
       id: id ?? this.id,
@@ -65,6 +71,7 @@ class CardsModel {
       userId: userId ?? this.userId,
       closingDay: closingDay ?? this.closingDay,
       paymentDay: paymentDay ?? this.paymentDay,
+      paidInvoices: paidInvoices ?? this.paidInvoices,
     );
   }
 }
