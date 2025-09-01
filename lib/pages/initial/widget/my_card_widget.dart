@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../controller/card_controller.dart';
@@ -498,31 +499,29 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                       SizedBox(width: 8.w),
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
+                          horizontal: 12.w,
                           vertical: 4.h,
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.12),
+                          // color: DefaultColors.redDark.withOpacity(.9),
                           borderRadius: BorderRadius.circular(20.r),
-                          border:
-                              Border.all(color: statusColor.withOpacity(0.3)),
+                          border: Border.all(
+                            color: DefaultColors.redDark.withOpacity(.9),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              width: 6.r,
-                              height: 6.r,
-                              decoration: BoxDecoration(
-                                color: statusColor,
-                                shape: BoxShape.circle,
-                              ),
+                            Icon(
+                              Iconsax.info_circle,
+                              color: DefaultColors.redDark,
+                              size: 12.h,
                             ),
                             SizedBox(width: 6.w),
                             Text(
                               statusText,
                               style: TextStyle(
-                                color: statusColor,
+                                color: DefaultColors.redDark,
                                 fontSize: 10.sp,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -693,15 +692,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                       ],
                     ),
                     SizedBox(height: 12.h),
-                    Text(
-                      'Próximo pagamento',
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
+
                     Row(
                       children: [
                         Expanded(
@@ -709,20 +700,20 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                formatter.format(closedAmount),
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
                                 'total da fatura',
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: DefaultColors.grey20,
                                   fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                formatter.format(closedAmount),
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -733,20 +724,20 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                formatter.format(nextAmount),
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
                                 'próxima fatura',
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: DefaultColors.grey20,
                                   fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                formatter.format(nextAmount),
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -809,7 +800,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.primaryColor,
                           foregroundColor: theme.scaffoldBackgroundColor,
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -854,7 +845,8 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                           'Pagar agora',
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
-                            fontSize: 14.sp,
+                            fontSize: 12.sp,
+                            color: theme.cardColor,
                           ),
                         ),
                       ),
