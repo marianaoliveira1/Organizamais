@@ -605,10 +605,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       effectiveCurrentDate,
     );
 
-    if (!comparison.hasData) {
-      return const SizedBox.shrink();
-    }
-
     // Calcular valores em R$ para comparação usando as janelas definidas
     final currentValue =
         PercentageCalculationService.getCategoryExpensesForPeriod(
@@ -624,6 +620,54 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             previousMonthStart,
             previousMonthEnd);
 
+    if (!comparison.hasData) {
+      // Se o serviço não trouxe dados comparáveis, verificar cenário "Novo":
+      final prevMonthFullEnd = DateTime(
+          previousMonthEnd.year, previousMonthEnd.month + 1, 0, 23, 59, 59);
+      final previousFullMonthValue =
+          PercentageCalculationService.getCategoryExpensesForPeriod(
+        transactionController.transaction,
+        categoryId,
+        previousMonthStart,
+        prevMonthFullEnd,
+      );
+
+      if (currentValue > 0 && previousFullMonthValue == 0) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: DefaultColors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Iconsax.star_1,
+                size: 15.h,
+                color: DefaultColors.grey,
+              ),
+              SizedBox(width: 4.w),
+              Flexible(
+                child: Text(
+                  'Novo',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: DefaultColors.grey,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return const SizedBox.shrink();
+    }
+
     // Calcular a diferença absoluta em R$
     final absoluteDifference = (currentValue - previousValue).abs();
 
@@ -635,7 +679,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           'Nova categoria - R\$ ${_formatCurrency(currentValue)} (não há dados do mês anterior)';
     } else if (comparison.type == PercentageType.neutral) {
       explanationText =
-          'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)}';
+          'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)})';
     } else {
       // Para positive e negative, usar a lógica real baseada nos valores
       if (currentValue < previousValue) {
@@ -648,7 +692,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
       } else {
         explanationText =
-            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)}';
+            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)})';
       }
     }
 

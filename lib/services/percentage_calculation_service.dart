@@ -509,11 +509,9 @@ class PercentageCalculationService {
 
       // Debug: mostrar transações específicas da categoria
 
-      for (final transaction in transactions.where((t) =>
+      for (final _ in transactions.where((t) =>
           t.type == TransactionType.despesa && t.category == categoryId)) {
-        if (transaction.paymentDay != null) {
-          final paymentDate = DateTime.parse(transaction.paymentDay!);
-        }
+        // noop
       }
 
       for (final transaction in transactions.where((t) =>
@@ -544,12 +542,11 @@ class PercentageCalculationService {
       }
 
       // Debug: verificar se há dados em outros meses
-      final hasAnyDataDebug = _hasCategoryTransactionsInAnyPreviousMonth(
-          transactions, categoryId, currentDate);
+      // noop: debug variable removed
 
-      // Lógica: considerar somente o mês anterior para definir "Novo"
+      // Lógica: considerar somente o mês anterior para definir "Novo" e cobrir cenários incompletos
       if (hasCurrentData || hasPreviousData) {
-        // "Novo" somente se houver dados no mês atual e o mês anterior completo foi zero
+        // Caso 1: Novo (tem no mês atual e mês anterior completo foi zero)
         if (hasCurrentData &&
             currentExpenses > 0 &&
             previousFullMonthExpenses == 0) {
@@ -561,9 +558,18 @@ class PercentageCalculationService {
           );
         }
 
-        // Se há dados no mês anterior, calcular a comparação normalmente
+        // Caso 2: Há dados no mês anterior dentro da janela comparável
         if (hasPreviousData) {
           if (previousExpenses == 0.0) {
+            // Sem gasto até o mesmo dia do mês anterior – tratar variação como 100% se houver gasto atual
+            if (currentExpenses > 0) {
+              return PercentageResult(
+                percentage: 100.0,
+                hasData: true,
+                type: PercentageType.negative, // aumento de despesa = ruim
+                displayText: _formatPercentage(100.0, PercentageType.negative),
+              );
+            }
             return PercentageResult(
               percentage: 0.0,
               hasData: true,
@@ -593,8 +599,28 @@ class PercentageCalculationService {
           );
         }
 
-        // Se chegou aqui, há dados atuais mas não havia no mês anterior: já atendido acima
-        // Caso contrário, sem dados relevantes
+        // Caso 3: Tem dados no mês atual, mas não no período comparável do mês anterior
+        // Se mesmo assim o mês anterior completo teve gasto (>0), consideramos aumento de 100%
+        if (hasCurrentData && previousFullMonthExpenses > 0) {
+          return PercentageResult(
+            percentage: 100.0,
+            hasData: true,
+            type: PercentageType.negative,
+            displayText: _formatPercentage(100.0, PercentageType.negative),
+          );
+        }
+
+        // Caso 4: Tem dados no mês anterior (na janela), mas não no atual até a data – queda de 100%
+        if (hasPreviousData && !hasCurrentData && previousExpenses > 0) {
+          return PercentageResult(
+            percentage: 100.0,
+            hasData: true,
+            type: PercentageType.positive, // diminuição de despesa = bom
+            displayText: _formatPercentage(100.0, PercentageType.positive),
+          );
+        }
+
+        // Sem dados relevantes para comparar
         return PercentageResult.noData();
       }
 

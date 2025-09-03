@@ -873,7 +873,16 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextButton(
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: theme.primaryColor.withOpacity(.4)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 6.h),
+                          ),
                           onPressed: () {
                             Get.to(() => InvoiceDetailsPage(
                                   cardName: card.name,
@@ -890,7 +899,16 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             ),
                           ),
                         ),
-                        TextButton(
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: theme.primaryColor.withOpacity(.4)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 6.h),
+                          ),
                           onPressed: () {
                             Get.to(() => InvoiceDetailsPage(
                                   cardName: card.name,
