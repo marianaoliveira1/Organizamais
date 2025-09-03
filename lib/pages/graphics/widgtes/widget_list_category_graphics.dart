@@ -530,20 +530,53 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       );
     }
 
+    // Quando for "Novo" diretamente pelo serviço, usar ícone de estrela
+    if (comparison.type == PercentageType.newData) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Iconsax.star_1,
+            size: 12.h,
+            color: DefaultColors.grey,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            'Novo',
+            style: TextStyle(
+              fontSize: 9.sp,
+              color: DefaultColors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Custom icon and color circle: green if increased, red if decreased, gray if same
+    final bool isEqual = comparison.percentage == 0;
+    final bool isIncrease = comparison.percentage > 0;
+    final Color circleColor = isEqual
+        ? DefaultColors.grey
+        : (isIncrease ? DefaultColors.greenDark : DefaultColors.redDark);
+    final IconData dirIcon = isEqual
+        ? Iconsax.more_circle
+        : (isIncrease ? Iconsax.arrow_circle_up : Iconsax.arrow_circle_down);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          comparison.icon,
-          size: 12.h,
-          color: comparison.color,
+          dirIcon,
+          size: 12.sp,
+          color: circleColor,
         ),
         SizedBox(width: 4.w),
         Text(
           comparison.displayText,
           style: TextStyle(
             fontSize: 9.sp,
-            color: comparison.color,
+            color: circleColor,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -643,10 +676,20 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Iconsax.star_1,
-                size: 15.h,
-                color: DefaultColors.grey,
+              Container(
+                width: 18.h,
+                height: 18.h,
+                decoration: BoxDecoration(
+                  color: DefaultColors.grey,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Iconsax.more_circle,
+                    size: 12.sp,
+                    color: theme.cardColor,
+                  ),
+                ),
               ),
               SizedBox(width: 4.w),
               Flexible(
@@ -696,6 +739,15 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       }
     }
 
+    final bool isEqual2 = comparison.percentage == 0;
+    final bool isIncrease2 = comparison.percentage > 0;
+    final Color circleColor2 = isEqual2
+        ? DefaultColors.grey
+        : (isIncrease2 ? DefaultColors.greenDark : DefaultColors.redDark);
+    final IconData dirIcon2 = isEqual2
+        ? Iconsax.more_circle
+        : (isIncrease2 ? Iconsax.arrow_circle_up : Iconsax.arrow_circle_down);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
       decoration: BoxDecoration(
@@ -707,9 +759,9 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            comparison.icon,
-            size: 15.h,
-            color: comparison.color,
+            dirIcon2,
+            size: 14.sp,
+            color: circleColor2,
           ),
           SizedBox(width: 4.w),
           Flexible(
@@ -717,7 +769,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
               explanationText,
               style: TextStyle(
                 fontSize: 11.sp,
-                color: comparison.color,
+                color: circleColor2,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.start,

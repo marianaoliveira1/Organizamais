@@ -10,6 +10,7 @@ import '../../transaction/transaction_page.dart';
 
 import '../../../widgetes/percentage_explanation_dialog.dart';
 import '../../../utils/color.dart';
+import 'package:iconsax/iconsax.dart';
 
 class FinanceDetailsPage extends StatelessWidget {
   const FinanceDetailsPage({
@@ -206,29 +207,40 @@ class FinanceDetailsPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (percentageResult.hasData) ...[
-                  Text(
-                    percentageResult.formattedPercentage,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: percentageResult.color,
-                    ),
-                  ),
-                  SizedBox(width: 4.w),
-                  Container(
-                    width: 18.h,
-                    height: 18.h,
-                    decoration: BoxDecoration(
-                      color: percentageResult.color,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        percentageResult.icon,
-                        size: 11.sp,
-                        color: theme.cardColor,
-                      ),
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final bool increased = currentValue > previousValue;
+                      final bool equal = currentValue == previousValue;
+                      final Color circleColor = equal
+                          ? DefaultColors.grey
+                          : (increased
+                              ? DefaultColors.greenDark
+                              : DefaultColors.redDark);
+                      final IconData dirIcon = equal
+                          ? Iconsax.more_circle
+                          : (increased
+                              ? Iconsax.arrow_circle_up
+                              : Iconsax.arrow_circle_down);
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            percentageResult.formattedPercentage,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: circleColor,
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          Icon(
+                            dirIcon,
+                            size: 14.sp,
+                            color: circleColor,
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ] else ...[
                   Builder(
@@ -248,44 +260,31 @@ class FinanceDetailsPage extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 4.w),
-                            Container(
-                              width: 18.h,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: DefaultColors.grey,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.arrow_right,
-                                  size: 11.sp,
-                                  color: theme.cardColor,
-                                ),
-                              ),
+                            Icon(
+                              Iconsax.more_circle,
+                              size: 14.sp,
+                              color: DefaultColors.grey,
                             ),
                           ],
                         );
                       }
                       final computedPercent =
                           ((curr - prev) / prev.abs()) * 100.0;
-                      final bool isExpense =
-                          type == PercentageExplanationType.expense;
-                      final bool isPositiveVar = isExpense
-                          ? (computedPercent < 0)
-                          : (computedPercent > 0);
-                      final color = isPositiveVar
-                          ? DefaultColors.greenDark
-                          : (computedPercent == 0
-                              ? DefaultColors.grey
+                      final bool increased = curr > prev;
+                      final bool equal = computedPercent == 0;
+                      final Color color = equal
+                          ? DefaultColors.grey
+                          : (increased
+                              ? DefaultColors.greenDark
                               : DefaultColors.redDark);
-                      final icon = (computedPercent == 0)
-                          ? Icons.arrow_right
-                          : (isPositiveVar
-                              ? Icons.north_east
-                              : Icons.south_east);
-                      final text = computedPercent == 0
+                      final IconData icon = equal
+                          ? Iconsax.more_circle
+                          : (increased
+                              ? Iconsax.arrow_circle_up
+                              : Iconsax.arrow_circle_down);
+                      final text = equal
                           ? '0.0%'
-                          : '${isPositiveVar ? '+' : '-'}${computedPercent.abs().toStringAsFixed(1)}%';
+                          : '${increased ? '+' : '-'}${computedPercent.abs().toStringAsFixed(1)}%';
                       return Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -298,20 +297,10 @@ class FinanceDetailsPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 4.w),
-                          Container(
-                            width: 18.h,
-                            height: 18.h,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                icon,
-                                size: 11.sp,
-                                color: theme.cardColor,
-                              ),
-                            ),
+                          Icon(
+                            icon,
+                            size: 14.sp,
+                            color: color,
                           ),
                         ],
                       );

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../model/percentage_result.dart';
 import 'percentage_explanation_dialog.dart';
+import 'package:iconsax/iconsax.dart';
+import '../utils/color.dart';
 
 class PercentageDisplayWidget extends StatelessWidget {
   final PercentageResult result;
@@ -91,6 +93,47 @@ class PercentageDisplayWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    // Determine icon and circle color based on current/previous when available,
+    // otherwise fall back to effectiveResult.type semantics
+    IconData iconData;
+    Color circleColor;
+    if (explanationType != null &&
+        currentValue != null &&
+        previousValue != null) {
+      final double prev = previousValue!;
+      final double curr = currentValue!;
+      final bool isEqual = curr == prev;
+      if (isEqual) {
+        iconData = Iconsax.more_circle;
+        circleColor = DefaultColors.grey;
+      } else if (curr > prev) {
+        iconData = Iconsax.arrow_circle_up;
+        circleColor = DefaultColors.greenDark;
+      } else {
+        iconData = Iconsax.arrow_circle_down;
+        circleColor = DefaultColors.redDark;
+      }
+    } else {
+      switch (effectiveResult.type) {
+        case PercentageType.positive:
+          iconData = Iconsax.arrow_circle_up;
+          circleColor = DefaultColors.greenDark;
+          break;
+        case PercentageType.negative:
+          iconData = Iconsax.arrow_circle_down;
+          circleColor = DefaultColors.redDark;
+          break;
+        case PercentageType.neutral:
+          iconData = Iconsax.more_circle;
+          circleColor = DefaultColors.grey;
+          break;
+        case PercentageType.newData:
+          iconData = Iconsax.star_1;
+          circleColor = DefaultColors.grey;
+          break;
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         if (explanationType != null &&
@@ -117,14 +160,14 @@ class PercentageDisplayWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
-                color: effectiveResult.color,
+                color: circleColor,
               ),
             ),
             SizedBox(width: 2.w),
             Icon(
-              effectiveResult.icon,
+              iconData,
               size: 12.sp,
-              color: effectiveResult.color,
+              color: circleColor,
             ),
           ],
         ),
