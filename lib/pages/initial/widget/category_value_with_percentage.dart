@@ -49,15 +49,23 @@ class CategoryValueWithPercentage extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                if (percentageResult != null && percentageResult!.hasData) ...[
-                  SizedBox(width: 6.w),
-                  PercentageDisplayWidget(
-                    result: percentageResult!,
-                    explanationType: explanationType,
-                    currentValue: currentValue,
-                    previousValue: previousValue,
-                  ),
-                ],
+                (((explanationType != null &&
+                            currentValue != null &&
+                            previousValue != null) ||
+                        (percentageResult != null && percentageResult!.hasData))
+                    ? Row(
+                        children: [
+                          SizedBox(width: 6.w),
+                          PercentageDisplayWidget(
+                            result:
+                                percentageResult ?? PercentageResult.noData(),
+                            explanationType: explanationType,
+                            currentValue: currentValue,
+                            previousValue: previousValue,
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
               ],
             ),
             SizedBox(height: 4.h),

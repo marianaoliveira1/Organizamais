@@ -21,19 +21,23 @@ class PercentageDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!result.hasData) {
-      return const SizedBox.shrink();
-    }
-
     // Derive an effective result using current/previous values when available
-    PercentageResult effectiveResult = result;
+    PercentageResult? derived;
     if (explanationType != null &&
         currentValue != null &&
         previousValue != null) {
       final double prev = previousValue!;
       final double curr = currentValue!;
 
-      if (prev != 0) {
+      if (prev == 0) {
+        // Sem base comparável: mostrar 0.0% em vez de "Novo"
+        derived = PercentageResult(
+          percentage: 0.0,
+          hasData: true,
+          type: PercentageType.neutral,
+          displayText: '0.0%',
+        );
+      } else {
         final double computedPercent = ((curr - prev) / prev.abs()) * 100.0;
 
         PercentageType type;
@@ -73,13 +77,18 @@ class PercentageDisplayWidget extends StatelessWidget {
             break;
         }
 
-        effectiveResult = PercentageResult(
+        derived = PercentageResult(
           percentage: computedPercent.abs(),
           hasData: true,
           type: type,
           displayText: displayText,
         );
       }
+    }
+
+    final PercentageResult effectiveResult = derived ?? result;
+    if (!effectiveResult.hasData) {
+      return const SizedBox.shrink();
     }
 
     return GestureDetector(
@@ -103,12 +112,6 @@ class PercentageDisplayWidget extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              effectiveResult.icon,
-              size: 12.sp,
-              color: effectiveResult.color,
-            ),
-            SizedBox(width: 2.w),
             Text(
               effectiveResult.formattedPercentage,
               style: TextStyle(
@@ -116,6 +119,12 @@ class PercentageDisplayWidget extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: effectiveResult.color,
               ),
+            ),
+            SizedBox(width: 2.w),
+            Icon(
+              effectiveResult.icon,
+              size: 12.sp,
+              color: effectiveResult.color,
             ),
           ],
         ),

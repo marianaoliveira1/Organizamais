@@ -201,16 +201,11 @@ class FinanceDetailsPage extends StatelessWidget {
                 color: theme.primaryColor,
               ),
             ),
-            if (percentageResult.hasData)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    percentageResult.icon,
-                    size: 14.sp,
-                    color: percentageResult.color,
-                  ),
-                  SizedBox(width: 4.w),
+            // Exibir a % mesmo quando o serviço não tiver dados, derivando pela janela atual
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (percentageResult.hasData) ...[
                   Text(
                     percentageResult.formattedPercentage,
                     style: TextStyle(
@@ -219,8 +214,112 @@ class FinanceDetailsPage extends StatelessWidget {
                       color: percentageResult.color,
                     ),
                   ),
+                  SizedBox(width: 4.w),
+                  Container(
+                    width: 18.h,
+                    height: 18.h,
+                    decoration: BoxDecoration(
+                      color: percentageResult.color,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        percentageResult.icon,
+                        size: 11.sp,
+                        color: theme.cardColor,
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Builder(
+                    builder: (context) {
+                      final prev = previousValue;
+                      final curr = currentValue;
+                      if (prev == 0) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '0.0%',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: DefaultColors.grey,
+                              ),
+                            ),
+                            SizedBox(width: 4.w),
+                            Container(
+                              width: 18.h,
+                              height: 18.h,
+                              decoration: BoxDecoration(
+                                color: DefaultColors.grey,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_right,
+                                  size: 11.sp,
+                                  color: theme.cardColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      final computedPercent =
+                          ((curr - prev) / prev.abs()) * 100.0;
+                      final bool isExpense =
+                          type == PercentageExplanationType.expense;
+                      final bool isPositiveVar = isExpense
+                          ? (computedPercent < 0)
+                          : (computedPercent > 0);
+                      final color = isPositiveVar
+                          ? DefaultColors.greenDark
+                          : (computedPercent == 0
+                              ? DefaultColors.grey
+                              : DefaultColors.redDark);
+                      final icon = (computedPercent == 0)
+                          ? Icons.arrow_right
+                          : (isPositiveVar
+                              ? Icons.north_east
+                              : Icons.south_east);
+                      final text = computedPercent == 0
+                          ? '0.0%'
+                          : '${isPositiveVar ? '+' : '-'}${computedPercent.abs().toStringAsFixed(1)}%';
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            text,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: color,
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          Container(
+                            width: 18.h,
+                            height: 18.h,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                icon,
+                                size: 11.sp,
+                                color: theme.cardColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
-              ),
+              ],
+            ),
           ],
         ),
         SizedBox(height: 6.h),

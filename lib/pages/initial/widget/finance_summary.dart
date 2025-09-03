@@ -55,7 +55,7 @@ class FinanceSummaryWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)}",
+                    "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)} (até hoje)",
                     style: TextStyle(
                       fontSize: 10.sp,
                       color: DefaultColors.grey,
@@ -76,8 +76,9 @@ class FinanceSummaryWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        formatter.format(transactionController.totalReceita -
-                            transactionController.totalDespesas),
+                        formatter.format(
+                          _getCurrentMonthBalance(transactionController),
+                        ),
                         style: TextStyle(
                           fontSize: 34.sp,
                           fontWeight: FontWeight.bold,
@@ -89,8 +90,8 @@ class FinanceSummaryWidget extends StatelessWidget {
                         result:
                             transactionController.monthlyPercentageComparison,
                         explanationType: PercentageExplanationType.balance,
-                        currentValue: transactionController.totalReceita -
-                            transactionController.totalDespesas,
+                        currentValue:
+                            _getCurrentMonthBalance(transactionController),
                         previousValue:
                             _getPreviousMonthBalance(transactionController),
                       ),
@@ -101,26 +102,28 @@ class FinanceSummaryWidget extends StatelessWidget {
                     children: [
                       CategoryValueWithPercentage(
                         title: "Receita",
-                        value: formatter
-                            .format(transactionController.totalReceita),
+                        value: formatter.format(
+                            _getCurrentMonthIncome(transactionController)),
                         color: DefaultColors.green,
                         percentageResult:
                             transactionController.incomePercentageComparison,
                         explanationType: PercentageExplanationType.income,
-                        currentValue: transactionController.totalReceita,
+                        currentValue:
+                            _getCurrentMonthIncome(transactionController),
                         previousValue:
                             _getPreviousMonthIncome(transactionController),
                       ),
                       SizedBox(width: 24.w),
                       CategoryValueWithPercentage(
                         title: "Despesas",
-                        value: formatter
-                            .format(transactionController.totalDespesas),
+                        value: formatter.format(
+                            _getCurrentMonthExpenses(transactionController)),
                         color: DefaultColors.red,
                         percentageResult:
                             transactionController.expensePercentageComparison,
                         explanationType: PercentageExplanationType.expense,
-                        currentValue: transactionController.totalDespesas,
+                        currentValue:
+                            _getCurrentMonthExpenses(transactionController),
                         previousValue:
                             _getPreviousMonthExpenses(transactionController),
                       ),
@@ -132,6 +135,47 @@ class FinanceSummaryWidget extends StatelessWidget {
           ),
         ),
       );
+    });
+  }
+
+  double _getCurrentMonthBalance(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    return controller.getBalanceForDateRange(startDate, endDate);
+  }
+
+  double _getCurrentMonthIncome(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.receita)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
+    });
+  }
+
+  double _getCurrentMonthExpenses(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    return controller
+        .getTransactionsForDateRange(startDate, endDate)
+        .where((t) => t.type == TransactionType.despesa)
+        .fold<double>(0.0, (sum, t) {
+      try {
+        return sum +
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      } catch (e) {
+        return sum;
+      }
     });
   }
 
