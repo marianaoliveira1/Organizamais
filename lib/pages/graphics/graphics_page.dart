@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -21,6 +20,7 @@ import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
 import 'pages/category_report_page.dart';
 import 'pages/spending_shift_balance_page.dart';
+import '../resume/widgtes/text_not_transaction.dart';
 
 List<String> getAllMonths() {
   final months = [
@@ -212,6 +212,15 @@ class _GraphicsPageState extends State<GraphicsPage> {
                       Obx(() {
                         if (transactionController.isLoading) {
                           return _buildShimmerContent(theme);
+                        }
+                        if (transactionController.transaction.isEmpty) {
+                          final vh = MediaQuery.of(context).size.height;
+                          return SizedBox(
+                            height: vh * 0.7,
+                            child: const Center(
+                              child: DefaultTextNotTransaction(),
+                            ),
+                          );
                         }
                         return _buildGraphicsContent(
                             theme,

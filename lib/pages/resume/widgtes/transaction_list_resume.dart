@@ -27,7 +27,10 @@ class TransactionsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (transactionController.transaction.isEmpty) {
-        return const DefaultTextNotTransaction();
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: const Center(child: DefaultTextNotTransaction()),
+        );
       }
 
       // Ordena as transações da mais recente para a mais antiga
