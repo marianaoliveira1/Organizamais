@@ -20,17 +20,17 @@ class OnboardingFixedSuccessPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Tudo pronto! 🎯 Agora é só acompanhar seus gastos e ver seu saldo crescer.',
+              '✨ Conquista desbloqueada: Adulto Responsável! 🏆 Sua conta fixa foi criada e já está trabalhando para você! 💸',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w700,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(height: 8.h),
             Text(
-              'Sua configuração inicial está pronta.',
+              'E lá vamos nós! Sua jornada rumo ao controle total começou... Prepare-se para vitórias épicas! ⚔️',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: DefaultColors.grey,
@@ -52,7 +52,7 @@ class OnboardingFixedSuccessPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Tudo pronto',
+                'Iniciar minha vida organizada! 🚀',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

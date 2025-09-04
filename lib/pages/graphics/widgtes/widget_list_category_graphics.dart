@@ -553,15 +553,27 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       );
     }
 
-    // Custom icon and color circle: green if increased, red if decreased, gray if same
-    final bool isEqual = comparison.percentage == 0;
-    final bool isIncrease = comparison.percentage > 0;
-    final Color circleColor = isEqual
-        ? DefaultColors.grey
-        : (isIncrease ? DefaultColors.greenDark : DefaultColors.redDark);
-    final IconData dirIcon = isEqual
-        ? Iconsax.more_circle
-        : (isIncrease ? Iconsax.arrow_circle_up : Iconsax.arrow_circle_down);
+    // Mapear pela natureza da despesa: positive => diminuiu (verde/baixo), negative => aumentou (vermelho/cima)
+    late final Color circleColor;
+    late final IconData dirIcon;
+    switch (comparison.type) {
+      case PercentageType.positive:
+        circleColor = DefaultColors.greenDark;
+        dirIcon = Iconsax.arrow_circle_down;
+        break;
+      case PercentageType.negative:
+        circleColor = DefaultColors.redDark;
+        dirIcon = Iconsax.arrow_circle_up;
+        break;
+      case PercentageType.neutral:
+        circleColor = DefaultColors.grey;
+        dirIcon = Iconsax.more_circle;
+        break;
+      case PercentageType.newData:
+        circleColor = DefaultColors.grey;
+        dirIcon = Iconsax.star_1;
+        break;
+    }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -739,14 +751,26 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       }
     }
 
-    final bool isEqual2 = comparison.percentage == 0;
-    final bool isIncrease2 = comparison.percentage > 0;
-    final Color circleColor2 = isEqual2
-        ? DefaultColors.grey
-        : (isIncrease2 ? DefaultColors.greenDark : DefaultColors.redDark);
-    final IconData dirIcon2 = isEqual2
-        ? Iconsax.more_circle
-        : (isIncrease2 ? Iconsax.arrow_circle_up : Iconsax.arrow_circle_down);
+    late final Color circleColor2;
+    late final IconData dirIcon2;
+    switch (comparison.type) {
+      case PercentageType.positive:
+        circleColor2 = DefaultColors.greenDark;
+        dirIcon2 = Iconsax.arrow_circle_down;
+        break;
+      case PercentageType.negative:
+        circleColor2 = DefaultColors.redDark;
+        dirIcon2 = Iconsax.arrow_circle_up;
+        break;
+      case PercentageType.neutral:
+        circleColor2 = DefaultColors.grey;
+        dirIcon2 = Iconsax.more_circle;
+        break;
+      case PercentageType.newData:
+        circleColor2 = DefaultColors.grey;
+        dirIcon2 = Iconsax.star_1;
+        break;
+    }
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),

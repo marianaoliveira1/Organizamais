@@ -20,28 +20,20 @@ class OnboardingWelcomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Bem vindo(a) ao Organiza+, o seu novo jeito de organizar as finanças simples e completa ✨',
+              '🎉 Uhuul! Sua vida organizada vai ficar mais divertida que abrir um pacote de biscoito e virar todos inteiros! 🍪',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 14.h),
-            Text(
-              'Vamos começar com alguns passos simples.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: theme.primaryColor,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w400,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
               ),
             ),
             SizedBox(height: 32.h),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
+                SizedBox(
+                  width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () {
                       AuthController.instance.isOnboarding = false;
@@ -55,17 +47,18 @@ class OnboardingWelcomePage extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Pular',
+                      'Pular": "Tô com pressa, me leva direto ao show! 🚀',
                       style: TextStyle(
                         color: DefaultColors.green,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 12.w),
-                Expanded(
+                SizedBox(height: 12.h),
+                SizedBox(
+                  width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => Get.offAllNamed(Routes.CARD_INTRO),
                     style: ElevatedButton.styleFrom(
@@ -76,10 +69,10 @@ class OnboardingWelcomePage extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Começar',
+                      'Bora nessa aventura organizacional! 🌟',
                       style: TextStyle(
                         color: theme.cardColor,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

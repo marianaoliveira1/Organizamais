@@ -8,6 +8,7 @@ import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../transaction/pages/category_page.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TransactionItem extends StatelessWidget {
   final dynamic transaction;
@@ -41,128 +42,184 @@ class TransactionItem extends StatelessWidget {
       child: Material(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        child: InkWell(
-          onLongPress: () =>
-              _showDeleteConfirmationDialog(context, transaction),
-          onTap: () => Get.to(
-            () => TransactionPage(
-              transaction: transaction,
-              overrideTransactionSalvar: (transaction) {
-                final controller = Get.find<TransactionController>();
-                controller.updateTransaction(transaction);
-              },
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(14.w),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16.r),
+          child: Slidable(
+            key: ValueKey('txn-${transaction.id ?? transaction.title}'),
+            endActionPane: ActionPane(
+              motion: const DrawerMotion(),
+              extentRatio: 0.45,
               children: [
-                // Ícone circular
-                Center(
-                  child: Image.asset(
-                    category?['icon'] ?? 'assets/icon-category/default.png',
-                    width: 24.w,
-                    height: 24.h,
-                    opacity:
-                        isFuture ? const AlwaysStoppedAnimation(0.4) : null,
+                CustomSlidableAction(
+                  onPressed: (_) => Get.to(
+                    () => TransactionPage(
+                      transaction: transaction,
+                      overrideTransactionSalvar: (updated) {
+                        final controller = Get.find<TransactionController>();
+                        controller.updateTransaction(updated);
+                      },
+                    ),
                   ),
-                ),
-
-                SizedBox(width: 12.w),
-
-                // Título + Categoria/descrição (+ Em breve)
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // título
-                      Text(
-                        _titleWithInstallment(
-                            transaction.title, controller.transaction),
-                        style: TextStyle(
-                          color: isFuture
-                              ? DefaultColors.grey
-                              : theme.primaryColor,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // linha com categoria + chip "Em breve"
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              category?['name'] ?? 'Categoria não encontrada',
-                              style: TextStyle(
-                                color: isFuture
-                                    ? DefaultColors.grey.withOpacity(0.6)
-                                    : DefaultColors.grey20,
-                                fontSize: 11.sp,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (isFuture) ...[
-                            SizedBox(width: 6.w),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 6.w, vertical: 2.h),
-                              decoration: BoxDecoration(
-                                color: DefaultColors.grey.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Text(
-                                'Em breve',
-                                style: TextStyle(
-                                  color: DefaultColors.grey,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 12.w,
-                ),
-
-                // Valor + paymentType (à direita)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      _formatValue(transaction.value),
+                  backgroundColor: Colors.orange,
+                  flex: 1,
+                  child: Center(
+                    child: Text(
+                      'Editar',
                       style: TextStyle(
-                        color:
-                            isFuture ? DefaultColors.grey : theme.primaryColor,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                CustomSlidableAction(
+                  onPressed: (_) =>
+                      _showDeleteConfirmationDialog(context, transaction),
+                  backgroundColor: Colors.red,
+                  flex: 1,
+                  child: Center(
+                    child: Text(
+                      'Deletar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            child: InkWell(
+              onLongPress: () =>
+                  _showDeleteConfirmationDialog(context, transaction),
+              onTap: () {
+                Slidable.of(context)?.close();
+                Get.to(
+                  () => TransactionPage(
+                    transaction: transaction,
+                    overrideTransactionSalvar: (transaction) {
+                      final controller = Get.find<TransactionController>();
+                      controller.updateTransaction(transaction);
+                    },
+                  ),
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.all(14.w),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Ícone circular
+                    Center(
+                      child: Image.asset(
+                        category?['icon'] ?? 'assets/icon-category/default.png',
+                        width: 24.w,
+                        height: 24.h,
                       ),
                     ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      transaction.paymentType,
-                      style: TextStyle(
-                        color: isFuture
-                            ? DefaultColors.grey.withOpacity(0.6)
-                            : DefaultColors.grey20,
-                        fontSize: 11.sp,
+
+                    SizedBox(width: 12.w),
+
+                    // Título + Categoria/descrição (+ Em breve)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // título
+                          Text(
+                            _titleWithInstallment(
+                                transaction.title, controller.transaction),
+                            style: TextStyle(
+                              color: isFuture
+                                  ? DefaultColors.grey
+                                  : theme.primaryColor,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4.h),
+
+                          // linha com categoria + chip "Em breve"
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  category?['name'] ??
+                                      'Categoria não encontrada',
+                                  style: TextStyle(
+                                    color: isFuture
+                                        ? DefaultColors.grey.withOpacity(0.6)
+                                        : DefaultColors.grey20,
+                                    fontSize: 11.sp,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (isFuture) ...[
+                                SizedBox(width: 6.w),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 6.w, vertical: 2.h),
+                                  decoration: BoxDecoration(
+                                    color: DefaultColors.grey.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                  child: Text(
+                                    'Em breve',
+                                    style: TextStyle(
+                                      color: DefaultColors.grey,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
+                    SizedBox(
+                      width: 12.w,
+                    ),
+
+                    // Valor + paymentType (à direita)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          _formatValue(transaction.value),
+                          style: TextStyle(
+                            color: isFuture
+                                ? DefaultColors.grey
+                                : theme.primaryColor,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 3.h),
+                        Text(
+                          transaction.paymentType,
+                          style: TextStyle(
+                            color: isFuture
+                                ? DefaultColors.grey.withOpacity(0.6)
+                                : DefaultColors.grey20,
+                            fontSize: 11.sp,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -227,7 +284,7 @@ class TransactionItem extends StatelessWidget {
   String? _computeInstallmentLabel(
       List<dynamic> allTransactions, String? title) {
     if (title == null) return null;
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
     final match = regex.firstMatch(title);
     if (match == null) return null;
     final current = int.tryParse(match.group(1) ?? '') ?? 0;
@@ -250,7 +307,7 @@ class TransactionItem extends StatelessWidget {
     final label = _computeInstallmentLabel(all, title);
     if (label == null) return title ?? '';
     // Se o título já é "Parcela N: Nome", substitui por "Parcela N de Y — Nome"
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
     final match = title != null ? regex.firstMatch(title) : null;
     if (match == null) return title ?? '';
     final baseTitle = match.group(2) ?? '';

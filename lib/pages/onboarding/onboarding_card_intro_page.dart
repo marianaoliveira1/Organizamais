@@ -5,6 +5,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../routes/route.dart';
 import '../../controller/auth_controller.dart';
 import '../initial/pages/add_card_page.dart';
+import '../initial/pages/fixed_accotuns_page.dart';
 
 class OnboardingCardIntroPage extends StatelessWidget {
   const OnboardingCardIntroPage({super.key});
@@ -32,7 +33,7 @@ class OnboardingCardIntroPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Agora, adicione seu cartão para acompanhar seus gastos automaticamente 💳',
+              '💳 Vamos cadastrar só um cartãozinho pra começar (prometo que não dói 😅)',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -52,7 +53,7 @@ class OnboardingCardIntroPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Vamos lá',
+                'Claro, vamos lá! 💪',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

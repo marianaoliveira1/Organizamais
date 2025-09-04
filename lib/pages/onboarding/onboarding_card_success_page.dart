@@ -19,18 +19,29 @@ class OnboardingCardSuccessPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Show! Agora vamos cadastrar uma conta fixa (tipo aluguel, internet, academia...) 📅',
+              '🎯 Cartão adicionado com sucesso! Seu dinheiro já tá mais organizado que fila de banco em segunda-feira.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 32.h),
+            SizedBox(height: 20.h),
+            Text(
+              '💡 Agora, que tal uma conta fixa? Para aquelas despesas que são tão certas quanto chorar em filme da Disney! 🥲',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 12.h),
             ElevatedButton(
-              onPressed: () => Get.offAll(
-                  () => const AddFixedAccountsFormPage(fromOnboarding: true)),
+              onPressed: () => Get.to(
+                () => const AddFixedAccountsFormPage(fromOnboarding: true),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: DefaultColors.green,
                 padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -39,7 +50,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Vamos lá',
+                'Criar minha conta fixa! 🛡️',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

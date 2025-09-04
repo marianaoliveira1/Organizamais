@@ -538,7 +538,9 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                               ),
                             )
                           : Text(
-                              "Salvar",
+                              widget.fromOnboarding
+                                  ? "✍️ Criar conta fixa"
+                                  : "Salvar",
                               style: TextStyle(
                                 color: theme.cardColor,
                                 fontSize: 14.sp,

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../controller/card_controller.dart';
 import '../../../controller/transaction_controller.dart';
@@ -414,502 +415,630 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               ? DefaultColors.redDark
               : (daysUntilDue <= 2 ? DefaultColors.orange : theme.primaryColor);
 
-          return GestureDetector(
-            onTap: () {
-              Get.to(() => AddCardPage(isEditing: true, card: card));
-            },
-            onLongPress: () {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  backgroundColor: theme.cardColor,
-                  content: Text(
-                      'Tem certeza que deseja excluir o cartão ${card.name}?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Cancelar',
-                          style: TextStyle(color: theme.primaryColor)),
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(16.r),
+            child: Slidable(
+              key: ValueKey('card-${card.id ?? card.name}'),
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                extentRatio: 0.60,
+                children: [
+                  CustomSlidableAction(
+                    onPressed: (_) {
+                      Get.to(() => AddCardPage(isEditing: true, card: card));
+                    },
+                    backgroundColor: Colors.orange,
+                    flex: 1,
+                    child: Center(
+                      child: Text(
+                        'Editar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16.sp,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {
+                  ),
+                  SlidableAction(
+                    onPressed: (_) async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          backgroundColor: theme.cardColor,
+                          title: Text(
+                            'Excluir cartão',
+                            style: TextStyle(color: theme.primaryColor),
+                          ),
+                          content: Text(
+                            'Tem certeza que deseja excluir o cartão ${card.name}?',
+                            style: TextStyle(color: DefaultColors.grey20),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text('Cancelar',
+                                  style: TextStyle(color: theme.primaryColor)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text('Excluir',
+                                  style:
+                                      TextStyle(color: DefaultColors.grey20)),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
                         widget.cardController.deleteCard(card.id!);
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Excluir',
-                          style: TextStyle(color: DefaultColors.grey20)),
-                    ),
-                  ],
-                ),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 12.h,
-                horizontal: 14.w,
-              ),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: theme.primaryColor.withOpacity(0.06),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                      }
+                    },
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Excluir',
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // header
-                  Row(
+              child: GestureDetector(
+                onTap: () {
+                  Slidable.of(context)?.close();
+                  Get.to(() => AddCardPage(isEditing: true, card: card));
+                },
+                onLongPress: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: theme.cardColor,
+                      content: Text(
+                          'Tem certeza que deseja excluir o cartão ${card.name}?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text('Cancelar',
+                              style: TextStyle(color: theme.primaryColor)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            widget.cardController.deleteCard(card.id!);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Excluir',
+                              style: TextStyle(color: DefaultColors.grey20)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 14.w,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                      color: theme.primaryColor.withOpacity(0.06),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
-                        child: card.iconPath != null
-                            ? Image.asset(
-                                card.iconPath!,
-                                width: 36.w,
-                                height: 36.h,
-                              )
-                            : Icon(Icons.credit_card, size: 20.sp),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              card.name,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                                color: theme.primaryColor,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            if (card.bankName != null &&
-                                (card.bankName ?? '')
-                                    .toString()
-                                    .trim()
-                                    .isNotEmpty)
-                              Padding(
-                                padding: EdgeInsets.only(top: 2.h),
-                                child: Text(
-                                  card.bankName!,
+                      // header
+                      Row(
+                        children: [
+                          Center(
+                            child: card.iconPath != null
+                                ? Image.asset(
+                                    card.iconPath!,
+                                    width: 36.w,
+                                    height: 36.h,
+                                  )
+                                : Icon(Icons.credit_card, size: 20.sp),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  card.name,
                                   style: TextStyle(
-                                    fontSize: 10.sp,
-                                    color: DefaultColors.grey20,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.primaryColor,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      if (statusText != null) ...[
-                        SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color: DefaultColors.redDark.withOpacity(.9),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Iconsax.info_circle,
-                                color: DefaultColors.redDark,
-                                size: 12.h,
-                              ),
-                              SizedBox(width: 6.w),
-                              Text(
-                                statusText,
-                                style: TextStyle(
-                                  color: DefaultColors.redDark,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-
-                  SizedBox(height: 30.h),
-
-                  // 🔥 Barra de progresso (ou dica para definir limite)
-                  if (hasLimit)
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final barWidth = constraints.maxWidth;
-                        final progressWidth = barWidth * ratio;
-
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            // fundo da barra
-                            Container(
-                              height: 10.h,
-                              width: barWidth,
-                              decoration: BoxDecoration(
-                                color: theme.primaryColor.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                            ),
-                            // progresso preenchido
-                            Container(
-                              height: 10.h,
-                              width: progressWidth,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    progressColor.withOpacity(0.85),
-                                    progressColor,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                            ),
-                            // bolha do percentual
-                            Positioned(
-                              left:
-                                  (progressWidth - 20).clamp(0, barWidth - 40),
-                              top: -24.h,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 6.w, vertical: 2.h),
-                                decoration: BoxDecoration(
-                                  color: theme.cardColor,
-                                  borderRadius: BorderRadius.circular(6.r),
-                                  border: Border.all(
-                                    color: theme.primaryColor.withOpacity(0.08),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          theme.shadowColor.withOpacity(0.05),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
+                                if (card.bankName != null &&
+                                    (card.bankName ?? '')
+                                        .toString()
+                                        .trim()
+                                        .isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2.h),
+                                    child: Text(
+                                      card.bankName!,
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: DefaultColors.grey20,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ],
-                                ),
-                                child: Text(
-                                  percentLabel,
-                                  style: TextStyle(
-                                    color: theme.primaryColor,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.bold,
                                   ),
+                              ],
+                            ),
+                          ),
+                          if (statusText != null) ...[
+                            SizedBox(width: 8.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.r),
+                                border: Border.all(
+                                  color: DefaultColors.redDark.withOpacity(.9),
                                 ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Iconsax.info_circle,
+                                    color: DefaultColors.redDark,
+                                    size: 12.h,
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Text(
+                                    statusText,
+                                    style: TextStyle(
+                                      color: DefaultColors.redDark,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
-                        );
-                      },
-                    )
-                  else
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 6.h),
-                      child: Text(
-                        'Defina o limite para acompanhar o uso',
-                        style: TextStyle(
-                          color: DefaultColors.grey20,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        ],
                       ),
-                    ),
 
-                  SizedBox(height: 12.h),
+                      SizedBox(height: 30.h),
 
-                  // status do uso por faixa
-                  // Text(
-                  //   statusLabel,
-                  //   style: TextStyle(
-                  //     fontSize: 11.sp,
-                  //     color: progressColor,
-                  //     fontWeight: FontWeight.w600,
-                  //   ),
-                  // ),
+                      // 🔥 Barra de progresso (ou dica para definir limite)
+                      if (hasLimit)
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final barWidth = constraints.maxWidth;
+                            final progressWidth = barWidth * ratio;
 
-                  // SizedBox(height: 8.h),
-
-                  // valores dinâmicos
-                  if (hasLimit)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          formatter.format(spent),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          'de ${formatter.format(limit)}',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                  SizedBox(height: 8.h),
-
-                  // Status e valores por ciclo
-                  if (showClosedSection) ...[
-                    // Cabeçalho tipo "upcoming payment"
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          _formatMonthDay(cycle.paymentDate),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 4.h),
-                          decoration: BoxDecoration(
-                            color: dueChipColor.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                                color: dueChipColor.withOpacity(0.3)),
-                          ),
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                // fundo da barra
+                                Container(
+                                  height: 10.h,
+                                  width: barWidth,
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryColor.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                ),
+                                // progresso preenchido
+                                Container(
+                                  height: 10.h,
+                                  width: progressWidth,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        progressColor.withOpacity(0.85),
+                                        progressColor,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                ),
+                                // bolha do percentual
+                                Positioned(
+                                  left: (progressWidth - 20)
+                                      .clamp(0, barWidth - 40),
+                                  top: -24.h,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 6.w, vertical: 2.h),
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      border: Border.all(
+                                        color: theme.primaryColor
+                                            .withOpacity(0.08),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: theme.shadowColor
+                                              .withOpacity(0.05),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      percentLabel,
+                                      style: TextStyle(
+                                        color: theme.primaryColor,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        )
+                      else
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6.h),
                           child: Text(
-                            dueChipText,
+                            'Defina o limite para acompanhar o uso',
                             style: TextStyle(
-                              color: dueChipColor,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w700,
+                              color: DefaultColors.grey20,
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 12.h),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'total da fatura',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: DefaultColors.grey20,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                      SizedBox(height: 12.h),
+
+                      // status do uso por faixa
+                      // Text(
+                      //   statusLabel,
+                      //   style: TextStyle(
+                      //     fontSize: 11.sp,
+                      //     color: progressColor,
+                      //     fontWeight: FontWeight.w600,
+                      //   ),
+                      // ),
+
+                      // SizedBox(height: 8.h),
+
+                      // valores dinâmicos
+                      if (hasLimit)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              formatter.format(spent),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w500,
                               ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                formatter.format(closedAmount),
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            ),
+                            Text(
+                              'de ${formatter.format(limit)}',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey20,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'próxima fatura',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: DefaultColors.grey20,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                formatter.format(nextAmount),
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    // Datas
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                      SizedBox(height: 8.h),
+
+                      // Status e valores por ciclo
+                      if (showClosedSection) ...[
+                        // Cabeçalho tipo "upcoming payment"
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               _formatMonthDay(cycle.paymentDate),
                               style: TextStyle(
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              'vencimento',
-                              style: TextStyle(
-                                fontSize: 10.sp,
+                                fontSize: 11.sp,
                                 color: DefaultColors.grey20,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              _formatMonthDay(cycle.openStart),
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w700,
+                            const Spacer(),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: dueChipColor.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                    color: dueChipColor.withOpacity(0.3)),
                               ),
-                            ),
-                            Text(
-                              'fechou em',
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: DefaultColors.grey20,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    // Botão primário "Pagar agora"
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryColor,
-                          foregroundColor: theme.scaffoldBackgroundColor,
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              backgroundColor: theme.cardColor,
-                              title: Text(
-                                'Confirmar pagamento',
-                                style: TextStyle(color: theme.primaryColor),
-                              ),
-                              content: Text(
-                                'Sua fatura foi paga?',
-                                style: TextStyle(color: DefaultColors.grey20),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: Text('Não',
-                                      style:
-                                          TextStyle(color: theme.primaryColor)),
+                              child: Text(
+                                dueChipText,
+                                style: TextStyle(
+                                  color: dueChipColor,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: Text('Sim',
-                                      style: TextStyle(
-                                          color: DefaultColors.green)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'total da fatura',
+                                    style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: DefaultColors.grey20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    formatter.format(closedAmount),
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: theme.primaryColor,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'próxima fatura',
+                                    style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: DefaultColors.grey20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    formatter.format(nextAmount),
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: theme.primaryColor,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        // Datas
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _formatMonthDay(cycle.paymentDate),
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  'vencimento',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: DefaultColors.grey20,
+                                  ),
                                 ),
                               ],
                             ),
-                          );
-                          if (confirmed == true) {
-                            _markInvoicePaid(card.id, card.name, cycle);
-                          }
-                        },
-                        child: Text(
-                          'Já foi paga?',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12.sp,
-                            color: theme.cardColor,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  _formatMonthDay(cycle.openStart),
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  'fechou em',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: DefaultColors.grey20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        // Botão primário "Pagar agora"
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.primaryColor,
+                              foregroundColor: theme.scaffoldBackgroundColor,
+                              padding: EdgeInsets.symmetric(vertical: 8.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  backgroundColor: theme.cardColor,
+                                  title: Text(
+                                    'Confirmar pagamento',
+                                    style: TextStyle(color: theme.primaryColor),
+                                  ),
+                                  content: Text(
+                                    'Sua fatura foi paga?',
+                                    style:
+                                        TextStyle(color: DefaultColors.grey20),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text('Não',
+                                          style: TextStyle(
+                                              color: theme.primaryColor)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text('Sim',
+                                          style: TextStyle(
+                                              color: DefaultColors.green)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed == true) {
+                                _markInvoicePaid(card.id, card.name, cycle);
+                              }
+                            },
+                            child: Text(
+                              'Já foi paga?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12.sp,
+                                color: theme.cardColor,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    // Links secundários
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                                color: theme.primaryColor.withOpacity(.4)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                        SizedBox(height: 10.h),
+                        // Links secundários
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color: theme.primaryColor.withOpacity(.4)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 6.h),
+                              ),
+                              onPressed: () {
+                                Get.to(() => InvoiceDetailsPage(
+                                      cardName: card.name,
+                                      periodStart: cycle.closedStart,
+                                      periodEnd: cycle.closedEnd,
+                                      title: 'Fatura anterior',
+                                    ));
+                              },
+                              child: Text(
+                                'Ver fatura anterior',
+                                style: TextStyle(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12.w, vertical: 6.h),
-                          ),
-                          onPressed: () {
-                            Get.to(() => InvoiceDetailsPage(
-                                  cardName: card.name,
-                                  periodStart: cycle.closedStart,
-                                  periodEnd: cycle.closedEnd,
-                                  title: 'Fatura anterior',
-                                ));
-                          },
-                          child: Text(
-                            'Ver fatura anterior',
-                            style: TextStyle(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.w700,
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color: theme.primaryColor.withOpacity(.4)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 6.h),
+                              ),
+                              onPressed: () {
+                                Get.to(() => InvoiceDetailsPage(
+                                      cardName: card.name,
+                                      periodStart: cycle.openStart,
+                                      periodEnd: cycle.openEnd,
+                                      title: 'Próxima fatura',
+                                    ));
+                              },
+                              child: Text(
+                                'Próxima fatura',
+                                style: TextStyle(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                                color: theme.primaryColor.withOpacity(.4)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                      ] else ...[
+                        // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Fatura do mês',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12.w, vertical: 6.h),
-                          ),
-                          onPressed: () {
+                            Text(
+                              formatter.format(nextAmount),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Fecha dia $closingDay',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              'Paga dia $paymentDay',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        InkWell(
+                          onTap: () {
+                            // Quando não está fechado, mostrar ciclo aberto (próxima fatura)
                             Get.to(() => InvoiceDetailsPage(
                                   cardName: card.name,
                                   periodStart: cycle.openStart,
@@ -917,94 +1046,31 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                   title: 'Próxima fatura',
                                 ));
                           },
-                          child: Text(
-                            'Próxima fatura',
-                            style: TextStyle(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Ver fatura',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.end,
+                              ),
+                              Icon(Icons.chevron_right,
+                                  color: theme.primaryColor),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                  ] else ...[
-                    // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Fatura do mês',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          formatter.format(nextAmount),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Fecha dia $closingDay',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          'Paga dia $paymentDay',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: DefaultColors.grey20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.h),
-                    InkWell(
-                      onTap: () {
-                        // Quando não está fechado, mostrar ciclo aberto (próxima fatura)
-                        Get.to(() => InvoiceDetailsPage(
-                              cardName: card.name,
-                              periodStart: cycle.openStart,
-                              periodEnd: cycle.openEnd,
-                              title: 'Próxima fatura',
-                            ));
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            'Ver fatura',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.end,
-                          ),
-                          Icon(Icons.chevron_right, color: theme.primaryColor),
-                        ],
-                      ),
-                    ),
-                  ],
 
-                  if (showClosedSection) ...[SizedBox(height: 0)],
-                  SizedBox(
-                    height: 10.h,
-                  )
-                ],
+                      if (showClosedSection) ...[SizedBox(height: 0)],
+                      SizedBox(
+                        height: 10.h,
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
           );
