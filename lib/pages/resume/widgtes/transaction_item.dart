@@ -67,8 +67,8 @@ class TransactionItem extends StatelessWidget {
                       'Editar',
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 10.sp,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -84,8 +84,8 @@ class TransactionItem extends StatelessWidget {
                       'Deletar',
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 10.sp,
                       ),
                       textAlign: TextAlign.center,
                     ),

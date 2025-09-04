@@ -169,7 +169,7 @@ class FixedAccounts extends StatelessWidget {
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 16.sp,
+                                        fontSize: 10.sp,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -222,7 +222,7 @@ class FixedAccounts extends StatelessWidget {
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 16.sp,
+                                        fontSize: 10.sp,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
