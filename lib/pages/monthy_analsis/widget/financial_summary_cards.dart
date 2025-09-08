@@ -438,3 +438,5 @@ class PortfolioCard extends StatelessWidget {
     return '${isNegative ? '-' : ''}R\$ $formatted';
   }
 }
+
+// Donut visualização removida a pedido do usuário.

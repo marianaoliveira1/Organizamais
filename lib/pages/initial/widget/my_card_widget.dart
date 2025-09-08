@@ -737,6 +737,29 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
 
                       // Status e valores por ciclo
                       if (showClosedSection) ...[
+                        // Cabeçalho: Fatura do mês (exibir apenas quando a fatura estiver fechada e não paga)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Fatura do mês',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              formatter.format(closedAmount),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
                         // Cabeçalho tipo "upcoming payment"
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -991,29 +1014,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                           ],
                         ),
                       ] else ...[
-                        // Fora do período de fatura fechada: exibir fatura do ciclo em aberto
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Fatura do mês',
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              formatter.format(nextAmount),
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.h),
+                        // Fora do período de fatura fechada
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

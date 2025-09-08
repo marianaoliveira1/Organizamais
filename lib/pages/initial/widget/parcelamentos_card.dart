@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:organizamais/pages/initial/widget/title_card.dart';
 import 'package:organizamais/utils/color.dart';
@@ -73,7 +74,9 @@ class ParcelamentosCard extends StatelessWidget {
                   text: parcelamentosCount > 0
                       ? 'Parcelas do Mês ($parcelamentosCount)'
                       : 'Parcelas do Mês',
-                  onTap: () {},
+                  onTap: () {
+                    Get.to(() => TransactionPage());
+                  },
                 ),
                 SizedBox(height: 12.h),
                 _buildParcelamentosContent(theme),

@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';

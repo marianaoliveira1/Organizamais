@@ -802,47 +802,13 @@ class CategoryAnalysisPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Resumo da categoria
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          spacing: 5.h,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              categoryName,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: DefaultColors.grey20,
-                              ),
-                            ),
-                            Text(
-                              currencyFormatter.format(totalValue),
-                              style: TextStyle(
-                                fontSize: 32.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Get.theme.primaryColor,
-                              ),
-                            ),
-                            Text(
-                              '${percentual.toStringAsFixed(1)}% do total',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: DefaultColors.grey20,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  CategorySummaryAnalysisPage(
+                    theme: theme,
+                    categoryName: categoryName,
+                    currencyFormatter: currencyFormatter,
+                    totalValue: totalValue,
+                    percentual: percentual,
+                    categoryColor: categoryColor,
                   ),
                   SizedBox(height: 24.h),
 
@@ -1243,5 +1209,160 @@ class CategoryAnalysisPage extends StatelessWidget {
       'Novembro',
       'Dezembro'
     ];
+  }
+}
+
+class CategorySummaryAnalysisPage extends StatelessWidget {
+  const CategorySummaryAnalysisPage({
+    super.key,
+    required this.theme,
+    required this.categoryName,
+    required this.currencyFormatter,
+    required this.totalValue,
+    required this.percentual,
+    required this.categoryColor,
+  });
+
+  final ThemeData theme;
+  final String categoryName;
+  final NumberFormat currencyFormatter;
+  final double totalValue;
+  final double percentual;
+  final Color categoryColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.grey20,
+                height: 1.3,
+              ),
+              children: [
+                const TextSpan(text: 'No ano de 2025, você gastou '),
+                TextSpan(
+                  text: currencyFormatter.format(totalValue),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Get.theme.primaryColor,
+                  ),
+                ),
+                const TextSpan(text: ' na categoria '),
+                TextSpan(
+                  text: categoryName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Get.theme.primaryColor,
+                  ),
+                ),
+                const TextSpan(text: ', que representa '),
+                TextSpan(
+                  text: '${percentual.toStringAsFixed(1)}% ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Get.theme.primaryColor,
+                  ),
+                ),
+                const TextSpan(text: 'do valor total.'),
+              ],
+            ),
+          ),
+          SizedBox(height: 40.h),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final double maxWidth = constraints.maxWidth;
+              // Tamanho responsivo para o donut dentro de uma linha com textos à direita
+              final double donutSize = maxWidth.isFinite
+                  ? (maxWidth * 0.096).clamp(50.0, 100.0)
+                  : 80.0;
+              final double donutStroke = (donutSize * 0.10).clamp(4.0, 10.0);
+
+              return Center(
+                child: _CategoryDonutPercent(
+                  percent: percentual,
+                  color: categoryColor,
+                  size: donutSize,
+                  strokeWidth: donutStroke,
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 20.h),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryDonutPercent extends StatelessWidget {
+  final double percent; // 0..100
+  final Color color;
+  final double size;
+  final double strokeWidth;
+
+  const _CategoryDonutPercent({
+    required this.percent,
+    required this.color,
+    this.size = 54,
+    this.strokeWidth = 7,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final double clamped = percent.clamp(0, 100);
+
+    final double outerRadius = (size / 2).w;
+    final double centerRadius = ((size / 2) - strokeWidth).clamp(0, size / 2).w;
+
+    return SizedBox(
+      width: size.w,
+      height: size.w,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              startDegreeOffset: -90,
+              sectionsSpace: 0,
+              centerSpaceRadius: centerRadius,
+              sections: [
+                PieChartSectionData(
+                  value: clamped <= 0 ? 0.0001 : clamped,
+                  color: color,
+                  showTitle: false,
+                  radius: outerRadius,
+                ),
+                PieChartSectionData(
+                  value: (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
+                  color: DefaultColors.greyLight,
+                  showTitle: false,
+                  radius: outerRadius,
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${clamped.toStringAsFixed(1).replaceAll('.', ',')}%',
+            style: TextStyle(
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w700,
+              color: theme.primaryColor,
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
