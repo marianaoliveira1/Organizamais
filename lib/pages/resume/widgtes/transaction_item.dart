@@ -48,7 +48,7 @@ class TransactionItem extends StatelessWidget {
             key: ValueKey('txn-${transaction.id ?? transaction.title}'),
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
-              extentRatio: 0.45,
+              extentRatio: 0.60,
               children: [
                 CustomSlidableAction(
                   onPressed: (_) => Get.to(
@@ -70,6 +70,8 @@ class TransactionItem extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         fontSize: 10.sp,
                       ),
+                      maxLines: 1,
+                      softWrap: false,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -87,6 +89,8 @@ class TransactionItem extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         fontSize: 10.sp,
                       ),
+                      maxLines: 1,
+                      softWrap: false,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -94,19 +98,8 @@ class TransactionItem extends StatelessWidget {
               ],
             ),
             child: InkWell(
-              onLongPress: () =>
-                  _showDeleteConfirmationDialog(context, transaction),
               onTap: () {
                 Slidable.of(context)?.close();
-                Get.to(
-                  () => TransactionPage(
-                    transaction: transaction,
-                    overrideTransactionSalvar: (transaction) {
-                      final controller = Get.find<TransactionController>();
-                      controller.updateTransaction(transaction);
-                    },
-                  ),
-                );
               },
               child: Padding(
                 padding: EdgeInsets.all(14.w),
