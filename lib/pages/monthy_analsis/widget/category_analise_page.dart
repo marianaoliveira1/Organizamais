@@ -1250,31 +1250,62 @@ class CategorySummaryAnalysisPage extends StatelessWidget {
                 height: 1.3,
               ),
               children: [
-                const TextSpan(text: 'No ano de 2025, você gastou '),
+                TextSpan(
+                  text: 'No ano de 2025, você gastou ',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey,
+                  ),
+                ),
                 TextSpan(
                   text: currencyFormatter.format(totalValue),
                   style: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
                     color: Get.theme.primaryColor,
                   ),
                 ),
-                const TextSpan(text: ' na categoria '),
+                TextSpan(
+                  text: ' na categoria ',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey,
+                  ),
+                ),
                 TextSpan(
                   text: categoryName,
                   style: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
                     color: Get.theme.primaryColor,
                   ),
                 ),
-                const TextSpan(text: ', que representa '),
+                TextSpan(
+                  text: ', que representa ',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey,
+                  ),
+                ),
                 TextSpan(
                   text: '${percentual.toStringAsFixed(1)}% ',
                   style: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
                     color: Get.theme.primaryColor,
                   ),
                 ),
-                const TextSpan(text: 'do valor total.'),
+                TextSpan(
+                  text: 'do valor total.',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: DefaultColors.grey,
+                  ),
+                ),
               ],
             ),
           ),

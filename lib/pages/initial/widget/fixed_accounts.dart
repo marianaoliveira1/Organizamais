@@ -98,7 +98,7 @@ class FixedAccounts extends StatelessWidget {
     final fixedAccountsController = Get.find<FixedAccountsController>();
 
     return Container(
-      padding: EdgeInsets.only(right: 14.w),
+      // padding: EdgeInsets.only(right: 6.w),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24.r),
@@ -212,7 +212,17 @@ class FixedAccounts extends StatelessWidget {
                               ],
                             ),
                             child: InkWell(
-                              child: Ink(
+                              child: Container(
+                                // Reserva espaço à direita para as ações do Slidable
+                                // 0.60 de extentRatio = 60% da largura da tela
+                                // Aplicamos um padding equivalente para evitar sobreposição
+                                padding: EdgeInsets.only(
+                                  // left: 16.w,
+                                  // top: 12.h,
+                                  // bottom: 12.h,
+                                  right: MediaQuery.of(context).size.width *
+                                      0.01, // Reserva 5% para margin de segurança
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -329,9 +339,12 @@ class FixedAccounts extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+                                    // Espaçamento para garantir que o valor não fique muito colado no conteúdo
+                                    SizedBox(width: 8.w),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
                                           _formatCurrency(fixedAccount.value),
@@ -347,7 +360,8 @@ class FixedAccounts extends StatelessWidget {
                                           ),
                                         ),
                                         SizedBox(
-                                          width: 130.w,
+                                          width: 100
+                                              .w, // Reduzido para dar mais espaço
                                           child: Text(
                                             "${fixedAccount.paymentType}",
                                             style: TextStyle(
@@ -362,7 +376,7 @@ class FixedAccounts extends StatelessWidget {
                                           ),
                                         ),
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
