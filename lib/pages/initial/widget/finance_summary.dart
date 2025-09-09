@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -9,6 +10,7 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/widgetes/percentage_display_widget.dart';
 import 'package:organizamais/widgetes/percentage_explanation_dialog.dart';
+import 'package:organizamais/model/percentage_result.dart';
 
 import 'package:organizamais/utils/color.dart';
 
@@ -27,8 +29,6 @@ class FinanceSummaryWidget extends StatelessWidget {
       symbol: "R\$",
     );
     final theme = Theme.of(context);
-
-    String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
 
     return Obx(() {
       if (transactionController.isLoading) {
@@ -51,53 +51,18 @@ class FinanceSummaryWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)} (até hoje)",
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: DefaultColors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Icon(
-                    Iconsax.arrow_right_3,
-                    size: 8.sp,
-                    color: DefaultColors.grey,
-                  ),
-                ],
+              _MonthlyBalanceHeader(
+                saldo: _getCurrentMonthBalance(transactionController),
+                previousSaldo: _getPreviousMonthBalance(transactionController),
+                percentageResult:
+                    transactionController.monthlyPercentageComparison,
               ),
               SizedBox(height: 8.h),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        formatter.format(
-                          _getCurrentMonthBalance(transactionController),
-                        ),
-                        style: TextStyle(
-                          fontSize: 34.sp,
-                          fontWeight: FontWeight.bold,
-                          color: theme.primaryColor,
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      PercentageDisplayWidget(
-                        result:
-                            transactionController.monthlyPercentageComparison,
-                        explanationType: PercentageExplanationType.balance,
-                        currentValue:
-                            _getCurrentMonthBalance(transactionController),
-                        previousValue:
-                            _getPreviousMonthBalance(transactionController),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
+                  // Percentual já mostrado ao lado do saldo no header
+
                   Row(
                     children: [
                       CategoryValueWithPercentage(
@@ -404,6 +369,81 @@ class FinanceSummaryWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MonthlyBalanceHeader extends StatelessWidget {
+  final double saldo;
+  final double previousSaldo;
+  final PercentageResult percentageResult;
+
+  const _MonthlyBalanceHeader({
+    required this.saldo,
+    required this.previousSaldo,
+    required this.percentageResult,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
+    final theme = Theme.of(context);
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: "pt_BR",
+      symbol: "R\$",
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: AutoSizeText(
+                "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)} (até hoje)",
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: DefaultColors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Iconsax.arrow_right_3,
+              size: 8.sp,
+              color: DefaultColors.grey,
+            ),
+          ],
+        ),
+        SizedBox(height: 8.h),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: AutoSizeText(
+                formatter.format(saldo),
+                maxLines: 1,
+                minFontSize: 16,
+                style: TextStyle(
+                  fontSize: 40.sp,
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            PercentageDisplayWidget(
+              result: percentageResult,
+              explanationType: PercentageExplanationType.balance,
+              currentValue: saldo,
+              previousValue: previousSaldo,
+              textFontSizeSp: 14.sp,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

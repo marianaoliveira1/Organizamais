@@ -55,6 +55,7 @@ dependencies:
   shimmer_animation: ^2.2.2
   fade_shimmer: ^2.4.0
   flutter_slidable: ^3.1.0
+  auto_size_text: ^3.0.0
 
 flutter_launcher_icons:
   android: "launcher_icon"

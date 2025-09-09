@@ -11,6 +11,7 @@ class PercentageDisplayWidget extends StatelessWidget {
   final PercentageExplanationType? explanationType;
   final double? currentValue;
   final double? previousValue;
+  final double? textFontSizeSp;
 
   const PercentageDisplayWidget({
     super.key,
@@ -19,6 +20,7 @@ class PercentageDisplayWidget extends StatelessWidget {
     this.explanationType,
     this.currentValue,
     this.previousValue,
+    this.textFontSizeSp,
   });
 
   @override
@@ -158,7 +160,7 @@ class PercentageDisplayWidget extends StatelessWidget {
             Text(
               effectiveResult.formattedPercentage,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: (textFontSizeSp ?? 10.sp),
                 fontWeight: FontWeight.w600,
                 color: circleColor,
               ),

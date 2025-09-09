@@ -196,7 +196,7 @@ class PercentageExplanationDialog extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.h),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
+              color: DefaultColors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6.r),
             ),
             child: Row(
@@ -204,7 +204,7 @@ class PercentageExplanationDialog extends StatelessWidget {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: Colors.blue,
+                  color: DefaultColors.grey,
                   size: 16.sp,
                 ),
                 SizedBox(width: 8.w),
@@ -212,7 +212,7 @@ class PercentageExplanationDialog extends StatelessWidget {
                   child: Text(
                     _getNote(),
                     style: TextStyle(
-                      color: Colors.blue.shade700,
+                      color: DefaultColors.grey,
                       fontSize: 11.sp,
                     ),
                   ),

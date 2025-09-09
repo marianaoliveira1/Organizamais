@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../model/percentage_result.dart';
 import '../../../widgetes/percentage_display_widget.dart';
@@ -41,8 +42,9 @@ class CategoryValueWithPercentage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
+                AutoSizeText(
                   title,
+                  maxLines: 1,
                   style: TextStyle(
                     fontSize: 10.sp,
                     color: color,
@@ -70,8 +72,10 @@ class CategoryValueWithPercentage extends StatelessWidget {
             ),
             SizedBox(height: 4.h),
             // Valor da categoria
-            Text(
+            AutoSizeText(
               value,
+              maxLines: 1,
+              minFontSize: 10,
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
