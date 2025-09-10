@@ -413,7 +413,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return Text(
       'Esta categoria corresponde a ${pct.toStringAsFixed(1)}% da sua receita mensal.',
       style: TextStyle(
-        fontSize: 11.sp,
+        fontSize: 12.sp,
         color: theme.primaryColor,
         fontWeight: FontWeight.bold,
       ),

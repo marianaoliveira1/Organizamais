@@ -433,7 +433,7 @@ class _MonthlyBalanceHeader extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8.w),
+            SizedBox(width: 2.w),
             PercentageDisplayWidget(
               result: percentageResult,
               explanationType: PercentageExplanationType.balance,

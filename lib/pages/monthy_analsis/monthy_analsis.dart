@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
+import 'package:organizamais/utils/color.dart';
 
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 
@@ -20,6 +21,53 @@ import '../resume/widgtes/text_not_transaction.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
+
+  // Paleta auxiliar para tipos de pagamento (fallback)
+  static const List<Color> _customCardColors = [
+    DefaultColors.pastelBlue,
+    DefaultColors.pastelGreen,
+    DefaultColors.pastelPurple,
+    DefaultColors.pastelOrange,
+    DefaultColors.pastelPink,
+    DefaultColors.pastelTeal,
+    DefaultColors.pastelCyan,
+    DefaultColors.pastelLime,
+    DefaultColors.lavender,
+    DefaultColors.peach,
+    DefaultColors.mint,
+    DefaultColors.plum,
+    DefaultColors.turquoise,
+    DefaultColors.salmon,
+    DefaultColors.lightBlue,
+  ];
+
+  static Color _getPaymentTypeColor(String paymentType) {
+    switch (paymentType.toLowerCase()) {
+      case 'crédito':
+        return DefaultColors.deepPurple;
+      case 'débito':
+        return DefaultColors.darkBlue;
+      case 'dinheiro':
+        return DefaultColors.orangeDark;
+      case 'pix':
+        return DefaultColors.greenDark;
+      case 'boleto':
+        return DefaultColors.brown;
+      case 'transferência':
+        return DefaultColors.blueGrey;
+      case 'cheque':
+        return DefaultColors.gold;
+      case 'vale':
+        return DefaultColors.lime;
+      case 'criptomoeda':
+        return DefaultColors.slateGrey;
+      case 'cupom':
+        return DefaultColors.hotPink;
+      default:
+        int colorIndex = paymentType.hashCode.abs() % _customCardColors.length;
+        return _customCardColors[colorIndex];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +221,208 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                       ),
                                     ],
                                   ),
+                                ),
+                                SizedBox(
+                                  height: 20.h,
+                                ),
+                                // Por tipo de pagamento (ANUAL)
+                                Builder(
+                                  builder: (context) {
+                                    // Agrupar despesas anuais por tipo de pagamento
+                                    final payTypes = filteredTransactions
+                                        .map((e) => e.paymentType)
+                                        .where((e) => e != null)
+                                        .toSet()
+                                        .toList()
+                                        .cast<String>();
+
+                                    final payData = payTypes
+                                        .map(
+                                          (pt) => {
+                                            'paymentType': pt,
+                                            'value': filteredTransactions
+                                                .where(
+                                                  (t) =>
+                                                      t.paymentType != null &&
+                                                      t.paymentType!
+                                                              .trim()
+                                                              .toLowerCase() ==
+                                                          pt
+                                                              .trim()
+                                                              .toLowerCase(),
+                                                )
+                                                .fold<double>(
+                                                  0.0,
+                                                  (prev, t) =>
+                                                      prev +
+                                                      double.parse(
+                                                        t.value
+                                                            .replaceAll('.', '')
+                                                            .replaceAll(
+                                                                ',', '.'),
+                                                      ),
+                                                ),
+                                            'color': _getPaymentTypeColor(pt),
+                                          },
+                                        )
+                                        .toList();
+
+                                    payData.sort(
+                                      (a, b) => (b['value'] as double)
+                                          .compareTo(a['value'] as double),
+                                    );
+
+                                    final payTotal = payData.fold<double>(
+                                      0.0,
+                                      (prev, e) =>
+                                          prev + (e['value'] as double),
+                                    );
+
+                                    if (payData.isEmpty || payTotal <= 0) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    final paySections = payData
+                                        .map(
+                                          (e) => PieChartSectionData(
+                                            value: e['value'] as double,
+                                            color: e['color'] as Color,
+                                            title: '',
+                                            radius: 50,
+                                            showTitle: false,
+                                            badgePositionPercentageOffset: 0.9,
+                                          ),
+                                        )
+                                        .toList();
+
+                                    return Container(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 12.h,
+                                        horizontal: 14.w,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: theme.cardColor,
+                                        borderRadius:
+                                            BorderRadius.circular(16.r),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          DefaultTextGraphic(
+                                            text:
+                                                'Por tipo de pagamento (anual)',
+                                          ),
+                                          SizedBox(height: 16.h),
+                                          Center(
+                                            child: SizedBox(
+                                              height: 180.h,
+                                              child: PieChart(
+                                                PieChartData(
+                                                  sectionsSpace: 0,
+                                                  centerSpaceRadius: 26,
+                                                  centerSpaceColor:
+                                                      theme.cardColor,
+                                                  sections: paySections,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 10.h),
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemCount: payData.length,
+                                            itemBuilder: (context, index) {
+                                              final item = payData[index];
+                                              final String pt =
+                                                  item['paymentType'] as String;
+                                              final double val =
+                                                  item['value'] as double;
+                                              final Color c =
+                                                  item['color'] as Color;
+                                              final double perc =
+                                                  (val / payTotal) * 100;
+
+                                              return Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 6.h,
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 18.w,
+                                                      height: 18.h,
+                                                      decoration: BoxDecoration(
+                                                        color: c,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(9.r),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10.w),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            pt,
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: theme
+                                                                  .primaryColor,
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          Text(
+                                                            '${perc.toStringAsFixed(0)}%',
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              color:
+                                                                  DefaultColors
+                                                                      .grey,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 130.w,
+                                                      child: Text(
+                                                        NumberFormat.currency(
+                                                          locale: 'pt_BR',
+                                                          symbol: 'R\$',
+                                                          decimalDigits: 2,
+                                                        ).format(val),
+                                                        style: TextStyle(
+                                                          fontSize: 14.sp,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: theme
+                                                              .primaryColor,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.end,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             );

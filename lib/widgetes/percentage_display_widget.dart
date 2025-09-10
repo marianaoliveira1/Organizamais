@@ -153,7 +153,7 @@ class PercentageDisplayWidget extends StatelessWidget {
         }
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+        padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.h),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

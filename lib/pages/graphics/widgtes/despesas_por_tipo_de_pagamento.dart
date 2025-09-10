@@ -349,6 +349,11 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                                 color: DefaultColors.grey,
                               ),
                             ),
+                            // Comparação com o mesmo dia do mês anterior (igual categorias)
+                            _buildPaymentTypeComparisonPercentage(
+                              paymentType,
+                              theme,
+                            ),
                           ],
                         ),
                       ),
@@ -406,18 +411,85 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildPaymentTypeMonthComparison(
+                      paymentType,
+                      theme,
+                    ),
+                    SizedBox(height: 6.h),
                     AdsBanner(),
                     SizedBox(
-                      height: 4.h,
+                      height: 6.h,
                     ),
+
+                    // Representação do total da receita
+                    Builder(builder: (context) {
+                      final tc = Get.find<TransactionController>();
+                      final months = const [
+                        'Janeiro',
+                        'Fevereiro',
+                        'Março',
+                        'Abril',
+                        'Maio',
+                        'Junho',
+                        'Julho',
+                        'Agosto',
+                        'Setembro',
+                        'Outubro',
+                        'Novembro',
+                        'Dezembro'
+                      ];
+                      final int currentYear = DateTime.now().year;
+                      final receitasMes = tc.transaction.where((t) {
+                        if (t.type != TransactionType.receita) return false;
+                        if (t.paymentDay == null) return false;
+                        final dt = DateTime.parse(t.paymentDay!);
+                        final monthName = months[dt.month - 1];
+                        return monthName == selectedMonth &&
+                            dt.year == currentYear;
+                      }).toList();
+
+                      double totalReceitas = receitasMes.fold(0.0, (prev, e) {
+                        return prev +
+                            double.parse(
+                              e.value.replaceAll('.', '').replaceAll(',', '.'),
+                            );
+                      });
+
+                      double totalGastoDoTipo =
+                          paymentTypeTransactions.fold(0.0, (prev, e) {
+                        return prev +
+                            double.parse(
+                              e.value.replaceAll('.', '').replaceAll(',', '.'),
+                            );
+                      });
+
+                      final percReceita = totalReceitas > 0
+                          ? (totalGastoDoTipo / totalReceitas * 100)
+                          : 0.0;
+
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 8.h),
+                        child: Text(
+                          'Representa ${percReceita.toStringAsFixed(0)}% do total da sua receita',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      );
+                    }),
+
+                    SizedBox(height: 2.h),
                     Text(
                       "Detalhes das Transações",
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.w600,
-                        color: theme.primaryColor,
+                        color: DefaultColors.grey20,
                       ),
                     ),
+
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -531,6 +603,319 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget _buildPaymentTypeComparisonPercentage(
+      String paymentType, ThemeData theme) {
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
+
+    // Definir datas conforme o mês selecionado
+    final now = DateTime.now();
+    final months = const [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+
+    DateTime currentMonthStart;
+    DateTime currentMonthEnd;
+    DateTime previousMonthStart;
+    DateTime previousMonthEnd;
+
+    final selectedIndex = months.indexOf(selectedMonth);
+    final bool isCurrentMonthSelected =
+        selectedMonth.isEmpty || selectedIndex == (now.month - 1);
+
+    if (isCurrentMonthSelected) {
+      // Mês atual até o dia de hoje; mês anterior até o mesmo dia
+      currentMonthStart = DateTime(now.year, now.month, 1);
+      currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+      final prevMonth = now.month == 1 ? 12 : now.month - 1;
+      final prevYear = now.month == 1 ? now.year - 1 : now.year;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrevMonth = DateTime(prevYear, prevMonth + 1, 0).day;
+      final prevDay = now.day > daysInPrevMonth ? daysInPrevMonth : now.day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, prevDay, 23, 59, 59);
+    } else {
+      // Mês selecionado inteiro; mês anterior inteiro
+      final selectedMonthNumber =
+          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
+      final selectedYear = now.year;
+
+      currentMonthStart = DateTime(selectedYear, selectedMonthNumber, 1);
+      final daysInSelected =
+          DateTime(selectedYear, selectedMonthNumber + 1, 0).day;
+      currentMonthEnd = DateTime(
+          selectedYear, selectedMonthNumber, daysInSelected, 23, 59, 59);
+
+      final prevMonth = selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
+      final prevYear =
+          selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, daysInPrev, 23, 59, 59);
+    }
+
+    // Somar despesas por tipo dentro das janelas
+    double currentValue = 0.0;
+    double previousValue = 0.0;
+
+    for (final t in transactionController.transaction) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa) continue;
+      final pt = t.paymentType;
+      if (pt == null) continue;
+      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase()) continue;
+
+      final d = DateTime.parse(t.paymentDay!);
+      if (d.isAfter(currentMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(currentMonthEnd.add(const Duration(seconds: 1)))) {
+        currentValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      if (d.isAfter(previousMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(previousMonthEnd.add(const Duration(seconds: 1)))) {
+        previousValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+
+    // Determinar o tipo de variação, seguindo a regra de despesas
+    if (currentValue == 0 && previousValue == 0) {
+      return const SizedBox.shrink();
+    }
+
+    // Se não há valor anterior mas há atual: tratamos como aumento 100%
+    if (previousValue == 0 && currentValue > 0) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Iconsax.arrow_circle_up,
+            size: 12.sp,
+            color: DefaultColors.redDark,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            '+100.0%',
+            style: TextStyle(
+              fontSize: 9.sp,
+              color: DefaultColors.redDark,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (previousValue == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final percentageChange =
+        ((currentValue - previousValue) / previousValue) * 100;
+
+    // Para despesas: diminuiu => verde com seta para baixo; aumentou => vermelho com seta para cima; igual => cinza
+    late final Color color;
+    late final IconData icon;
+    late final String display;
+
+    if (percentageChange < 0) {
+      color = DefaultColors.greenDark;
+      icon = Iconsax.arrow_circle_down;
+      display = '+${percentageChange.abs().toStringAsFixed(1)}%';
+    } else if (percentageChange > 0) {
+      color = DefaultColors.redDark;
+      icon = Iconsax.arrow_circle_up;
+      display = '-${percentageChange.abs().toStringAsFixed(1)}%';
+    } else {
+      color = DefaultColors.grey;
+      icon = Iconsax.more_circle;
+      display = '0.0%';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 12.sp,
+          color: color,
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          display,
+          style: TextStyle(
+            fontSize: 9.sp,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentTypeMonthComparison(String paymentType, ThemeData theme) {
+    final TransactionController controller = Get.find<TransactionController>();
+
+    // Definir datas conforme o mês selecionado
+    final now = DateTime.now();
+    final months = const [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+
+    DateTime currentMonthStart;
+    DateTime currentMonthEnd;
+    DateTime previousMonthStart;
+    DateTime previousMonthEnd;
+
+    final selectedIndex = months.indexOf(selectedMonth);
+    final bool isCurrentMonthSelected =
+        selectedMonth.isEmpty || selectedIndex == (now.month - 1);
+
+    if (isCurrentMonthSelected) {
+      // Mês atual até o dia de hoje; mês anterior até o mesmo dia
+      currentMonthStart = DateTime(now.year, now.month, 1);
+      currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+      final prevMonth = now.month == 1 ? 12 : now.month - 1;
+      final prevYear = now.month == 1 ? now.year - 1 : now.year;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrevMonth = DateTime(prevYear, prevMonth + 1, 0).day;
+      final prevDay = now.day > daysInPrevMonth ? daysInPrevMonth : now.day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, prevDay, 23, 59, 59);
+    } else {
+      // Mês selecionado inteiro; mês anterior inteiro
+      final selectedMonthNumber =
+          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
+      final selectedYear = now.year;
+
+      currentMonthStart = DateTime(selectedYear, selectedMonthNumber, 1);
+      final daysInSelected =
+          DateTime(selectedYear, selectedMonthNumber + 1, 0).day;
+      currentMonthEnd = DateTime(
+          selectedYear, selectedMonthNumber, daysInSelected, 23, 59, 59);
+
+      final prevMonth = selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
+      final prevYear =
+          selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
+      previousMonthStart = DateTime(prevYear, prevMonth, 1);
+      final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+      previousMonthEnd = DateTime(prevYear, prevMonth, daysInPrev, 23, 59, 59);
+    }
+
+    // Somar despesas por tipo dentro das janelas
+    double currentValue = 0.0;
+    double previousValue = 0.0;
+
+    for (final t in controller.transaction) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa) continue;
+      final pt = t.paymentType;
+      if (pt == null) continue;
+      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase()) continue;
+
+      final d = DateTime.parse(t.paymentDay!);
+      if (d.isAfter(currentMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(currentMonthEnd.add(const Duration(seconds: 1)))) {
+        currentValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      if (d.isAfter(previousMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(previousMonthEnd.add(const Duration(seconds: 1)))) {
+        previousValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+
+    // Construir texto explicativo
+    String explanationText = '';
+    late final Color color;
+    late final IconData icon;
+
+    if (previousValue == 0 && currentValue > 0) {
+      color = DefaultColors.redDark; // aumento de despesa = ruim
+      icon = Iconsax.arrow_circle_up;
+      explanationText =
+          'Aumentou 100.0% (R\$ ${_formatCurrency(currentValue)}) em comparação ao mesmo dia do mês anterior (R\$ 0,00), hoje R\$ ${_formatCurrency(currentValue)}';
+    } else if (previousValue == 0 && currentValue == 0) {
+      return const SizedBox.shrink();
+    } else {
+      final diff = (currentValue - previousValue).abs();
+      final percentageChange =
+          ((currentValue - previousValue) / previousValue) * 100;
+      if (currentValue < previousValue) {
+        color = DefaultColors.greenDark; // diminuiu = bom
+        icon = Iconsax.arrow_circle_down;
+        explanationText =
+            'Diminuiu ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+      } else if (currentValue > previousValue) {
+        color = DefaultColors.redDark; // aumentou = ruim
+        icon = Iconsax.arrow_circle_up;
+        explanationText =
+            'Aumentou ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+      } else {
+        color = DefaultColors.grey; // igual
+        icon = Iconsax.more_circle;
+        explanationText =
+            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)})';
+      }
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: DefaultColors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14.sp,
+            color: color,
+          ),
+          SizedBox(width: 4.w),
+          Flexible(
+            child: Text(
+              explanationText,
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatCurrency(double value) {
+    return value.toStringAsFixed(2).replaceAll('.', ',');
   }
 
   String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
