@@ -19,6 +19,7 @@ import 'controller/auth_controller.dart';
 import 'controller/card_controller.dart';
 import 'controller/transaction_controller.dart';
 import 'routes/route.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,12 @@ void main() async {
     initializeDateFormatting('pt_BR', null);
   } catch (e) {
     print('Error initializing date formatting: $e');
+  }
+
+  try {
+    await NotificationService().init();
+  } catch (e) {
+    print('Error initializing notifications: $e');
   }
 
   // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

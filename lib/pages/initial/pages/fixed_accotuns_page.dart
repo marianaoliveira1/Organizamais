@@ -363,18 +363,6 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                   ),
                 ),
               ),
-              DefaultTitleTransaction(
-                title: "Categoria",
-              ),
-              DefaultButtonSelectCategory(
-                selectedCategory: categoryId,
-                transactionType: TransactionType.despesa,
-                onTap: (category) {
-                  setState(() {
-                    categoryId = category;
-                  });
-                },
-              ),
               // Resumo da periodicidade selecionada
               if (selectedFrequency.isNotEmpty)
                 Padding(
@@ -388,6 +376,19 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                     ),
                   ),
                 ),
+              DefaultTitleTransaction(
+                title: "Categoria",
+              ),
+              DefaultButtonSelectCategory(
+                selectedCategory: categoryId,
+                transactionType: TransactionType.despesa,
+                onTap: (category) {
+                  setState(() {
+                    categoryId = category;
+                  });
+                },
+              ),
+
               DefaultTitleTransaction(
                 title: "Tipo de pagamento",
               ),

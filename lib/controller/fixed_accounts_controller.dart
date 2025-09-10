@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 
 import '../model/fixed_account_model.dart';
+import '../services/notification_service.dart';
 
 class FixedAccountsController extends GetxController {
   final _allFixedAccounts = <FixedAccountModel>[].obs;
@@ -67,6 +68,9 @@ class FixedAccountsController extends GetxController {
           )
           .toList();
       isLoading.value = false;
+
+      // Reagendar notificações simples (12:00 no dia)
+      NotificationService().rescheduleAll(_allFixedAccounts);
     });
   }
 
@@ -77,6 +81,7 @@ class FixedAccountsController extends GetxController {
           fixedAccountWithUserId.toMap(),
         );
     Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
+    await NotificationService().scheduleDueDay(fixedAccountWithUserId);
   }
 
   Future<void> updateFixedAccount(FixedAccountModel fixedAccount) async {
@@ -91,6 +96,7 @@ class FixedAccountsController extends GetxController {
           fixedAccount.toMap(),
         );
     Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');
+    await NotificationService().scheduleDueDay(fixedAccount);
   }
 
   Future<void> disableFixedAccount(String id) async {
@@ -101,6 +107,7 @@ class FixedAccountsController extends GetxController {
       'deactivatedAt': DateTime.now().toIso8601String(),
     });
     Get.snackbar('Sucesso', 'Conta fixa desabilitada com sucesso');
+    await NotificationService().cancelFor(id);
   }
 
   Future<void> reactivateFixedAccount(String id) async {
@@ -111,6 +118,10 @@ class FixedAccountsController extends GetxController {
       'deactivatedAt': null,
     });
     Get.snackbar('Sucesso', 'Conta fixa reativada com sucesso');
+    final account = _allFixedAccounts.firstWhereOrNull((a) => a.id == id);
+    if (account != null) {
+      await NotificationService().scheduleDueDay(account);
+    }
   }
 
   Future<void> deleteFixedAccount(String id) async {
@@ -119,5 +130,6 @@ class FixedAccountsController extends GetxController {
         .doc(id)
         .delete();
     Get.snackbar('Sucesso', 'Conta fixa removida permanentemente');
+    await NotificationService().cancelFor(id);
   }
 }

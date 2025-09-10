@@ -116,6 +116,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "dbus",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/dbus-0.7.11",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "equatable",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/equatable-2.0.7",
       "packageUri": "lib/",
@@ -216,6 +222,24 @@
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "flutter_local_notifications",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_local_notifications-17.2.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "flutter_local_notifications_linux",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_local_notifications_linux-4.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "flutter_local_notifications_platform_interface",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/flutter_local_notifications_platform_interface-7.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "flutter_localization",
@@ -564,6 +588,12 @@
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/test_api-0.7.4",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "timezone",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/timezone-0.9.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "typed_data",

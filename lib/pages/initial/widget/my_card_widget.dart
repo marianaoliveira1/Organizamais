@@ -435,7 +435,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 16.sp,
+                          fontSize: 12.sp,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -476,7 +476,6 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
-                    icon: Icons.delete,
                     label: 'Excluir',
                   ),
                 ],
