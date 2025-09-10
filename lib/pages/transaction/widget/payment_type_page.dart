@@ -101,8 +101,11 @@ class PaymentTypePage extends StatelessWidget {
                                     ),
                                   ),
                                   onTap: () {
-                                    controller.text = card.name;
-                                    Get.back();
+                                    // Retorna o nome e o ícone do cartão selecionado
+                                    Get.back(result: {
+                                      'title': card.name,
+                                      'assetPath': card.iconPath,
+                                    });
                                   },
                                 ),
                               );

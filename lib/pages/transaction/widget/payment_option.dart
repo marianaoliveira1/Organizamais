@@ -45,8 +45,11 @@ class PaymentOption extends StatelessWidget {
           ),
         ),
         onTap: () {
-          controller.text = title;
-          Get.back();
+          // Retorna o título e o caminho do ícone para que o chamador possa exibir ambos
+          Get.back(result: {
+            'title': title,
+            'assetPath': assetPath,
+          });
         },
       ),
     );
