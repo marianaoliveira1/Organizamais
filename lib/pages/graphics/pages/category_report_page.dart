@@ -260,6 +260,17 @@ class _CategoryReportPageState extends State<CategoryReportPage> {
             SizedBox(
               height: 20.h,
             ),
+            Text(
+              "Variação em relação ao dia equivalente do mês anterior",
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: DefaultColors.grey,
+              ),
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
             Row(
               children: [
                 _InfoChip(

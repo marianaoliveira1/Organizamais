@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 import 'package:organizamais/utils/color.dart';
 
@@ -18,6 +19,7 @@ import 'widget/financial_summary_cards.dart';
 import 'widget/monthly_financial_chart.dart';
 import 'widget/widget_category_analise.dart';
 import '../resume/widgtes/text_not_transaction.dart';
+import 'widget/payment_type_analise_page.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
@@ -310,8 +312,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           DefaultTextGraphic(
-                                            text:
-                                                'Por tipo de pagamento (anual)',
+                                            text: 'Por tipo de pagamento',
                                           ),
                                           SizedBox(height: 16.h),
                                           Center(
@@ -349,72 +350,106 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                 padding: EdgeInsets.symmetric(
                                                   vertical: 6.h,
                                                 ),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 18.w,
-                                                      height: 18.h,
-                                                      decoration: BoxDecoration(
-                                                        color: c,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(9.r),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    Get.to(
+                                                      () =>
+                                                          PaymentTypeAnalysisPage(
+                                                        paymentType: pt,
+                                                        paymentColor: c,
+                                                        totalValue: val,
+                                                        percentual: perc,
                                                       ),
-                                                    ),
-                                                    SizedBox(width: 10.w),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            pt,
-                                                            style: TextStyle(
-                                                              fontSize: 14.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
+                                                    );
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 18.w,
+                                                        height: 18.h,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: c,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      9.r),
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 10.w),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              pt,
+                                                              style: TextStyle(
+                                                                fontSize: 14.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: theme
+                                                                    .primaryColor,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            Text(
+                                                              '${perc.toStringAsFixed(0)}%',
+                                                              style: TextStyle(
+                                                                fontSize: 10.sp,
+                                                                color:
+                                                                    DefaultColors
+                                                                        .grey,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 130.w,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              NumberFormat
+                                                                  .currency(
+                                                                locale: 'pt_BR',
+                                                                symbol: 'R\$',
+                                                                decimalDigits:
+                                                                    2,
+                                                              ).format(val),
+                                                              style: TextStyle(
+                                                                fontSize: 14.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: theme
+                                                                    .primaryColor,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign.end,
+                                                            ),
+                                                            SizedBox(
+                                                                height: 6.h),
+                                                            Icon(
+                                                              Iconsax
+                                                                  .arrow_right_3,
+                                                              size: 16.sp,
                                                               color: theme
                                                                   .primaryColor,
                                                             ),
-                                                            maxLines: 2,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                          Text(
-                                                            '${perc.toStringAsFixed(0)}%',
-                                                            style: TextStyle(
-                                                              fontSize: 10.sp,
-                                                              color:
-                                                                  DefaultColors
-                                                                      .grey,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 130.w,
-                                                      child: Text(
-                                                        NumberFormat.currency(
-                                                          locale: 'pt_BR',
-                                                          symbol: 'R\$',
-                                                          decimalDigits: 2,
-                                                        ).format(val),
-                                                        style: TextStyle(
-                                                          fontSize: 14.sp,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: theme
-                                                              .primaryColor,
+                                                          ],
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.end,
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               );
                                             },

@@ -47,7 +47,8 @@ class GraphicsPage extends StatefulWidget {
   State<GraphicsPage> createState() => _GraphicsPageState();
 }
 
-class _GraphicsPageState extends State<GraphicsPage> {
+class _GraphicsPageState extends State<GraphicsPage>
+    with AutomaticKeepAliveClientMixin {
   late ScrollController _monthScrollController;
   String selectedMonth = getAllMonths()[DateTime.now().month - 1];
   Set<int> _selectedCategoryIds = {};
@@ -123,6 +124,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final TransactionController transactionController =
         Get.put(TransactionController());
@@ -530,28 +532,124 @@ class _GraphicsPageState extends State<GraphicsPage> {
       TransactionController transactionController,
       NumberFormat currencyFormatter) {
     final filteredTransactions = getFilteredTransactions(transactionController);
-    final String monthKey = _getMonthKey();
-    final Set<int> effectiveEssentialIds =
-        _monthEssentialCategoryIds[monthKey] ?? _essentialCategoryIds;
 
-    double essentialTotal = 0.0;
-    double nonEssentialTotal = 0.0;
-    final Set<int> usedEssentialCategoryIds = {};
-    final Set<int> usedNonEssentialCategoryIds = {};
+    double fixedTotal = 0.0;
+    double variableTotal = 0.0;
+    double extraTotal = 0.0;
+
+    final Set<String> usedFixedCategoryNames = {};
+    final Set<String> usedVariableCategoryNames = {};
+    final Set<String> usedExtraCategoryNames = {};
+
+    String normalize(String s) => s.trim().toLowerCase();
+
+    String classify(String? name) {
+      if (name == null) return 'variaveis';
+      final n = normalize(name);
+
+      // Fixas
+      const fixedKeywords = [
+        'moradia',
+        'contas (água, luz, gás, internet)',
+        'condomínio',
+        'plano de saúde/seguro de vida',
+        'seguro do carro',
+        'ipva',
+        'financiamento',
+        'empréstimos',
+        'taxas',
+        'assinaturas e serviços',
+        'educação',
+      ];
+
+      // Variáveis
+      const variableKeywords = [
+        'alimentação',
+        'mercado',
+        'restaurantes',
+        'delivery',
+        'lanches',
+        'padaria',
+        'transporte',
+        'combustível',
+        'transporte por aplicativo',
+        'pedágio/estacionamento',
+        'manutenção',
+        'saúde',
+        'salão',
+        'barbearia',
+        'cuidados pessoais',
+        'academia',
+        'livros',
+        'revistas',
+        'lazer',
+        'hobbies',
+        'cinema',
+        'streaming',
+        'jogos online',
+        'passeios',
+        'compras',
+        'vestuário',
+        'roupas',
+        'acessórios',
+        'eletrônicos',
+        'presentes',
+        'pets',
+        'família e filhos',
+        'aplicativos',
+        'viagens',
+        'hospedagem',
+        'passagens',
+        'alimentação em viagens',
+      ];
+
+      // Extras
+      const extraKeywords = [
+        'multas',
+        'emergência',
+        'doações',
+        'caridade',
+        'impostos',
+        'outros',
+        'trabalho',
+      ];
+
+      bool containsAny(String text, List<String> keys) {
+        for (final k in keys) {
+          if (text.contains(k)) return true;
+        }
+        return false;
+      }
+
+      if (containsAny(n, extraKeywords)) return 'extras';
+      if (containsAny(n, fixedKeywords)) return 'fixas';
+      if (containsAny(n, variableKeywords)) return 'variaveis';
+      // default fallback
+      return 'variaveis';
+    }
+
     for (var t in filteredTransactions) {
       final double value =
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       final int? categoryId = t.category;
-      if (categoryId != null && effectiveEssentialIds.contains(categoryId)) {
-        essentialTotal += value;
-        usedEssentialCategoryIds.add(categoryId);
+      final Map<String, dynamic>? category =
+          categoryId != null ? findCategoryById(categoryId) : null;
+      final String? categoryName =
+          category != null ? category['name'] as String? : null;
+      final group = classify(categoryName);
+      if (group == 'fixas') {
+        fixedTotal += value;
+        if (categoryName != null) usedFixedCategoryNames.add(categoryName);
+      } else if (group == 'extras') {
+        extraTotal += value;
+        if (categoryName != null) usedExtraCategoryNames.add(categoryName);
       } else {
-        nonEssentialTotal += value;
-        if (categoryId != null) usedNonEssentialCategoryIds.add(categoryId);
+        variableTotal += value;
+        if (categoryName != null) usedVariableCategoryNames.add(categoryName);
       }
     }
 
-    final double total = essentialTotal + nonEssentialTotal;
+    final double total = fixedTotal + variableTotal + extraTotal;
     if (total <= 0) {
       return Container(
         margin: EdgeInsets.only(bottom: 16.h),
@@ -565,7 +663,7 @@ class _GraphicsPageState extends State<GraphicsPage> {
         ),
         child: Center(
           child: Text(
-            "Sem dados para Essenciais x Não essenciais",
+            "Sem dados para Fixas x Variáveis x Extras",
             style: TextStyle(
               color: DefaultColors.grey,
               fontSize: 12.sp,
@@ -575,30 +673,14 @@ class _GraphicsPageState extends State<GraphicsPage> {
       );
     }
 
-    final double essentialPct = (essentialTotal / total) * 100.0;
-    final double nonEssentialPct = (nonEssentialTotal / total) * 100.0;
-    final List<String> essentialNames = usedEssentialCategoryIds
-        .map((id) => findCategoryById(id)?['name'] as String?)
-        .where((name) => name != null && name.isNotEmpty)
-        .cast<String>()
-        .toList()
-      ..sort();
-    final List<String> nonEssentialNames = usedNonEssentialCategoryIds
-        .map((id) => findCategoryById(id)?['name'] as String?)
-        .where((name) => name != null && name.isNotEmpty)
-        .cast<String>()
-        .toList()
-      ..sort();
+    final double fixedPct = (fixedTotal / total) * 100.0;
+    final double variablePct = (variableTotal / total) * 100.0;
+    final double extraPct = (extraTotal / total) * 100.0;
 
-    // Monta lista de categorias usadas no mês para o seletor
-    final List<int> monthUsedCategories = filteredTransactions
-        .map((e) => e.category)
-        .where((e) => e != null)
-        .toSet()
-        .toList()
-        .cast<int>();
-
-    // removed: detailed data list not needed for selection mode
+    final List<String> fixedNames = usedFixedCategoryNames.toList()..sort();
+    final List<String> variableNames = usedVariableCategoryNames.toList()
+      ..sort();
+    final List<String> extraNames = usedExtraCategoryNames.toList()..sort();
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -614,57 +696,47 @@ class _GraphicsPageState extends State<GraphicsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: DefaultTextGraphic(text: "Essenciais x Não essenciais"),
-              ),
-              IconButton(
-                icon: Icon(Icons.tune, color: theme.primaryColor),
-                onPressed: () async {
-                  final Set<int> initialSelected = {
-                    ...effectiveEssentialIds
-                        .where((id) => monthUsedCategories.contains(id))
-                  };
-                  final result = await Navigator.of(context).push<Set<int>>(
-                    MaterialPageRoute(
-                      builder: (_) => CategoryReportPage(
-                        selectedMonth: selectedMonth,
-                        selectionMode: true,
-                        initialSelected: initialSelected,
-                      ),
-                    ),
-                  );
-                  if (result != null) {
-                    setState(() {
-                      _monthEssentialCategoryIds[monthKey] = result;
-                    });
-                  }
-                },
-              ),
+              DefaultTextGraphic(text: "Fixas x Variáveis x Extras"),
             ],
           ),
           SizedBox(height: 16.h),
-          SizedBox(
-            height: 180.h,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 0,
-                centerSpaceRadius: 26,
-                centerSpaceColor: theme.cardColor,
-                sections: [
-                  PieChartSectionData(
-                    value: essentialTotal,
-                    color: DefaultColors.green,
-                    title: '',
-                    radius: 50,
-                    showTitle: false,
-                  ),
-                  PieChartSectionData(
-                    value: nonEssentialTotal,
-                    color: DefaultColors.redDark,
-                    title: '',
-                    radius: 50,
-                    showTitle: false,
+          RepaintBoundary(
+            child: SizedBox(
+              height: 180.h,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  PieChart(
+                    PieChartData(
+                      sectionsSpace: 0,
+                      centerSpaceRadius: 26,
+                      centerSpaceColor: theme.cardColor,
+                      sections: [
+                        PieChartSectionData(
+                          value: fixedTotal,
+                          color: DefaultColors.darkBlue,
+                          title: '',
+                          radius: 50,
+                          showTitle: false,
+                        ),
+                        PieChartSectionData(
+                          value: variableTotal,
+                          color: DefaultColors.orangeDark,
+                          title: '',
+                          radius: 50,
+                          showTitle: false,
+                        ),
+                        PieChartSectionData(
+                          value: extraTotal,
+                          color: DefaultColors.plum,
+                          title: '',
+                          radius: 50,
+                          showTitle: false,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -672,98 +744,49 @@ class _GraphicsPageState extends State<GraphicsPage> {
           ),
           SizedBox(height: 12.h),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLegendItem(
-                color: DefaultColors.green,
-                label: 'Essenciais',
-                amount: currencyFormatter.format(essentialTotal),
-                percent: essentialPct,
+              _buildFancyLegend(
+                color: DefaultColors.darkBlue,
+                label: 'Fixas',
+                amount: currencyFormatter.format(fixedTotal),
+                percent: fixedPct,
                 theme: theme,
               ),
-              if (essentialNames.isNotEmpty) ...[
-                _buildCategoryChips(essentialNames, theme, DefaultColors.green),
-              ],
-              SizedBox(
-                height: 10.h,
-              ),
-              _buildLegendItem(
-                color: DefaultColors.redDark,
-                label: 'Não essenciais',
-                amount: currencyFormatter.format(nonEssentialTotal),
-                percent: nonEssentialPct,
+              if (fixedNames.isNotEmpty)
+                _buildCategoryChips(fixedNames, theme, DefaultColors.darkBlue),
+              SizedBox(height: 10.h),
+              _buildFancyLegend(
+                color: DefaultColors.orangeDark,
+                label: 'Variáveis',
+                amount: currencyFormatter.format(variableTotal),
+                percent: variablePct,
                 theme: theme,
               ),
+              if (variableNames.isNotEmpty)
+                _buildCategoryChips(
+                    variableNames, theme, DefaultColors.orangeDark),
+              SizedBox(height: 10.h),
+              _buildFancyLegend(
+                color: DefaultColors.plum,
+                label: 'Extras',
+                amount: currencyFormatter.format(extraTotal),
+                percent: extraPct,
+                theme: theme,
+              ),
+              if (extraNames.isNotEmpty)
+                _buildCategoryChips(extraNames, theme, DefaultColors.plum),
             ],
           ),
-          if (nonEssentialNames.isNotEmpty) ...[
-            _buildCategoryChips(
-                nonEssentialNames, theme, DefaultColors.redDark),
-          ],
         ],
       ),
     );
   }
 
-  String _getMonthKey() {
-    int month;
-    if (selectedMonth.isEmpty) {
-      month = DateTime.now().month;
-    } else {
-      month = getAllMonths().indexOf(selectedMonth) + 1;
-      if (month <= 0) month = DateTime.now().month;
-    }
-    final int year = DateTime.now().year;
-    final String monthStr = month.toString().padLeft(2, '0');
-    return '$year-$monthStr';
-  }
-
-  Widget _buildLegendItem({
-    required Color color,
-    required String label,
-    required String amount,
-    required double percent,
-    required ThemeData theme,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 14.w,
-          height: 14.w,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3.r),
-          ),
-        ),
-        SizedBox(width: 8.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                '$amount  ·  ${percent.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  color: DefaultColors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildCategoryChips(List<String> names, ThemeData theme, Color color) {
     return Wrap(
+      alignment: WrapAlignment.start,
+      runAlignment: WrapAlignment.start,
       spacing: 6.w,
       runSpacing: 6.h,
       children: names
@@ -984,87 +1007,89 @@ class _GraphicsPageState extends State<GraphicsPage> {
                   child: Column(
                     children: [
                       // Gráfico LineChart com fl_chart
-                      SizedBox(
-                        height: 120.h,
-                        child: LineChart(
-                          LineChartData(
-                            lineTouchData: LineTouchData(
-                              handleBuiltInTouches: true,
-                              touchTooltipData: LineTouchTooltipData(
-                                getTooltipColor: (touchedSpot) =>
-                                    DefaultColors.green.withOpacity(0.8),
-                                getTooltipItems: (touchedSpots) {
-                                  return touchedSpots.map((touchedSpot) {
-                                    return LineTooltipItem(
-                                      currencyFormatter.format(touchedSpot.y),
-                                      TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 8.sp,
-                                      ),
-                                    );
-                                  }).toList();
-                                },
-                                tooltipPadding: EdgeInsets.symmetric(
-                                  horizontal: 6.w,
-                                  vertical: 4.h,
+                      RepaintBoundary(
+                        child: SizedBox(
+                          height: 120.h,
+                          child: LineChart(
+                            LineChartData(
+                              lineTouchData: LineTouchData(
+                                handleBuiltInTouches: true,
+                                touchTooltipData: LineTouchTooltipData(
+                                  getTooltipColor: (touchedSpot) =>
+                                      DefaultColors.green.withOpacity(0.8),
+                                  getTooltipItems: (touchedSpots) {
+                                    return touchedSpots.map((touchedSpot) {
+                                      return LineTooltipItem(
+                                        currencyFormatter.format(touchedSpot.y),
+                                        TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 8.sp,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                  tooltipPadding: EdgeInsets.symmetric(
+                                    horizontal: 6.w,
+                                    vertical: 4.h,
+                                  ),
+                                  tooltipRoundedRadius: 4.r,
                                 ),
-                                tooltipRoundedRadius: 4.r,
                               ),
-                            ),
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: false,
-                              horizontalInterval: data.isNotEmpty
-                                  ? (data.reduce((a, b) => a > b ? a : b) > 0
-                                      ? data.reduce((a, b) => a > b ? a : b) / 4
-                                      : 1)
-                                  : 1,
-                              getDrawingHorizontalLine: (value) {
-                                return FlLine(
-                                  color: DefaultColors.grey.withOpacity(0.2),
-                                  strokeWidth: 1,
-                                );
-                              },
-                            ),
-                            titlesData: FlTitlesData(show: false),
-                            borderData: FlBorderData(show: false),
-                            minX: 0,
-                            maxX: (data.length - 1).toDouble(),
-                            minY: 0,
-                            maxY: data.isNotEmpty &&
-                                    data.reduce((a, b) => a > b ? a : b) > 0
-                                ? data.reduce((a, b) => a > b ? a : b) * 1.2
-                                : 100,
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: data.asMap().entries.map((entry) {
-                                  return FlSpot(
-                                    entry.key.toDouble(),
-                                    entry.value,
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: false,
+                                horizontalInterval: data.isNotEmpty
+                                    ? (data.reduce((a, b) => a > b ? a : b) > 0
+                                        ? data.reduce((a, b) => a > b ? a : b) /
+                                            4
+                                        : 1)
+                                    : 1,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: DefaultColors.grey.withOpacity(0.2),
+                                    strokeWidth: 1,
                                   );
-                                }).toList(),
-                                isCurved: true,
-                                curveSmoothness: 0.3,
-                                color: DefaultColors.green,
-                                barWidth: 3,
-                                isStrokeCapRound: true,
-                                dotData: FlDotData(show: false),
-                                belowBarData: BarAreaData(
-                                  show: true,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      DefaultColors.green.withOpacity(0.3),
-                                      DefaultColors.green.withOpacity(0.1),
-                                    ],
+                                },
+                              ),
+                              titlesData: FlTitlesData(show: false),
+                              borderData: FlBorderData(show: false),
+                              minX: 0,
+                              maxX: (data.length - 1).toDouble(),
+                              minY: 0,
+                              maxY: data.isNotEmpty &&
+                                      data.reduce((a, b) => a > b ? a : b) > 0
+                                  ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                                  : 100,
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: data.asMap().entries.map((entry) {
+                                    return FlSpot(
+                                      entry.key.toDouble(),
+                                      entry.value,
+                                    );
+                                  }).toList(),
+                                  isCurved: true,
+                                  curveSmoothness: 0.3,
+                                  color: DefaultColors.green,
+                                  barWidth: 3,
+                                  isStrokeCapRound: true,
+                                  dotData: FlDotData(show: false),
+                                  belowBarData: BarAreaData(
+                                    show: true,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        DefaultColors.green.withOpacity(0.3),
+                                        DefaultColors.green.withOpacity(0.1),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          duration: const Duration(milliseconds: 250),
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -1433,97 +1458,101 @@ class _GraphicsPageState extends State<GraphicsPage> {
                     });
                   }
                 },
-                child: SizedBox(
-                  height: 180.h,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 26,
-                      centerSpaceColor: theme.cardColor,
-                      sections: chartData,
+                child: RepaintBoundary(
+                  child: SizedBox(
+                    height: 180.h,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 26,
+                        centerSpaceColor: theme.cardColor,
+                        sections: chartData,
+                      ),
                     ),
                   ),
                 ),
               ),
             )
           else
-            SizedBox(
-              height: 220.h,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: (data.isNotEmpty
-                              ? (data
-                                  .map((e) => e['value'] as double)
-                                  .reduce((a, b) => a > b ? a : b))
-                              : 0) >
-                          0
-                      ? (data
-                              .map((e) => e['value'] as double)
-                              .reduce((a, b) => a > b ? a : b) *
-                          1.2)
-                      : 100,
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final int idx = value.toInt();
-                          if (idx < 0 || idx >= data.length) {
-                            return const SizedBox.shrink();
-                          }
-                          final String name =
-                              (data[idx]['name'] ?? '') as String;
-                          final String abbr =
-                              name.length <= 3 ? name : name.substring(0, 3);
-                          return Padding(
-                            padding: EdgeInsets.only(top: 4.h),
-                            child: Text(
-                              abbr,
-                              style: TextStyle(
-                                fontSize: 9.sp,
-                                color: DefaultColors.grey,
+            RepaintBoundary(
+              child: SizedBox(
+                height: 220.h,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: (data.isNotEmpty
+                                ? (data
+                                    .map((e) => e['value'] as double)
+                                    .reduce((a, b) => a > b ? a : b))
+                                : 0) >
+                            0
+                        ? (data
+                                .map((e) => e['value'] as double)
+                                .reduce((a, b) => a > b ? a : b) *
+                            1.2)
+                        : 100,
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            final int idx = value.toInt();
+                            if (idx < 0 || idx >= data.length) {
+                              return const SizedBox.shrink();
+                            }
+                            final String name =
+                                (data[idx]['name'] ?? '') as String;
+                            final String abbr =
+                                name.length <= 3 ? name : name.substring(0, 3);
+                            return Padding(
+                              padding: EdgeInsets.only(top: 4.h),
+                              child: Text(
+                                abbr,
+                                style: TextStyle(
+                                  fontSize: 9.sp,
+                                  color: DefaultColors.grey,
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: 1,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: DefaultColors.grey.withOpacity(0.15),
-                      strokeWidth: 1,
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: 1,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: DefaultColors.grey.withOpacity(0.15),
+                        strokeWidth: 1,
+                      ),
                     ),
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(data.length, (i) {
+                      final double v = data[i]['value'] as double;
+                      return BarChartGroupData(
+                        x: i,
+                        barRods: [
+                          BarChartRodData(
+                            toY: v,
+                            width: 12.w,
+                            color: (data[i]['color'] as Color?) ??
+                                theme.primaryColor,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ],
+                      );
+                    }),
                   ),
-                  borderData: FlBorderData(show: false),
-                  barGroups: List.generate(data.length, (i) {
-                    final double v = data[i]['value'] as double;
-                    return BarChartGroupData(
-                      x: i,
-                      barRods: [
-                        BarChartRodData(
-                          toY: v,
-                          width: 12.w,
-                          color: (data[i]['color'] as Color?) ??
-                              theme.primaryColor,
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                      ],
-                    );
-                  }),
                 ),
               ),
             ),
@@ -1540,4 +1569,77 @@ class _GraphicsPageState extends State<GraphicsPage> {
       ),
     );
   }
+
+  Widget _buildFancyLegend({
+    required Color color,
+    required String label,
+    required String amount,
+    required double percent,
+    required ThemeData theme,
+  }) {
+    final double pct = percent.isNaN ? 0 : percent.clamp(0, 100);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 12.w,
+                  height: 12.w,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(3.r),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              '${pct.toStringAsFixed(1)}%',
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: DefaultColors.grey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 6.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total',
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: DefaultColors.grey,
+              ),
+            ),
+            Text(
+              amount,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: theme.primaryColor,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }
