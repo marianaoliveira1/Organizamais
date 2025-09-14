@@ -9,6 +9,7 @@ import '../../widgtes/default_button.dart';
 import '../../widgtes/default_button_google.dart';
 import '../../widgtes/default_continue_com.dart';
 import '../../widgtes/default_text_field.dart';
+import '../../widgetes/privacy_policy_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,6 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool acceptedPrivacy = false;
 
   @override
   void dispose() {
@@ -30,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final AuthController authController = Get.find();
 
     return Scaffold(
@@ -81,10 +84,20 @@ class _LoginPageState extends State<LoginPage> {
               ),
               DefaultButton(
                 text: "Entrar",
-                onTap: () => authController.login(
-                  emailController.text,
-                  passwordController.text,
-                ),
+                onTap: () {
+                  if (!acceptedPrivacy) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Você precisa aceitar a Política de Privacidade para continuar.')),
+                    );
+                    return;
+                  }
+                  authController.login(
+                    emailController.text,
+                    passwordController.text,
+                  );
+                },
               ),
               SizedBox(
                 height: 20.h,
@@ -95,7 +108,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
               ButtonLoginWithGoogle(
                 text: "Entrar com Google",
-                onTap: () => authController.loginWithGoogle(),
+                onTap: () {
+                  if (!acceptedPrivacy) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Você precisa aceitar a Política de Privacidade para continuar.')),
+                    );
+                    return;
+                  }
+                  authController.loginWithGoogle();
+                },
               ),
               SizedBox(
                 height: 60.h,
@@ -122,6 +145,47 @@ class _LoginPageState extends State<LoginPage> {
                         color: DefaultColors.black,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    checkColor: theme.cardColor,
+                    fillColor: MaterialStateProperty.resolveWith(
+                      (states) => states.contains(MaterialState.selected)
+                          ? theme.primaryColor
+                          : null,
+                    ),
+                    value: acceptedPrivacy,
+                    onChanged: (v) =>
+                        setState(() => acceptedPrivacy = v ?? false),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  Expanded(
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          "Concordo com os ",
+                          style: TextStyle(
+                              fontSize: 11.sp, color: DefaultColors.grey),
+                        ),
+                        GestureDetector(
+                          onTap: () => showPrivacyPolicyDialog(context),
+                          child: Text(
+                            "Termos de Uso e Política de Privacidade",
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w700,
+                              color: DefaultColors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

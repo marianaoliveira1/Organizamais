@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../ads_banner/ads_banner.dart';
 import 'widgtes/resume_content.dart';
+import '../../widgetes/privacy_policy_dialog.dart';
 
 class ResumePage extends StatelessWidget {
   const ResumePage({super.key});
@@ -26,6 +27,22 @@ class ResumePage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: SafeArea(
                     child: ResumeContent(),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              GestureDetector(
+                onTap: () => showPrivacyPolicyDialog(context),
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 8.h),
+                  child: Text(
+                    'Ao continuar, você concorda com nossa Política de Privacidade',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Theme.of(context).hintColor,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

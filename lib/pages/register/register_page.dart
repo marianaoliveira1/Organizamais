@@ -9,6 +9,7 @@ import '../../widgtes/default_button.dart';
 import '../../widgtes/default_button_google.dart';
 import '../../widgtes/default_continue_com.dart';
 import '../../widgtes/default_text_field.dart';
+import '../../widgetes/privacy_policy_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -21,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool acceptedPrivacy = false;
 
   @override
   void dispose() {
@@ -33,6 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find();
+    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: DefaultColors.backgroundLight,
@@ -80,11 +83,21 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             DefaultButton(
               text: "Cadastrar",
-              onTap: () => authController.register(
-                nameController.text,
-                emailController.text,
-                passwordController.text,
-              ),
+              onTap: () {
+                if (!acceptedPrivacy) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Você precisa aceitar a Política de Privacidade para continuar.')),
+                  );
+                  return;
+                }
+                authController.register(
+                  nameController.text,
+                  emailController.text,
+                  passwordController.text,
+                );
+              },
             ),
             SizedBox(
               height: 20.h,
@@ -95,7 +108,17 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             ButtonLoginWithGoogle(
               text: "Cadastrar com Google",
-              onTap: authController.loginWithGoogle,
+              onTap: () {
+                if (!acceptedPrivacy) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Você precisa aceitar a Política de Privacidade para continuar.')),
+                  );
+                  return;
+                }
+                authController.loginWithGoogle();
+              },
             ),
             SizedBox(
               height: 60.h,
@@ -127,6 +150,52 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30.h, vertical: 10.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Checkbox(
+                checkColor: theme.cardColor,
+                fillColor: MaterialStateProperty.resolveWith(
+                  (states) => states.contains(MaterialState.selected)
+                      ? theme.primaryColor
+                      : null,
+                ),
+                value: acceptedPrivacy,
+                onChanged: (v) => setState(() => acceptedPrivacy = v ?? false),
+                visualDensity: VisualDensity.compact,
+              ),
+              Expanded(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      "Concordo com os ",
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: DefaultColors.grey,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => showPrivacyPolicyDialog(context),
+                      child: Text(
+                        "Termos de Uso e Política de Privacidade",
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w700,
+                          color: DefaultColors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

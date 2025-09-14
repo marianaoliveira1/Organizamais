@@ -421,7 +421,8 @@ class _MonthlyBalanceHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: AutoSizeText(
                 formatter.format(saldo),
                 maxLines: 1,
@@ -433,7 +434,7 @@ class _MonthlyBalanceHeader extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 2.w),
+            SizedBox(width: 8.w),
             PercentageDisplayWidget(
               result: percentageResult,
               explanationType: PercentageExplanationType.balance,
