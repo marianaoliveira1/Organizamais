@@ -14,7 +14,9 @@ import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/title_transaction.dart';
 
 class AddGoalPage extends StatefulWidget {
-  const AddGoalPage({super.key});
+  final bool isEditing;
+  final GoalModel? initialGoal;
+  const AddGoalPage({super.key, this.isEditing = false, this.initialGoal});
 
   @override
   _AddGoalPageState createState() => _AddGoalPageState();
@@ -24,8 +26,28 @@ class _AddGoalPageState extends State<AddGoalPage> {
   final GoalController goalController = Get.find();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
-  DateTime _selectedDate = DateTime.now(); // Use um nome diferente para evitar confusão
+  DateTime _selectedDate =
+      DateTime.now(); // Use um nome diferente para evitar confusão
   int? categoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isEditing && widget.initialGoal != null) {
+      final g = widget.initialGoal!;
+      nameController.text = g.name;
+      valueController.text = g.value; // já está formatado em BRL
+      try {
+        final parts = g.date.split('/');
+        _selectedDate = DateTime(
+          int.parse(parts[2]),
+          int.parse(parts[1]),
+          int.parse(parts[0]),
+        );
+      } catch (_) {}
+      categoryId = g.categoryId;
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -42,7 +64,9 @@ class _AddGoalPageState extends State<AddGoalPage> {
   }
 
   bool _isFormValid() {
-    return nameController.text.isNotEmpty && valueController.text.isNotEmpty && categoryId != null;
+    return nameController.text.isNotEmpty &&
+        valueController.text.isNotEmpty &&
+        categoryId != null;
   }
 
   @override
@@ -54,7 +78,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         title: Text(
-          'Adicionar Meta',
+          widget.isEditing ? 'Editar Meta' : 'Adicionar Meta',
           style: TextStyle(color: theme.primaryColor),
         ),
       ),
@@ -98,7 +122,8 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   color: theme.primaryColor.withOpacity(.5),
                 ),
               ),
-              onChanged: (_) => setState(() {}), // Atualiza o estado ao mudar o texto
+              onChanged: (_) =>
+                  setState(() {}), // Atualiza o estado ao mudar o texto
             ),
             DefaultTitleTransaction(
               title: "Valor",
@@ -134,14 +159,15 @@ class _AddGoalPageState extends State<AddGoalPage> {
                   ),
                 ),
                 focusColor: theme.primaryColor,
-                hintText: "0,00",
+                hintText: "R\$ 0,00",
                 hintStyle: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: theme.primaryColor.withOpacity(0.5),
                 ),
               ),
-              onChanged: (_) => setState(() {}), // Atualiza o estado ao mudar o texto
+              onChanged: (_) =>
+                  setState(() {}), // Atualiza o estado ao mudar o texto
             ),
             DefaultTitleTransaction(
               title: "Data",
@@ -186,21 +212,57 @@ class _AddGoalPageState extends State<AddGoalPage> {
                 Spacer(),
                 InkWell(
                   onTap: _isFormValid()
-                      ? () {
-                          final double value = double.tryParse(valueController.text.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.')) ?? 0.0;
-                          final goal = GoalModel(
-                            name: nameController.text,
-                            value: NumberFormat.currency(locale: 'pt_BR').format(
-                              value,
-                            ), // Formata para Real Brasileiro
-                            date: DateFormat('dd/MM/yyyy').format(
-                              _selectedDate, // Usando a variável _selectedDate
-                            ),
-                            categoryId: categoryId ?? 0,
-                            currentValue: 0,
-                          );
-                          goalController.addGoal(goal);
-                          Get.back();
+                      ? () async {
+                          final String raw = valueController.text
+                              .replaceAll('R\$', '')
+                              .replaceAll(' ', '')
+                              .trim();
+                          // Converte BRL preservando centavos: usa o ÚLTIMO separador (vírgula ou ponto) como decimal
+                          final int lastComma = raw.lastIndexOf(',');
+                          final int lastDot = raw.lastIndexOf('.');
+                          final int sepIndex =
+                              lastComma > lastDot ? lastComma : lastDot;
+                          String numeric;
+                          if (sepIndex != -1) {
+                            final String intPart = raw
+                                .substring(0, sepIndex)
+                                .replaceAll('.', '')
+                                .replaceAll(',', '');
+                            final String decPart = raw
+                                .substring(sepIndex + 1)
+                                .replaceAll('.', '')
+                                .replaceAll(',', '');
+                            numeric = '$intPart.$decPart';
+                          } else {
+                            numeric =
+                                raw.replaceAll('.', '').replaceAll(',', '');
+                          }
+                          final double value = double.tryParse(numeric) ?? 0.0;
+                          if (widget.isEditing && widget.initialGoal != null) {
+                            final updated = widget.initialGoal!.copyWith(
+                              name: nameController.text,
+                              value: NumberFormat.currency(locale: 'pt_BR')
+                                  .format(value),
+                              date: DateFormat('dd/MM/yyyy')
+                                  .format(_selectedDate),
+                              categoryId:
+                                  categoryId ?? widget.initialGoal!.categoryId,
+                            );
+                            await goalController.updateGoal(updated);
+                            Get.back(result: updated);
+                          } else {
+                            final goal = GoalModel(
+                              name: nameController.text,
+                              value: NumberFormat.currency(locale: 'pt_BR')
+                                  .format(value),
+                              date: DateFormat('dd/MM/yyyy')
+                                  .format(_selectedDate),
+                              categoryId: categoryId ?? 0,
+                              currentValue: 0,
+                            );
+                            await goalController.addGoal(goal);
+                            Get.back();
+                          }
                         }
                       : null, // Desabilita o botão se o formulário não for válido
                   child: Container(
@@ -211,15 +273,18 @@ class _AddGoalPageState extends State<AddGoalPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: _isFormValid() ? theme.primaryColor.withOpacity(.5) : Colors.grey.withOpacity(.5),
+                        color: _isFormValid()
+                            ? theme.primaryColor.withOpacity(.5)
+                            : Colors.grey.withOpacity(.5),
                       ),
                     ),
                     child: Text(
-                      "Salvar",
+                      widget.isEditing ? "Atualizar" : "Salvar",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
-                        color: _isFormValid() ? theme.primaryColor : Colors.grey,
+                        color:
+                            _isFormValid() ? theme.primaryColor : Colors.grey,
                       ),
                     ),
                   ),

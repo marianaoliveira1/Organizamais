@@ -8,11 +8,19 @@ import '../../ads_banner/ads_banner.dart';
 import '../../controller/fixed_accounts_controller.dart';
 import '../../controller/transaction_controller.dart';
 import '../../controller/auth_controller.dart';
+import '../../controller/goal_controller.dart';
+import '../goals/pages/add_goal_page.dart';
+import '../goals/pages/details_goals_page.dart';
+import '../../model/goal_model.dart';
+import '../transaction/pages/category_page.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 import 'widget/credit_card_selection.dart';
 import 'widget/custom_drawer.dart';
 import 'widget/finance_summary.dart';
 
+import 'widget/goals_card.dart';
 import 'widget/parcelamentos_card.dart';
 
 import 'widget/widghet_fixed_accoutns.dart';
@@ -23,6 +31,10 @@ class InitialPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(FixedAccountsController());
+    final GoalController goalController = Get.put(GoalController());
+    if (goalController.goalStream == null) {
+      goalController.startGoalStream();
+    }
 
     final theme = Theme.of(context);
     final TransactionController transactionController =
@@ -107,6 +119,7 @@ class InitialPage extends StatelessWidget {
                       const DefaultWidgetFixedAccounts(),
                       ParcelamentosCard(),
                       CreditCardSection(),
+                      const GoalsCard(),
                       SizedBox(
                         height: 10.h,
                       ),

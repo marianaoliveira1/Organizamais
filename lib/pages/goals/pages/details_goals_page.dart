@@ -3,10 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../controller/goal_controller.dart';
 import '../../../model/goal_model.dart';
 import '../../transaction/pages/category_page.dart';
+import 'add_goal_page.dart';
+import '../../../widgetes/currency_ipunt_formated.dart';
+import '../../../utils/color.dart';
 
 class GoalDetailsPage extends StatelessWidget {
   final GoalModel initialGoal;
@@ -41,6 +45,21 @@ class GoalDetailsPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(
+              Iconsax.edit,
+              color: theme.primaryColor,
+            ),
+            onPressed: () async {
+              final edited = await Get.to(() => AddGoalPage(
+                    isEditing: true,
+                    initialGoal: goal.value,
+                  ));
+              if (edited is GoalModel) {
+                goal.value = edited;
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(
               Iconsax.trash,
               color: theme.primaryColor,
             ),
@@ -57,16 +76,33 @@ class GoalDetailsPage extends StatelessWidget {
         child: ValueListenableBuilder<GoalModel>(
           valueListenable: goal,
           builder: (context, currentGoal, child) {
-            final String cleanedValue = currentGoal.value.replaceAll(RegExp(r'[^\d\.]'), '').replaceAll(',', '.');
-            final double numericValue = double.tryParse(cleanedValue) ?? 0.0;
+            final String sanitized =
+                currentGoal.value.replaceAll(RegExp(r'[^0-9,\.]'), '');
+            final int lastComma = sanitized.lastIndexOf(',');
+            final int lastDot = sanitized.lastIndexOf('.');
+            final int sepIndex = lastComma > lastDot ? lastComma : lastDot;
+            String numeric;
+            if (sepIndex != -1) {
+              final String intPart = sanitized
+                  .substring(0, sepIndex)
+                  .replaceAll(RegExp(r'[^0-9]'), '');
+              final String decPart = sanitized
+                  .substring(sepIndex + 1)
+                  .replaceAll(RegExp(r'[^0-9]'), '');
+              numeric = '$intPart.$decPart';
+            } else {
+              numeric = sanitized.replaceAll(RegExp(r'[^0-9]'), '');
+            }
+            final double numericValue = double.tryParse(numeric) ?? 0.0;
             final double progress = currentGoal.currentValue / numericValue;
             final category = findCategoryById(currentGoal.categoryId);
-            final currentDate = DateTime.now();
-            final formattedDate = "${currentDate.day}, ${_getMonthName(currentDate.month)}. ${currentDate.year}";
+            final String formattedDate = currentGoal.date;
 
             // Format values in Brazilian Real standard
-            final String formattedCurrentValue = _formatCurrencyBRL(currentGoal.currentValue);
-            final String formattedTargetValue = _formatCurrencyBRL(numericValue);
+            final String formattedCurrentValue =
+                _formatCurrencyBRL(currentGoal.currentValue);
+            final String formattedTargetValue =
+                _formatCurrencyBRL(numericValue);
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,17 +158,211 @@ class GoalDetailsPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
 
-                // Progress bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                    minHeight: 6.h,
+                // Progress bar with percentage bubble
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double barWidth = constraints.maxWidth;
+                    final double clamped = progress.clamp(0.0, 1.0);
+                    final double markerLeft =
+                        (barWidth * clamped - 20).clamp(0, barWidth - 40);
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: LinearProgressIndicator(
+                            value: clamped,
+                            backgroundColor: Colors.grey.shade300,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.green),
+                            minHeight: 8.h,
+                          ),
+                        ),
+                        Positioned(
+                          left: markerLeft,
+                          top: -22.h,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w, vertical: 2.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Text(
+                                  '${(clamped * 100).toStringAsFixed(0)}%',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Container(
+                                width: 2.w,
+                                height: 10.h,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: 16.h),
+
+                // Resumo: quanto falta e dias restantes
+                Builder(builder: (context) {
+                  final double remaining =
+                      (numericValue - currentGoal.currentValue)
+                          .clamp(0, double.infinity);
+                  int daysLeft = 0;
+                  try {
+                    final parts = currentGoal.date.split('/');
+                    final dl = DateTime(
+                      int.parse(parts[2]),
+                      int.parse(parts[1]),
+                      int.parse(parts[0]),
+                    );
+                    final now = DateTime.now();
+                    final todayOnly = DateTime(now.year, now.month, now.day);
+                    final dueOnly = DateTime(dl.year, dl.month, dl.day);
+                    daysLeft = dueOnly.difference(todayOnly).inDays;
+                  } catch (_) {}
+                  final String daysLabel = daysLeft > 0
+                      ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
+                      : (daysLeft == 0
+                          ? 'Vence hoje'
+                          : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 8.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Faltam R\$ ${_formatCurrencyBRL(remaining)}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                        Text(
+                          daysLabel,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: daysLeft < 0
+                                ? DefaultColors.redDark
+                                : theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+
+                // Transações
+                Text(
+                  'Transações',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
                   ),
                 ),
-                SizedBox(height: 32.h),
+                SizedBox(height: 8.h),
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: initialGoal.id == null
+                        ? const Stream.empty()
+                        : FirebaseFirestore.instance
+                            .collection('goals')
+                            .doc(initialGoal.id!)
+                            .collection('transactions')
+                            .orderBy('date', descending: true)
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const SizedBox.shrink();
+                      }
+                      final docs = snapshot.data!.docs;
+                      if (docs.isEmpty) {
+                        return Text(
+                          'Nenhuma transação registrada.',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.grey,
+                          ),
+                        );
+                      }
+                      return ListView.separated(
+                        itemCount: docs.length,
+                        separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                        itemBuilder: (context, index) {
+                          final data = docs[index].data();
+                          final bool isAddition = data['isAddition'] == true;
+                          final double amount =
+                              (data['amount'] as num?)?.toDouble() ?? 0.0;
+                          final Timestamp? ts = data['date'] as Timestamp?;
+                          final DateTime date = ts?.toDate() ?? DateTime.now();
+                          final String label = isAddition
+                              ? 'Valor adicionado'
+                              : 'Valor retirado';
+                          final String dateStr =
+                              DateFormat('dd/MM/yyyy').format(date);
+
+                          return Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      label,
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2.h),
+                                    Text(
+                                      dateStr,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'R\$ ${_formatCurrencyBRL(amount)}',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: isAddition
+                                        ? Colors.green
+                                        : DefaultColors.redDark,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
 
                 Spacer(),
                 Padding(
@@ -185,23 +415,7 @@ class GoalDetailsPage extends StatelessWidget {
     );
   }
 
-  String _getMonthName(int month) {
-    final List<String> months = [
-      'jan',
-      'fev',
-      'mar',
-      'abr',
-      'mai',
-      'jun',
-      'jul',
-      'ago',
-      'set',
-      'out',
-      'nov',
-      'dez'
-    ];
-    return months[month - 1];
-  }
+  // _getMonthName was used previously for current date label; no longer needed.
 
   // Helper method to format currency in Brazilian Real standard
   String _formatCurrencyBRL(double value) {
@@ -236,7 +450,8 @@ class GoalDetailsPage extends StatelessWidget {
     return "$integerPart,$decimalPart";
   }
 
-  void _showAddValueBottomSheet(BuildContext context, ValueNotifier<GoalModel> goal) {
+  void _showAddValueBottomSheet(
+      BuildContext context, ValueNotifier<GoalModel> goal) {
     double valueToAdd = 0;
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
@@ -283,34 +498,40 @@ class GoalDetailsPage extends StatelessWidget {
                   TextField(
                     controller: valueController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [CurrencyCentsInputFormatter()],
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Valor a adicionar',
-                      hintStyle: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      fillColor: theme.primaryColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: theme.primaryColor.withOpacity(.5),
-                        ),
                       ),
+                      prefixIcon: Icon(Icons.attach_money),
+                      prefixIconColor: DefaultColors.grey,
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
                           color: theme.primaryColor.withOpacity(.5),
                         ),
                       ),
+                      focusColor: theme.primaryColor,
+                      hintText: 'R\$ 0,00',
+                      hintStyle: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     onChanged: (value) {
-                      // Permite entrada no formato brasileiro (com vírgula)
-                      String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
-                      valueToAdd = double.tryParse(cleanValue) ?? 0;
-                      validateForm(); // Validate after change
+                      // Converte "R$ 1.234,56" para double
+                      String numeric = value
+                          .replaceAll('R\$', '')
+                          .trim()
+                          .replaceAll('.', '')
+                          .replaceAll(',', '.');
+                      valueToAdd = double.tryParse(numeric) ?? 0;
+                      validateForm();
                     },
                   ),
                   SizedBox(height: 16.h),
@@ -340,19 +561,35 @@ class GoalDetailsPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isFormValid ? Colors.black : Colors.grey, // Change color based on validation
+                        backgroundColor: isFormValid
+                            ? Colors.black
+                            : Colors.grey, // Change color based on validation
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12.h),
                       ),
                       onPressed: isFormValid
-                          ? () {
+                          ? () async {
                               // Only allow press when form is valid
                               final updatedGoal = goal.value.copyWith(
-                                currentValue: goal.value.currentValue + valueToAdd,
+                                currentValue:
+                                    goal.value.currentValue + valueToAdd,
                               );
-                              goalController.updateGoal(updatedGoal);
+                              await goalController.updateGoal(updatedGoal);
+                              try {
+                                if (initialGoal.id != null) {
+                                  await FirebaseFirestore.instance
+                                      .collection('goals')
+                                      .doc(initialGoal.id!)
+                                      .collection('transactions')
+                                      .add({
+                                    'amount': valueToAdd,
+                                    'date': selectedDate,
+                                    'isAddition': true,
+                                  });
+                                }
+                              } catch (_) {}
                               goal.value = updatedGoal;
                               Navigator.pop(context);
                             }
@@ -375,7 +612,8 @@ class GoalDetailsPage extends StatelessWidget {
     );
   }
 
-  void _showRemoveValueBottomSheet(BuildContext context, ValueNotifier<GoalModel> goal) {
+  void _showRemoveValueBottomSheet(
+      BuildContext context, ValueNotifier<GoalModel> goal) {
     double valueToRemove = 0;
     DateTime selectedDate = DateTime.now();
     TextEditingController valueController = TextEditingController();
@@ -398,7 +636,8 @@ class GoalDetailsPage extends StatelessWidget {
             // Function to validate form
             void validateForm() {
               modalSetState(() {
-                isFormValid = valueController.text.isNotEmpty && valueToRemove > 0;
+                isFormValid =
+                    valueController.text.isNotEmpty && valueToRemove > 0;
               });
             }
 
@@ -424,38 +663,39 @@ class GoalDetailsPage extends StatelessWidget {
                   TextField(
                     controller: valueController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [CurrencyCentsInputFormatter()],
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'R\$ Valor a retirar',
+                      fillColor: theme.primaryColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      prefixIcon: Icon(Icons.attach_money),
+                      prefixIconColor: DefaultColors.grey,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(
+                          color: theme.primaryColor.withOpacity(.5),
+                        ),
+                      ),
+                      focusColor: theme.primaryColor,
+                      hintText: 'R\$ 0,00',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          12.r,
-                        ),
-                        borderSide: BorderSide(
-                          color: theme.primaryColor.withOpacity(.5),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          12.r,
-                        ),
-                        borderSide: BorderSide(
-                          color: theme.primaryColor.withOpacity(.5),
-                        ),
-                      ),
                     ),
                     onChanged: (value) {
-                      // Permite entrada no formato brasileiro (com vírgula)
-                      String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
-                      valueToRemove = double.tryParse(cleanValue) ?? 0;
-                      validateForm(); // Validate after change
+                      String numeric = value
+                          .replaceAll('R\$', '')
+                          .trim()
+                          .replaceAll('.', '')
+                          .replaceAll(',', '.');
+                      valueToRemove = double.tryParse(numeric) ?? 0;
+                      validateForm();
                     },
                   ),
                   SizedBox(height: 16.h),
@@ -485,19 +725,35 @@ class GoalDetailsPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isFormValid ? Colors.black : Colors.grey, // Change color based on validation
+                        backgroundColor: isFormValid
+                            ? Colors.black
+                            : Colors.grey, // Change color based on validation
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12.h),
                       ),
                       onPressed: isFormValid
-                          ? () {
+                          ? () async {
                               // Only allow press when form is valid
                               final updatedGoal = goal.value.copyWith(
-                                currentValue: goal.value.currentValue - valueToRemove,
+                                currentValue:
+                                    goal.value.currentValue - valueToRemove,
                               );
-                              goalController.updateGoal(updatedGoal);
+                              await goalController.updateGoal(updatedGoal);
+                              try {
+                                if (initialGoal.id != null) {
+                                  await FirebaseFirestore.instance
+                                      .collection('goals')
+                                      .doc(initialGoal.id!)
+                                      .collection('transactions')
+                                      .add({
+                                    'amount': valueToRemove,
+                                    'date': selectedDate,
+                                    'isAddition': false,
+                                  });
+                                }
+                              } catch (_) {}
                               goal.value = updatedGoal;
                               Navigator.pop(context);
                             }

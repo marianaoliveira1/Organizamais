@@ -31,21 +31,6 @@ class ResumePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 8.h),
-              GestureDetector(
-                onTap: () => showPrivacyPolicyDialog(context),
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 8.h),
-                  child: Text(
-                    'Ao continuar, você concorda com nossa Política de Privacidade',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: Theme.of(context).hintColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

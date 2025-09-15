@@ -81,11 +81,25 @@ class GoalsPage extends StatelessWidget {
                   itemCount: goalController.goal.length,
                   itemBuilder: (context, index) {
                     final GoalModel goal = goalController.goal[index];
-                    final String cleanedValue = goal.value
-                        .replaceAll(RegExp(r'[^\d\.]'), '')
-                        .replaceAll(',', '.');
-                    final double numericValue =
-                        double.tryParse(cleanedValue) ?? 0.0;
+                    final String sanitized =
+                        goal.value.replaceAll(RegExp(r'[^0-9,\.]'), '');
+                    final int lastComma = sanitized.lastIndexOf(',');
+                    final int lastDot = sanitized.lastIndexOf('.');
+                    final int sepIndex =
+                        lastComma > lastDot ? lastComma : lastDot;
+                    String numeric;
+                    if (sepIndex != -1) {
+                      final String intPart = sanitized
+                          .substring(0, sepIndex)
+                          .replaceAll(RegExp(r'[^0-9]'), '');
+                      final String decPart = sanitized
+                          .substring(sepIndex + 1)
+                          .replaceAll(RegExp(r'[^0-9]'), '');
+                      numeric = '$intPart.$decPart';
+                    } else {
+                      numeric = sanitized.replaceAll(RegExp(r'[^0-9]'), '');
+                    }
+                    final double numericValue = double.tryParse(numeric) ?? 0.0;
                     final double progress = goal.currentValue / numericValue;
                     final category = findCategoryById(goal.categoryId);
                     final formattedDate = goal.date;

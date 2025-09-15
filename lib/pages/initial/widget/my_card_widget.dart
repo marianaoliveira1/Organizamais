@@ -388,6 +388,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           final bool hasLimit = limit > 0;
           final double usagePercent = hasLimit ? (spent / limit) * 100.0 : 0.0;
           final double ratio = (usagePercent / 100).clamp(0.0, 1.0);
+          final double remaining = limit - spent;
           final Color progressColor = usagePercent <= 30
               ? DefaultColors.greenDark // Verde (Saudável)
               : (usagePercent <= 70
@@ -731,6 +732,21 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             ),
                           ],
                         ),
+                      if (hasLimit) ...[
+                        SizedBox(height: 4.h),
+                        Text(
+                          remaining >= 0
+                              ? 'Faltam ${formatter.format(remaining)} para o limite'
+                              : 'Ultrapassou o limite em ${formatter.format(-remaining)}',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            color: remaining >= 0
+                                ? DefaultColors.grey20
+                                : DefaultColors.redDark,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
 
                       SizedBox(height: 8.h),
 
