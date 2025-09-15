@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/goal_controller.dart';
 import '../../../model/goal_model.dart';
 import '../../transaction/pages/category_page.dart';
@@ -107,6 +108,8 @@ class GoalDetailsPage extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                AdsBanner(),
+                SizedBox(height: 10.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -132,7 +135,7 @@ class GoalDetailsPage extends StatelessWidget {
                 ),
                 // Icon and information section
 
-                SizedBox(height: 8.h),
+                SizedBox(height: 14.h),
 
                 // Progress values
                 Row(
@@ -159,6 +162,9 @@ class GoalDetailsPage extends StatelessWidget {
                 SizedBox(height: 8.h),
 
                 // Progress bar with percentage bubble
+                SizedBox(
+                  height: 20.h,
+                ),
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final double barWidth = constraints.maxWidth;
@@ -264,12 +270,21 @@ class GoalDetailsPage extends StatelessWidget {
                     ),
                   );
                 }),
+                SizedBox(height: 10.h),
+                Text(
+                  "A dica é: coloque esse valor onde possa render juros, como na Caixinha do Nubank ou no Cofrinho do Inter! Porque assim seu dinheiro vai render, no final você vai ter mais e merece aquele emoji de lâmpada 💡",
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: DefaultColors.grey,
+                  ),
+                ),
+                SizedBox(height: 10.h),
 
                 // Transações
                 Text(
                   'Transações',
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     color: theme.primaryColor,
                   ),
@@ -508,8 +523,6 @@ class GoalDetailsPage extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      prefixIcon: Icon(Icons.attach_money),
-                      prefixIconColor: DefaultColors.grey,
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(

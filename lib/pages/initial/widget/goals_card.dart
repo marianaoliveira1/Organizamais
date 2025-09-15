@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:organizamais/pages/initial/widget/title_card.dart';
 import 'package:organizamais/utils/color.dart';
 
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../controller/goal_controller.dart';
@@ -30,40 +29,47 @@ class GoalsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Minhas metas financeiras',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
-                ),
-              ),
-              InkWell(
-                onTap: () => Get.to(() => const AddGoalPage()),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(60.r),
-                  ),
-                  padding: EdgeInsets.all(6.h),
-                  child:
-                      Icon(Iconsax.add, size: 16.sp, color: theme.primaryColor),
-                ),
-              ),
-            ],
+          DefaultTitleCard(
+            text: "Minhas metas financeira",
+            onTap: () {
+              Get.to(() => const AddGoalPage());
+            },
           ),
-          SizedBox(height: 8.h),
+          SizedBox(
+            height: 10.h,
+          ),
           Obx(() {
             final goals = goalController.goal;
             if (goals.isEmpty) {
-              return Text(
-                'Crie sua primeira meta clicando no +',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: DefaultColors.grey,
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Nenhuma meta adicionada',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: DefaultColors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    OutlinedButton.icon(
+                      onPressed: () => Get.to(() => const AddGoalPage()),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Adicionar meta'),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 8.h,
+                        ),
+                        side: BorderSide(
+                            color: theme.primaryColor.withOpacity(0.4)),
+                        foregroundColor: theme.primaryColor,
+                      ),
+                    )
+                  ],
                 ),
               );
             }
@@ -96,13 +102,19 @@ class GoalsCard extends StatelessWidget {
                     ? (goal.currentValue / target).clamp(0.0, 1.0)
                     : 0.0;
                 final category = findCategoryById(goal.categoryId);
+                // Removido cálculo de dias por não ser utilizado no novo layout
+                // Variáveis de status não utilizadas foram removidas para limpar o linter
+                // Progresso formatado
+                final double clamped = progress.clamp(0.0, 1.0);
+                final int percent = (clamped * 100).round();
+                final Color progressColor = DefaultColors.greenDark;
 
                 return InkWell(
                   onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
                   child: Container(
-                    margin: EdgeInsets.only(top: 12.h),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
+                      color: theme.scaffoldBackgroundColor.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     padding: EdgeInsets.all(12.w),
@@ -110,96 +122,112 @@ class GoalsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                if (category != null)
-                                  Image.asset(
-                                    category['icon'],
-                                    width: 24.w,
-                                    height: 24.w,
-                                  )
-                                else
-                                  Icon(Icons.category,
-                                      size: 18.sp, color: theme.primaryColor),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  goal.name,
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.primaryColor,
-                                  ),
-                                ),
-                              ],
+                            Center(
+                              child: category != null
+                                  ? Image.asset(
+                                      category['icon'],
+                                      width: 26.w,
+                                      height: 26.w,
+                                    )
+                                  : Icon(
+                                      Icons.savings_outlined,
+                                      size: 16.sp,
+                                      color: DefaultColors.grey,
+                                    ),
                             ),
-                            Text(
-                              goal.date,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: DefaultColors.grey,
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    goal.name,
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: theme.primaryColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    goal.date,
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: DefaultColors.grey,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                ],
                               ),
                             ),
+                            SizedBox(width: 10.w),
+                            Container(
+                              width: 28.w,
+                              height: 28.w,
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor.withOpacity(0.06),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.north_east,
+                                size: 14.sp,
+                                color: theme.primaryColor,
+                              ),
+                            )
                           ],
                         ),
-                        SizedBox(height: 40.h),
+                        SizedBox(height: 26.h),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final double barWidth = constraints.maxWidth;
-                            final double clamped = progress.clamp(0.0, 1.0);
                             final double markerLeft = (barWidth * clamped - 20)
                                 .clamp(0, barWidth - 40);
                             return Stack(
                               clipBehavior: Clip.none,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.r),
+                                  borderRadius: BorderRadius.circular(999.r),
                                   child: LinearProgressIndicator(
                                     value: clamped,
+                                    minHeight: 8.h,
                                     backgroundColor:
                                         theme.primaryColor.withOpacity(0.08),
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                        DefaultColors.green),
-                                    minHeight: 8.h,
+                                        progressColor),
                                   ),
                                 ),
                                 Positioned(
                                   left: markerLeft,
-                                  top: -22.h,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 8.w, vertical: 2.h),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius:
-                                              BorderRadius.circular(12.r),
-                                        ),
-                                        child: Text(
-                                          '${(clamped * 100).toStringAsFixed(0)}%',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10.sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
+                                  top: -26.h,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
+                                      vertical: 2.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius:
+                                          BorderRadius.circular(999.r),
+                                    ),
+                                    child: Text(
+                                      '$percent%',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w700,
                                       ),
-                                      SizedBox(height: 2.h),
-                                      Container(
-                                        width: 2.w,
-                                        height: 10.h,
-                                        color: Colors.black,
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
                             );
                           },
                         ),
-                        SizedBox(height: 8.h),
+                        SizedBox(height: 12.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -208,9 +236,8 @@ class GoalsCard extends StatelessWidget {
                                       locale: 'pt_BR', symbol: 'R\$')
                                   .format(goal.currentValue),
                               style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: theme.primaryColor,
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey,
                               ),
                             ),
                             Text(
@@ -218,9 +245,8 @@ class GoalsCard extends StatelessWidget {
                                       locale: 'pt_BR', symbol: 'R\$')
                                   .format(target),
                               style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: theme.primaryColor,
+                                fontSize: 11.sp,
+                                color: DefaultColors.grey,
                               ),
                             ),
                           ],
