@@ -365,8 +365,8 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                   child: Row(
                                                     children: [
                                                       Container(
-                                                        width: 18.w,
-                                                        height: 18.h,
+                                                        width: 16.w,
+                                                        height: 16.h,
                                                         decoration:
                                                             BoxDecoration(
                                                           color: c,
@@ -383,67 +383,86 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                              pt,
-                                                              style: TextStyle(
-                                                                fontSize: 14.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: theme
-                                                                    .primaryColor,
-                                                              ),
-                                                              maxLines: 2,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                            Text(
-                                                              '${perc.toStringAsFixed(0)}%',
-                                                              style: TextStyle(
-                                                                fontSize: 10.sp,
-                                                                color:
-                                                                    DefaultColors
-                                                                        .grey,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 130.w,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            Text(
-                                                              NumberFormat
-                                                                  .currency(
-                                                                locale: 'pt_BR',
-                                                                symbol: 'R\$',
-                                                                decimalDigits:
-                                                                    2,
-                                                              ).format(val),
-                                                              style: TextStyle(
-                                                                fontSize: 14.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: theme
-                                                                    .primaryColor,
-                                                              ),
-                                                              textAlign:
-                                                                  TextAlign.end,
+                                                            // Row 1: name + value
+                                                            Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  child: Text(
+                                                                    pt,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color: theme
+                                                                          .primaryColor,
+                                                                    ),
+                                                                    maxLines: 2,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 8.w),
+                                                                Text(
+                                                                  NumberFormat
+                                                                      .currency(
+                                                                    locale:
+                                                                        'pt_BR',
+                                                                    symbol:
+                                                                        'R\$',
+                                                                    decimalDigits:
+                                                                        2,
+                                                                  ).format(val),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        13.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: theme
+                                                                        .primaryColor,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .end,
+                                                                ),
+                                                              ],
                                                             ),
                                                             SizedBox(
                                                                 height: 6.h),
-                                                            Icon(
-                                                              Iconsax
-                                                                  .arrow_right_3,
-                                                              size: 16.sp,
-                                                              color: theme
-                                                                  .primaryColor,
+                                                            // Row 2: percent + icon
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  '${perc.toStringAsFixed(0)}%',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        11.sp,
+                                                                    color:
+                                                                        DefaultColors
+                                                                            .grey,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 6.w),
+                                                                Icon(
+                                                                  Iconsax
+                                                                      .arrow_right_3,
+                                                                  size: 12.sp,
+                                                                  color:
+                                                                      DefaultColors
+                                                                          .grey,
+                                                                ),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),

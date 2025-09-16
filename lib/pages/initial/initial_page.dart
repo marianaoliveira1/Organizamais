@@ -2,19 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:organizamais/utils/color.dart';
 
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/fixed_accounts_controller.dart';
 import '../../controller/transaction_controller.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/goal_controller.dart';
-import '../goals/pages/add_goal_page.dart';
-import '../goals/pages/details_goals_page.dart';
-import '../../model/goal_model.dart';
-import '../transaction/pages/category_page.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 
 import 'widget/credit_card_selection.dart';
 import 'widget/custom_drawer.dart';

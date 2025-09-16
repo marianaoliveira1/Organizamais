@@ -98,7 +98,7 @@ class _AddCardPageState extends State<AddCardPage> {
             ),
             DefaultTitleTransaction(title: "Nome do cartão"),
             SizedBox(
-              height: 10.h,
+              height: 6.h,
             ),
             TextField(
               controller: nameController,
@@ -135,6 +135,9 @@ class _AddCardPageState extends State<AddCardPage> {
               height: 10.h,
             ),
             DefaultTitleTransaction(title: "Limite do cartão"),
+            SizedBox(
+              height: 6.h,
+            ),
             TextField(
               controller: limitController,
               style: TextStyle(
@@ -171,6 +174,9 @@ class _AddCardPageState extends State<AddCardPage> {
             ),
             SizedBox(height: 10.h),
             DefaultTitleTransaction(title: "Fecha no dia"),
+            SizedBox(
+              height: 6.h,
+            ),
             TextField(
               controller: closingDayController,
               style: TextStyle(
@@ -204,6 +210,9 @@ class _AddCardPageState extends State<AddCardPage> {
             ),
             SizedBox(height: 10.h),
             DefaultTitleTransaction(title: "Paga no dia"),
+            SizedBox(
+              height: 6.h,
+            ),
             TextField(
               controller: paymentDayController,
               style: TextStyle(
@@ -235,7 +244,7 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.h),
             InkWell(
               onTap: () {
                 Get.to(() => SelectIconPage(

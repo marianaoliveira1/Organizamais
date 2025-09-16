@@ -8,8 +8,8 @@ import 'package:intl/intl.dart';
 
 import '../../../controller/goal_controller.dart';
 import '../../../model/goal_model.dart';
-import '../../goals/pages/add_goal_page.dart';
-import '../../goals/pages/details_goals_page.dart';
+import '../pages/add_goal_page.dart';
+import '../pages/details_goals_page.dart';
 import '../../transaction/pages/category_page.dart';
 
 class GoalsCard extends StatelessWidget {

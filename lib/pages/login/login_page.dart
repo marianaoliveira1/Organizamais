@@ -42,156 +42,163 @@ class _LoginPageState extends State<LoginPage> {
           horizontal: 30.h,
           vertical: 30.w,
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 80.h,
-              ),
-              Text(
-                "ORGANIZA+",
-                style: TextStyle(
-                  color: DefaultColors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14.sp,
-                ),
-              ),
-              SizedBox(
-                height: 70.h,
-              ),
-              DefaultTextField(
-                hintText: "Email",
-                prefixIcon: Icon(Iconsax.sms),
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                onSubmitted: (_) => FocusScope.of(context).nextFocus(),
-              ),
-              SizedBox(height: 20.h),
-              DefaultTextField(
-                hintText: "Senha",
-                prefixIcon: Icon(Iconsax.lock),
-                controller: passwordController,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => authController.login(
-                  emailController.text,
-                  passwordController.text,
-                ),
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              DefaultButton(
-                text: "Entrar",
-                onTap: () {
-                  if (!acceptedPrivacy) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              'Você precisa aceitar a Política de Privacidade para continuar.')),
-                    );
-                    return;
-                  }
-                  authController.login(
-                    emailController.text,
-                    passwordController.text,
-                  );
-                },
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              DefaultContinueCom(),
-              SizedBox(
-                height: 20.h,
-              ),
-              ButtonLoginWithGoogle(
-                text: "Entrar com Google",
-                onTap: () {
-                  if (!acceptedPrivacy) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              'Você precisa aceitar a Política de Privacidade para continuar.')),
-                    );
-                    return;
-                  }
-                  authController.loginWithGoogle();
-                },
-              ),
-              SizedBox(
-                height: 60.h,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "Não tem uma conta?",
-                    style: TextStyle(
-                      color: DefaultColors.grey,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 80.h,
                     ),
-                  ),
-                  SizedBox(
-                    width: 3.w,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, "/register");
-                    },
-                    child: Text(
-                      "Cadastre-se",
+                    Text(
+                      "ORGANIZA+",
                       style: TextStyle(
                         color: DefaultColors.black,
                         fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.h),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    checkColor: theme.cardColor,
-                    fillColor: MaterialStateProperty.resolveWith(
-                      (states) => states.contains(MaterialState.selected)
-                          ? theme.primaryColor
-                          : null,
+                    SizedBox(
+                      height: 70.h,
                     ),
-                    value: acceptedPrivacy,
-                    onChanged: (v) =>
-                        setState(() => acceptedPrivacy = v ?? false),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  Expanded(
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                    DefaultTextField(
+                      hintText: "Email",
+                      prefixIcon: Icon(Iconsax.sms),
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                    ),
+                    SizedBox(height: 20.h),
+                    DefaultTextField(
+                      hintText: "Senha",
+                      prefixIcon: Icon(Iconsax.lock),
+                      controller: passwordController,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => authController.login(
+                        emailController.text,
+                        passwordController.text,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    DefaultButton(
+                      text: "Entrar",
+                      onTap: () {
+                        if (!acceptedPrivacy) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Você precisa aceitar a Política de Privacidade para continuar.')),
+                          );
+                          return;
+                        }
+                        authController.login(
+                          emailController.text,
+                          passwordController.text,
+                        );
+                      },
+                    ),
+                    SizedBox(
+                      height: 28.h,
+                    ),
+                    DefaultContinueCom(),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    ButtonLoginWithGoogle(
+                      text: "Entrar com Google",
+                      onTap: () {
+                        if (!acceptedPrivacy) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Você precisa aceitar a Política de Privacidade para continuar.')),
+                          );
+                          return;
+                        }
+                        authController.loginWithGoogle();
+                      },
+                    ),
+                    SizedBox(
+                      height: 30.h,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Concordo com os ",
+                          "Não tem uma conta?",
                           style: TextStyle(
-                              fontSize: 11.sp, color: DefaultColors.grey),
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 3.w,
                         ),
                         GestureDetector(
-                          onTap: () => showPrivacyPolicyDialog(context),
+                          onTap: () {
+                            Navigator.pushNamed(context, "/register");
+                          },
                           child: Text(
-                            "Termos de Uso e Política de Privacidade",
+                            "Cadastre-se",
                             style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w700,
                               color: DefaultColors.black,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Checkbox(
+                  checkColor: theme.cardColor,
+                  fillColor: MaterialStateProperty.resolveWith(
+                    (states) => states.contains(MaterialState.selected)
+                        ? theme.primaryColor
+                        : null,
+                  ),
+                  value: acceptedPrivacy,
+                  onChanged: (v) =>
+                      setState(() => acceptedPrivacy = v ?? false),
+                  visualDensity: VisualDensity.compact,
+                ),
+                Expanded(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        "Concordo com os ",
+                        style: TextStyle(
+                            fontSize: 11.sp, color: DefaultColors.grey),
+                      ),
+                      GestureDetector(
+                        onTap: () => showPrivacyPolicyDialog(context),
+                        child: Text(
+                          "Termos de Uso e Política de Privacidade",
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w700,
+                            color: DefaultColors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

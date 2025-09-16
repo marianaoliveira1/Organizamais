@@ -17,7 +17,7 @@ class DefaultButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        height: 35.h,
+        height: 42.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: DefaultColors.black,
@@ -30,7 +30,7 @@ class DefaultButton extends StatelessWidget {
             text,
             style: TextStyle(
               color: DefaultColors.white,
-              fontSize: 14.sp,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w500,
             ),
           ),

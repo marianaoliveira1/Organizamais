@@ -49,9 +49,6 @@ void main() async {
     print('Error initializing notifications: $e');
   }
 
-  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
   runApp(const MyApp());
 }
 
@@ -68,7 +65,7 @@ class MyApp extends StatelessWidget {
     Get.put(SpendingGoalController());
 
     return ScreenUtilInit(
-      designSize: Size(375, 812),
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       child: GetMaterialApp(
@@ -86,18 +83,46 @@ class MyApp extends StatelessWidget {
         ],
         initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
+
+        // 🌞 Tema Claro
         theme: ThemeData(
           textTheme: GoogleFonts.rubikTextTheme(),
           brightness: Brightness.light,
           scaffoldBackgroundColor: DefaultColors.backgroundLight,
           primaryColor: DefaultColors.black,
           cardColor: DefaultColors.white,
+
+          // Cursor piscando e seleção
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: DefaultColors.black,
+            selectionColor: DefaultColors.black.withOpacity(0.3),
+            selectionHandleColor: DefaultColors.black,
+          ),
+
+          // ProgressIndicator sempre na cor primária
+          progressIndicatorTheme: const ProgressIndicatorThemeData(),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: DefaultColors.black,
+            brightness: Brightness.light,
+          ),
         ),
+
+        // 🌙 Tema Escuro
         darkTheme: ThemeData(
           brightness: Brightness.dark,
           scaffoldBackgroundColor: DefaultColors.backgroundDark,
           primaryColor: DefaultColors.white,
           cardColor: DefaultColors.backgroundCard,
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: DefaultColors.white,
+            selectionColor: DefaultColors.white.withOpacity(0.3),
+            selectionHandleColor: DefaultColors.white,
+          ),
+          progressIndicatorTheme: const ProgressIndicatorThemeData(),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: DefaultColors.white,
+            brightness: Brightness.dark,
+          ),
         ),
       ),
     );

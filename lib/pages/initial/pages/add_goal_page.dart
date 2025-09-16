@@ -9,7 +9,6 @@ import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/goal_controller.dart';
 import '../../../model/goal_model.dart';
 import '../../../model/transaction_model.dart';
-import '../../../utils/color.dart';
 import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/title_transaction.dart';
@@ -53,11 +52,33 @@ class _AddGoalPageState extends State<AddGoalPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final theme = Theme.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      builder: (ctx, child) {
+        final t = Theme.of(ctx);
+        return Theme(
+          data: t.copyWith(
+            dialogBackgroundColor: theme.cardColor,
+            colorScheme: t.colorScheme.copyWith(
+              surface: theme.cardColor,
+              background: theme.cardColor,
+              primary: theme.primaryColor,
+              onPrimary: theme.cardColor,
+              onSurface: theme.primaryColor,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: theme.primaryColor,
+              ),
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -248,11 +269,11 @@ class _AddGoalPageState extends State<AddGoalPage> {
                                 widget.initialGoal!.value.trim()) {
                               finalValueStr = widget.initialGoal!.value;
                             } else {
-                              finalValueStr =
-                                  NumberFormat.currency(locale: 'pt_BR')
-                                      .format(value);
-                              // Fallback: se por algum motivo o parse zerou mas havia um valor salvo, mantém o antigo
-                              if (finalValueStr.contains('0,00')) {
+                              finalValueStr = NumberFormat.currency(
+                                locale: 'pt_BR',
+                              ).format(value);
+                              // Fallback APENAS se o valor numérico ficou exatamente 0
+                              if (value == 0.0) {
                                 final String prevSanitized = widget
                                     .initialGoal!.value
                                     .replaceAll(RegExp(r'[^0-9,\.]'), '');

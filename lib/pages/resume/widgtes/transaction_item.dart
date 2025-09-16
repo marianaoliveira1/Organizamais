@@ -32,10 +32,11 @@ class TransactionItem extends StatelessWidget {
     final isToday = DateUtils.isSameDay(transactionDate, today);
     final isFuture = transactionDate.isAfter(today) && !isToday;
 
-    final String? installmentLabel = _computeInstallmentLabel(
-      controller.transaction,
-      transaction.title,
-    );
+    // installmentLabel calculado, mas não utilizado diretamente na UI
+    // final String? installmentLabel = _computeInstallmentLabel(
+    //   controller.transaction,
+    //   transaction.title,
+    // );
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -152,7 +153,7 @@ class TransactionItem extends StatelessWidget {
                                         : DefaultColors.grey20,
                                     fontSize: 11.sp,
                                   ),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -185,30 +186,40 @@ class TransactionItem extends StatelessWidget {
                     ),
 
                     // Valor + paymentType (à direita)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          _formatValue(transaction.value),
-                          style: TextStyle(
-                            color: isFuture
-                                ? DefaultColors.grey
-                                : theme.primaryColor,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                    Flexible(
+                      fit: FlexFit.tight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _formatValue(transaction.value),
+                            style: TextStyle(
+                              color: isFuture
+                                  ? DefaultColors.grey
+                                  : theme.primaryColor,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
                           ),
-                        ),
-                        SizedBox(height: 3.h),
-                        Text(
-                          transaction.paymentType,
-                          style: TextStyle(
-                            color: isFuture
-                                ? DefaultColors.grey.withOpacity(0.6)
-                                : DefaultColors.grey20,
-                            fontSize: 11.sp,
+                          SizedBox(height: 3.h),
+                          Text(
+                            transaction.paymentType,
+                            style: TextStyle(
+                              color: isFuture
+                                  ? DefaultColors.grey.withOpacity(0.6)
+                                  : DefaultColors.grey20,
+                              fontSize: 11.sp,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

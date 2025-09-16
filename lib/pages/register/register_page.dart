@@ -100,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
               },
             ),
             SizedBox(
-              height: 20.h,
+              height: 28.h,
             ),
             DefaultContinueCom(),
             SizedBox(
@@ -121,10 +121,11 @@ class _RegisterPageState extends State<RegisterPage> {
               },
             ),
             SizedBox(
-              height: 60.h,
+              height: 30.h,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   "Já tem uma conta?",

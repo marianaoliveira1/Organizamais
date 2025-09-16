@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -102,13 +103,18 @@ class MonthlyFinancialChart extends StatelessWidget {
                   groupSpacing = 64.0;
                 }
 
+                // Compute nice Y-axis ticks to avoid duplicate rounded labels
+                final double maxVal = _getMaxValue(monthlyData);
+                final double step = _niceInterval(maxVal);
+                final double niceMaxY = ((maxVal / step).ceil()) * step;
+
                 return SizedBox(
                   height: 300,
                   width: double.infinity,
                   child: BarChart(
                     BarChartData(
                       alignment: BarChartAlignment.center,
-                      maxY: _getMaxValue(monthlyData) * 1.2,
+                      maxY: niceMaxY,
                       barTouchData: BarTouchData(
                         enabled: true,
                         touchTooltipData: BarTouchTooltipData(
@@ -146,7 +152,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                             strokeWidth: groupSpacing,
                           );
                         },
-                        horizontalInterval: _getMaxValue(monthlyData) / 4,
+                        horizontalInterval: step,
                         getDrawingHorizontalLine: (value) {
                           return FlLine(
                             color: Colors.grey.withOpacity(0.2),
@@ -189,7 +195,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                           sideTitles: SideTitles(
                             showTitles: true,
                             reservedSize: 60,
-                            interval: _getMaxValue(monthlyData) / 4,
+                            interval: step,
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 _formatCurrencyShort(value),
@@ -300,6 +306,21 @@ class MonthlyFinancialChart extends StatelessWidget {
       }
     }
     return maxValue == 0 ? 1000 : maxValue;
+  }
+
+  // Compute "nice" axis interval such as 250, 500, 1000, 2000, etc.
+  double _niceInterval(double maxVal) {
+    if (maxVal <= 0) return 250;
+    // Target ~4 horizontal lines
+    final double rough = maxVal / 4.0;
+    final int exp = (math.log(rough) / math.log(10)).floor();
+    final double pow10 = math.pow(10, exp).toDouble();
+    final List<double> niceSteps = <double>[1, 2, 2.5, 5, 10];
+    for (final double s in niceSteps) {
+      final double candidate = s * pow10;
+      if (rough <= candidate) return candidate;
+    }
+    return 10 * pow10;
   }
 
   String _getMonthName(int month) {
