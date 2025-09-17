@@ -471,14 +471,6 @@ class GoalDetailsPage extends StatelessWidget {
                       );
                     }),
                     SizedBox(height: 10.h),
-                    Text(
-                      "A dica é: coloque esse valor onde possa render juros, como na Caixinha do Nubank ou no Cofrinho do Inter! Porque assim seu dinheiro vai render, no final você vai ter mais e merece aquele emoji de lâmpada 💡",
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: DefaultColors.grey,
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
 
                     // Transações
                     Text(
@@ -555,12 +547,6 @@ class GoalDetailsPage extends StatelessWidget {
                                         value: removed,
                                         color: DefaultColors.redDark,
                                         prefix: '-'),
-                                    _summaryPill(context,
-                                        label: 'Total no cofrinho',
-                                        value: net,
-                                        color: theme.primaryColor,
-                                        prefix: 'R\$ ',
-                                        showPrefixAsSign: false),
                                   ],
                                 ),
                               ),
