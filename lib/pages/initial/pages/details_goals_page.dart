@@ -12,6 +12,7 @@ import '../../transaction/pages/category_page.dart';
 import 'add_goal_page.dart';
 import '../../../widgetes/currency_ipunt_formated.dart';
 import '../../../utils/color.dart';
+import '../../../routes/route.dart';
 
 class GoalDetailsPage extends StatelessWidget {
   final GoalModel initialGoal;
@@ -120,7 +121,7 @@ class GoalDetailsPage extends StatelessWidget {
               );
               if (confirmed == true) {
                 await goalController.deleteGoal(initialGoal.id!);
-                Get.back();
+                Get.offAllNamed(Routes.INITIAL);
               }
             },
           ),
@@ -165,7 +166,20 @@ class GoalDetailsPage extends StatelessWidget {
                 final double numericValue = double.tryParse(numeric) ?? 0.0;
                 final double progress = currentGoal.currentValue / numericValue;
                 final category = findCategoryById(currentGoal.categoryId);
-                final String formattedDate = currentGoal.date;
+                // final String formattedDate = currentGoal.date;
+                final String headerForecast = (() {
+                  try {
+                    final parts = currentGoal.date.split('/');
+                    final d = DateTime(
+                      int.parse(parts[2]),
+                      int.parse(parts[1]),
+                      int.parse(parts[0]),
+                    );
+                    return DateFormat("d 'de' MMMM 'de' y", 'pt_BR').format(d);
+                  } catch (_) {
+                    return currentGoal.date;
+                  }
+                })();
 
                 // Format values in Brazilian Real standard
                 final String formattedCurrentValue =
@@ -181,23 +195,126 @@ class GoalDetailsPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        category != null
-                            ? Image.asset(
-                                category['icon'],
-                                height: 38.h,
-                                width: 38.w,
-                              )
-                            : Icon(
-                                Icons.category,
-                                color: Colors.white,
-                                size: 24.sp,
-                              ),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12.sp,
-                          ),
+                        Row(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 44.w,
+                                  height: 44.w,
+                                  decoration: BoxDecoration(
+                                    color: (category != null &&
+                                            category['color'] != null)
+                                        ? category['color'] as Color
+                                        : DefaultColors.grey,
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                ),
+                                if (category != null &&
+                                    (category['icon'] as String).isNotEmpty)
+                                  Image.asset(
+                                    category['icon'] as String,
+                                    width: 30.w,
+                                    height: 30.w,
+                                  )
+                                else
+                                  Icon(
+                                    Icons.category,
+                                    size: 12.sp,
+                                    color: Colors.white,
+                                  ),
+                              ],
+                            ),
+                            SizedBox(width: 8.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Categoria: ',
+                                        style: TextStyle(
+                                          color: DefaultColors.grey,
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: category != null
+                                            ? (category['name'] as String)
+                                            : '—',
+                                        style: TextStyle(
+                                          color: theme.primaryColor,
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 2.h),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Previsão: ',
+                                      style: TextStyle(
+                                        color: DefaultColors.grey,
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      headerForecast,
+                                      style: TextStyle(
+                                        color: theme.primaryColor,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Builder(
+                                      builder: (context) {
+                                        int daysLeft = 0;
+                                        try {
+                                          final parts =
+                                              currentGoal.date.split('/');
+                                          final dl = DateTime(
+                                            int.parse(parts[2]),
+                                            int.parse(parts[1]),
+                                            int.parse(parts[0]),
+                                          );
+                                          final now = DateTime.now();
+                                          final todayOnly = DateTime(
+                                              now.year, now.month, now.day);
+                                          final dueOnly = DateTime(
+                                              dl.year, dl.month, dl.day);
+                                          daysLeft = dueOnly
+                                              .difference(todayOnly)
+                                              .inDays;
+                                        } catch (_) {}
+                                        final String daysLabel = daysLeft > 0
+                                            ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
+                                            : (daysLeft == 0
+                                                ? 'Vence hoje'
+                                                : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
+                                        return Text(
+                                          " ($daysLabel)",
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: daysLeft < 0
+                                                ? DefaultColors.redDark
+                                                : theme.primaryColor,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -209,27 +326,51 @@ class GoalDetailsPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "R\$ $formattedCurrentValue",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "R\$ $formattedCurrentValue",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                            Text(
+                              "Saldo atual",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: DefaultColors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          ],
                         ),
-                        Text(
-                          "R\$ $formattedTargetValue",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                          ),
-                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "R\$ $formattedTargetValue",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                            Text(
+                              "Meta",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: DefaultColors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          ],
+                        )
                       ],
                     ),
-                    SizedBox(height: 8.h),
 
-                    // Progress bar with percentage bubble
                     SizedBox(
                       height: 20.h,
                     ),
@@ -325,16 +466,6 @@ class GoalDetailsPage extends StatelessWidget {
                                 color: theme.primaryColor,
                               ),
                             ),
-                            Text(
-                              daysLabel,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: daysLeft < 0
-                                    ? DefaultColors.redDark
-                                    : theme.primaryColor,
-                              ),
-                            ),
                           ],
                         ),
                       );
@@ -355,7 +486,7 @@ class GoalDetailsPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
-                        color: theme.primaryColor,
+                        color: DefaultColors.grey,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -383,76 +514,164 @@ class GoalDetailsPage extends StatelessWidget {
                               ),
                             );
                           }
-                          return ListView.separated(
-                            itemCount: docs.length,
-                            separatorBuilder: (_, __) => SizedBox(height: 8.h),
-                            itemBuilder: (context, index) {
-                              final data = docs[index].data();
-                              final bool isAddition =
-                                  data['isAddition'] == true;
-                              final double amount =
-                                  (data['amount'] as num?)?.toDouble() ?? 0.0;
-                              final Timestamp? ts = data['date'] as Timestamp?;
-                              final DateTime date =
-                                  ts?.toDate() ?? DateTime.now();
-                              final String label = isAddition
-                                  ? 'Valor adicionado'
-                                  : 'Valor retirado';
-                              final String dateStr =
-                                  DateFormat('dd/MM/yyyy').format(date);
+                          // Resumo de totais
+                          double added = 0;
+                          double removed = 0;
+                          for (final d in docs) {
+                            final m = d.data();
+                            final double amount =
+                                (m['amount'] as num?)?.toDouble() ?? 0.0;
+                            final bool isAddition = m['isAddition'] == true;
+                            if (isAddition) {
+                              added += amount;
+                            } else {
+                              removed += amount;
+                            }
+                          }
+                          final double net = added - removed;
 
-                              return Container(
+                          return Column(
+                            children: [
+                              Container(
                                 padding: EdgeInsets.all(12.w),
                                 decoration: BoxDecoration(
                                   color: theme.cardColor,
                                   borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                      color:
+                                          theme.primaryColor.withOpacity(0.08)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          label,
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
-                                          ),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          dateStr,
-                                          style: TextStyle(
-                                            fontSize: 11.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      'R\$ ${_formatCurrencyBRL(amount)}',
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w700,
-                                        color: isAddition
-                                            ? Colors.green
-                                            : DefaultColors.redDark,
-                                      ),
-                                    ),
+                                    _summaryPill(context,
+                                        label: 'Total adicionado',
+                                        value: added,
+                                        color: Colors.green,
+                                        prefix: '+'),
+                                    _summaryPill(context,
+                                        label: 'Total retirado',
+                                        value: removed,
+                                        color: DefaultColors.redDark,
+                                        prefix: '-'),
+                                    _summaryPill(context,
+                                        label: 'Total no cofrinho',
+                                        value: net,
+                                        color: theme.primaryColor,
+                                        prefix: 'R\$ ',
+                                        showPrefixAsSign: false),
                                   ],
                                 ),
-                              );
-                            },
+                              ),
+                              SizedBox(height: 10.h),
+                              Expanded(
+                                child: ListView.separated(
+                                  itemCount: docs.length,
+                                  separatorBuilder: (_, __) =>
+                                      SizedBox(height: 8.h),
+                                  itemBuilder: (context, index) {
+                                    final data = docs[index].data();
+                                    final bool isAddition =
+                                        data['isAddition'] == true;
+                                    final double amount =
+                                        (data['amount'] as num?)?.toDouble() ??
+                                            0.0;
+                                    final Timestamp? ts =
+                                        data['date'] as Timestamp?;
+                                    final DateTime date =
+                                        ts?.toDate() ?? DateTime.now();
+                                    final String label = isAddition
+                                        ? 'Valor adicionado'
+                                        : 'Valor retirado';
+                                    final String dateStr =
+                                        DateFormat('dd/MM/yyyy').format(date);
+
+                                    return Container(
+                                      padding: EdgeInsets.all(12.w),
+                                      decoration: BoxDecoration(
+                                        color: theme.cardColor,
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 18.w,
+                                                height: 18.w,
+                                                decoration: BoxDecoration(
+                                                  color: (isAddition
+                                                          ? Colors.green
+                                                          : DefaultColors
+                                                              .redDark)
+                                                      .withOpacity(0.12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6.r),
+                                                ),
+                                                child: Icon(
+                                                  isAddition
+                                                      ? Icons.arrow_downward
+                                                      : Icons.arrow_upward,
+                                                  size: 12.sp,
+                                                  color: isAddition
+                                                      ? Colors.green
+                                                      : DefaultColors.redDark,
+                                                ),
+                                              ),
+                                              SizedBox(width: 8.w),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    label,
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: theme.primaryColor,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 2.h),
+                                                  Text(
+                                                    dateStr,
+                                                    style: TextStyle(
+                                                      fontSize: 11.sp,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            'R\$ ${_formatCurrencyBRL(amount)}',
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: isAddition
+                                                  ? Colors.green
+                                                  : DefaultColors.redDark,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
                     ),
 
-                    Spacer(),
+                    SizedBox(height: 16.h),
                     Padding(
                       padding: EdgeInsets.only(bottom: 16.h),
                       child: Row(
@@ -497,6 +716,7 @@ class GoalDetailsPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    // SizedBox(height: 10.h),
                   ],
                 );
               },
@@ -504,6 +724,35 @@ class GoalDetailsPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  Widget _summaryPill(BuildContext context,
+      {required String label,
+      required double value,
+      required Color color,
+      required String prefix,
+      bool showPrefixAsSign = true}) {
+    String textValue = _formatCurrencyBRL(value);
+    String display =
+        showPrefixAsSign ? '$prefix $textValue' : '$prefix$textValue';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          display,
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 

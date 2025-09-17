@@ -41,36 +41,18 @@ class GoalsCard extends StatelessWidget {
           Obx(() {
             final goals = goalController.goal;
             if (goals.isEmpty) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Nenhuma meta adicionada',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: DefaultColors.grey,
-                      ),
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Nenhuma meta adicionada',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: DefaultColors.grey,
                     ),
-                    SizedBox(height: 8.h),
-                    OutlinedButton.icon(
-                      onPressed: () => Get.to(() => const AddGoalPage()),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Adicionar meta'),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                        side: BorderSide(
-                            color: theme.primaryColor.withOpacity(0.4)),
-                        foregroundColor: theme.primaryColor,
-                      ),
-                    )
-                  ],
-                ),
+                  ),
+                ],
               );
             }
 
