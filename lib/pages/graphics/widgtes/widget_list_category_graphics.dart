@@ -74,12 +74,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   padding: EdgeInsets.symmetric(
                     vertical: 8.h,
                   ),
-                  decoration: BoxDecoration(
-                    color: selectedCategoryId.value == categoryId
-                        ? categoryColor.withOpacity(0.1)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
                   child: Row(
                     children: [
                       Container(
@@ -102,43 +96,42 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                              width: 120.w,
-                              child: Text(
-                                item['name'] as String,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: theme.primaryColor,
-                                ),
-                                textAlign: TextAlign.start,
-                                softWrap: true,
-                                overflow: TextOverflow.clip,
-                              ),
-                            ),
-                            Text(
-                              "${percentual.toStringAsFixed(0)}%",
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: DefaultColors.grey,
-                              ),
-                            ),
-                            // Porcentagem de comparação com mês anterior
-                            _buildMonthComparisonPercentage(
-                              categoryId,
-                              theme,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          budgets.containsKey(categoryId)
-                              ? RichText(
-                                  text: TextSpan(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 150.w,
+                                  child: Text(
+                                    item['name'] as String,
                                     style: TextStyle(
                                       fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.primaryColor,
+                                    ),
+                                    textAlign: TextAlign.start,
+                                    softWrap: true,
+                                    overflow: TextOverflow.clip,
+                                  ),
+                                ),
+                                Text(
+                                  "${percentual.toStringAsFixed(0)}%",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 2.h),
+
+                            // Linha 3: valor e orçamento
+                            Row(
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w500,
                                       color: theme.primaryColor,
                                     ),
@@ -146,39 +139,46 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       TextSpan(
                                         text: currencyFormatter.format(valor),
                                         style: TextStyle(
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w500,
                                           color: theme.primaryColor,
                                         ),
                                       ),
-                                      TextSpan(
-                                        text: ' / ',
-                                        style: TextStyle(
-                                          color: DefaultColors.grey,
+                                      if (budgets.containsKey(categoryId)) ...[
+                                        TextSpan(
+                                          text: ' de ',
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 12.sp,
+                                          ),
                                         ),
-                                      ),
-                                      TextSpan(
+                                        TextSpan(
                                           text: currencyFormatter
-                                              .format(budgets[categoryId]!)),
+                                              .format(budgets[categoryId] ?? 0),
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
-                                )
-                              : Text(
-                                  currencyFormatter.format(valor),
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.primaryColor,
-                                  ),
                                 ),
-                          Icon(
-                            Iconsax.arrow_down5,
-                            // selectedCategoryId.value == categoryId
-                            //     ? Iconsax.arrow_down_2
-                            //     : Iconsax.arrow_up_2,
-                            color: DefaultColors.grey,
-                            size: 16.h,
-                          ),
-                        ],
+                              ],
+                            ),
+                            // Linha 4: comparação colapsada
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildCollapsedComparisonPercent(
+                                    categoryId, theme),
+                                Icon(Iconsax.arrow_down_1,
+                                    size: 12.sp, color: DefaultColors.grey),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -213,6 +213,44 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (budgets.containsKey(categoryId)) ...[
+                        Builder(builder: (context) {
+                          final double b = budgets[categoryId] ?? 0.0;
+                          final double pct = b > 0 ? (valor / b) * 100 : 0.0;
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              _BudgetDonut(percent: pct, color: categoryColor),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      currencyFormatter.format(valor),
+                                      style: TextStyle(
+                                        fontSize: 26.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'de ' + currencyFormatter.format(b),
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: DefaultColors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    // _buildComparisonChip(categoryId, theme),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                        SizedBox(height: 12.h),
+                      ],
                       // Resumo da meta mensal (se existir)
                       if (budgets.containsKey(categoryId)) ...[
                         Builder(builder: (context) {
@@ -471,189 +509,20 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     final pct = (totalCategoria / totalReceitaMes) * 100.0;
 
-    return Text(
-      'Esta categoria corresponde a ${pct.toStringAsFixed(1)}% da sua receita mensal.',
-      style: TextStyle(
-        fontSize: 12.sp,
-        color: theme.primaryColor,
-        fontWeight: FontWeight.bold,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: DefaultColors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
       ),
-    );
-  }
-
-  Widget _buildMonthComparisonPercentage(int categoryId, ThemeData theme) {
-    final TransactionController transactionController =
-        Get.find<TransactionController>();
-
-    // Escolher a data base conforme o mês selecionado
-    final now = DateTime.now();
-    final months = getAllMonths();
-    final selectedIndex = monthName.isNotEmpty ? months.indexOf(monthName) : -1;
-    final bool isCurrentMonthSelected =
-        monthName.isEmpty || selectedIndex == (now.month - 1);
-
-    DateTime effectiveCurrentDate;
-    if (isCurrentMonthSelected) {
-      // Mês atual: comparar até hoje vs mesmo dia do mês anterior
-      effectiveCurrentDate = now;
-    } else {
-      // Mês passado selecionado: comparar mês cheio vs mês cheio anterior
-      final selectedMonth =
-          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
-      final selectedYear = now.year;
-      final lastDaySelectedMonth =
-          DateTime(selectedYear, selectedMonth + 1, 0).day;
-      effectiveCurrentDate = DateTime(
-          selectedYear, selectedMonth, lastDaySelectedMonth, 23, 59, 59);
-    }
-
-    // Calcular a comparação com o mês anterior usando a data base correta
-    final comparison =
-        PercentageCalculationService.calculateCategoryExpenseComparison(
-      transactionController.transaction,
-      categoryId,
-      effectiveCurrentDate,
-    );
-
-    // Fallback: se não houver dados comparáveis, verificar histórico do mês anterior completo
-    if (!comparison.hasData) {
-      final now = DateTime.now();
-      final currentValue =
-          PercentageCalculationService.getCategoryExpensesForPeriod(
-        transactionController.transaction,
-        categoryId,
-        DateTime(now.year, now.month, 1),
-        DateTime(now.year, now.month, now.day, 23, 59, 59),
-      );
-
-      if (currentValue <= 0) {
-        return const SizedBox.shrink();
-      }
-
-      final previousMonth = now.month == 1 ? 12 : now.month - 1;
-      final previousYear = now.month == 1 ? now.year - 1 : now.year;
-      final previousMonthStart = DateTime(previousYear, previousMonth, 1);
-      final lastDayPreviousMonth =
-          DateTime(previousYear, previousMonth + 1, 0).day;
-      final previousMonthEnd = DateTime(
-          previousYear, previousMonth, lastDayPreviousMonth, 23, 59, 59);
-
-      final previousFullMonthValue =
-          PercentageCalculationService.getCategoryExpensesForPeriod(
-        transactionController.transaction,
-        categoryId,
-        previousMonthStart,
-        previousMonthEnd,
-      );
-
-      if (previousFullMonthValue > 0) {
-        // Já houve transações no mês anterior (em qualquer dia) => não é "Novo"
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Iconsax.arrow_right_2,
-              size: 12.h,
-              color: DefaultColors.grey,
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              '0.0%',
-              style: TextStyle(
-                fontSize: 9.sp,
-                color: DefaultColors.grey,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        );
-      }
-
-      // Sem histórico no mês anterior -> "Novo"
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Iconsax.star_1,
-            size: 12.h,
-            color: DefaultColors.grey,
-          ),
-          SizedBox(width: 4.w),
-          Text(
-            'Novo',
-            style: TextStyle(
-              fontSize: 9.sp,
-              color: DefaultColors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      );
-    }
-
-    // Quando for "Novo" diretamente pelo serviço, usar ícone de estrela
-    if (comparison.type == PercentageType.newData) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Iconsax.star_1,
-            size: 12.h,
-            color: DefaultColors.grey,
-          ),
-          SizedBox(width: 4.w),
-          Text(
-            'Novo',
-            style: TextStyle(
-              fontSize: 9.sp,
-              color: DefaultColors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      );
-    }
-
-    // Mapear pela natureza da despesa: positive => diminuiu (verde/baixo), negative => aumentou (vermelho/cima)
-    late final Color circleColor;
-    late final IconData dirIcon;
-    switch (comparison.type) {
-      case PercentageType.positive:
-        circleColor = DefaultColors.greenDark;
-        dirIcon = Iconsax.arrow_circle_down;
-        break;
-      case PercentageType.negative:
-        circleColor = DefaultColors.redDark;
-        dirIcon = Iconsax.arrow_circle_up;
-        break;
-      case PercentageType.neutral:
-        circleColor = DefaultColors.grey;
-        dirIcon = Iconsax.more_circle;
-        break;
-      case PercentageType.newData:
-        circleColor = DefaultColors.grey;
-        dirIcon = Iconsax.star_1;
-        break;
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          dirIcon,
-          size: 12.sp,
-          color: circleColor,
+      child: Text(
+        'Esta categoria corresponde a ${pct.toStringAsFixed(1)}% da sua receita mensal.',
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: theme.primaryColor,
+          fontWeight: FontWeight.bold,
         ),
-        SizedBox(width: 4.w),
-        Text(
-          comparison.displayText,
-          style: TextStyle(
-            fontSize: 9.sp,
-            color: circleColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -834,11 +703,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      // padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      // decoration: BoxDecoration(
+      //   color: Colors.transparent,
+      //   borderRadius: BorderRadius.circular(16.r),
+      // ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -853,7 +722,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             child: Text(
               explanationText,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 12.sp,
                 color: circleColor2,
                 fontWeight: FontWeight.w600,
               ),
@@ -868,5 +737,165 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   // Remover os métodos duplicados e usar apenas o serviço
   String _formatCurrency(double value) {
     return value.toStringAsFixed(2).replaceAll('.', ',');
+  }
+}
+
+Widget _buildCollapsedComparisonPercent(int categoryId, ThemeData theme) {
+  final TransactionController transactionController =
+      Get.find<TransactionController>();
+
+  final now = DateTime.now();
+  final comparison =
+      PercentageCalculationService.calculateCategoryExpenseComparison(
+    transactionController.transaction,
+    categoryId,
+    now,
+  );
+
+  if (!comparison.hasData) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Iconsax.more_circle,
+          size: 11.sp,
+          color: DefaultColors.grey,
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          '0,0%',
+          style: TextStyle(fontSize: 11.sp, color: DefaultColors.grey),
+        ),
+      ],
+    );
+  }
+
+  late final Color color;
+  late final IconData icon;
+  final String text = comparison.displayText;
+
+  switch (comparison.type) {
+    case PercentageType.positive:
+      color = DefaultColors.greenDark;
+      icon = Iconsax.arrow_circle_down;
+      break;
+    case PercentageType.negative:
+      color = DefaultColors.redDark;
+      icon = Iconsax.arrow_circle_up;
+      break;
+    case PercentageType.neutral:
+      color = DefaultColors.grey;
+      icon = Iconsax.more_circle;
+      break;
+    case PercentageType.newData:
+      color = DefaultColors.grey;
+      icon = Iconsax.star_1;
+      break;
+  }
+
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 13.sp, color: color),
+      SizedBox(width: 4.w),
+      Text(text, style: TextStyle(fontSize: 11.sp, color: color)),
+    ],
+  );
+}
+
+Widget _buildDeltaChip(int categoryId, ThemeData theme) {
+  final TransactionController transactionController =
+      Get.find<TransactionController>();
+  final cmp = PercentageCalculationService.calculateCategoryExpenseComparison(
+      transactionController.transaction, categoryId, DateTime.now());
+
+  Color color;
+  IconData icon;
+  String label;
+  if (!cmp.hasData) {
+    color = DefaultColors.grey;
+    icon = Iconsax.more_circle;
+    label = '0,0%';
+  } else {
+    label = cmp.displayText;
+    switch (cmp.type) {
+      case PercentageType.positive:
+        color = DefaultColors.greenDark;
+        icon = Iconsax.arrow_circle_down;
+        break;
+      case PercentageType.negative:
+        color = DefaultColors.redDark;
+        icon = Iconsax.arrow_circle_up;
+        break;
+      case PercentageType.neutral:
+        color = DefaultColors.grey;
+        icon = Iconsax.more_circle;
+        break;
+      case PercentageType.newData:
+        color = DefaultColors.grey;
+        icon = Iconsax.star_1;
+        break;
+    }
+  }
+
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+    decoration: BoxDecoration(
+      color: color.withOpacity(.12),
+      borderRadius: BorderRadius.circular(999.r),
+      border: Border.all(color: color.withOpacity(.25)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12.sp, color: color),
+        SizedBox(width: 6.w),
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 11.sp, color: color, fontWeight: FontWeight.w600),
+        ),
+      ],
+    ),
+  );
+}
+
+class _BudgetDonut extends StatelessWidget {
+  final double percent; // 0..100
+  final Color color;
+
+  const _BudgetDonut({required this.percent, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final double clamped = percent.clamp(0, 100);
+    return Container(
+      width: 56.w,
+      height: 56.w,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: theme.primaryColor.withOpacity(.15)),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: (clamped / 100.0),
+            strokeWidth: 6.w,
+            color: color,
+            backgroundColor: theme.primaryColor.withOpacity(.08),
+          ),
+          Text(
+            '${clamped.toStringAsFixed(0)}%',
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w700,
+              color: theme.primaryColor,
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

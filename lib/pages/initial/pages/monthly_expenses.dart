@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/auth_controller.dart';
 import '../../transaction/pages/category_page.dart';
 import '../../../utils/color.dart';
@@ -105,6 +106,10 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
 
                 return Column(
                   children: [
+                    AdsBanner(),
+                    SizedBox(
+                      height: 10.h,
+                    ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
                       child: TextField(
@@ -238,6 +243,8 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AdsBanner(),
+              SizedBox(height: 10.h),
               Text(
                 'Definir orçamento para $name',
                 style: TextStyle(

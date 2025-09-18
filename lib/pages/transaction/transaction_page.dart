@@ -201,11 +201,13 @@ class _TransactionPageState extends State<TransactionPage> {
                 ],
               ),
             ),
+            SizedBox(height: 8.h),
             AdsBanner(),
+            SizedBox(height: 8.h),
 
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: 20.h,
+                horizontal: 20.w,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,7 +230,7 @@ class _TransactionPageState extends State<TransactionPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.h),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -252,7 +254,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 20.h,
+                    horizontal: 20.w,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +280,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 if (_selectedType == TransactionType.despesa)
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 20.h,
+                      horizontal: 20.w,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,7 +410,7 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: 20.h,
+                horizontal: 20.w,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,7 +452,7 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
 
             Padding(
-              padding: EdgeInsets.all(2.h),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 2.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -572,7 +574,7 @@ class _TransactionPageState extends State<TransactionPage> {
               style: TextStyle(
                 color: DefaultColors.white,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 12.sp,
+                fontSize: 16.sp,
               ),
             ),
             SizedBox(height: 2.h),
@@ -592,6 +594,7 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildShimmerSkeleton(ThemeData theme) {
     return SingleChildScrollView(
       child: Column(
