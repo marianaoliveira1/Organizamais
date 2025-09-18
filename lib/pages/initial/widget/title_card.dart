@@ -8,11 +8,13 @@ import 'package:organizamais/utils/color.dart';
 class DefaultTitleCard extends StatelessWidget {
   final String text;
   void Function() onTap;
+  final String? suffix;
 
   DefaultTitleCard({
     super.key,
     required this.text,
     required this.onTap,
+    this.suffix,
   });
 
   @override
@@ -20,19 +22,34 @@ class DefaultTitleCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          text,
-          style: TextStyle(
-            color: DefaultColors.grey20,
-            fontWeight: FontWeight.w500,
-            fontSize: 10.sp,
-          ),
+        Row(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                color: DefaultColors.grey20,
+                fontWeight: FontWeight.w500,
+                fontSize: 12.sp,
+              ),
+            ),
+            if (suffix != null) ...[
+              SizedBox(width: 6.w),
+              Text(
+                '(${suffix})',
+                style: TextStyle(
+                  color: DefaultColors.grey,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12.sp,
+                ),
+              ),
+            ],
+          ],
         ),
         GestureDetector(
           onTap: onTap,
           child: Icon(
             Icons.add,
-            size: 12.sp,
+            size: 14.sp,
             color: DefaultColors.grey,
           ),
         ),

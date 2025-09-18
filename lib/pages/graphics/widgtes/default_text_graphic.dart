@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:organizamais/utils/color.dart';
 
 class DefaultTextGraphic extends StatelessWidget {
   final String text;
@@ -15,8 +16,8 @@ class DefaultTextGraphic extends StatelessWidget {
       text,
       style: TextStyle(
         fontSize: 14.sp,
-        fontWeight: FontWeight.w700,
-        color: theme.primaryColor,
+        fontWeight: FontWeight.w500,
+        color: DefaultColors.grey,
       ),
     );
   }

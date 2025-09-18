@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:organizamais/utils/color.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:organizamais/controller/auth_controller.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
@@ -40,7 +42,8 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
 
     return Obx(() {
       final monthlyData = _calculateMonthlyData(controller.transaction);
-      final analysis = _generateMonthlyAnalysis(monthlyData);
+      final user = Get.find<AuthController>().firebaseUser.value;
+      final String? uid = user?.uid;
 
       return Column(
         children: [
@@ -65,6 +68,52 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                     color: DefaultColors.grey,
                   ),
                 ),
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 12.w,
+                          height: 12.w,
+                          decoration: BoxDecoration(
+                            color: widget.categoryColor,
+                            borderRadius: BorderRadius.circular(3.r),
+                          ),
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'Gasto',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 16.w),
+                    Row(
+                      children: [
+                        Container(
+                          width: 12.w,
+                          height: 12.w,
+                          decoration: BoxDecoration(
+                            color: DefaultColors.grey,
+                            borderRadius: BorderRadius.circular(3.r),
+                          ),
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'Meta',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 SizedBox(height: 20.h),
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -81,6 +130,20 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        // Orçamento do usuário para esta categoria
+                        if (uid != null)
+                          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(uid)
+                                .collection('categoryBudgets')
+                                .doc(widget.categoryId.toString())
+                                .snapshots(),
+                            builder: (context, budgetSnap) {
+                              // Apenas força rebuild quando o budget mudar
+                              return const SizedBox.shrink();
+                            },
+                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -109,221 +172,296 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                         SizedBox(
                           height: 300,
                           width: double.infinity,
-                          child: _chartMode == _ChartMode.bar
-                              ? BarChart(
-                                  BarChartData(
-                                    alignment: BarChartAlignment.center,
-                                    maxY: _getOptimalMaxY(monthlyData),
-                                    barTouchData: BarTouchData(
-                                      enabled: true,
-                                      touchTooltipData: BarTouchTooltipData(
-                                        getTooltipColor: (group) =>
-                                            Colors.blueGrey.withOpacity(0.8),
-                                        tooltipRoundedRadius: 8,
-                                        getTooltipItem:
-                                            (group, groupIndex, rod, rodIndex) {
-                                          final month =
-                                              _getMonthName(group.x.toInt());
-                                          final value = rod.toY;
-                                          return BarTooltipItem(
-                                            '$month\n${_formatCurrency(value)}',
-                                            TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12.sp,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    titlesData: FlTitlesData(
-                                      show: true,
-                                      rightTitles: const AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                      topTitles: const AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          getTitlesWidget: (value, meta) {
-                                            return Transform.rotate(
-                                              angle: -0.5,
-                                              child: SizedBox(
-                                                width: barWidth * 3,
-                                                child: Text(
-                                                  _getMonthAbbr(value.toInt()),
-                                                  style: TextStyle(
-                                                    color: DefaultColors.grey,
-                                                    fontSize: 10.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 1,
+                          child: StreamBuilder<
+                              DocumentSnapshot<Map<String, dynamic>>>(
+                            stream: uid == null
+                                ? const Stream.empty()
+                                : FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(uid)
+                                    .collection('categoryBudgets')
+                                    .doc(widget.categoryId.toString())
+                                    .snapshots(),
+                            builder: (context, budgetSnap) {
+                              final double budget =
+                                  (budgetSnap.data?.data()?['amount'] as num?)
+                                          ?.toDouble() ??
+                                      0.0;
+                              final bool hasBudget = budget > 0;
+                              return _chartMode == _ChartMode.bar
+                                  ? BarChart(
+                                      BarChartData(
+                                        alignment: BarChartAlignment.center,
+                                        groupsSpace: hasBudget ? 6 : 12,
+                                        maxY: _getOptimalMaxY(monthlyData),
+                                        barTouchData: BarTouchData(
+                                          enabled: true,
+                                          touchTooltipData: BarTouchTooltipData(
+                                            getTooltipColor: (group) => Colors
+                                                .blueGrey
+                                                .withOpacity(0.8),
+                                            tooltipRoundedRadius: 8,
+                                            getTooltipItem: (group, groupIndex,
+                                                rod, rodIndex) {
+                                              final month = _getMonthName(
+                                                  group.x.toInt());
+                                              final value = rod.toY;
+                                              return BarTooltipItem(
+                                                '$month\n${_formatCurrency(value)}',
+                                                TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12.sp,
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                          reservedSize: 45,
+                                              );
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          reservedSize: 45.w,
-                                          interval: _getOptimalInterval(
-                                              _getMaxValue(monthlyData)),
-                                          getTitlesWidget: (value, meta) {
-                                            if (value < 0)
-                                              return const SizedBox.shrink();
-                                            return Text(
-                                              _formatCurrencyShort(value),
-                                              style: TextStyle(
-                                                color: DefaultColors.grey,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 8.sp,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    borderData: FlBorderData(show: false),
-                                    barGroups: _createBarGroups(monthlyData,
-                                        barWidth: barWidth),
-                                    gridData: FlGridData(
-                                      show: true,
-                                      drawVerticalLine: false,
-                                      horizontalInterval: _getOptimalInterval(
-                                          _getMaxValue(monthlyData)),
-                                      getDrawingHorizontalLine: (value) {
-                                        return FlLine(
-                                          color: DefaultColors.grey
-                                              .withOpacity(0.2),
-                                          strokeWidth: 1,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              : LineChart(
-                                  LineChartData(
-                                    minX: 1,
-                                    maxX: 12,
-                                    maxY: _getOptimalMaxY(monthlyData),
-                                    lineTouchData: LineTouchData(
-                                      enabled: true,
-                                      touchTooltipData: LineTouchTooltipData(
-                                        tooltipRoundedRadius: 8,
-                                        getTooltipItems: (touchedSpots) {
-                                          return touchedSpots.map((spot) {
-                                            final month =
-                                                _getMonthName(spot.x.toInt());
-                                            return LineTooltipItem(
-                                              '$month\n${_formatCurrency(spot.y)}',
-                                              TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12.sp,
-                                              ),
-                                            );
-                                          }).toList();
-                                        },
-                                      ),
-                                    ),
-                                    titlesData: FlTitlesData(
-                                      show: true,
-                                      rightTitles: const AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                      topTitles: const AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          getTitlesWidget: (value, meta) {
-                                            return Transform.rotate(
-                                              angle: -0.5,
-                                              child: SizedBox(
-                                                width: 24.w * 3,
-                                                child: Text(
-                                                  _getMonthAbbr(value.toInt()),
-                                                  style: TextStyle(
-                                                    color: DefaultColors.grey,
-                                                    fontSize: 10.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 1,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          reservedSize: 45,
-                                        ),
-                                      ),
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          reservedSize: 45.w,
-                                          interval: _getOptimalInterval(
-                                              _getMaxValue(monthlyData)),
-                                          getTitlesWidget: (value, meta) {
-                                            if (value < 0)
-                                              return const SizedBox.shrink();
-                                            return Text(
-                                              _formatCurrencyShort(value),
-                                              style: TextStyle(
-                                                color: DefaultColors.grey,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 8.sp,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    gridData: FlGridData(
-                                      show: true,
-                                      drawVerticalLine: false,
-                                      horizontalInterval: _getOptimalInterval(
-                                          _getMaxValue(monthlyData)),
-                                      getDrawingHorizontalLine: (value) {
-                                        return FlLine(
-                                          color: DefaultColors.grey
-                                              .withOpacity(0.2),
-                                          strokeWidth: 1,
-                                        );
-                                      },
-                                    ),
-                                    borderData: FlBorderData(show: false),
-                                    lineBarsData: [
-                                      LineChartBarData(
-                                        spots: List.generate(12, (i) {
-                                          final month = i + 1;
-                                          final y = monthlyData[month] ?? 0;
-                                          return FlSpot(month.toDouble(), y);
-                                        }),
-                                        isCurved: true,
-                                        color: widget.categoryColor,
-                                        barWidth: 3,
-                                        isStrokeCapRound: true,
-                                        dotData: FlDotData(show: false),
-                                        belowBarData: BarAreaData(
+                                        titlesData: FlTitlesData(
                                           show: true,
-                                          color: widget.categoryColor
-                                              .withOpacity(0.10),
+                                          rightTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          topTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              interval: 1,
+                                              getTitlesWidget: (value, meta) {
+                                                final String label =
+                                                    _getMonthAbbr(
+                                                        value.toInt());
+                                                if (hasBudget) {
+                                                  return SizedBox(
+                                                    width: 28.w,
+                                                    child: Text(
+                                                      label,
+                                                      style: TextStyle(
+                                                        color:
+                                                            DefaultColors.grey,
+                                                        fontSize: 10.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return Transform.rotate(
+                                                    angle: -0.5,
+                                                    child: SizedBox(
+                                                      width: barWidth * 3,
+                                                      child: Text(
+                                                        label,
+                                                        style: TextStyle(
+                                                          color: DefaultColors
+                                                              .grey,
+                                                          fontSize: 10.sp,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        maxLines: 1,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              reservedSize: hasBudget ? 32 : 45,
+                                            ),
+                                          ),
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 45.w,
+                                              interval: _getOptimalInterval(
+                                                  _getMaxValue(monthlyData)),
+                                              getTitlesWidget: (value, meta) {
+                                                if (value < 0)
+                                                  return const SizedBox
+                                                      .shrink();
+                                                return Text(
+                                                  _formatCurrencyShort(value),
+                                                  style: TextStyle(
+                                                    color: DefaultColors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 8.sp,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        borderData: FlBorderData(show: false),
+                                        barGroups: _createBarGroups(monthlyData,
+                                            barWidth: barWidth, budget: budget),
+                                        gridData: FlGridData(
+                                          show: true,
+                                          drawVerticalLine: false,
+                                          horizontalInterval:
+                                              _getOptimalInterval(
+                                                  _getMaxValue(monthlyData)),
+                                          getDrawingHorizontalLine: (value) {
+                                            return FlLine(
+                                              color: DefaultColors.grey
+                                                  .withOpacity(0.2),
+                                              strokeWidth: 1,
+                                            );
+                                          },
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    )
+                                  : LineChart(
+                                      LineChartData(
+                                        minX: 1,
+                                        maxX: 12,
+                                        maxY: _getOptimalMaxY(monthlyData),
+                                        lineTouchData: LineTouchData(
+                                          enabled: true,
+                                          touchTooltipData:
+                                              LineTouchTooltipData(
+                                            tooltipRoundedRadius: 8,
+                                            getTooltipItems: (touchedSpots) {
+                                              return touchedSpots.map((spot) {
+                                                final month = _getMonthName(
+                                                    spot.x.toInt());
+                                                return LineTooltipItem(
+                                                  '$month\n${_formatCurrency(spot.y)}',
+                                                  TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12.sp,
+                                                  ),
+                                                );
+                                              }).toList();
+                                            },
+                                          ),
+                                        ),
+                                        titlesData: FlTitlesData(
+                                          show: true,
+                                          rightTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          topTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              getTitlesWidget: (value, meta) {
+                                                return Transform.rotate(
+                                                  angle: -0.5,
+                                                  child: SizedBox(
+                                                    width: 24.w * 3,
+                                                    child: Text(
+                                                      _getMonthAbbr(
+                                                          value.toInt()),
+                                                      style: TextStyle(
+                                                        color:
+                                                            DefaultColors.grey,
+                                                        fontSize: 10.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              reservedSize: 45,
+                                            ),
+                                          ),
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 45.w,
+                                              interval: _getOptimalInterval(
+                                                  _getMaxValue(monthlyData)),
+                                              getTitlesWidget: (value, meta) {
+                                                if (value < 0)
+                                                  return const SizedBox
+                                                      .shrink();
+                                                return Text(
+                                                  _formatCurrencyShort(value),
+                                                  style: TextStyle(
+                                                    color: DefaultColors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 8.sp,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        gridData: FlGridData(
+                                          show: true,
+                                          drawVerticalLine: false,
+                                          horizontalInterval:
+                                              _getOptimalInterval(
+                                                  _getMaxValue(monthlyData)),
+                                          getDrawingHorizontalLine: (value) {
+                                            return FlLine(
+                                              color: DefaultColors.grey
+                                                  .withOpacity(0.2),
+                                              strokeWidth: 1,
+                                            );
+                                          },
+                                        ),
+                                        borderData: FlBorderData(show: false),
+                                        lineBarsData: [
+                                          LineChartBarData(
+                                            spots: List.generate(12, (i) {
+                                              final month = i + 1;
+                                              final y = monthlyData[month] ?? 0;
+                                              return FlSpot(
+                                                  month.toDouble(), y);
+                                            }),
+                                            isCurved: true,
+                                            color: widget.categoryColor,
+                                            barWidth: 3,
+                                            isStrokeCapRound: true,
+                                            dotData: FlDotData(show: false),
+                                            belowBarData: BarAreaData(
+                                              show: true,
+                                              color: widget.categoryColor
+                                                  .withOpacity(0.10),
+                                            ),
+                                          ),
+                                          if (budget > 0)
+                                            LineChartBarData(
+                                              spots: List.generate(12, (i) {
+                                                final month = i + 1;
+                                                final hasTxn =
+                                                    (monthlyData[month] ?? 0) >
+                                                        0;
+                                                if (!hasTxn) return null;
+                                                return FlSpot(
+                                                    month.toDouble(), budget);
+                                              }).whereType<FlSpot>().toList(),
+                                              isCurved: false,
+                                              color: DefaultColors.grey,
+                                              barWidth: 2,
+                                              isStrokeCapRound: true,
+                                              dotData: FlDotData(show: false),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                            },
+                          ),
                         ),
                       ],
                     );
@@ -333,26 +471,41 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
             ),
           ),
 
-          // Análise Mensal
-          if (analysis.isNotEmpty)
-            Container(
-              padding: EdgeInsets.all(16.w),
-              margin: EdgeInsets.only(bottom: 16.h),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DefaultTextGraphic(
-                    text: "Análise Mensal",
-                  ),
-                  SizedBox(height: 16.h),
-                  ...analysis.map((item) => _buildAnalysisItem(item, theme)),
-                ],
-              ),
-            ),
+          // Análise Mensal (com meta)
+          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: uid == null
+                ? const Stream.empty()
+                : FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .collection('categoryBudgets')
+                    .doc(widget.categoryId.toString())
+                    .snapshots(),
+            builder: (context, snap) {
+              final double budget =
+                  (snap.data?.data()?['amount'] as num?)?.toDouble() ?? 0.0;
+              final analysis = _generateMonthlyAnalysis(monthlyData, budget);
+              if (analysis.isEmpty) return const SizedBox.shrink();
+              return Container(
+                padding: EdgeInsets.all(16.w),
+                margin: EdgeInsets.only(bottom: 16.h),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DefaultTextGraphic(
+                      text: "Análise Mensal",
+                    ),
+                    SizedBox(height: 16.h),
+                    ...analysis.map((item) => _buildAnalysisItem(item, theme)),
+                  ],
+                ),
+              );
+            },
+          ),
           AdsBanner(),
           SizedBox(
             height: 20.h,
@@ -439,7 +592,8 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
   }
 
   List<Map<String, dynamic>> _generateMonthlyAnalysis(
-      Map<int, double> monthlyData) {
+      Map<int, double> monthlyData,
+      [double budget = 0.0]) {
     List<Map<String, dynamic>> analysis = [];
     final currentMonth = DateTime.now().month;
 
@@ -487,9 +641,22 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
             ? 'Aumentou ${_formatCurrency(absoluteDifference)}'
             : 'Diminuiu ${_formatCurrency(absoluteDifference)}';
 
+        String budgetLine = '';
+        if (budget > 0) {
+          final double remaining = budget - currentValue;
+          if (remaining >= 0) {
+            budgetLine =
+                ' Sua meta mensal foi R\$ ${_formatCurrency(budget)} e faltou R\$ ${_formatCurrency(remaining)} para atingir.';
+          } else {
+            budgetLine =
+                ' Você ultrapassou R\$ ${_formatCurrency(remaining.abs())} da meta de orçamento.';
+          }
+        }
+
         analysis.add({
           'month': _getMonthName(month),
-          'analysis': '$valueText (${percentChange.toStringAsFixed(1)}%)',
+          'analysis':
+              '$valueText (${percentChange.toStringAsFixed(1)}%)$budgetLine',
           'percentChange': percentChange,
           'isPositive': difference > 0,
           'currentValue': currentValue,
@@ -504,240 +671,9 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
     return analysis;
   }
 
-  List<Widget> _getCategoryTips(
-      String categoryName, Map<int, double> monthlyData, ThemeData theme) {
-    List<String> tips = [];
+  // _getCategoryTips removido (não utilizado)
 
-    // Calcular padrões de gasto
-    List<double> values = monthlyData.values.where((v) => v > 0).toList();
-    if (values.isEmpty) {
-      return [_buildTipItem("Sem dados suficientes para análise", theme)];
-    }
-
-    double average = values.reduce((a, b) => a + b) / values.length;
-    double maxValue = values.reduce((a, b) => a > b ? a : b);
-    int peakMonth =
-        monthlyData.entries.firstWhere((e) => e.value == maxValue).key;
-
-    // Dicas específicas por categoria
-    switch (categoryName.toLowerCase()) {
-      // Grupo Alimentação (Restaurantes, Delivery, Mercado, Lanches)
-      case 'alimentação':
-      case 'comida':
-      case 'restaurante':
-      case 'delivery':
-      case 'mercado':
-      case 'lanches':
-      case 'padaria':
-      case 'alimentação em viagens':
-        tips.addAll([
-          'Faça "batch cooking" - cozinhe grandes quantidades e congele porções individuais',
-          'Compre cortes de carne menos nobres e aprenda técnicas para deixá-los macios',
-          'Crie um "banco de alimentos" com amigos para comprar atacado coletivamente',
-          'Use apps como Too Good To Go para comprar excedentes de restaurantes a preços reduzidos',
-          'Transforme sobras em novas refeições (ex: arroz vira bolinho, frango vira sanduíche)'
-        ]);
-        break;
-
-      // Grupo Transporte (Combustível, Uber, Pedágio, etc)
-      case 'transporte':
-      case 'combustível':
-      case 'gasolina':
-      case 'uber/99':
-      case 'pedágio':
-      case 'multas':
-      case 'ipva':
-      case 'seguro do carro':
-        tips.addAll([
-          'Experimente a "direção hipereficiente" (manter velocidade constante, antecipar frenagens)',
-          'Crie um sistema de caronas rotativas com vizinhos para atividades regulares',
-          'Negocie pacotes de corridas com motoristas de aplicativo fixos',
-          'Use apps de estacionamento para encontrar vagas gratuitas ou mais baratas',
-          'Considere alugar sua vaga de garagem quando não estiver usando'
-        ]);
-        break;
-
-      // Grupo Moradia (Contas, Manutenção, Casa)
-      case 'casa':
-      case 'moradia':
-      case 'manutenção':
-      case 'contas (água, luz, gás, internet)':
-      case 'coisas para casa':
-        tips.addAll([
-          'Instale válvulas de fechamento automático em torneiras para evitar vazamentos',
-          'Use garrafas PET cheias de água na caixa acoplada do vaso para reduzir consumo',
-          'Crie um "clube de ferramentas" com vizinhos para compartilhar equipamentos',
-          'Aplique filme refletivo em janelas para melhorar isolamento térmico',
-          'Negocie pacotes de serviços com prestadores fixos (eletricista, encanador)'
-        ]);
-        break;
-
-      // Grupo Saúde & Bem-estar
-      case 'saúde':
-      case 'farmácia':
-      case 'médico':
-      case 'plano de saúde/seguro de vida':
-      case 'academia':
-      case 'cuidados pessoais':
-        tips.addAll([
-          'Agende consultas médicas no final do expediente - muitos profissionais oferecem descontos',
-          'Participe de programas de prevenção gratuitos oferecidos por planos de saúde',
-          'Aprenda automassagem para reduzir idas a massagistas',
-          'Compre medicamentos em farmácias de bairro (muitas têm preços melhores que redes)',
-          'Use apps de exercícios em casa ao invés de academia quando possível'
-        ]);
-        break;
-
-      // Grupo Entretenimento & Lazer
-      case 'lazer':
-      case 'entretenimento':
-      case 'cinema/streaming':
-      case 'jogos online':
-      case 'viagens':
-      case 'hospedagens':
-      case 'passeios':
-      case 'passagens':
-        tips.addAll([
-          'Assine serviços de streaming durante promoções anuais (Black Friday costuma valer a pena)',
-          'Explore programas de fidelidade de companhias aéreas mesmo para voos baratos',
-          'Visite atrações turísticas em dias de entrada gratuita ou horários com desconto',
-          'Troque experiências (ex: ofereça hospedagem em sua cidade em plataformas de troca)',
-          'Compre ingressos de atrações turísticas com antecedência online (muitas vezes mais barato)'
-        ]);
-        break;
-
-      // Grupo Educação & Desenvolvimento
-      case 'educação':
-      case 'cursos':
-      case 'livros/revistas':
-        tips.addAll([
-          'Organize grupos de estudo coletivo para dividir custos de cursos caros',
-          'Procure edições internacionais de livros técnicos (muitas vezes mais baratas)',
-          'Peça samples gratuitos de materiais educacionais diretamente aos fornecedores',
-          'Participe como voluntário em eventos acadêmicos para ter acesso gratuito',
-          'Venda materiais didáticos antigos para financiar os novos'
-        ]);
-        break;
-
-      // Grupo Vestuário & Acessórios
-      case 'roupas':
-      case 'vestuário':
-      case 'roupas e acessórios':
-        tips.addAll([
-          'Organize eventos de troca de roupas com amigos periodicamente',
-          'Compre roupas de estação fora de época (agasalhos no verão, roupas de banho no inverno)',
-          'Aprenda técnicas básicas de costura para fazer reparos e ajustes',
-          'Invista em acessórios versáteis que mudam o visual de poucas peças básicas',
-          'Compre roupas de qualidade em leilões de estoque de lojas premium'
-        ]);
-        break;
-
-      // Grupo Tecnologia & Serviços
-      case 'assinaturas e serviços':
-      case 'aplicativos':
-      case 'streaming':
-      case 'taxas':
-        tips.addAll([
-          'Use cartões pré-pagos para assinaturas e evite cobranças automáticas',
-          'Negocie diretamente com atendentes para obter descontos em serviços',
-          'Compartilhe contas familiares maximizando os perfis permitidos',
-          'Cancele serviços sazonais durante períodos de não uso',
-          'Prefira planos anuais quando o desconto for superior a 20%'
-        ]);
-        break;
-
-      // Grupo Família & Pets
-      case 'família e filhos':
-      case 'pets':
-      case 'pet (veterinário/ração)':
-        tips.addAll([
-          'Organize uma creche compartilhada com outros pais em seu bairro',
-          'Compre ração em sacos grandes e armazene em potes herméticos',
-          'Aprenda a fazer brinquedos educativos caseiros para crianças/pets',
-          'Negocie pacotes de consultas com veterinários/pediátricas',
-          'Junte-se a outros donos de pets para comprar medicamentos em atacado'
-        ]);
-        break;
-
-      // Grupo Financeiros & Impostos
-      case 'impostos':
-      case 'financiamento':
-      case 'empréstimos':
-      case 'doações/caridade':
-        tips.addAll([
-          'Antecipe pagamentos de impostos quando houver desconto',
-          'Considere refinanciar dívidas sempre que as taxas caírem significativamente',
-          'Documente doações para abater no imposto de renda',
-          'Negocie taxas diretamente com gerentes bancários',
-          'Use serviços gratuitos de consultoria financeira oferecidos por algumas instituições'
-        ]);
-        break;
-
-      default:
-        tips.addAll([
-          'Implemente a regra 72h: espere 3 dias antes de qualquer gasto não essencial',
-          'Crie um sistema de "orçamento reverso" (defina o que quer guardar primeiro)',
-          'Automatize transferências para poupança imediatamente após receber o salário',
-          'Converse com profissionais da área para descobrir "hacks" específicos',
-          'Monitore por 3 meses antes de cortar - alguns gastos trazem retornos ocultos'
-        ]);
-    }
-
-    // Dicas baseadas em padrões de gasto
-    if (peakMonth >= 11 || peakMonth <= 2) {
-      tips.add(
-          'Gastos maiores no fim/início do ano são normais, mas planeje-se antecipadamente');
-    }
-
-    if (values.length > 1) {
-      double variation = (values.reduce((a, b) => a > b ? a : b) -
-              values.reduce((a, b) => a < b ? a : b)) /
-          average;
-      if (variation > 0.5) {
-        tips.add(
-            'Seus gastos variam muito mês a mês. Tente criar uma rotina mais consistente');
-      }
-    }
-
-    // Selecionar 3-4 dicas mais relevantes
-    tips.shuffle();
-    return tips.take(4).map((tip) => _buildTipItem(tip, theme)).toList();
-  }
-
-  Widget _buildTipItem(String tip, ThemeData theme) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(
-          color: Colors.blue.withOpacity(0.2),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Iconsax.lamp_on,
-            color: Colors.blue,
-            size: 16.sp,
-          ),
-          SizedBox(width: 8.w),
-          Expanded(
-            child: Text(
-              tip,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: DefaultColors.grey,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // _buildTipItem removido
 
   Map<int, double> _calculateMonthlyData(List<TransactionModel> transactions) {
     final currentYear = DateTime.now().year;
@@ -770,20 +706,33 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
   }
 
   List<BarChartGroupData> _createBarGroups(Map<int, double> monthlyData,
-      {required double barWidth}) {
+      {required double barWidth, double budget = 0.0}) {
     return monthlyData.entries.map((entry) {
+      final double primaryWidth = (barWidth * 0.5).clamp(5.0, 16.0);
+      final double budgetWidth = (barWidth * 0.5).clamp(5.0, 16.0);
       return BarChartGroupData(
         x: entry.key,
+        barsSpace: 2,
         barRods: [
           BarChartRodData(
             toY: entry.value,
             color: widget.categoryColor,
-            width: barWidth,
+            width: primaryWidth,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(barWidth * 0.25),
               topRight: Radius.circular(barWidth * 0.25),
             ),
           ),
+          if ((entry.value) > 0 && budget > 0)
+            BarChartRodData(
+              toY: budget,
+              color: DefaultColors.grey,
+              width: budgetWidth,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(barWidth * 0.25),
+                topRight: Radius.circular(barWidth * 0.25),
+              ),
+            ),
         ],
       );
     }).toList();

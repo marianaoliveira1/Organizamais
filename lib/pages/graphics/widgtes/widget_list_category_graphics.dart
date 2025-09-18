@@ -27,6 +27,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     required this.theme,
     required this.currencyFormatter,
     required this.dateFormatter,
+    this.budgets = const {},
   });
 
   final List<Map<String, dynamic>> data;
@@ -36,6 +37,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   final ThemeData theme;
   final NumberFormat currencyFormatter;
   final DateFormat dateFormatter;
+  final Map<int, double> budgets;
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +134,42 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            currencyFormatter.format(valor),
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: theme.primaryColor,
-                            ),
-                          ),
+                          budgets.containsKey(categoryId)
+                              ? RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.primaryColor,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: currencyFormatter.format(valor),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: ' / ',
+                                        style: TextStyle(
+                                          color: DefaultColors.grey,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                          text: currencyFormatter
+                                              .format(budgets[categoryId]!)),
+                                    ],
+                                  ),
+                                )
+                              : Text(
+                                  currencyFormatter.format(valor),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
                           Icon(
                             Iconsax.arrow_down5,
                             // selectedCategoryId.value == categoryId
@@ -183,6 +213,37 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Resumo da meta mensal (se existir)
+                      if (budgets.containsKey(categoryId)) ...[
+                        Builder(builder: (context) {
+                          final double budget = budgets[categoryId] ?? 0.0;
+                          double totalCategoria = 0.0;
+                          final txs = getTransactionsByCategoryAndMonth(
+                              categoryId, monthName);
+                          for (final t in txs) {
+                            totalCategoria += double.parse(
+                              t.value.replaceAll('.', '').replaceAll(',', '.'),
+                            );
+                          }
+                          final double remaining = (budget - totalCategoria);
+                          final bool exceeded = remaining < 0;
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: Text(
+                              exceeded
+                                  ? 'Você ultrapassou seu valor de gasto mensal em R\$ ${currencyFormatter.format(remaining.abs())}.'
+                                  : 'Sua meta mensal é de R\$ ${currencyFormatter.format(budget)} e faltam R\$ ${currencyFormatter.format(remaining)} para chegar ao total.',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: exceeded
+                                    ? DefaultColors.redDark
+                                    : theme.primaryColor,
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
                       _buildCategoryMonthComparison(categoryId, theme),
                       SizedBox(
                         height: 10.h,
@@ -775,7 +836,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: DefaultColors.grey.withOpacity(0.1),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Row(

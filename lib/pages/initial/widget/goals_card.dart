@@ -29,12 +29,13 @@ class GoalsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTitleCard(
-            text: "Minhas metas financeira",
-            onTap: () {
-              Get.to(() => const AddGoalPage());
-            },
-          ),
+          Obx(() => DefaultTitleCard(
+                text: "Minhas metas financeira",
+                suffix: goalController.goal.length.toString(),
+                onTap: () {
+                  Get.to(() => const AddGoalPage());
+                },
+              )),
           SizedBox(
             height: 10.h,
           ),
@@ -96,8 +97,11 @@ class GoalsCard extends StatelessWidget {
                   child: Container(
                     margin: EdgeInsets.only(bottom: 12.h),
                     decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor.withOpacity(0.5),
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: theme.primaryColor.withOpacity(0.06),
+                      ),
                     ),
                     padding: EdgeInsets.all(12.w),
                     child: Column(

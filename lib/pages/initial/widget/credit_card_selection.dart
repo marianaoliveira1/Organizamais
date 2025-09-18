@@ -30,16 +30,17 @@ class CreditCardSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DefaultTitleCard(
-              text: "Meus Cartões",
-              onTap: () {
-                Get.to(
-                  () => AddCardPage(
-                    isEditing: false,
-                  ),
-                );
-              },
-            ),
+            Obx(() => DefaultTitleCard(
+                  text: "Meus Cartões",
+                  suffix: cardController.card.length.toString(),
+                  onTap: () {
+                    Get.to(
+                      () => AddCardPage(
+                        isEditing: false,
+                      ),
+                    );
+                  },
+                )),
             SizedBox(
               height: 10.h,
             ),

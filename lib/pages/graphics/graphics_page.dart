@@ -6,6 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:organizamais/controller/auth_controller.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/widgtes/despesas_por_tipo_de_pagamento.dart';
@@ -1421,7 +1423,10 @@ class _GraphicsPageState extends State<GraphicsPage>
                 child: DefaultTextGraphic(text: "Despesas por categoria"),
               ),
               IconButton(
-                icon: Icon(Icons.chevron_right, color: theme.primaryColor),
+                icon: Icon(
+                  Icons.chevron_right,
+                  color: DefaultColors.grey,
+                ),
                 onPressed: () async {
                   final result = await Navigator.of(context).push<Set<int>>(
                     MaterialPageRoute(
@@ -1556,15 +1561,51 @@ class _GraphicsPageState extends State<GraphicsPage>
                 ),
               ),
             ),
-          WidgetListCategoryGraphics(
-            data: data,
-            totalValue: totalValue,
-            selectedCategoryId: selectedCategoryId,
-            theme: theme,
-            currencyFormatter: currencyFormatter,
-            dateFormatter: dateFormatter,
-            monthName: selectedMonth,
-          ),
+          // Carregar budgets do Firestore do usuário atual
+          Obx(() {
+            final user = Get.find<AuthController>().firebaseUser.value;
+            if (user == null) {
+              return WidgetListCategoryGraphics(
+                data: data,
+                totalValue: totalValue,
+                selectedCategoryId: selectedCategoryId,
+                theme: theme,
+                currencyFormatter: currencyFormatter,
+                dateFormatter: dateFormatter,
+                monthName: selectedMonth,
+              );
+            }
+            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user.uid)
+                  .collection('categoryBudgets')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final Map<int, double> budgets = {};
+                if (snapshot.hasData) {
+                  for (final d in snapshot.data!.docs) {
+                    final data = d.data();
+                    final int id =
+                        int.tryParse(d.id) ?? data['categoryId'] as int? ?? -1;
+                    final double amount =
+                        (data['amount'] as num?)?.toDouble() ?? 0.0;
+                    if (id >= 0) budgets[id] = amount;
+                  }
+                }
+                return WidgetListCategoryGraphics(
+                  data: data,
+                  totalValue: totalValue,
+                  selectedCategoryId: selectedCategoryId,
+                  theme: theme,
+                  currencyFormatter: currencyFormatter,
+                  dateFormatter: dateFormatter,
+                  monthName: selectedMonth,
+                  budgets: budgets,
+                );
+              },
+            );
+          }),
         ],
       ),
     );

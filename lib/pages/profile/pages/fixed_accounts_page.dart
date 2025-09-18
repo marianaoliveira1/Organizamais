@@ -46,12 +46,19 @@ class FixedAccountsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        title: Text(
+          "Minhas contas fixas",
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 16.sp,
+          ),
+        ),
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: 10.h,
+            vertical: 14.h,
             horizontal: 16.w,
           ),
           child: Column(
@@ -72,6 +79,9 @@ class FixedAccountsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    SizedBox(
+                      height: 14.h,
+                    ),
                     Obx(
                       () {
                         final fixedAccounts = fixedAccountsController

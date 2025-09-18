@@ -29,12 +29,17 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
       ),
       child: Column(
         children: [
-          DefaultTitleCard(
-            text: "Contas fixas",
-            onTap: () {
-              Get.toNamed("/fixed-accounts");
-            },
-          ),
+          Obx(() {
+            final count =
+                Get.find<FixedAccountsController>().fixedAccounts.length;
+            return DefaultTitleCard(
+              text: "Contas fixas",
+              suffix: count.toString(),
+              onTap: () {
+                Get.toNamed("/fixed-accounts");
+              },
+            );
+          }),
           SizedBox(
             height: 10.h,
           ),

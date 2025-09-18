@@ -16,6 +16,13 @@ class CardsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        title: Text(
+          "Meus cartões",
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 16.sp,
+          ),
+        ),
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
       body: Padding(
@@ -34,8 +41,8 @@ class CardsPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
               ),
               padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-                horizontal: 20.h,
+                vertical: 14.h,
+                horizontal: 16.h,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -72,7 +79,7 @@ class CardsPage extends StatelessWidget {
                                       style: TextStyle(
                                         color: theme.primaryColor,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16.sp,
+                                        fontSize: 14.sp,
                                       ),
                                     ),
                                   ),

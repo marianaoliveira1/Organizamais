@@ -58,6 +58,13 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        title: Text(
+          "Meu perfil",
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 16.sp,
+          ),
+        ),
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
       ),
