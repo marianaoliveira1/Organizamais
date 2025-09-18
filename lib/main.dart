@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
 
         // 🌞 Tema Claro
         theme: ThemeData(
-          textTheme: GoogleFonts.rubikTextTheme(),
+          textTheme: GoogleFonts.interTextTheme(),
           brightness: Brightness.light,
           scaffoldBackgroundColor: DefaultColors.backgroundLight,
           primaryColor: DefaultColors.black,

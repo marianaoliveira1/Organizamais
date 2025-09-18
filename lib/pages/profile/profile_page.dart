@@ -7,6 +7,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/auth_controller.dart';
 import '../initial/widget/edit_name_dialog.dart';
+import '../../widgetes/privacy_policy_dialog.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -146,7 +147,30 @@ class ProfilePage extends StatelessWidget {
                 );
               },
             ),
+            SizedBox(height: 16.h),
             const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => showPrivacyPolicyDialog(context),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: theme.primaryColor.withOpacity(.4)),
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  foregroundColor: theme.primaryColor,
+                ),
+                label: Text(
+                  'Política de Privacidade',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

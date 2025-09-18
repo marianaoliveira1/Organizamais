@@ -273,44 +273,42 @@ class GoalDetailsPage extends StatelessWidget {
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                    Builder(
-                                      builder: (context) {
-                                        int daysLeft = 0;
-                                        try {
-                                          final parts =
-                                              currentGoal.date.split('/');
-                                          final dl = DateTime(
-                                            int.parse(parts[2]),
-                                            int.parse(parts[1]),
-                                            int.parse(parts[0]),
-                                          );
-                                          final now = DateTime.now();
-                                          final todayOnly = DateTime(
-                                              now.year, now.month, now.day);
-                                          final dueOnly = DateTime(
-                                              dl.year, dl.month, dl.day);
-                                          daysLeft = dueOnly
-                                              .difference(todayOnly)
-                                              .inDays;
-                                        } catch (_) {}
-                                        final String daysLabel = daysLeft > 0
-                                            ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
-                                            : (daysLeft == 0
-                                                ? 'Vence hoje'
-                                                : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
-                                        return Text(
-                                          " ($daysLabel)",
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: daysLeft < 0
-                                                ? DefaultColors.redDark
-                                                : theme.primaryColor,
-                                          ),
-                                        );
-                                      },
-                                    ),
                                   ],
+                                ),
+                                Builder(
+                                  builder: (context) {
+                                    int daysLeft = 0;
+                                    try {
+                                      final parts = currentGoal.date.split('/');
+                                      final dl = DateTime(
+                                        int.parse(parts[2]),
+                                        int.parse(parts[1]),
+                                        int.parse(parts[0]),
+                                      );
+                                      final now = DateTime.now();
+                                      final todayOnly = DateTime(
+                                          now.year, now.month, now.day);
+                                      final dueOnly =
+                                          DateTime(dl.year, dl.month, dl.day);
+                                      daysLeft =
+                                          dueOnly.difference(todayOnly).inDays;
+                                    } catch (_) {}
+                                    final String daysLabel = daysLeft > 0
+                                        ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
+                                        : (daysLeft == 0
+                                            ? 'Vence hoje'
+                                            : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
+                                    return Text(
+                                      " ($daysLabel)",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: daysLeft < 0
+                                            ? DefaultColors.redDark
+                                            : theme.primaryColor,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -372,7 +370,7 @@ class GoalDetailsPage extends StatelessWidget {
                     ),
 
                     SizedBox(
-                      height: 20.h,
+                      height: 30.h,
                     ),
                     LayoutBuilder(
                       builder: (context, constraints) {
@@ -434,29 +432,38 @@ class GoalDetailsPage extends StatelessWidget {
                       final double remaining =
                           (numericValue - currentGoal.currentValue)
                               .clamp(0, double.infinity);
-                      int daysLeft = 0;
-                      try {
-                        final parts = currentGoal.date.split('/');
-                        final dl = DateTime(
-                          int.parse(parts[2]),
-                          int.parse(parts[1]),
-                          int.parse(parts[0]),
+                      // dias restantes não utilizados na versão atual
+                      // final String daysLabel = daysLeft > 0
+                      //     ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
+                      //     : (daysLeft == 0
+                      //         ? 'Vence hoje'
+                      //         : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
+                      final bool isCompleted = numericValue > 0 &&
+                          currentGoal.currentValue >= numericValue;
+                      if (isCompleted) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'A recompensa do esforço chega com nome e sobrenome: meta conquistada! 💪',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         );
-                        final now = DateTime.now();
-                        final todayOnly =
-                            DateTime(now.year, now.month, now.day);
-                        final dueOnly = DateTime(dl.year, dl.month, dl.day);
-                        daysLeft = dueOnly.difference(todayOnly).inDays;
-                      } catch (_) {}
-                      final String daysLabel = daysLeft > 0
-                          ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
-                          : (daysLeft == 0
-                              ? 'Vence hoje'
-                              : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
+                      }
                       return Padding(
                         padding: EdgeInsets.only(bottom: 8.h),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
                               'Faltam R\$ ${_formatCurrencyBRL(remaining)}',
@@ -520,7 +527,7 @@ class GoalDetailsPage extends StatelessWidget {
                               removed += amount;
                             }
                           }
-                          final double net = added - removed;
+                          // final double net = added - removed;
 
                           return Column(
                             children: [

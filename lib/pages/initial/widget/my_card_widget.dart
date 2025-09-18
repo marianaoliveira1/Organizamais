@@ -414,7 +414,9 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           }
           final Color dueChipColor = daysUntilDue < 0
               ? DefaultColors.redDark
-              : (daysUntilDue <= 2 ? DefaultColors.orange : theme.primaryColor);
+              : (daysUntilDue <= 2
+                  ? DefaultColors.orange
+                  : DefaultColors.grey20);
 
           return ClipRRect(
             borderRadius: BorderRadius.circular(16.r),
@@ -533,8 +535,8 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             child: card.iconPath != null
                                 ? Image.asset(
                                     card.iconPath!,
-                                    width: 36.w,
-                                    height: 36.h,
+                                    width: 38.w,
+                                    height: 38.h,
                                   )
                                 : Icon(Icons.credit_card, size: 20.sp),
                           ),
@@ -546,11 +548,11 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                 Text(
                                   card.name,
                                   style: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
                                     color: theme.primaryColor,
                                   ),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 if (card.bankName != null &&
@@ -718,7 +720,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             Text(
                               formatter.format(spent),
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 12.sp,
                                 color: theme.primaryColor,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -726,7 +728,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             Text(
                               'de ${formatter.format(limit)}',
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 12.sp,
                                 color: DefaultColors.grey20,
                               ),
                             ),
@@ -739,7 +741,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                               ? 'Faltam ${formatter.format(remaining)} para o limite'
                               : 'Ultrapassou o limite em ${formatter.format(-remaining)}',
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 12.sp,
                             color: remaining >= 0
                                 ? DefaultColors.grey20
                                 : DefaultColors.redDark,
@@ -790,17 +792,15 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             const Spacer(),
                             Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 4.h),
+                                  horizontal: 12.w, vertical: 6.h),
                               decoration: BoxDecoration(
                                 color: dueChipColor.withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(12.r),
-                                border: Border.all(
-                                    color: dueChipColor.withOpacity(0.3)),
                               ),
                               child: Text(
                                 dueChipText,
                                 style: TextStyle(
-                                  color: dueChipColor,
+                                  color: theme.primaryColor,
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -1053,6 +1053,8 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                         ),
                         SizedBox(height: 8.h),
                         InkWell(
+                          borderRadius: BorderRadius.circular(
+                              12), // efeito ripple arredondado
                           onTap: () {
                             // Quando não está fechado, mostrar ciclo aberto (próxima fatura)
                             Get.to(() => InvoiceDetailsPage(
@@ -1062,22 +1064,44 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                   title: 'Próxima fatura',
                                 ));
                           },
-                          child: Row(
-                            children: [
-                              Text(
-                                'Ver fatura',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.bold,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
                                 ),
-                                textAlign: TextAlign.end,
-                              ),
-                              Icon(Icons.chevron_right,
-                                  color: theme.primaryColor),
-                            ],
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Iconsax.receipt,
+                                        color: theme.primaryColor),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Ver fatura',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Icon(Icons.chevron_right,
+                                    color: theme.primaryColor),
+                              ],
+                            ),
                           ),
-                        ),
+                        )
                       ],
 
                       if (showClosedSection) ...[SizedBox(height: 0)],
