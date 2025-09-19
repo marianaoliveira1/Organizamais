@@ -1051,7 +1051,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.h),
+                        SizedBox(height: 10.h),
                         InkWell(
                           borderRadius: BorderRadius.circular(
                               12), // efeito ripple arredondado
@@ -1068,15 +1068,10 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              border: Border.all(
+                                color: theme.primaryColor,
+                              ),
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

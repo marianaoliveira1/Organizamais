@@ -33,22 +33,28 @@ class DefaultButtonSelectCategory extends StatelessWidget {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: 10.h,
-          horizontal: 5.w,
+          vertical: 6.h,
+          horizontal: 0.w,
         ),
         child: Row(
           children: [
-            if (selectedCategoryData != null)
-              Image.asset(
-                selectedCategoryData['icon'],
-                height: 30.h,
-                width: 30.w,
-              )
-            else
-              Icon(
-                Iconsax.textalign_justifycenter,
-                color: DefaultColors.grey20,
+            SizedBox(
+              width: 40.w,
+              height: 40.h,
+              child: Center(
+                child: selectedCategoryData != null
+                    ? Image.asset(
+                        selectedCategoryData['icon'],
+                        height: 22.h,
+                        width: 22.w,
+                      )
+                    : Icon(
+                        Iconsax.textalign_justifycenter,
+                        color: DefaultColors.grey20,
+                        size: 22.w,
+                      ),
               ),
+            ),
             SizedBox(width: 10.w),
             Text(
               selectedCategoryData != null

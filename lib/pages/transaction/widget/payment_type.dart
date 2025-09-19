@@ -118,19 +118,24 @@ class _PaymentTypeFieldState extends State<PaymentTypeField> {
           fontWeight: FontWeight.w500,
         ),
         border: InputBorder.none,
-        prefixIcon: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-          child: hasAsset
-              ? Image.asset(
-                  _selectedAssetPath!,
-                  width: 24.w,
-                  height: 24.h,
-                )
-              : Icon(
-                  _mapTitleToIcon(widget.controller.text),
-                  color: DefaultColors.grey20,
-                  size: 24.w,
-                ),
+        contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+        prefixIconConstraints: BoxConstraints(minWidth: 40.w, minHeight: 40.h),
+        prefixIcon: SizedBox(
+          width: 40.w,
+          height: 40.h,
+          child: Center(
+            child: hasAsset
+                ? Image.asset(
+                    _selectedAssetPath!,
+                    width: 22.w,
+                    height: 22.h,
+                  )
+                : Icon(
+                    _mapTitleToIcon(widget.controller.text),
+                    color: DefaultColors.grey20,
+                    size: 22.w,
+                  ),
+          ),
         ),
       ),
       onTap: () async {

@@ -29,7 +29,7 @@ class DefaultTitleCard extends StatelessWidget {
               style: TextStyle(
                 color: DefaultColors.grey20,
                 fontWeight: FontWeight.w500,
-                fontSize: 12.sp,
+                fontSize: 10.sp,
               ),
             ),
             if (suffix != null) ...[
@@ -39,7 +39,7 @@ class DefaultTitleCard extends StatelessWidget {
                 style: TextStyle(
                   color: DefaultColors.grey,
                   fontWeight: FontWeight.w500,
-                  fontSize: 12.sp,
+                  fontSize: 10.sp,
                 ),
               ),
             ],
@@ -49,7 +49,7 @@ class DefaultTitleCard extends StatelessWidget {
           onTap: onTap,
           child: Icon(
             Icons.add,
-            size: 14.sp,
+            size: 12.sp,
             color: DefaultColors.grey,
           ),
         ),

@@ -431,9 +431,19 @@ class _TransactionPageState extends State<TransactionPage> {
                         color: DefaultColors.grey,
                         fontWeight: FontWeight.w500,
                       ),
-                      prefixIcon: Icon(
-                        Icons.calendar_month,
-                        color: DefaultColors.grey20,
+                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                      prefixIconConstraints:
+                          BoxConstraints(minWidth: 40.w, minHeight: 40.h),
+                      prefixIcon: SizedBox(
+                        width: 40.w,
+                        height: 40.h,
+                        child: Center(
+                          child: Icon(
+                            Icons.calendar_month,
+                            color: DefaultColors.grey20,
+                            size: 22.w,
+                          ),
+                        ),
                       ),
                       border: InputBorder.none,
                     ),
