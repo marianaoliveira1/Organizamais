@@ -405,7 +405,7 @@ class _MonthlyBalanceHeader extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: DefaultColors.grey,
+                  color: DefaultColors.textGrey,
                   fontWeight: FontWeight.w500,
                 ),
               ),
