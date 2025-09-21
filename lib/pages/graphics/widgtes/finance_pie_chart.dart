@@ -101,66 +101,54 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       double receitaPercent = total == 0 ? 0 : (totalReceita / total) * 100;
       double despesasPercent = total == 0 ? 0 : (totalDespesas / total) * 100;
 
-      return Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DefaultTextGraphic(
-                text: "Gráfico porcentagem de receita e despesas"),
-            SizedBox(
-              height: 16.h,
-            ),
-            SizedBox(
-              height: 180,
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      value: totalReceita,
-                      title: "",
-                      color: DefaultColors.green,
-                      radius: 50,
-                    ),
-                    PieChartSectionData(
-                      value: totalDespesas,
-                      title: "",
-                      color: DefaultColors.red,
-                      radius: 50,
-                    ),
-                  ],
-                ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 180,
+            child: PieChart(
+              PieChartData(
+                sections: [
+                  PieChartSectionData(
+                    value: totalReceita,
+                    title: "",
+                    color: DefaultColors.green,
+                    radius: 50,
+                  ),
+                  PieChartSectionData(
+                    value: totalDespesas,
+                    title: "",
+                    color: DefaultColors.red,
+                    radius: 50,
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FinanceLegend(
-                  title: "Receita",
-                  color: DefaultColors.green,
-                  percent: receitaPercent,
-                  value: totalReceita,
-                  formatter: formatter,
-                ),
-                SizedBox(
-                  height: 4.h,
-                ),
-                FinanceLegend(
-                  title: "Despesas",
-                  color: DefaultColors.red,
-                  percent: despesasPercent,
-                  value: totalDespesas,
-                  formatter: formatter,
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 16),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FinanceLegend(
+                title: "Receita",
+                color: DefaultColors.green,
+                percent: receitaPercent,
+                value: totalReceita,
+                formatter: formatter,
+              ),
+              SizedBox(
+                height: 4.h,
+              ),
+              FinanceLegend(
+                title: "Despesas",
+                color: DefaultColors.red,
+                percent: despesasPercent,
+                value: totalDespesas,
+                formatter: formatter,
+              ),
+            ],
+          ),
+        ],
       );
     });
   }

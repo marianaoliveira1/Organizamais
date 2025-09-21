@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:organizamais/pages/initial/widget/title_card.dart';
+// import 'package:organizamais/pages/initial/widget/title_card.dart';
+import 'package:organizamais/widgetes/info_card.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../../controller/transaction_controller.dart';
 import '../pages/parcelas_details_page.dart';
@@ -39,53 +40,42 @@ class ParcelamentosCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        color: theme.cardColor,
-      ),
-      padding: EdgeInsets.symmetric(
-        vertical: 12.h,
-        horizontal: 14.w,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Obx(() {
-            if (_transactionController.isLoading) {
-              return _buildShimmerSkeleton(theme);
-            }
+    return Obx(() {
+      if (_transactionController.isLoading) {
+        return _buildShimmerSkeleton(theme);
+      }
 
-            final currentMonth = DateTime.now().month;
-            final currentYear = DateTime.now().year;
+      final currentMonth = DateTime.now().month;
+      final currentYear = DateTime.now().year;
 
-            final parcelamentosCount = _transactionController.transaction
-                .where((t) => t.title.contains('Parcela'))
-                .where((t) {
-              if (t.paymentDay == null) return false;
-              final date = DateTime.parse(t.paymentDay!);
-              return date.month == currentMonth && date.year == currentYear;
-            }).length;
+      final parcelamentos = _transactionController.transaction
+          .where((t) => t.title.contains('Parcela'))
+          .where((t) {
+        if (t.paymentDay == null) return false;
+        final date = DateTime.parse(t.paymentDay!);
+        return date.month == currentMonth && date.year == currentYear;
+      }).toList();
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DefaultTitleCard(
-                  text: parcelamentosCount > 0
-                      ? 'Parcelas do Mês ($parcelamentosCount)'
-                      : 'Parcelas do Mês',
-                  onTap: () {
-                    Get.to(() => TransactionPage());
-                  },
-                ),
-                SizedBox(height: 12.h),
-                _buildParcelamentosContent(theme),
-              ],
-            );
-          }),
-        ],
-      ),
-    );
+      if (parcelamentos.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      final parcelamentosCount = parcelamentos.length;
+
+      return InfoCard(
+        title: 'Parcelas do Mês ($parcelamentosCount)',
+        icon: Icons.add,
+        onTap: () {
+          Get.to(() => TransactionPage());
+        },
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildParcelamentosContent(theme),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildParcelamentosContent(ThemeData theme) {

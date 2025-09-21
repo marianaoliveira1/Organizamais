@@ -7,7 +7,8 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
-import '../../graphics/widgtes/default_text_graphic.dart';
+// import '../../graphics/widgtes/default_text_graphic.dart';
+import 'package:organizamais/widgetes/info_card.dart';
 import 'chart_legend_item.dart';
 
 class MonthlyFinancialChart extends StatelessWidget {
@@ -21,27 +22,12 @@ class MonthlyFinancialChart extends StatelessWidget {
     return Obx(() {
       final monthlyData = _calculateMonthlyData(controller.transaction);
 
-      return Container(
-        padding: EdgeInsets.symmetric(
-          vertical: 12.h,
-          horizontal: 14.w,
-        ),
-        margin: EdgeInsets.only(
-          bottom: 32.h,
-        ),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Column(
+      return InfoCard(
+        title: 'Receitas vs Despesas Mensais',
+        onTap: () {},
+        content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DefaultTextGraphic(
-              text: "Receitas vs Despesas Mensais",
-            ),
-            SizedBox(
-              height: 8.h,
-            ),
             Text(
               'Ano ${DateTime.now().year} (até hoje)',
               style: TextStyle(
@@ -50,21 +36,15 @@ class MonthlyFinancialChart extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-
-            // Legenda
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ChartLegendItem(label: 'Receitas', color: DefaultColors.green),
-                SizedBox(
-                  width: 20.w,
-                ),
+                SizedBox(width: 20.w),
                 ChartLegendItem(label: 'Despesas', color: DefaultColors.red),
               ],
             ),
             SizedBox(height: 20.h),
-
-            // Gráfico
             LayoutBuilder(
               builder: (context, constraints) {
                 // Calculate optimal dimensions based on available width

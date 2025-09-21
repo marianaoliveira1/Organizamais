@@ -14,6 +14,7 @@ import 'package:organizamais/model/percentage_result.dart';
 
 import 'package:organizamais/utils/color.dart';
 
+import '../../../widgetes/info_card.dart';
 import '../pages/finance_details_page.dart';
 import 'category_value_with_percentage.dart';
 
@@ -30,39 +31,37 @@ class FinanceSummaryWidget extends StatelessWidget {
     );
     final theme = Theme.of(context);
 
+    final String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
+
     return Obx(() {
       if (transactionController.isLoading) {
         return _buildShimmerSkeleton(theme);
       }
 
-      return GestureDetector(
-        onTap: () {
-          Get.to(() => const FinanceDetailsPage());
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 12.h,
-            horizontal: 14.w,
-          ),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _MonthlyBalanceHeader(
-                saldo: _getCurrentMonthBalance(transactionController),
-                previousSaldo: _getPreviousMonthBalance(transactionController),
-                percentageResult:
-                    transactionController.monthlyPercentageComparison,
-              ),
-              SizedBox(height: 8.h),
-              Column(
+      return Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Get.to(() => const FinanceDetailsPage());
+            },
+            child: InfoCard(
+              title:
+                  'Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)} (até hoje)',
+              icon: Iconsax.arrow_right_3,
+              onTap: () {
+                Get.to(() => const FinanceDetailsPage());
+              },
+              content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Percentual já mostrado ao lado do saldo no header
-
+                  _MonthlyBalanceHeader(
+                    saldo: _getCurrentMonthBalance(transactionController),
+                    previousSaldo:
+                        _getPreviousMonthBalance(transactionController),
+                    percentageResult:
+                        transactionController.monthlyPercentageComparison,
+                  ),
+                  SizedBox(height: 20.h),
                   Row(
                     children: [
                       CategoryValueWithPercentage(
@@ -96,9 +95,9 @@ class FinanceSummaryWidget extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     });
   }
@@ -386,7 +385,7 @@ class _MonthlyBalanceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
+    // mesAtual não é utilizado diretamente aqui, mantido no escopo superior
     final theme = Theme.of(context);
     final NumberFormat formatter = NumberFormat.currency(
       locale: "pt_BR",
@@ -396,53 +395,25 @@ class _MonthlyBalanceHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: AutoSizeText(
-                "Saldo do mês de ${mesAtual[0].toUpperCase()}${mesAtual.substring(1)} (até hoje)",
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: DefaultColors.textGrey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Icon(
-              Iconsax.arrow_right_3,
-              size: 8.sp,
-              color: DefaultColors.grey,
-            ),
-          ],
+        // Linha 1: Valor em R$
+        AutoSizeText(
+          formatter.format(saldo),
+          maxLines: 1,
+          minFontSize: 16,
+          style: TextStyle(
+            fontSize: 40.sp,
+            fontWeight: FontWeight.bold,
+            color: theme.primaryColor,
+          ),
         ),
-        SizedBox(height: 8.h),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              fit: FlexFit.loose,
-              child: AutoSizeText(
-                formatter.format(saldo),
-                maxLines: 1,
-                minFontSize: 16,
-                style: TextStyle(
-                  fontSize: 40.sp,
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
-                ),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            PercentageDisplayWidget(
-              result: percentageResult,
-              explanationType: PercentageExplanationType.balance,
-              currentValue: saldo,
-              previousValue: previousSaldo,
-              textFontSizeSp: 14.sp,
-            ),
-          ],
+        SizedBox(height: 4.h),
+        // Linha 2: Percentual abaixo
+        PercentageDisplayWidget(
+          result: percentageResult,
+          explanationType: PercentageExplanationType.balance,
+          currentValue: saldo,
+          previousValue: previousSaldo,
+          textFontSizeSp: 14.sp,
         ),
       ],
     );

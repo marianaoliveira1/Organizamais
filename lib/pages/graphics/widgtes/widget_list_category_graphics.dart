@@ -182,8 +182,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 }),
                                 Obx(() => Icon(
                                       selectedCategoryId.value == categoryId
-                                          ? Iconsax.arrow_up_1
-                                          : Iconsax.arrow_down_1,
+                                          ? Iconsax.arrow_up_24
+                                          : Iconsax.arrow_down,
                                       size: 14.sp,
                                       color: DefaultColors.grey,
                                     )),

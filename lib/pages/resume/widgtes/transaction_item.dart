@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:organizamais/utils/color.dart';
 
@@ -192,19 +193,27 @@ class TransactionItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            _formatValue(transaction.value),
-                            style: TextStyle(
-                              color: isFuture
-                                  ? DefaultColors.grey
-                                  : theme.primaryColor,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: false,
-                          ),
+                          Builder(builder: (context) {
+                            final bool isReceita =
+                                transaction.type == TransactionType.receita;
+                            final String sign = isReceita ? '+' : '-';
+                            final Color valueColor = isFuture
+                                ? DefaultColors.grey
+                                : (isReceita
+                                    ? DefaultColors.greenDark
+                                    : DefaultColors.redDark);
+                            return Text(
+                              '$sign ${_formatValue(transaction.value)}',
+                              style: TextStyle(
+                                color: valueColor,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            );
+                          }),
                           SizedBox(height: 3.h),
                           Text(
                             transaction.paymentType,

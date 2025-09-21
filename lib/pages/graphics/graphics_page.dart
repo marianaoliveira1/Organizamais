@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,6 +24,7 @@ import 'pages/select_categories_page.dart';
 import 'pages/category_report_page.dart';
 import 'pages/spending_shift_balance_page.dart';
 import '../resume/widgtes/text_not_transaction.dart';
+import '../../widgetes/info_card.dart';
 
 List<String> getAllMonths() {
   final months = [
@@ -415,18 +417,83 @@ class _GraphicsPageState extends State<GraphicsPage>
             theme, transactionController, currencyFormatter, dayFormatter),
         AdsBanner(),
         SizedBox(height: 20.h),
-        // Pie Chart - Despesas por categoria
-        _buildCategoryChart(theme, transactionController, selectedCategoryId,
-            currencyFormatter, dateFormatter),
+        // Pie Chart - Despesas por categoria (InfoCard)
+        InfoCard(
+          title: 'Despesas por categoria',
+          icon: Iconsax.category,
+          onTap: null,
+          onIconTap: () async {
+            // Abre seletor com os mesmos dados do gráfico
+            final filteredTransactions =
+                getFilteredTransactions(transactionController);
+            final categories = filteredTransactions
+                .map((e) => e.category)
+                .where((e) => e != null)
+                .toSet()
+                .toList()
+                .cast<int>();
+            final data = categories
+                .map((e) => {
+                      "category": e,
+                      "value": filteredTransactions
+                          .where((element) => element.category == e)
+                          .fold<double>(
+                            0.0,
+                            (prev, element) =>
+                                prev +
+                                double.parse(element.value
+                                    .replaceAll('.', '')
+                                    .replaceAll(',', '.')),
+                          ),
+                      "name": findCategoryById(e)?['name'],
+                      "color": findCategoryById(e)?['color'],
+                      "icon": findCategoryById(e)?['icon'],
+                    })
+                .toList();
+
+            final result = await Navigator.of(context).push<Set<int>>(
+              MaterialPageRoute(
+                builder: (_) => SelectCategoriesPage(
+                  data: data,
+                  initialSelected: _selectedCategoryIds,
+                ),
+              ),
+            );
+            if (result != null) {
+              setState(() {
+                _selectedCategoryIds = result;
+              });
+            }
+          },
+          backgroundColor: theme.cardColor,
+          content: _buildCategoryChart(
+            theme,
+            transactionController,
+            selectedCategoryId,
+            currencyFormatter,
+            dateFormatter,
+          ),
+        ),
 
         SizedBox(height: 16.h),
-        _buildEssentialsVsNonEssentialsChart(
-            theme, transactionController, currencyFormatter),
+        // Fixas x Variáveis x Extras (InfoCard)
+        InfoCard(
+          title: 'Fixas x Variáveis x Extras',
+          icon: Icons.add,
+          onTap: () {},
+          backgroundColor: theme.cardColor,
+          content: _buildEssentialsVsNonEssentialsChart(
+            theme,
+            transactionController,
+            currencyFormatter,
+          ),
+        ),
         AdsBanner(),
         SizedBox(height: 20.h),
 
-        // Botão: Balanço de troca de gastos (alimentação)
-        InkWell(
+        // Balanço de troca de gastos (InfoCard)
+        InfoCard(
+          title: 'Balanço de Gastos por Categoria',
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -436,43 +503,35 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
             );
           },
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 14.w,
-            ),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "📊 Balanço de Gastos por Categoria",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    DefaultTextGraphic(
-                      text: 'Todas as categorias usadas no mês',
-                    ),
-                  ],
+          backgroundColor: theme.cardColor,
+          content: Row(
+            children: [
+              Container(
+                width: 36.w,
+                height: 36.h,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                Icon(Icons.chevron_right, color: theme.primaryColor),
-              ],
-            ),
+                child: Icon(Iconsax.wallet,
+                    color: theme.primaryColor, size: 18.sp),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: DefaultTextGraphic(
+                    text:
+                        'Acompanhe em detalhes cada categoria em que você utilizou seu dinheiro ao longo do mês.'),
+              ),
+              Icon(Icons.chevron_right, color: theme.primaryColor),
+            ],
           ),
         ),
 
         SizedBox(height: 16.h),
 
-        InkWell(
+        // Relatório Mensal (InfoCard)
+        InfoCard(
+          title: 'Relatório Mensal',
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -482,48 +541,50 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
             );
           },
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 14.w,
-            ),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "📊 Relatório Mensal",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+          backgroundColor: theme.cardColor,
+          content: Row(
+            children: [
+              Container(
+                width: 36.w,
+                height: 36.h,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    DefaultTextGraphic(
-                      text: 'Comparativo com mês anterior',
-                    ),
-                    Icon(Icons.chevron_right, color: theme.primaryColor),
-                  ],
-                ),
-              ],
-            ),
+                child:
+                    Icon(Iconsax.chart, color: theme.primaryColor, size: 18.sp),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: DefaultTextGraphic(
+                    text:
+                        'Veja a diferença de valores entre este mês e o anterior, categoria por categoria'),
+              ),
+              Icon(Icons.chevron_right, color: theme.primaryColor),
+            ],
           ),
         ),
-
-        // Outros gráficos
-        DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
+        SizedBox(height: 30.h),
+        // Por tipo de pagamento (InfoCard)
+        InfoCard(
+          title: 'Por tipo de pagamento',
+          onTap: () {},
+          backgroundColor: theme.cardColor,
+          content: DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
+        ),
         SizedBox(height: 30.h),
 
         AdsBanner(),
         SizedBox(height: 20.h),
 
-        GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
+        // Receita x Despesa (%) (InfoCard)
+        InfoCard(
+          title: 'Receita x Despesa (%)',
+          onTap: () {},
+          backgroundColor: theme.cardColor,
+          content:
+              GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
+        ),
         SizedBox(height: 20.h),
       ],
     );
@@ -686,23 +747,9 @@ class _GraphicsPageState extends State<GraphicsPage>
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.symmetric(
-        vertical: 12.h,
-        horizontal: 14.w,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              DefaultTextGraphic(text: "Fixas x Variáveis x Extras"),
-            ],
-          ),
           SizedBox(height: 16.h),
           RepaintBoundary(
             child: SizedBox(
@@ -1406,45 +1453,10 @@ class _GraphicsPageState extends State<GraphicsPage>
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.symmetric(
-        vertical: 12.h,
-        horizontal: 14.w,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: DefaultTextGraphic(text: "Despesas por categoria"),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.chevron_right,
-                  color: DefaultColors.grey,
-                ),
-                onPressed: () async {
-                  final result = await Navigator.of(context).push<Set<int>>(
-                    MaterialPageRoute(
-                      builder: (_) => SelectCategoriesPage(
-                        data: data,
-                        initialSelected: _selectedCategoryIds,
-                      ),
-                    ),
-                  );
-                  if (result != null) {
-                    setState(() {
-                      _selectedCategoryIds = result;
-                    });
-                  }
-                },
-              ),
-            ],
-          ),
+          // (removida a linha dinâmica de porcentagem para voltar ao estado anterior)
           if (!_showBarCategoryChart)
             Center(
               child: GestureDetector(
@@ -1479,84 +1491,102 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
             )
           else
-            RepaintBoundary(
-              child: SizedBox(
-                height: 220.h,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: (data.isNotEmpty
-                                ? (data
-                                    .map((e) => e['value'] as double)
-                                    .reduce((a, b) => a > b ? a : b))
-                                : 0) >
-                            0
-                        ? (data
-                                .map((e) => e['value'] as double)
-                                .reduce((a, b) => a > b ? a : b) *
-                            1.2)
-                        : 100,
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final int idx = value.toInt();
-                            if (idx < 0 || idx >= data.length) {
-                              return const SizedBox.shrink();
-                            }
-                            final String name =
-                                (data[idx]['name'] ?? '') as String;
-                            final String abbr =
-                                name.length <= 3 ? name : name.substring(0, 3);
-                            return Padding(
-                              padding: EdgeInsets.only(top: 4.h),
-                              child: Text(
-                                abbr,
-                                style: TextStyle(
-                                  fontSize: 9.sp,
-                                  color: DefaultColors.grey,
+            GestureDetector(
+              onTap: () async {
+                final result = await Navigator.of(context).push<Set<int>>(
+                  MaterialPageRoute(
+                    builder: (_) => SelectCategoriesPage(
+                      data: data,
+                      initialSelected: _selectedCategoryIds,
+                    ),
+                  ),
+                );
+                if (result != null) {
+                  setState(() {
+                    _selectedCategoryIds = result;
+                  });
+                }
+              },
+              child: RepaintBoundary(
+                child: SizedBox(
+                  height: 220.h,
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: (data.isNotEmpty
+                                  ? (data
+                                      .map((e) => e['value'] as double)
+                                      .reduce((a, b) => a > b ? a : b))
+                                  : 0) >
+                              0
+                          ? (data
+                                  .map((e) => e['value'] as double)
+                                  .reduce((a, b) => a > b ? a : b) *
+                              1.2)
+                          : 100,
+                      titlesData: FlTitlesData(
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) {
+                              final int idx = value.toInt();
+                              if (idx < 0 || idx >= data.length) {
+                                return const SizedBox.shrink();
+                              }
+                              final String name =
+                                  (data[idx]['name'] ?? '') as String;
+                              final String abbr = name.length <= 3
+                                  ? name
+                                  : name.substring(0, 3);
+                              return Padding(
+                                padding: EdgeInsets.only(top: 4.h),
+                                child: Text(
+                                  abbr,
+                                  style: TextStyle(
+                                    fontSize: 9.sp,
+                                    color: DefaultColors.grey,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: 1,
-                      getDrawingHorizontalLine: (value) => FlLine(
-                        color: DefaultColors.grey.withOpacity(0.15),
-                        strokeWidth: 1,
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        horizontalInterval: 1,
+                        getDrawingHorizontalLine: (value) => FlLine(
+                          color: DefaultColors.grey.withOpacity(0.15),
+                          strokeWidth: 1,
+                        ),
                       ),
+                      borderData: FlBorderData(show: false),
+                      barGroups: List.generate(data.length, (i) {
+                        final double v = data[i]['value'] as double;
+                        return BarChartGroupData(
+                          x: i,
+                          barRods: [
+                            BarChartRodData(
+                              toY: v,
+                              width: 12.w,
+                              color: (data[i]['color'] as Color?) ??
+                                  theme.primaryColor,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ],
+                        );
+                      }),
                     ),
-                    borderData: FlBorderData(show: false),
-                    barGroups: List.generate(data.length, (i) {
-                      final double v = data[i]['value'] as double;
-                      return BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: v,
-                            width: 12.w,
-                            color: (data[i]['color'] as Color?) ??
-                                theme.primaryColor,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ],
-                      );
-                    }),
                   ),
                 ),
               ),

@@ -149,46 +149,27 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
 
           return Column(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.h,
-                  horizontal: 14.w,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DefaultTextGraphic(
-                      text: "Despesas por tipo de Pagamento",
+              Center(
+                child: SizedBox(
+                  height: 180.h,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 0,
+                      centerSpaceRadius: 26,
+                      centerSpaceColor: theme.cardColor,
+                      sections: chartData,
                     ),
-                    SizedBox(height: 16.h),
-                    Center(
-                      child: SizedBox(
-                        height: 180.h,
-                        child: PieChart(
-                          PieChartData(
-                            sectionsSpace: 0,
-                            centerSpaceRadius: 26,
-                            centerSpaceColor: theme.cardColor,
-                            sections: chartData,
-                          ),
-                        ),
-                      ),
-                    ),
-                    WidgetListPaymentTypeGraphics(
-                      data: data,
-                      totalValue: totalValue,
-                      selectedPaymentType: selectedPaymentType,
-                      theme: theme,
-                      currencyFormatter: currencyFormatter,
-                      dateFormatter: dateFormatter,
-                      selectedMonth: selectedMonth,
-                    ),
-                  ],
+                  ),
                 ),
+              ),
+              WidgetListPaymentTypeGraphics(
+                data: data,
+                totalValue: totalValue,
+                selectedPaymentType: selectedPaymentType,
+                theme: theme,
+                currencyFormatter: currencyFormatter,
+                dateFormatter: dateFormatter,
+                selectedMonth: selectedMonth,
               ),
             ],
           );

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+// import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
-import 'package:organizamais/utils/color.dart';
+// import 'package:organizamais/utils/color.dart';
 
 import '../../../controller/transaction_controller.dart';
 import '../../../pages/monthy_analsis/portfolio_details_page.dart';
 import 'portfolio_card_analsis.dart';
+import '../../../widgetes/info_card.dart';
 
 class FinancialSummaryCards extends StatelessWidget {
   const FinancialSummaryCards({super.key});
@@ -31,11 +33,13 @@ class FinancialSummaryCards extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
+          InfoCard(
+            title: 'Análise anual de 2025',
+            icon: Iconsax.arrow_right_3,
             onTap: () {
               Get.to(() => const PortfolioDetailsPage());
             },
-            child: PortfolioCard(
+            content: PortfolioCard(
               saldo: saldo,
               valueReceita: totalReceita,
               valueDespesa: totalDespesas,

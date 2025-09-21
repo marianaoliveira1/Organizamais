@@ -24,76 +24,66 @@ class PortfolioCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 10.h,
-        horizontal: 12.w,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _AnnualAnalysisHeader(
-            saldo: saldo,
-          ),
-          SizedBox(height: 10.h),
-          Row(
-            children: [
-              Expanded(
-                child: _LabeledAmount(
-                  label: 'Receitas',
-                  valueText: _formatCurrency(valueReceita),
-                  valueColor: theme.primaryColor,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _AnnualAnalysisHeader(
+          saldo: saldo,
+        ),
+        SizedBox(height: 10.h),
+        Row(
+          children: [
+            Expanded(
+              child: _LabeledAmount(
+                label: 'Receitas',
+                valueText: _formatCurrency(valueReceita),
+                valueColor: theme.primaryColor,
               ),
-              Container(
-                width: 1.w,
-                height: 40.h,
-                color: DefaultColors.greyLight,
+            ),
+            Container(
+              width: 1.w,
+              height: 40.h,
+              color: DefaultColors.greyLight,
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: _LabeledAmount(
+                label: 'Despesas',
+                valueText: _formatCurrency(valueDespesa),
+                valueColor: theme.primaryColor,
               ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: _LabeledAmount(
-                  label: 'Despesas',
-                  valueText: _formatCurrency(valueDespesa),
-                  valueColor: theme.primaryColor,
-                ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          children: [
+            Expanded(
+              child: _LabeledAmount(
+                label: 'Média de Receitas',
+                valueText: _formatCurrency(mediaReceita),
+                valueColor: theme.primaryColor,
               ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              Expanded(
-                child: _LabeledAmount(
-                  label: 'Média de Receitas',
-                  valueText: _formatCurrency(mediaReceita),
-                  valueColor: theme.primaryColor,
-                ),
+            ),
+            Container(
+              width: 1.w,
+              height: 40.h,
+              color: DefaultColors.greyLight,
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: _LabeledAmount(
+                label: 'Média de Despesas',
+                valueText: _formatCurrency(mediaDespesa),
+                valueColor: theme.primaryColor,
               ),
-              Container(
-                width: 1.w,
-                height: 40.h,
-                color: DefaultColors.greyLight,
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: _LabeledAmount(
-                  label: 'Média de Despesas',
-                  valueText: _formatCurrency(mediaDespesa),
-                  valueColor: theme.primaryColor,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 10.h,
+        ),
+      ],
     );
   }
 
@@ -117,33 +107,9 @@ class _AnnualAnalysisHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String title = 'Análise anual de ${DateTime.now().year}';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: AutoSizeText(
-                title,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: DefaultColors.grey20,
-                ),
-              ),
-            ),
-            Icon(
-              Iconsax.arrow_right_3,
-              size: 8.sp,
-              color: DefaultColors.grey,
-            ),
-          ],
-        ),
-        SizedBox(height: 10.h),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

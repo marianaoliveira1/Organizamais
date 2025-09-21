@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
+// import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 import 'package:organizamais/utils/color.dart';
 
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
@@ -20,6 +20,7 @@ import 'widget/monthly_financial_chart.dart';
 import 'widget/widget_category_analise.dart';
 import '../resume/widgtes/text_not_transaction.dart';
 import 'widget/payment_type_analise_page.dart';
+import 'package:organizamais/widgetes/info_card.dart';
 
 class MonthlyAnalysisPage extends StatelessWidget {
   const MonthlyAnalysisPage({super.key});
@@ -179,23 +180,18 @@ class MonthlyAnalysisPage extends StatelessWidget {
 
                             return Column(
                               children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 12.h,
-                                    horizontal: 14.w,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.cardColor,
-                                    borderRadius: BorderRadius.circular(16.r),
-                                  ),
-                                  child: Column(
+                                SizedBox(
+                                  height: 30.h,
+                                ),
+                                InfoCard(
+                                  title: 'Por categoria',
+                                  onTap: () {
+                                    Get.to(() => const CategoryPage());
+                                  },
+                                  content: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      DefaultTextGraphic(
-                                        text: "Por categoria",
-                                      ),
-                                      SizedBox(height: 16.h),
                                       Center(
                                         child: SizedBox(
                                           height: 180.h,
@@ -297,24 +293,13 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                         )
                                         .toList();
 
-                                    return Container(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12.h,
-                                        horizontal: 14.w,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: theme.cardColor,
-                                        borderRadius:
-                                            BorderRadius.circular(16.r),
-                                      ),
-                                      child: Column(
+                                    return InfoCard(
+                                      title: 'Por tipo de pagamento',
+                                      onTap: () {},
+                                      content: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          DefaultTextGraphic(
-                                            text: 'Por tipo de pagamento',
-                                          ),
-                                          SizedBox(height: 16.h),
                                           Center(
                                             child: SizedBox(
                                               height: 180.h,
@@ -365,8 +350,8 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                   child: Row(
                                                     children: [
                                                       Container(
-                                                        width: 16.w,
-                                                        height: 16.h,
+                                                        width: 20.w,
+                                                        height: 20.h,
                                                         decoration:
                                                             BoxDecoration(
                                                           color: c,
@@ -383,7 +368,6 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            // Row 1: name + value
                                                             Row(
                                                               children: [
                                                                 Expanded(
@@ -392,7 +376,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
-                                                                          13.sp,
+                                                                          14.sp,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w500,
@@ -420,7 +404,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                                   style:
                                                                       TextStyle(
                                                                     fontSize:
-                                                                        13.sp,
+                                                                        14.sp,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w500,
@@ -435,7 +419,6 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                             ),
                                                             SizedBox(
                                                                 height: 6.h),
-                                                            // Row 2: percent + icon
                                                             Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
@@ -446,7 +429,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                                                   style:
                                                                       TextStyle(
                                                                     fontSize:
-                                                                        11.sp,
+                                                                        12.sp,
                                                                     color:
                                                                         DefaultColors
                                                                             .grey,
