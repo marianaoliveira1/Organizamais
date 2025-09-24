@@ -106,7 +106,7 @@ class InitialPage extends StatelessWidget {
                     horizontal: 20.h,
                   ),
                   child: Column(
-                    spacing: 20.h,
+                    spacing: 14.h,
                     children: [
                       const FinanceSummaryWidget(),
                       const DefaultWidgetFixedAccounts(),

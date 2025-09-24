@@ -32,18 +32,18 @@ class GoalsCard extends StatelessWidget {
         content: Obx(() {
           final goals = goalController.goal;
           if (goals.isEmpty) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Nenhuma meta adicionada',
+            return SizedBox(
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  'Nenhuma meta financeira adicionada',
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: DefaultColors.grey,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ],
+              ),
             );
           }
 
@@ -85,6 +85,7 @@ class GoalsCard extends StatelessWidget {
               return InkWell(
                 onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
                 child: Container(
+                  width: double.infinity,
                   margin: EdgeInsets.only(bottom: 12.h),
                   decoration: BoxDecoration(
                     color: Colors.transparent,

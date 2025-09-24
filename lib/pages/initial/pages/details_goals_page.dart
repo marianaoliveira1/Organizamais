@@ -320,6 +320,40 @@ class GoalDetailsPage extends StatelessWidget {
 
                     SizedBox(height: 14.h),
 
+                    // Ação de Dicas (antes do valor do saldo atual)
+                    InkWell(
+                      onTap: () => _showTipsBottomSheet(context, currentGoal),
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 24.w,
+                            height: 24.w,
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            child: Icon(
+                              Icons.lightbulb_outline,
+                              size: 14.sp,
+                              color: Colors.amber.shade700,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            'Dicas',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: 14.h),
                     // Progress values
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1111,4 +1145,183 @@ class GoalDetailsPage extends StatelessWidget {
       },
     );
   }
+}
+
+void _showTipsBottomSheet(BuildContext context, GoalModel goal) {
+  final theme = Theme.of(context);
+
+  // Parse target value
+  String sanitized = goal.value.replaceAll(RegExp(r'[^0-9,\.]'), '');
+  final int lastComma = sanitized.lastIndexOf(',');
+  final int lastDot = sanitized.lastIndexOf('.');
+  final int sepIndex = lastComma > lastDot ? lastComma : lastDot;
+  String numeric;
+  if (sepIndex != -1) {
+    final String intPart =
+        sanitized.substring(0, sepIndex).replaceAll(RegExp(r'[^0-9]'), '');
+    final String decPart =
+        sanitized.substring(sepIndex + 1).replaceAll(RegExp(r'[^0-9]'), '');
+    numeric = '$intPart.$decPart';
+  } else {
+    numeric = sanitized.replaceAll(RegExp(r'[^0-9]'), '');
+  }
+  final double target = double.tryParse(numeric) ?? 0.0;
+  final double current = goal.currentValue;
+  final double remaining = (target - current).clamp(0, double.infinity);
+
+  // Deadline
+  DateTime? deadline;
+  try {
+    final parts = goal.date.split('/');
+    deadline = DateTime(
+      int.parse(parts[2]),
+      int.parse(parts[1]),
+      int.parse(parts[0]),
+    );
+  } catch (_) {
+    deadline = null;
+  }
+
+  final DateTime today = DateTime.now();
+  final DateTime start = DateTime(today.year, today.month, today.day);
+  final DateTime end = deadline != null
+      ? DateTime(deadline!.year, deadline!.month, deadline!.day)
+      : start;
+  final int totalDays = end.isAfter(start) ? end.difference(start).inDays : 0;
+
+  double perDay = totalDays > 0 ? remaining / totalDays : remaining;
+  double perWeek = totalDays > 0 ? remaining / (totalDays / 7.0) : remaining;
+  double perFortnight =
+      totalDays > 0 ? remaining / (totalDays / 15.0) : remaining;
+  double perMonth = totalDays > 0 ? remaining / (totalDays / 30.0) : remaining;
+  // Only show 3m/6m/1y when prazo >= respectivo período
+  double per3Months = (totalDays >= 90) ? remaining / (totalDays / 90.0) : 0.0;
+  double per6Months =
+      (totalDays >= 180) ? remaining / (totalDays / 180.0) : 0.0;
+  double per1Year = (totalDays >= 365) ? remaining / (totalDays / 365.0) : 0.0;
+
+  String brl(double v) {
+    String s = v.isFinite ? v.toStringAsFixed(2) : '0.00';
+    s = s.replaceAll('.', ',');
+    final parts = s.split(',');
+    String intPart = parts[0];
+    String decPart = parts.length > 1 ? parts[1] : '00';
+    if (intPart.length > 3) {
+      String result = '';
+      int count = 0;
+      for (int i = intPart.length - 1; i >= 0; i--) {
+        result = intPart[i] + result;
+        count++;
+        if (count % 3 == 0 && i > 0) result = '.$result';
+      }
+      intPart = result;
+    }
+    return 'R\$ $intPart,$decPart';
+  }
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: theme.cardColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+    ),
+    builder: (ctx) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(
+            16.w, 16.h, 16.w, 16.h + MediaQuery.of(ctx).viewInsets.bottom),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 28.w,
+                    height: 28.w,
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Icon(Icons.lightbulb_outline,
+                        size: 16.sp, color: Colors.amber.shade700),
+                  ),
+                  SizedBox(width: 10.w),
+                  Text(
+                    'Dicas inteligentes',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                'Transforme suas economias em conquistas! Coloque seu dinheiro para render na caixinha do Nubank ou no cofrinho do Inter e veja seus sonhos ganharem vida 🚀',
+                style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                'Vamos calcular quanto você precisa colocar na caixinha para alcançar sua meta? ',
+                style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 12.h),
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _forecastLine('Por dia', brl(perDay)),
+                    _forecastLine('Por semana', brl(perWeek)),
+                    _forecastLine('Por quinzena', brl(perFortnight)),
+                    _forecastLine('Por mês', brl(perMonth)),
+                    if (per3Months > 0)
+                      _forecastLine('A cada 3 meses', brl(per3Months)),
+                    if (per6Months > 0)
+                      _forecastLine('A cada 6 meses', brl(per6Months)),
+                    if (per1Year > 0) _forecastLine('Por ano', brl(per1Year)),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Fechar'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Widget _forecastLine(String label, String value) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 6.h),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label,
+            style: TextStyle(fontSize: 12.sp, color: DefaultColors.grey)),
+        Text(value,
+            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700)),
+      ],
+    ),
+  );
 }

@@ -15,6 +15,7 @@ import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 
+import '../initial/widget/custom_drawer.dart';
 import 'widget/financial_summary_cards.dart';
 import 'widget/monthly_financial_chart.dart';
 import 'widget/widget_category_analise.dart';
@@ -78,6 +79,17 @@ class MonthlyAnalysisPage extends StatelessWidget {
     final controller = Get.find<TransactionController>();
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(
+          'Análise Anual',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: theme.primaryColor,
+          ),
+        ),
+      ),
+      drawer: const CustomDrawer(),
       body: SafeArea(
         child: Column(
           children: [

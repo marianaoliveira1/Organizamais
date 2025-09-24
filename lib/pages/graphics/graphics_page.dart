@@ -17,7 +17,8 @@ import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
 import '../../ads_banner/ads_banner.dart';
-import 'widgtes/default_text_graphic.dart';
+
+import '../initial/widget/custom_drawer.dart';
 import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
@@ -150,6 +151,17 @@ class _GraphicsPageState extends State<GraphicsPage>
     // já centraliza no initState
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Gráficos',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: theme.primaryColor,
+          ),
+        ),
+      ),
+      drawer: const CustomDrawer(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
@@ -488,6 +500,7 @@ class _GraphicsPageState extends State<GraphicsPage>
             currencyFormatter,
           ),
         ),
+        SizedBox(height: 20.h),
         AdsBanner(),
         SizedBox(height: 20.h),
 
@@ -518,9 +531,14 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: DefaultTextGraphic(
-                    text:
-                        'Acompanhe em detalhes cada categoria em que você utilizou seu dinheiro ao longo do mês.'),
+                child: Text(
+                  "Acompanhe em detalhes cada categoria em que você utilizou seu dinheiro ao longo do mês.",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
               Icon(Icons.chevron_right, color: theme.primaryColor),
             ],
@@ -556,9 +574,14 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: DefaultTextGraphic(
-                    text:
-                        'Veja a diferença de valores entre este mês e o anterior, categoria por categoria'),
+                child: Text(
+                  "Veja a diferença de valores entre este mês e o anterior, categoria por categoria",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
               Icon(Icons.chevron_right, color: theme.primaryColor),
             ],
@@ -572,7 +595,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           backgroundColor: theme.cardColor,
           content: DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
         ),
-        SizedBox(height: 30.h),
+        SizedBox(height: 20.h),
 
         AdsBanner(),
         SizedBox(height: 20.h),

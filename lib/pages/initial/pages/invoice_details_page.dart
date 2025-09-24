@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
+import '../../../widgetes/info_card.dart';
+import 'invoice_categories_breakdown_page.dart';
 
 class InvoiceDetailsPage extends StatelessWidget {
   const InvoiceDetailsPage({
@@ -123,7 +126,59 @@ class InvoiceDetailsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10.h),
                 ],
+              ),
+            ),
+            SizedBox(height: 12.h),
+            InfoCard(
+              title: 'Visão por Categoria',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => InvoiceCategoriesBreakdownPage(
+                      cardName: cardName,
+                      periodStart: periodStart,
+                      periodEnd: periodEnd,
+                    ),
+                  ),
+                );
+              },
+              backgroundColor: theme.cardColor,
+              content: Row(
+                children: [
+                  Container(
+                    width: 36.w,
+                    height: 36.h,
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(Iconsax.wallet,
+                        color: theme.primaryColor, size: 18.sp),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      "Acompanhe em detalhes cada categoria em que você utilizou seu dinheiro ao longo do mês.",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, color: theme.primaryColor),
+                ],
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              "Transações",
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: DefaultColors.grey20,
               ),
             ),
             SizedBox(height: 12.h),

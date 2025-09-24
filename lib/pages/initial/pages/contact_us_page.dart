@@ -3,13 +3,89 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../ads_banner/ads_banner.dart';
+import '../../../utils/color.dart';
 
 class ContactUsPage extends StatelessWidget {
   const ContactUsPage({super.key});
 
   static const String _contactEmail = 'organizamaisgrupomp@gmail.com';
+  static final Uri _instagramUri =
+      Uri.parse('https://www.instagram.com/organizamais.app/');
+  static final Uri _mailtoUri = Uri(scheme: 'mailto', path: _contactEmail);
+
+  Future<void> _openInstagram() async {
+    if (!await launchUrl(_instagramUri, mode: LaunchMode.externalApplication)) {
+      await launchUrl(_instagramUri, mode: LaunchMode.inAppWebView);
+    }
+  }
+
+  Future<void> _openEmail() async {
+    await launchUrl(_mailtoUri, mode: LaunchMode.externalApplication);
+  }
+
+  Widget _contactTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(14.w),
+        margin: EdgeInsets.only(bottom: 10.h),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[300]!, width: 1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 28.w,
+              height: 28.w,
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(icon, size: 16.sp, color: theme.primaryColor),
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w700,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: DefaultColors.grey20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,77 +99,41 @@ class ContactUsPage extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AdsBanner(),
-            SizedBox(
-              height: 4.h,
-            ),
-            Text(
-              'Fala com a gente 🚀',
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: theme.primaryColor,
-              ),
-            ),
-            SizedBox(height: 10.h),
-            Text(
-              'Sabemos que cuidar das finanças às vezes pode dar um nó na cabeça 🤯. Mas relaxa, você não está sozinho nessa! Se tiver dúvida, ideia, sugestão ou até mesmo uma bronca (faz parte 😅), fala com a gente por aqui. Nosso time responde rapidinho e adora ouvir o que você tem a dizer. Afinal, esse app é feito pra você – e fica ainda melhor com a sua ajuda 💬✨',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 12.sp,
-                color: theme.primaryColor,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              "Manda aquele textão no e-mail 📧 ",
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  _contactEmail,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AdsBanner(),
+              SizedBox(height: 10.h),
+              Text(
+                'Estamos sempre prontos para ouvir você. Conta pra gente como podemos ajudar',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: DefaultColors.grey,
                 ),
-                SizedBox(width: 8.w),
-                GestureDetector(
-                  onTap: () async {
-                    await Clipboard.setData(
-                        const ClipboardData(text: _contactEmail));
-                    Get.snackbar(
-                      'Copiado',
-                      'Email copiado para a área de transferência',
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: EdgeInsets.all(12.w),
-                    );
-                  },
-                  child: Icon(
-                    Iconsax.clipboard_tick,
-                    size: 22.sp,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
-            Text(
-              'Ou toque no emoji para copiar e colar no seu app de email favorito.',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: theme.textTheme.bodySmall?.color,
               ),
-            ),
-          ],
+              SizedBox(height: 10.h),
+
+              // Instagram (substitui telefone)
+              _contactTile(
+                context: context,
+                icon: Iconsax.instagram,
+                title: 'Instagram: @organizamais.app',
+                subtitle: 'Toque para abrir nosso perfil.',
+                onTap: _openInstagram,
+              ),
+
+              // Email
+              _contactTile(
+                context: context,
+                icon: Iconsax.sms_tracking,
+                title: 'Email: $_contactEmail',
+                subtitle: 'Respondemos rapidinho ao seu contato.',
+                onTap: _openEmail,
+              ),
+            ],
+          ),
         ),
       ),
     );

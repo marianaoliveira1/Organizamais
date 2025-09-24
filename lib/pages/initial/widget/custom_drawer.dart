@@ -71,12 +71,6 @@ class CustomDrawer extends StatelessWidget {
             ),
             _buildDivider(),
             SettingItem(
-              icon: Iconsax.lamp,
-              title: 'Dicas',
-              onTap: () => Get.to(() => const EconomicTipsPage()),
-            ),
-            _buildDivider(),
-            SettingItem(
               icon: Iconsax.message,
               title: 'Fale conosco',
               onTap: () => Get.to(() => const ContactUsPage()),
