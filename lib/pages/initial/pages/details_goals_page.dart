@@ -33,7 +33,10 @@ class GoalDetailsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: theme.primaryColor,
+          ),
           onPressed: () => Get.back(),
         ),
         title: ValueListenableBuilder<GoalModel>(

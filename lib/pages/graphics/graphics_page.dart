@@ -96,6 +96,10 @@ class _GraphicsPageState extends State<GraphicsPage>
   final Map<String, Set<int>> _monthEssentialCategoryIds = {};
   bool _showWeekly = false;
   bool _showBarCategoryChart = false;
+  // Flags para animação de entrada única
+  static bool _didEntranceAnimateOnce = false;
+  bool _shouldPlayEntrance = false;
+  bool _entranceVisible = false;
 
   @override
   void initState() {
@@ -104,6 +108,21 @@ class _GraphicsPageState extends State<GraphicsPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToCurrentMonth();
     });
+
+    if (!_didEntranceAnimateOnce) {
+      _shouldPlayEntrance = true;
+      _entranceVisible = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          _entranceVisible = true;
+          _didEntranceAnimateOnce = true;
+        });
+      });
+    } else {
+      _shouldPlayEntrance = false;
+      _entranceVisible = true;
+    }
   }
 
   void _scrollToCurrentMonth() {
@@ -424,9 +443,11 @@ class _GraphicsPageState extends State<GraphicsPage>
       RxnInt selectedCategoryId) {
     return Column(
       children: [
-        // Line Chart - Despesas diárias
-        _buildLineChart(
-            theme, transactionController, currencyFormatter, dayFormatter),
+        // Line Chart - Despesas diárias (fade-in uma única vez por execução)
+        _entranceWrap(
+          _buildLineChart(
+              theme, transactionController, currencyFormatter, dayFormatter),
+        ),
         AdsBanner(),
         SizedBox(height: 20.h),
         // Pie Chart - Despesas por categoria (InfoCard)
@@ -478,12 +499,14 @@ class _GraphicsPageState extends State<GraphicsPage>
             }
           },
           backgroundColor: theme.cardColor,
-          content: _buildCategoryChart(
-            theme,
-            transactionController,
-            selectedCategoryId,
-            currencyFormatter,
-            dateFormatter,
+          content: _entranceWrap(
+            _buildCategoryChart(
+              theme,
+              transactionController,
+              selectedCategoryId,
+              currencyFormatter,
+              dateFormatter,
+            ),
           ),
         ),
 
@@ -494,10 +517,12 @@ class _GraphicsPageState extends State<GraphicsPage>
           icon: Icons.add,
           onTap: () {},
           backgroundColor: theme.cardColor,
-          content: _buildEssentialsVsNonEssentialsChart(
-            theme,
-            transactionController,
-            currencyFormatter,
+          content: _entranceWrap(
+            _buildEssentialsVsNonEssentialsChart(
+              theme,
+              transactionController,
+              currencyFormatter,
+            ),
           ),
         ),
         SizedBox(height: 20.h),
@@ -593,7 +618,9 @@ class _GraphicsPageState extends State<GraphicsPage>
           title: 'Por tipo de pagamento',
           onTap: () {},
           backgroundColor: theme.cardColor,
-          content: DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
+          content: _entranceWrap(
+            DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
+          ),
         ),
         SizedBox(height: 20.h),
 
@@ -605,8 +632,9 @@ class _GraphicsPageState extends State<GraphicsPage>
           title: 'Receita x Despesa (%)',
           onTap: () {},
           backgroundColor: theme.cardColor,
-          content:
-              GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
+          content: _entranceWrap(
+            GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
+          ),
         ),
         SizedBox(height: 20.h),
       ],
@@ -809,6 +837,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                         ),
                       ],
                     ),
+                    swapAnimationDuration: const Duration(milliseconds: 700),
+                    swapAnimationCurve: Curves.easeOutCubic,
                   ),
                 ],
               ),
@@ -1301,6 +1331,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                         ),
                       ),
                     ),
+                    swapAnimationDuration: const Duration(milliseconds: 700),
+                    swapAnimationCurve: Curves.easeOutCubic,
                   ),
                 ),
                 SizedBox(height: 12.h),
@@ -1409,6 +1441,22 @@ class _GraphicsPageState extends State<GraphicsPage>
 
   // Removed old week label function (using ordinal labels to match requested style)
 
+  // Wrapper para animação de entrada única por execução
+  Widget _entranceWrap(Widget child) {
+    if (!_shouldPlayEntrance) return child;
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeOutCubic,
+      opacity: _entranceVisible ? 1 : 0,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeOutBack,
+        scale: _entranceVisible ? 1.0 : 0.98,
+        child: child,
+      ),
+    );
+  }
+
   Widget _buildCategoryChart(
       ThemeData theme,
       TransactionController transactionController,
@@ -1508,6 +1556,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                         centerSpaceColor: theme.cardColor,
                         sections: chartData,
                       ),
+                      swapAnimationDuration: const Duration(milliseconds: 700),
+                      swapAnimationCurve: Curves.easeOutCubic,
                     ),
                   ),
                 ),

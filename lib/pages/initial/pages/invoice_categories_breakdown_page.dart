@@ -95,6 +95,25 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
         )
         .toList();
 
+    // Comparativo com mês anterior (mesmo cartão)
+    final DateTime prevMonthStart =
+        DateTime(periodStart.year, periodStart.month - 1, 1);
+    final DateTime prevMonthEnd =
+        DateTime(prevMonthStart.year, prevMonthStart.month + 1, 0, 23, 59, 59);
+    final double prevTotal = txController.transaction.where((t) {
+      if (t.paymentDay == null) return false;
+      if (t.type != TransactionType.despesa) return false;
+      if ((t.paymentType ?? '') != cardName) return false;
+      DateTime d;
+      try {
+        d = DateTime.parse(t.paymentDay!);
+      } catch (_) {
+        return false;
+      }
+      return !d.isBefore(prevMonthStart) && !d.isAfter(prevMonthEnd);
+    }).fold<double>(0.0, (s, t) => s + _parseAmount(t.value));
+    String prevMonthName = DateFormat('MMMM', 'pt_BR').format(prevMonthStart);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Categorias do cartão'),
@@ -118,6 +137,36 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                   color: theme.primaryColor,
                 ),
               ),
+              SizedBox(height: 8.h),
+              // Bloco informativo ANTES do gráfico
+              Builder(builder: (context) {
+                final double diff = total - prevTotal;
+                final bool increased = diff > 0;
+                final String verb = increased
+                    ? 'aumentou'
+                    : (diff < 0 ? 'diminuiu' : 'manteve');
+                final Color color = diff > 0
+                    ? DefaultColors.redDark
+                    : (diff < 0 ? DefaultColors.greenDark : DefaultColors.grey);
+                final String prevMonthName =
+                    DateFormat('MMMM', 'pt_BR').format(prevMonthStart);
+                return Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Text(
+                    'No mês anterior você gastou ${currency.format(prevTotal)}, e neste mês foram ${currency.format(total)}; houve ${verb} de ${currency.format(diff.abs())}.',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }),
               SizedBox(height: 8.h),
               Container(
                 padding: EdgeInsets.all(14.w),

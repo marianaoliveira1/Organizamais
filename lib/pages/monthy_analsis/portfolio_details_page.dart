@@ -85,6 +85,8 @@ class PortfolioDetailsPage extends StatelessWidget {
                               monthData,
                               transactionController,
                             )),
+                    SizedBox(height: 16.h),
+                    _buildFinalAverages(theme, formatter, monthlyData),
                   ],
                 ),
               ),
@@ -430,6 +432,101 @@ class PortfolioDetailsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildFinalAverages(ThemeData theme, NumberFormat formatter,
+      List<Map<String, dynamic>> monthlyData) {
+    // Filtra meses com receita > 0
+    final List<Map<String, dynamic>> monthsWithIncome =
+        monthlyData.where((m) => (m['income'] as double) > 0).toList();
+
+    // Ordena por ano/mês decrescente e pega os últimos 3 com receita
+    monthsWithIncome.sort((a, b) {
+      final ay = a['year'] as int;
+      final by = b['year'] as int;
+      if (ay != by) return by.compareTo(ay);
+      return (b['month'] as int).compareTo(a['month'] as int);
+    });
+    final last3 = monthsWithIncome.take(3).toList();
+
+    double avgIncome = 0.0;
+    double avgExpenses = 0.0;
+    if (last3.isNotEmpty) {
+      avgIncome = last3
+              .map<double>((m) => (m['income'] as double))
+              .fold(0.0, (s, v) => s + v) /
+          last3.length;
+      avgExpenses = last3
+              .map<double>((m) => (m['expenses'] as double))
+              .fold(0.0, (s, v) => s + v) /
+          last3.length;
+    }
+
+    return Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(top: 8.h, bottom: 8.h),
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Com base no seu histórico, aqui está uma previsão de receita e despesas (esses valores podem variar):',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: theme.primaryColor,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Receita média estimada (últimos 3 meses):',
+                    style:
+                        TextStyle(fontSize: 12.sp, color: DefaultColors.grey20),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  formatter.format(avgIncome),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: theme.primaryColor,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+            SizedBox(height: 6.h),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Despesas médias estimadas (últimos 3 meses):',
+                    style:
+                        TextStyle(fontSize: 12.sp, color: DefaultColors.grey20),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  formatter.format(avgExpenses),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: theme.primaryColor,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+          ],
+        ));
   }
 
   List<Map<String, dynamic>> _getMonthlyData(TransactionController controller) {

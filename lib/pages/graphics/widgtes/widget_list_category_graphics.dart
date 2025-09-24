@@ -316,39 +316,77 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      AdsBanner(),
+                      SizedBox(
+                        height: 10.h,
+                      ),
                       if (budgets.containsKey(categoryId)) ...[
                         Builder(builder: (context) {
                           final double b = budgets[categoryId] ?? 0.0;
                           final double pct = b > 0 ? (valor / b) * 100 : 0.0;
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          final double clampedPct =
+                              pct.isNaN ? 0 : pct.clamp(0, 100);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _BudgetDonut(percent: pct, color: categoryColor),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currencyFormatter.format(valor),
-                                      style: TextStyle(
-                                        fontSize: 26.sp,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.primaryColor,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '${clampedPct.toStringAsFixed(0)}%',
+                                    style: TextStyle(
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: categoryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final double widthFactor =
+                                      (clampedPct / 100.0);
+                                  return Container(
+                                    height: 8.h,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          theme.primaryColor.withOpacity(0.08),
+                                      borderRadius:
+                                          BorderRadius.circular(999.r),
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: FractionallySizedBox(
+                                        widthFactor: widthFactor,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: categoryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(999.r),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      'de ' + currencyFormatter.format(b),
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: DefaultColors.grey,
-                                      ),
-                                    ),
-                                    SizedBox(height: 6.h),
-                                    // _buildComparisonChip(categoryId, theme),
-                                  ],
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 10.h),
+                              Text(
+                                currencyFormatter.format(valor),
+                                style: TextStyle(
+                                  fontSize: 26.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.primaryColor,
                                 ),
                               ),
+                              Text(
+                                'de ${currencyFormatter.format(b)}',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: DefaultColors.grey,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
                             ],
                           );
                         }),
@@ -389,12 +427,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                       SizedBox(
                         height: 10.h,
                       ),
+
+                      _buildExpenseOverIncomeLine(categoryId, theme),
+                      SizedBox(height: 6.h),
+
                       AdsBanner(),
                       SizedBox(
                         height: 10.h,
                       ),
-                      _buildExpenseOverIncomeLine(categoryId, theme),
-                      SizedBox(height: 6.h),
                       Text(
                         "Transações recentes",
                         style: TextStyle(
@@ -612,19 +652,12 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     final pct = (totalCategoria / totalReceitaMes) * 100.0;
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-      decoration: BoxDecoration(
-        color: DefaultColors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Text(
-        'Esta categoria corresponde a ${pct.toStringAsFixed(1)}% da sua receita mensal.',
-        style: TextStyle(
-          fontSize: 12.sp,
-          color: theme.primaryColor,
-          fontWeight: FontWeight.bold,
-        ),
+    return Text(
+      'E isso corresponde a ${pct.toStringAsFixed(1)}% do que você recebe no mês.',
+      style: TextStyle(
+        fontSize: 12.sp,
+        color: theme.primaryColor,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -789,23 +822,20 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     if (comparison.type == PercentageType.newData) {
       explanationText =
-          'Nova categoria - R\$ ${_formatCurrency(currentValue)} (não há dados do mês anterior)';
+          'Nova categoria: R\$ ${_formatCurrency(currentValue)} (sem dados no mês passado)';
     } else if (comparison.type == PercentageType.neutral) {
       explanationText =
-          'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)})';
+          'Mesmo valor: R\$ ${_formatCurrency(currentValue)} (igual ao mês passado, R\$ ${_formatCurrency(previousValue)})';
     } else {
-      // Para positive e negative, usar a lógica real baseada nos valores
       if (currentValue < previousValue) {
-        // Despesas diminuíram = bom
         explanationText =
-            'Diminuiu ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (${_formatPreviousMonthDate()}), foi R\$ ${_formatCurrency(previousValue)} e hoje R\$ ${_formatCurrency(currentValue)}';
+            'Gasto menor: -${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em relação ao mesmo dia do mês passado (${_formatPreviousMonthDate()}). Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
       } else if (currentValue > previousValue) {
-        // Despesas aumentaram = ruim
         explanationText =
-            'Aumentou ${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em comparação ao mesmo dia do mês anterior (${_formatPreviousMonthDate()}), foi R\$ ${_formatCurrency(previousValue)} e hoje R\$ ${_formatCurrency(currentValue)}';
+            'Gasto maior: +${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em relação ao mesmo dia do mês passado (${_formatPreviousMonthDate()}). Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
       } else {
         explanationText =
-            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (${_formatPreviousMonthDate()})';
+            'Mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mês passado (${_formatPreviousMonthDate()})';
       }
     }
 
@@ -830,28 +860,26 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         break;
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          dirIcon2,
-          size: 14.sp,
-          color: circleColor2,
-        ),
-        SizedBox(width: 4.w),
-        Flexible(
-          child: Text(
-            explanationText,
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: circleColor2,
-              fontWeight: FontWeight.w600,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 3.w, color: circleColor2),
+          SizedBox(width: 6.w),
+          Flexible(
+            child: Text(
+              explanationText,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: circleColor2,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.start,
             ),
-            textAlign: TextAlign.start,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

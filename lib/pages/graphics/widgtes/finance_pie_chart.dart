@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
-import 'package:organizamais/pages/graphics/widgtes/default_text_graphic.dart';
 
 import '../../../utils/color.dart';
 import 'finance_legend.dart';
@@ -64,7 +63,7 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       return allTransactions;
     }
 
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     return Obx(() {
       var filteredTransactions = getFilteredTransactions();
@@ -104,24 +103,29 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 180,
-            child: PieChart(
-              PieChartData(
-                sections: [
-                  PieChartSectionData(
-                    value: totalReceita,
-                    title: "",
-                    color: DefaultColors.green,
-                    radius: 50,
-                  ),
-                  PieChartSectionData(
-                    value: totalDespesas,
-                    title: "",
-                    color: DefaultColors.red,
-                    radius: 50,
-                  ),
-                ],
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 650),
+            switchInCurve: Curves.easeOutCubic,
+            child: SizedBox(
+              key: ValueKey(total.toStringAsFixed(2)),
+              height: 180,
+              child: PieChart(
+                PieChartData(
+                  sections: [
+                    PieChartSectionData(
+                      value: totalReceita,
+                      title: "",
+                      color: DefaultColors.green,
+                      radius: 50,
+                    ),
+                    PieChartSectionData(
+                      value: totalDespesas,
+                      title: "",
+                      color: DefaultColors.red,
+                      radius: 50,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

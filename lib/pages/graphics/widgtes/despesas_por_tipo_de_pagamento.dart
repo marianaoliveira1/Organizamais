@@ -11,7 +11,6 @@ import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 
 import '../../../ads_banner/ads_banner.dart';
-import 'default_text_graphic.dart';
 
 class DespesasPorTipoDePagamento extends StatelessWidget {
   const DespesasPorTipoDePagamento({super.key, required this.selectedMonth});
@@ -150,14 +149,19 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
           return Column(
             children: [
               Center(
-                child: SizedBox(
-                  height: 180.h,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 26,
-                      centerSpaceColor: theme.cardColor,
-                      sections: chartData,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 650),
+                  switchInCurve: Curves.easeOutCubic,
+                  child: SizedBox(
+                    key: ValueKey(totalValue.toStringAsFixed(2)),
+                    height: 180.h,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 26,
+                        centerSpaceColor: theme.cardColor,
+                        sections: chartData,
+                      ),
                     ),
                   ),
                 ),
