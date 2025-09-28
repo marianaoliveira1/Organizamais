@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:async';
 
 class AdsBanner extends StatefulWidget {
   const AdsBanner({super.key});
@@ -59,5 +60,88 @@ class _AdsBannerState extends State<AdsBanner> {
     } else {
       return const SizedBox(); // Retorna vazio se o anúncio não está pronto
     }
+  }
+}
+
+// Interstitial ad helper (for one-off show on save)
+class AdsInterstitial {
+  static InterstitialAd? _ad;
+  static bool _isLoading = false;
+
+  static Future<void> preload() async {
+    if (_ad != null || _isLoading) return;
+    debugPrint('AdsInterstitial.preload: start');
+    _isLoading = true;
+    await InterstitialAd.load(
+      adUnitId: 'ca-app-pub-8308246738505070/3973050625',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _ad = ad;
+          _isLoading = false;
+          debugPrint('AdsInterstitial.preload: loaded');
+        },
+        onAdFailedToLoad: (error) {
+          _ad = null;
+          _isLoading = false;
+          debugPrint('AdsInterstitial.preload: failed $error');
+        },
+      ),
+    );
+  }
+
+  static Future<bool> showIfReady() async {
+    final ad = _ad;
+    debugPrint('AdsInterstitial.showIfReady: ready=${ad != null}');
+    if (ad == null) return false;
+    final Completer<bool> completer = Completer<bool>();
+    _ad = null;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        debugPrint('AdsInterstitial.showIfReady: dismissed');
+        if (!completer.isCompleted) completer.complete(true);
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        debugPrint('AdsInterstitial.showIfReady: failed to show $error');
+        if (!completer.isCompleted) completer.complete(false);
+      },
+    );
+    debugPrint('AdsInterstitial.showIfReady: showing');
+    ad.show();
+    return completer.future;
+  }
+
+  static Future<void> show() async {
+    final Completer<void> completer = Completer<void>();
+    debugPrint('AdsInterstitial.show: load-then-show start');
+    await InterstitialAd.load(
+      adUnitId: 'ca-app-pub-8308246738505070/4767435153',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('AdsInterstitial.show: loaded, showing');
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              debugPrint('AdsInterstitial.show: dismissed');
+              if (!completer.isCompleted) completer.complete();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              debugPrint('AdsInterstitial.show: failed to show $error');
+              if (!completer.isCompleted) completer.complete();
+            },
+          );
+          ad.show();
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('AdsInterstitial.show: failed to load $error');
+          if (!completer.isCompleted) completer.complete();
+        },
+      ),
+    );
+    return completer.future;
   }
 }

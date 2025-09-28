@@ -653,7 +653,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final pct = (totalCategoria / totalReceitaMes) * 100.0;
 
     return Text(
-      'E isso corresponde a ${pct.toStringAsFixed(1)}% do que você recebe no mês.',
+      'Corresponde a ${pct.toStringAsFixed(1)}% do valor que você recebe no mês.',
       style: TextStyle(
         fontSize: 12.sp,
         color: theme.primaryColor,

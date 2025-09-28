@@ -224,6 +224,9 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
           ? 'R\$ ${_formatCurrencyBR(currentBudget)}'
           : '',
     );
+    // Preload interstitial before showing the sheet
+    AdsInterstitial.preload();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -282,7 +285,14 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                         .doc(categoryId.toString())
                         .set({'categoryId': categoryId, 'amount': amount},
                             SetOptions(merge: true));
-                    Navigator.pop(ctx);
+                    // Try show preloaded interstitial; fallback to immediate load
+                    try {
+                      final shown = await AdsInterstitial.showIfReady();
+                      if (!shown) {
+                        await AdsInterstitial.show();
+                      }
+                    } catch (_) {}
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.primaryColor,
