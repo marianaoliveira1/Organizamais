@@ -235,6 +235,10 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                 SizedBox(
                                   height: 20.h,
                                 ),
+                                AdsBanner(),
+                                SizedBox(
+                                  height: 20.h,
+                                ),
                                 // Por tipo de pagamento (ANUAL)
                                 Builder(
                                   builder: (context) {

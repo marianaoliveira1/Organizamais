@@ -612,8 +612,12 @@ class _GraphicsPageState extends State<GraphicsPage>
             ],
           ),
         ),
-        SizedBox(height: 30.h),
+        SizedBox(height: 20.h),
         // Por tipo de pagamento (InfoCard)
+        AdsBanner(),
+        SizedBox(
+          height: 20.h,
+        ),
         InfoCard(
           title: 'Por tipo de pagamento',
           onTap: () {},

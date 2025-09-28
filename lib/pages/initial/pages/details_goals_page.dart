@@ -746,7 +746,9 @@ class GoalDetailsPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // SizedBox(height: 10.h),
+                    SizedBox(height: 10.h),
+                    AdsBanner(),
+                    SizedBox(height: 10.h),
                   ],
                 );
               },
@@ -1237,6 +1239,10 @@ void _showTipsBottomSheet(BuildContext context, GoalModel goal) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AdsBanner(),
+              SizedBox(
+                height: 10.h,
+              ),
               Row(
                 children: [
                   Container(
@@ -1303,7 +1309,14 @@ void _showTipsBottomSheet(BuildContext context, GoalModel goal) {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Fechar'),
+                  child: Text(
+                    'Fechar',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
             ],

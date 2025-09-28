@@ -110,9 +110,12 @@ class InitialPage extends StatelessWidget {
                     children: [
                       const FinanceSummaryWidget(),
                       const DefaultWidgetFixedAccounts(),
+                      AdsBanner(),
                       ParcelamentosCard(),
                       CreditCardSection(),
+                      AdsBanner(),
                       const GoalsCard(),
+                      AdsBanner(),
                       SizedBox(
                         height: 10.h,
                       ),
