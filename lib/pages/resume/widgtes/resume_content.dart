@@ -13,7 +13,7 @@ class ResumeContent extends StatelessWidget {
   static final TransactionController _transactionController =
       Get.put(TransactionController());
   static final RxString _selectedMonth =
-      getAllMonths()[DateTime.now().month - 1].obs;
+      '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}'.obs;
   static final NumberFormat _formatter =
       NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
@@ -38,7 +38,7 @@ class ResumeContent extends StatelessWidget {
       children: [
         MonthSelectorResume(
           selectedMonth: _selectedMonth,
-          initialMonth: DateTime.now().month - 1,
+          initialIndex: DateTime.now().month - 1,
           centerCurrentMonth: true,
         ),
         SizedBox(height: 20.h),

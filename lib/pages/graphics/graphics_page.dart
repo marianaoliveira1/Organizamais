@@ -45,6 +45,41 @@ List<String> getAllMonths() {
   return months;
 }
 
+List<String> _buildMonthYearOptions() {
+  final now = DateTime.now();
+  final int currentYear = now.year;
+  final int nextYear = now.year + 1;
+  final months = getAllMonths();
+  final List<String> result = [];
+  for (final m in months) {
+    result.add('$m/$currentYear');
+  }
+  for (final m in months) {
+    result.add('$m/$nextYear');
+  }
+  return result;
+}
+
+({int month, int year}) _parseSelectedMonthYear(String selected) {
+  if (selected.isEmpty) {
+    final now = DateTime.now();
+    return (month: now.month, year: now.year);
+  }
+  final parts = selected.split('/');
+  if (parts.length == 2) {
+    final name = parts[0];
+    final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+    final idx = getAllMonths().indexOf(name);
+    final month = idx >= 0 ? idx + 1 : DateTime.now().month;
+    return (month: month, year: year);
+  }
+  final idx = getAllMonths().indexOf(selected);
+  return (
+    month: (idx >= 0 ? idx + 1 : DateTime.now().month),
+    year: DateTime.now().year
+  );
+}
+
 class GraphicsPage extends StatefulWidget {
   const GraphicsPage({super.key});
 
@@ -55,7 +90,8 @@ class GraphicsPage extends StatefulWidget {
 class _GraphicsPageState extends State<GraphicsPage>
     with AutomaticKeepAliveClientMixin {
   late ScrollController _monthScrollController;
-  String selectedMonth = getAllMonths()[DateTime.now().month - 1];
+  String selectedMonth =
+      '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
   Set<int> _selectedCategoryIds = {};
   final Set<int> _essentialCategoryIds = {
     // Moradia / Aluguel / Financiamento / Condomínio / Contas / Manutenção
@@ -100,13 +136,15 @@ class _GraphicsPageState extends State<GraphicsPage>
   static bool _didEntranceAnimateOnce = false;
   bool _shouldPlayEntrance = false;
   bool _entranceVisible = false;
+  int _scrollRetries = 0;
+  bool _didIntroScroll = false;
 
   @override
   void initState() {
     super.initState();
     _monthScrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrentMonth();
+      _playIntroMonthScroll();
     });
 
     if (!_didEntranceAnimateOnce) {
@@ -126,11 +164,25 @@ class _GraphicsPageState extends State<GraphicsPage>
   }
 
   void _scrollToCurrentMonth() {
-    final int currentMonthIndex = DateTime.now().month - 1;
+    final options = _buildMonthYearOptions();
+    final currentLabel =
+        '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
+    final int currentMonthIndex =
+        options.indexOf(currentLabel).clamp(0, options.length - 1);
     final double itemWidth = 78.w;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+    if (!_monthScrollController.hasClients ||
+        (_monthScrollController.position.hasContentDimensions == false) ||
+        _monthScrollController.position.maxScrollExtent == 0) {
+      if (_scrollRetries < 4) {
+        _scrollRetries += 1;
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _scrollToCurrentMonth());
+      }
+      return;
+    }
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
     final double scrollPosition = offset.clamp(0.0, maxScroll);
     _monthScrollController.animateTo(
@@ -138,6 +190,43 @@ class _GraphicsPageState extends State<GraphicsPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> _playIntroMonthScroll() async {
+    final options = _buildMonthYearOptions();
+    final currentLabel =
+        '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
+    final int targetIndex =
+        options.indexOf(currentLabel).clamp(0, options.length - 1);
+    if (_didIntroScroll) {
+      _scrollToCurrentMonth();
+      return;
+    }
+    if (!_monthScrollController.hasClients) {
+      if (_scrollRetries < 8) {
+        _scrollRetries += 1;
+        await Future.delayed(const Duration(milliseconds: 60));
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _playIntroMonthScroll());
+      }
+      return;
+    }
+    _didIntroScroll = true;
+    final double itemWidth = 78.w;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    try {
+      _monthScrollController.jumpTo(0);
+    } catch (_) {}
+    for (int i = 0; i <= targetIndex; i++) {
+      final double offset = i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+      final double maxScroll = _monthScrollController.position.maxScrollExtent;
+      final double scrollPosition = offset.clamp(0.0, maxScroll);
+      await _monthScrollController.animateTo(
+        scrollPosition,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -193,26 +282,22 @@ class _GraphicsPageState extends State<GraphicsPage>
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Lista de meses
+                      // Lista de meses/ano
                       SizedBox(
                         height: 30.h,
                         child: ListView.separated(
                           controller: _monthScrollController,
                           scrollDirection: Axis.horizontal,
-                          itemCount: getAllMonths().length,
+                          itemCount: _buildMonthYearOptions().length,
                           separatorBuilder: (context, index) =>
                               SizedBox(width: 8.w),
                           itemBuilder: (context, index) {
-                            final month = getAllMonths()[index];
+                            final month = _buildMonthYearOptions()[index];
                             return GestureDetector(
                               onTap: () {
-                                if (selectedMonth == month) {
-                                  selectedMonth = '';
-                                } else {
-                                  setState(() {
-                                    selectedMonth = month;
-                                  });
-                                }
+                                setState(() {
+                                  selectedMonth = month;
+                                });
                                 selectedCategoryId.value = null;
                               },
                               child: Container(
@@ -918,30 +1003,30 @@ class _GraphicsPageState extends State<GraphicsPage>
         .where((e) => e.type == TransactionType.despesa)
         .toList();
 
-    final String selectedMonth = this.selectedMonth;
-    if (selectedMonth.isNotEmpty) {
-      final int currentYear = DateTime.now().year;
-      return despesas.where((transaction) {
-        if (transaction.paymentDay == null) return false;
-        DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-        String monthName = getAllMonths()[transactionDate.month - 1];
-        return monthName == selectedMonth &&
-            transactionDate.year == currentYear;
-      }).toList();
-    }
+    final parts = this.selectedMonth.split('/');
+    final String monthName = parts.isNotEmpty ? parts[0] : this.selectedMonth;
+    final int year = parts.length == 2
+        ? int.tryParse(parts[1]) ?? DateTime.now().year
+        : DateTime.now().year;
 
-    return despesas;
+    return despesas.where((transaction) {
+      if (transaction.paymentDay == null) return false;
+      DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+      String m = getAllMonths()[transactionDate.month - 1];
+      return m == monthName && transactionDate.year == year;
+    }).toList();
   }
 
   Map<String, dynamic> getSparklineData(
       TransactionController transactionController, DateFormat dayFormatter) {
     var filteredTransactions = getFilteredTransactions(transactionController);
 
-    final String selectedMonth = this.selectedMonth;
-    int selectedMonthIndex = selectedMonth.isEmpty
-        ? DateTime.now().month - 1
-        : getAllMonths().indexOf(selectedMonth);
-    int selectedYear = DateTime.now().year;
+    final parts = this.selectedMonth.split('/');
+    final String monthName = parts.isNotEmpty ? parts[0] : this.selectedMonth;
+    final int selectedMonthIndex = getAllMonths().indexOf(monthName);
+    final int selectedYear = parts.length == 2
+        ? int.tryParse(parts[1]) ?? DateTime.now().year
+        : DateTime.now().year;
 
     int daysInMonth = DateTime(selectedYear, selectedMonthIndex + 1 + 1, 0).day;
 
@@ -1692,16 +1777,35 @@ class _GraphicsPageState extends State<GraphicsPage>
                 final Map<int, double> budgets = {};
                 if (snapshot.hasData) {
                   for (final d in snapshot.data!.docs) {
-                    final data = d.data();
-                    final int id =
-                        int.tryParse(d.id) ?? data['categoryId'] as int? ?? -1;
+                    final docData = d.data();
+                    final int id = int.tryParse(d.id) ??
+                        (docData['categoryId'] as int?) ??
+                        -1;
                     final double amount =
-                        (data['amount'] as num?)?.toDouble() ?? 0.0;
+                        (docData['amount'] as num?)?.toDouble() ?? 0.0;
                     if (id >= 0) budgets[id] = amount;
                   }
                 }
+                // Incluir categorias com orçamento mesmo sem transações (valor 0)
+                final List<Map<String, dynamic>> extendedData =
+                    List<Map<String, dynamic>>.from(data);
+                final Set<int> existingIds =
+                    extendedData.map((e) => e['category'] as int).toSet();
+                budgets.keys
+                    .where((id) => !existingIds.contains(id))
+                    .forEach((id) {
+                  final info = findCategoryById(id);
+                  extendedData.add({
+                    'category': id,
+                    'value': 0.0,
+                    'name': info?['name'],
+                    'color':
+                        info?['color'] ?? theme.primaryColor.withOpacity(0.2),
+                    'icon': info?['icon'],
+                  });
+                });
                 return WidgetListCategoryGraphics(
-                  data: data,
+                  data: extendedData,
                   totalValue: totalValue,
                   selectedCategoryId: selectedCategoryId,
                   theme: theme,

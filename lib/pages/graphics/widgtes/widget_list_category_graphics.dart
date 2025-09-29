@@ -436,7 +436,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         height: 10.h,
                       ),
                       Text(
-                        "Transações recentes",
+                        "Transações recentes (${categoryTransactions.length})",
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.w600,
@@ -587,15 +587,18 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           .toList();
 
       if (monthName.isNotEmpty) {
-        final int currentYear = DateTime.now().year;
+        final parts = monthName.split('/');
+        final String targetMonthName = parts.isNotEmpty ? parts[0] : monthName;
+        final int targetYear = parts.length == 2
+            ? int.tryParse(parts[1]) ?? DateTime.now().year
+            : DateTime.now().year;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
-
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
           String transactionMonthName =
               getAllMonths()[transactionDate.month - 1];
-          return transactionMonthName == monthName &&
-              transactionDate.year == currentYear;
+          return transactionMonthName == targetMonthName &&
+              transactionDate.year == targetYear;
         }).toList();
       }
 
@@ -632,8 +635,13 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       if (t.paymentDay == null) continue;
       if (t.type != TransactionType.receita) continue;
       final d = DateTime.parse(t.paymentDay!);
+      final parts = monthName.split('/');
+      final String selMonthName = parts.isNotEmpty ? parts[0] : monthName;
+      final int selYear = parts.length == 2
+          ? int.tryParse(parts[1]) ?? DateTime.now().year
+          : DateTime.now().year;
       final String mName = getAllMonths()[d.month - 1];
-      if (mName != monthName || d.year != DateTime.now().year) continue;
+      if (mName != selMonthName || d.year != selYear) continue;
       totalReceitaMes +=
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
     }
@@ -666,49 +674,33 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final TransactionController transactionController =
         Get.find<TransactionController>();
 
-    // Definir datas conforme o mês selecionado
-    final now = DateTime.now();
+    // Definir datas conforme o mês/ano selecionado
     final months = getAllMonths();
+    final partsSel = monthName.split('/');
+    final String selMonthName = partsSel.isNotEmpty ? partsSel[0] : monthName;
+    final int selYear = partsSel.length == 2
+        ? int.tryParse(partsSel[1]) ?? DateTime.now().year
+        : DateTime.now().year;
     DateTime currentMonthStart;
     DateTime currentMonthEnd;
     DateTime previousMonthStart;
     DateTime previousMonthEnd;
 
-    final selectedIndex = monthName.isNotEmpty ? months.indexOf(monthName) : -1;
-    final bool isCurrentMonthSelected =
-        monthName.isEmpty || selectedIndex == (now.month - 1);
+    final selectedIndex = months.indexOf(selMonthName);
+    final int selMonth =
+        selectedIndex >= 0 ? selectedIndex + 1 : DateTime.now().month;
+    currentMonthStart = DateTime(selYear, selMonth, 1);
+    final daysInSelected = DateTime(selYear, selMonth + 1, 0).day;
+    currentMonthEnd = DateTime(selYear, selMonth, daysInSelected, 23, 59, 59);
 
-    if (isCurrentMonthSelected) {
-      // Mês atual até o dia de hoje; mês anterior até o mesmo dia
-      currentMonthStart = DateTime(now.year, now.month, 1);
-      currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-      final prevMonth = now.month == 1 ? 12 : now.month - 1;
-      final prevYear = now.month == 1 ? now.year - 1 : now.year;
-      previousMonthStart = DateTime(prevYear, prevMonth, 1);
-      final daysInPrevMonth = DateTime(prevYear, prevMonth + 1, 0).day;
-      final prevDay = now.day > daysInPrevMonth ? daysInPrevMonth : now.day;
-      previousMonthEnd = DateTime(prevYear, prevMonth, prevDay, 23, 59, 59);
-    } else {
-      // Mês selecionado inteiro; mês anterior até o mesmo dia do mês selecionado
-      final selectedMonth =
-          (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
-      final selectedYear = now.year;
-
-      currentMonthStart = DateTime(selectedYear, selectedMonth, 1);
-      final daysInSelected = DateTime(selectedYear, selectedMonth + 1, 0).day;
-      currentMonthEnd =
-          DateTime(selectedYear, selectedMonth, daysInSelected, 23, 59, 59);
-
-      final prevMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
-      final prevYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
-      previousMonthStart = DateTime(prevYear, prevMonth, 1);
-      final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
-      final prevDaySameAsSelected =
-          daysInSelected > daysInPrev ? daysInPrev : daysInSelected;
-      previousMonthEnd =
-          DateTime(prevYear, prevMonth, prevDaySameAsSelected, 23, 59, 59);
-    }
+    final prevMonth = selMonth == 1 ? 12 : selMonth - 1;
+    final prevYear = selMonth == 1 ? selYear - 1 : selYear;
+    previousMonthStart = DateTime(prevYear, prevMonth, 1);
+    final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final prevDaySameAsSelected =
+        daysInSelected > daysInPrev ? daysInPrev : daysInSelected;
+    previousMonthEnd =
+        DateTime(prevYear, prevMonth, prevDaySameAsSelected, 23, 59, 59);
 
     // Calcular a comparação com base na data efetiva (fim do período atual)
     final effectiveCurrentDate = currentMonthEnd;

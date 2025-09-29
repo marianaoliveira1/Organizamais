@@ -63,16 +63,31 @@ class TransactionsList extends StatelessWidget {
     final int currentYear = DateTime.now().year;
     final today = DateTime.now();
 
+    // Extrair mês/ano selecionados do formato "Mês/AAAA"
+    String? selectedMonthName;
+    int? selectedYear;
+    if (selectedMonth.value.isNotEmpty) {
+      final parts = selectedMonth.value.split('/');
+      if (parts.length == 2) {
+        selectedMonthName = parts[0];
+        selectedYear = int.tryParse(parts[1]);
+      } else {
+        selectedMonthName = selectedMonth.value;
+        selectedYear = currentYear;
+      }
+    }
+
     for (var transaction in transactions) {
       DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
 
-      // Filtra apenas transações do ano atual
-      if (transactionDate.year != currentYear) continue;
+      // Filtra por ano selecionado (ou ano atual como fallback)
+      final int yearFilter = selectedYear ?? currentYear;
+      if (transactionDate.year != yearFilter) continue;
 
-      if (selectedMonth.value.isNotEmpty) {
+      if (selectedMonthName != null && selectedMonthName.isNotEmpty) {
         String monthName =
             ResumeContent.getAllMonths()[transactionDate.month - 1];
-        if (monthName != selectedMonth.value) continue;
+        if (monthName != selectedMonthName) continue;
       }
 
       String relativeDate = _getRelativeDate(transaction.paymentDay!);
