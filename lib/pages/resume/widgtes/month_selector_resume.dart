@@ -15,7 +15,7 @@ class MonthSelectorResume extends StatefulWidget {
     super.key,
     required this.selectedMonth,
     this.initialIndex = 0,
-    this.centerCurrentMonth = false,
+    this.centerCurrentMonth = true,
   });
 
   @override
@@ -67,12 +67,91 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
     // Centralizar o mês atual após a construção do widget
     if (widget.centerCurrentMonth) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final int idx = _items.indexOf(widget.selectedMonth.value);
-        final int target = idx >= 0 ? idx : widget.initialIndex;
-        widget.selectedMonth.value = _items[target];
-        await _centerOnIndex(target);
+        // Determinar índice do mês atual
+        final now = DateTime.now();
+        const List<String> months = [
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro'
+        ];
+        final String currentLabel = '${months[now.month - 1]}/${now.year}';
+        final int currentIndex = _items.indexOf(currentLabel);
+        final int target = currentIndex >= 0
+            ? currentIndex
+            : (_items.isNotEmpty ? 0 : widget.initialIndex);
+
+        // Definir mês selecionado e centralizar
+        if (_items.isNotEmpty) {
+          widget.selectedMonth.value = _items[target];
+          await _centerWithRetries(target);
+        }
+      });
+    } else {
+      // Se não for para centralizar, garanta ao menos que o valor inicial é válido
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final now = DateTime.now();
+        const List<String> months = [
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro'
+        ];
+        final String currentLabel = '${months[now.month - 1]}/${now.year}';
+        if (!_items.contains(widget.selectedMonth.value) && _items.isNotEmpty) {
+          final int idx = _items.indexOf(currentLabel);
+          final int safeIdx = idx >= 0 ? idx : 0;
+          widget.selectedMonth.value = _items[safeIdx];
+        }
       });
     }
+  }
+
+  Future<void> _centerWithRetries(int itemIndex) async {
+    // Tenta centralizar usando ensureVisible, fazendo um pré-scroll proporcional
+    // para forçar a construção do item quando necessário.
+    int tries = 0;
+    while (tries < 6) {
+      final key = _itemKeys[itemIndex];
+      if (key != null && key.currentContext != null) {
+        await Scrollable.ensureVisible(
+          key.currentContext!,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+        );
+        _didIntroScroll = true;
+        return;
+      }
+      if (_scrollController.hasClients && _items.length > 1) {
+        final double fraction = itemIndex / (_items.length - 1);
+        final double maxScroll = _scrollController.position.maxScrollExtent;
+        final double target = (maxScroll * fraction).clamp(0.0, maxScroll);
+        try {
+          _scrollController.jumpTo(target);
+        } catch (_) {}
+      }
+      tries += 1;
+      await Future.delayed(const Duration(milliseconds: 60));
+    }
+    // Fallback final
+    await _centerOnIndex(itemIndex);
   }
 
   void _scrollToIndex(int itemIndex) {
@@ -170,7 +249,7 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
             return GestureDetector(
               onTap: () {
                 widget.selectedMonth.value = _items[index];
-                _centerOnIndex(index);
+                _centerWithRetries(index);
               },
               child: Container(
                 key: _itemKeys.putIfAbsent(index, () => GlobalKey()),

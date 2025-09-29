@@ -90,6 +90,7 @@ class GraphicsPage extends StatefulWidget {
 class _GraphicsPageState extends State<GraphicsPage>
     with AutomaticKeepAliveClientMixin {
   late ScrollController _monthScrollController;
+  final Map<int, GlobalKey> _monthItemKeys = {}; // keys para centralizar
   String selectedMonth =
       '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
   Set<int> _selectedCategoryIds = {};
@@ -169,6 +170,18 @@ class _GraphicsPageState extends State<GraphicsPage>
         '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
     final int currentMonthIndex =
         options.indexOf(currentLabel).clamp(0, options.length - 1);
+    // Tente usar ensureVisible se tivermos a key do item
+    final key = _monthItemKeys[currentMonthIndex];
+    if (key != null && key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      return;
+    }
+    // Fallback baseado em offset estimado
     final double itemWidth = 78.w;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
@@ -218,6 +231,16 @@ class _GraphicsPageState extends State<GraphicsPage>
       _monthScrollController.jumpTo(0);
     } catch (_) {}
     for (int i = 0; i <= targetIndex; i++) {
+      final key = _monthItemKeys[i];
+      if (key != null && key.currentContext != null) {
+        await Scrollable.ensureVisible(
+          key.currentContext!,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+        );
+        continue;
+      }
       final double offset = i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
       final double maxScroll = _monthScrollController.position.maxScrollExtent;
       final double scrollPosition = offset.clamp(0.0, maxScroll);
@@ -301,6 +324,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                                 selectedCategoryId.value = null;
                               },
                               child: Container(
+                                key: _monthItemKeys.putIfAbsent(
+                                    index, () => GlobalKey()),
                                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,

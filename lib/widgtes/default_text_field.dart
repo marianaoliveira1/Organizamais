@@ -43,6 +43,7 @@ class _DefaultTextFieldState extends State<DefaultTextField> {
       textInputAction: widget.textInputAction,
       onSubmitted: widget.onSubmitted,
       keyboardType: widget.keyboardType,
+      cursorColor: DefaultColors.black,
       style: TextStyle(
         fontSize: 13.sp,
         fontWeight: FontWeight.w500,

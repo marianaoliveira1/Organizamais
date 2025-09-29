@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
           // Cursor piscando e seleção
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: DefaultColors.black,
-            selectionColor: DefaultColors.black.withOpacity(0.3),
+            selectionColor: DefaultColors.black,
             selectionHandleColor: DefaultColors.black,
           ),
 
