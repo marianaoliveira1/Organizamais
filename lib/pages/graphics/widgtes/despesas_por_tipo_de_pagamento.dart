@@ -399,20 +399,18 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildPaymentTypeMonthComparison(
+                    AdsBanner(),
+                    SizedBox(height: 6.h),
+                    _buildPaymentTypeMonthComparisonRibbon(
                       paymentType,
                       theme,
                     ),
                     SizedBox(height: 6.h),
-                    AdsBanner(),
-                    SizedBox(
-                      height: 6.h,
-                    ),
 
                     // Representação do total da receita
                     Builder(builder: (context) {
                       final tc = Get.find<TransactionController>();
-                      final months = const [
+                      const months = [
                         'Janeiro',
                         'Fevereiro',
                         'Março',
@@ -426,24 +424,36 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                         'Novembro',
                         'Dezembro'
                       ];
-                      final int currentYear = DateTime.now().year;
+
+                      // Suporta formatos "Mês" e "Mês/AAAA"
+                      String monthName;
+                      int year;
+                      if (selectedMonth.contains('/')) {
+                        final parts = selectedMonth.split('/');
+                        monthName = parts[0];
+                        year = int.tryParse(parts[1]) ?? DateTime.now().year;
+                      } else {
+                        monthName = selectedMonth;
+                        year = DateTime.now().year;
+                      }
+
                       final receitasMes = tc.transaction.where((t) {
                         if (t.type != TransactionType.receita) return false;
                         if (t.paymentDay == null) return false;
                         final dt = DateTime.parse(t.paymentDay!);
-                        final monthName = months[dt.month - 1];
-                        return monthName == selectedMonth &&
-                            dt.year == currentYear;
+                        final m = months[dt.month - 1];
+                        return m == monthName && dt.year == year;
                       }).toList();
 
-                      double totalReceitas = receitasMes.fold(0.0, (prev, e) {
+                      final double totalReceitas =
+                          receitasMes.fold(0.0, (prev, e) {
                         return prev +
                             double.parse(
                               e.value.replaceAll('.', '').replaceAll(',', '.'),
                             );
                       });
 
-                      double totalGastoDoTipo =
+                      final double totalGastoDoTipo =
                           paymentTypeTransactions.fold(0.0, (prev, e) {
                         return prev +
                             double.parse(
@@ -458,7 +468,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                       return Padding(
                         padding: EdgeInsets.only(bottom: 8.h),
                         child: Text(
-                          'Representa ${percReceita.toStringAsFixed(0)}% do total da sua receita',
+                          'Corresponde a ${percReceita.toStringAsFixed(1)}% do valor que você recebe no mês',
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
@@ -467,10 +477,11 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                         ),
                       );
                     }),
-
                     SizedBox(height: 2.h),
+                    AdsBanner(),
+                    SizedBox(height: 6.h),
                     Text(
-                      "Detalhes das Transações (${paymentTypeTransactions.length})",
+                      "Transações recentes (${paymentTypeTransactions.length})",
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w600,
@@ -753,6 +764,148 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     );
   }
 
+  // Versão com "ribbon" colorido à esquerda, igual ao exemplo dos cards
+  Widget _buildPaymentTypeMonthComparisonRibbon(
+      String paymentType, ThemeData theme) {
+    final TransactionController controller = Get.find<TransactionController>();
+
+    // Datas considerando mês selecionado (com suporte a "Mês/AAAA")
+    final now = DateTime.now();
+    final months = const [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+
+    DateTime currentMonthStart;
+    DateTime currentMonthEnd;
+    DateTime previousMonthStart;
+    DateTime previousMonthEnd;
+
+    int selectedIndex = months.indexOf(selectedMonth);
+    int selectedYear = now.year;
+    if (selectedMonth.contains('/')) {
+      final p = selectedMonth.split('/');
+      if (p.length == 2) {
+        selectedIndex = months.indexOf(p[0]);
+        selectedYear = int.tryParse(p[1]) ?? now.year;
+      }
+    }
+
+    if (selectedIndex < 0) selectedIndex = now.month - 1;
+    final selectedMonthNumber = selectedIndex + 1;
+
+    currentMonthStart = DateTime(selectedYear, selectedMonthNumber, 1);
+    final daysInSelected =
+        DateTime(selectedYear, selectedMonthNumber + 1, 0).day;
+    final syncDay = now.day.clamp(1, daysInSelected);
+    currentMonthEnd =
+        DateTime(selectedYear, selectedMonthNumber, syncDay, 23, 59, 59);
+
+    final prevMonth = selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
+    final prevYear = selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
+    previousMonthStart = DateTime(prevYear, prevMonth, 1);
+    final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final prevSyncDay = now.day.clamp(1, daysInPrev);
+    previousMonthEnd = DateTime(prevYear, prevMonth, prevSyncDay, 23, 59, 59);
+
+    double currentValue = 0.0;
+    double previousValue = 0.0;
+
+    for (final t in controller.transaction) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa) continue;
+      final pt = t.paymentType;
+      if (pt == null) continue;
+      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase()) continue;
+
+      final d = DateTime.parse(t.paymentDay!);
+      if (d.isAfter(currentMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(currentMonthEnd.add(const Duration(seconds: 1)))) {
+        currentValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      if (d.isAfter(previousMonthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(previousMonthEnd.add(const Duration(seconds: 1)))) {
+        previousValue +=
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+
+    if (currentValue == 0 && previousValue == 0) {
+      return const SizedBox.shrink();
+    }
+
+    late final Color sideColor;
+    late final String text;
+    if (previousValue == 0 && currentValue > 0) {
+      sideColor = DefaultColors.redDark;
+      text =
+          'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.';
+    } else {
+      final diff = (currentValue - previousValue).abs();
+      final percentageChange =
+          ((currentValue - previousValue) / previousValue) * 100;
+
+      if (currentValue > previousValue) {
+        sideColor = DefaultColors.redDark;
+        text = 'Gasto maior: +${percentageChange.abs().toStringAsFixed(1)}% '
+            '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
+            'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+      } else if (currentValue < previousValue) {
+        sideColor = DefaultColors.greenDark;
+        text = 'Gasto menor: -${percentageChange.abs().toStringAsFixed(1)}% '
+            '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
+            'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+      } else {
+        sideColor = DefaultColors.grey;
+        text =
+            'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}';
+      }
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: 4.w,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: sideColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12.r),
+                bottomLeft: Radius.circular(12.r),
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: sideColor,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPaymentTypeMonthComparison(String paymentType, ThemeData theme) {
     final TransactionController controller = Get.find<TransactionController>();
 
@@ -952,13 +1105,16 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
           .toList();
 
       if (selectedMonth.isNotEmpty) {
-        final int currentYear = DateTime.now().year;
+        final parts = selectedMonth.split('/');
+        final String monthName = parts.isNotEmpty ? parts[0] : selectedMonth;
+        final int year = parts.length == 2
+            ? int.tryParse(parts[1]) ?? DateTime.now().year
+            : DateTime.now().year;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
-          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth &&
-              transactionDate.year == currentYear;
+          final dt = DateTime.parse(transaction.paymentDay!);
+          final mName = getAllMonths()[dt.month - 1];
+          return mName == monthName && dt.year == year;
         }).toList();
       }
       return despesas;

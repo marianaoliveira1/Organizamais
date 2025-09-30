@@ -59,6 +59,7 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
   url_launcher: ^6.3.0
+  syncfusion_flutter_charts: ^31.1.19
 
 flutter_launcher_icons:
   android: "launcher_icon"

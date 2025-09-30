@@ -1,4 +1,5 @@
-import 'package:fl_chart/fl_chart.dart';
+// import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -85,17 +86,7 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
     final double total =
         slices.fold(0.0, (prev, s) => prev + (s.value.isFinite ? s.value : 0));
 
-    final List<PieChartSectionData> sections = slices
-        .map(
-          (s) => PieChartSectionData(
-            value: s.value,
-            color: s.color,
-            title: '',
-            radius: 52,
-            showTitle: false,
-          ),
-        )
-        .toList();
+    // Syncfusion usa a própria série com 'slices' como dataSource
 
     // Comparativo com mês anterior (mesmo cartão)
     final DateTime prevMonthStart =
@@ -114,7 +105,8 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
       }
       return !d.isBefore(prevMonthStart) && !d.isAfter(prevMonthEnd);
     }).fold<double>(0.0, (s, t) => s + _parseAmount(t.value));
-    String prevMonthName = DateFormat('MMMM', 'pt_BR').format(prevMonthStart);
+    // Nome do mês anterior (se necessário):
+    // final String prevMonthName = DateFormat('MMMM', 'pt_BR').format(prevMonthStart);
 
     return Scaffold(
       appBar: AppBar(
@@ -200,17 +192,29 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                   children: [
                     SizedBox(
                       height: 200.h,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          PieChart(
-                            PieChartData(
-                              sectionsSpace: 0,
-                              centerSpaceRadius: 34.r,
-                              centerSpaceColor: theme.cardColor,
-                              sections: sections,
-                            ),
-                          ),
+                      child: SfCircularChart(
+                        margin: EdgeInsets.zero,
+                        legend: Legend(isVisible: false),
+                        series: <CircularSeries<_CategorySlice, String>>[
+                          PieSeries<_CategorySlice, String>(
+                            dataSource: slices,
+                            xValueMapper: (_CategorySlice s, _) => s.name,
+                            yValueMapper: (_CategorySlice s, _) => s.value,
+                            pointColorMapper: (_CategorySlice s, _) => s.color,
+                            dataLabelMapper: (_CategorySlice s, _) {
+                              final double pct =
+                                  total > 0 ? (s.value / total) * 100 : 0;
+                              return '${s.name}\n${pct.toStringAsFixed(0)}%';
+                            },
+                            dataLabelSettings:
+                                const DataLabelSettings(isVisible: false),
+                            explode: true,
+                            explodeIndex: slices.isEmpty ? null : 0,
+                            explodeOffset: '8%',
+                            sortingOrder: SortingOrder.descending,
+                            sortFieldValueMapper: (_CategorySlice s, _) =>
+                                s.value,
+                          )
                         ],
                       ),
                     ),

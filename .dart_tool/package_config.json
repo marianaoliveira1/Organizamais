@@ -578,6 +578,18 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "syncfusion_flutter_charts",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/syncfusion_flutter_charts-31.1.19",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "syncfusion_flutter_core",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/syncfusion_flutter_core-31.1.19",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "term_glyph",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/term_glyph-1.2.2",
       "packageUri": "lib/",

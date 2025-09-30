@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -164,21 +164,7 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                   previousValue + (element['value'] as double),
                             );
 
-                            // Criar as seções do gráfico sem ícones (apenas cores)
-                            var chartData = data
-                                .map(
-                                  (e) => PieChartSectionData(
-                                    value: e['value'] as double,
-                                    color: e['color'] == null
-                                        ? Colors.grey.withOpacity(0.5)
-                                        : e['color'] as Color,
-                                    title: '', // Sem título
-                                    radius: 50,
-                                    showTitle: false,
-                                    badgePositionPercentageOffset: 0.9,
-                                  ),
-                                )
-                                .toList();
+                            // Usaremos 'data' diretamente como fonte para o Syncfusion Pie
 
                             if (data.isEmpty) {
                               final vh = MediaQuery.of(context).size.height;
@@ -207,13 +193,57 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                       Center(
                                         child: SizedBox(
                                           height: 180.h,
-                                          child: PieChart(
-                                            PieChartData(
-                                              sectionsSpace: 0,
-                                              centerSpaceRadius: 26,
-                                              centerSpaceColor: theme.cardColor,
-                                              sections: chartData,
-                                            ),
+                                          child: SfCircularChart(
+                                            margin: EdgeInsets.zero,
+                                            legend: Legend(isVisible: false),
+                                            series: <CircularSeries<
+                                                Map<String, dynamic>, String>>[
+                                              PieSeries<Map<String, dynamic>,
+                                                  String>(
+                                                dataSource: data,
+                                                xValueMapper:
+                                                    (Map<String, dynamic> e,
+                                                            _) =>
+                                                        (e['name'] ?? '')
+                                                            .toString(),
+                                                yValueMapper:
+                                                    (Map<String, dynamic> e,
+                                                            _) =>
+                                                        (e['value'] as double),
+                                                pointColorMapper:
+                                                    (Map<String, dynamic> e,
+                                                            _) =>
+                                                        (e['color']
+                                                            as Color?) ??
+                                                        Colors.grey
+                                                            .withOpacity(0.5),
+                                                dataLabelMapper:
+                                                    (Map<String, dynamic> e,
+                                                        _) {
+                                                  final double v =
+                                                      (e['value'] as double);
+                                                  final double pct =
+                                                      totalValue > 0
+                                                          ? (v / totalValue) *
+                                                              100
+                                                          : 0;
+                                                  return '${(e['name'] ?? '').toString()}\n${pct.toStringAsFixed(0)}%';
+                                                },
+                                                dataLabelSettings:
+                                                    const DataLabelSettings(
+                                                        isVisible: false),
+                                                explode: true,
+                                                explodeIndex:
+                                                    data.isEmpty ? null : 0,
+                                                explodeOffset: '8%',
+                                                sortingOrder:
+                                                    SortingOrder.descending,
+                                                sortFieldValueMapper:
+                                                    (Map<String, dynamic> e,
+                                                            _) =>
+                                                        (e['value'] as double),
+                                              )
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -296,19 +326,6 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                       return const SizedBox.shrink();
                                     }
 
-                                    final paySections = payData
-                                        .map(
-                                          (e) => PieChartSectionData(
-                                            value: e['value'] as double,
-                                            color: e['color'] as Color,
-                                            title: '',
-                                            radius: 50,
-                                            showTitle: false,
-                                            badgePositionPercentageOffset: 0.9,
-                                          ),
-                                        )
-                                        .toList();
-
                                     return InfoCard(
                                       title: 'Por tipo de pagamento',
                                       onTap: () {},
@@ -319,14 +336,63 @@ class MonthlyAnalysisPage extends StatelessWidget {
                                           Center(
                                             child: SizedBox(
                                               height: 180.h,
-                                              child: PieChart(
-                                                PieChartData(
-                                                  sectionsSpace: 0,
-                                                  centerSpaceRadius: 26,
-                                                  centerSpaceColor:
-                                                      theme.cardColor,
-                                                  sections: paySections,
-                                                ),
+                                              child: SfCircularChart(
+                                                margin: EdgeInsets.zero,
+                                                legend:
+                                                    Legend(isVisible: false),
+                                                series: <CircularSeries<
+                                                    Map<String, dynamic>,
+                                                    String>>[
+                                                  PieSeries<
+                                                      Map<String, dynamic>,
+                                                      String>(
+                                                    dataSource: payData,
+                                                    xValueMapper:
+                                                        (Map<String, dynamic> e,
+                                                                _) =>
+                                                            (e['paymentType']
+                                                                as String),
+                                                    yValueMapper:
+                                                        (Map<String, dynamic> e,
+                                                                _) =>
+                                                            (e['value']
+                                                                as double),
+                                                    pointColorMapper:
+                                                        (Map<String, dynamic> e,
+                                                                _) =>
+                                                            (e['color']
+                                                                as Color),
+                                                    dataLabelMapper:
+                                                        (Map<String, dynamic> e,
+                                                            _) {
+                                                      final double v =
+                                                          (e['value']
+                                                              as double);
+                                                      final double pct =
+                                                          payTotal > 0
+                                                              ? (v / payTotal) *
+                                                                  100
+                                                              : 0;
+                                                      return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
+                                                    },
+                                                    dataLabelSettings:
+                                                        const DataLabelSettings(
+                                                            isVisible: false),
+                                                    explode: true,
+                                                    explodeIndex:
+                                                        payData.isEmpty
+                                                            ? null
+                                                            : 0,
+                                                    explodeOffset: '8%',
+                                                    sortingOrder:
+                                                        SortingOrder.descending,
+                                                    sortFieldValueMapper:
+                                                        (Map<String, dynamic> e,
+                                                                _) =>
+                                                            (e['value']
+                                                                as double),
+                                                  )
+                                                ],
                                               ),
                                             ),
                                           ),

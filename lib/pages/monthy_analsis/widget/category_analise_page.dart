@@ -1,3 +1,4 @@
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -118,14 +119,6 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final double availableWidth = constraints.maxWidth;
-                    final int monthCount = 12;
-                    final double minBarWidth = 8.0;
-                    final double minBarSpacing = 8.0;
-
-                    double barWidth =
-                        ((availableWidth - (monthCount - 1) * minBarSpacing) /
-                                monthCount)
-                            .clamp(minBarWidth, 24.0);
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -187,277 +180,191 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                                   (budgetSnap.data?.data()?['amount'] as num?)
                                           ?.toDouble() ??
                                       0.0;
+                              // ignore: unused_local_variable
                               final bool hasBudget = budget > 0;
                               return _chartMode == _ChartMode.bar
-                                  ? BarChart(
-                                      BarChartData(
-                                        alignment: BarChartAlignment.center,
-                                        groupsSpace: hasBudget ? 6 : 12,
-                                        maxY: _getOptimalMaxY(monthlyData),
-                                        barTouchData: BarTouchData(
-                                          enabled: true,
-                                          touchTooltipData: BarTouchTooltipData(
-                                            getTooltipColor: (group) => Colors
-                                                .blueGrey
-                                                .withOpacity(0.8),
-                                            tooltipRoundedRadius: 8,
-                                            getTooltipItem: (group, groupIndex,
-                                                rod, rodIndex) {
-                                              final month = _getMonthName(
-                                                  group.x.toInt());
-                                              final value = rod.toY;
-                                              return BarTooltipItem(
-                                                '$month\n${_formatCurrency(value)}',
-                                                TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12.sp,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        titlesData: FlTitlesData(
-                                          show: true,
-                                          rightTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          topTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          bottomTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: true,
-                                              interval: 1,
-                                              getTitlesWidget: (value, meta) {
-                                                final String label =
-                                                    _getMonthAbbr(
-                                                        value.toInt());
-                                                if (hasBudget) {
-                                                  return SizedBox(
-                                                    width: 28.w,
-                                                    child: Text(
-                                                      label,
-                                                      style: TextStyle(
-                                                        color:
-                                                            DefaultColors.grey,
-                                                        fontSize: 10.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return Transform.rotate(
-                                                    angle: -0.5,
-                                                    child: SizedBox(
-                                                      width: barWidth * 3,
-                                                      child: Text(
-                                                        label,
-                                                        style: TextStyle(
-                                                          color: DefaultColors
-                                                              .grey,
-                                                          fontSize: 10.sp,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        maxLines: 1,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                              reservedSize: hasBudget ? 32 : 45,
+                                  ? SfCartesianChart(
+                                      margin: EdgeInsets.zero,
+                                      primaryXAxis: NumericAxis(
+                                        minimum: 1,
+                                        maximum: 12,
+                                        interval: 1,
+                                        majorGridLines:
+                                            const MajorGridLines(width: 0),
+                                        majorTickLines:
+                                            const MajorTickLines(size: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        axisLabelFormatter:
+                                            (AxisLabelRenderDetails args) {
+                                          final int m = args.value.toInt();
+                                          return ChartAxisLabel(
+                                            _getMonthAbbr(m),
+                                            TextStyle(
+                                              color: DefaultColors.grey,
+                                              fontSize: 10.sp,
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                          ),
-                                          leftTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: true,
-                                              reservedSize: 45.w,
-                                              interval: _getOptimalInterval(
-                                                  _getMaxValue(monthlyData)),
-                                              getTitlesWidget: (value, meta) {
-                                                if (value < 0)
-                                                  return const SizedBox
-                                                      .shrink();
-                                                return Text(
-                                                  _formatCurrencyShort(value),
-                                                  style: TextStyle(
-                                                    color: DefaultColors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 8.sp,
-                                                  ),
-                                                );
-                                              },
+                                          );
+                                        },
+                                      ),
+                                      primaryYAxis: NumericAxis(
+                                        minimum: 0,
+                                        maximum: _getOptimalMaxY(monthlyData),
+                                        interval: _getOptimalInterval(
+                                            _getMaxValue(monthlyData)),
+                                        majorGridLines:
+                                            const MajorGridLines(width: 0),
+                                        majorTickLines:
+                                            const MajorTickLines(size: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        axisLabelFormatter:
+                                            (AxisLabelRenderDetails args) {
+                                          return ChartAxisLabel(
+                                            _formatCurrencyShort(
+                                                args.value.toDouble()),
+                                            TextStyle(
+                                              color: DefaultColors.grey,
+                                              fontSize: 8.sp,
+                                              fontWeight: FontWeight.bold,
                                             ),
+                                          );
+                                        },
+                                      ),
+                                      plotAreaBorderWidth: 0,
+                                      series: <CartesianSeries<
+                                          MapEntry<int, double>, num>>[
+                                        // Barra da categoria (Column)
+                                        ColumnSeries<MapEntry<int, double>,
+                                            num>(
+                                          dataSource:
+                                              monthlyData.entries.toList(),
+                                          xValueMapper: (e, _) => e.key,
+                                          yValueMapper: (e, _) =>
+                                              e.value.toDouble(),
+                                          color: widget.categoryColor,
+                                          width: 0.45,
+                                          spacing: 0.1,
+                                          dataLabelSettings:
+                                              const DataLabelSettings(
+                                                  isVisible: false),
+                                        ),
+                                        // Barrinha da meta: só nos meses com transação
+                                        if (budget > 0)
+                                          ColumnSeries<MapEntry<int, double>,
+                                              num>(
+                                            dataSource: monthlyData.entries
+                                                .where((e) => e.value > 0)
+                                                .map((e) =>
+                                                    MapEntry<int, double>(e.key,
+                                                        budget.toDouble()))
+                                                .toList(),
+                                            xValueMapper: (e, _) => e.key,
+                                            yValueMapper: (e, _) => e.value,
+                                            color: DefaultColors.grey,
+                                            width: 0.45,
+                                            spacing: 0.1,
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: false),
                                           ),
-                                        ),
-                                        borderData: FlBorderData(show: false),
-                                        barGroups: _createBarGroups(monthlyData,
-                                            barWidth: barWidth, budget: budget),
-                                        gridData: FlGridData(
-                                          show: true,
-                                          drawVerticalLine: false,
-                                          horizontalInterval:
-                                              _getOptimalInterval(
-                                                  _getMaxValue(monthlyData)),
-                                          getDrawingHorizontalLine: (value) {
-                                            return FlLine(
-                                              color: DefaultColors.grey
-                                                  .withOpacity(0.2),
-                                              strokeWidth: 1,
-                                            );
-                                          },
-                                        ),
+                                      ],
+                                      tooltipBehavior: TooltipBehavior(
+                                        enable: true,
+                                        header: '',
+                                        canShowMarker: false,
+                                        format: 'point.y',
                                       ),
                                     )
-                                  : LineChart(
-                                      LineChartData(
-                                        minX: 1,
-                                        maxX: 12,
-                                        maxY: _getOptimalMaxY(monthlyData),
-                                        lineTouchData: LineTouchData(
-                                          enabled: true,
-                                          touchTooltipData:
-                                              LineTouchTooltipData(
-                                            tooltipRoundedRadius: 8,
-                                            getTooltipItems: (touchedSpots) {
-                                              return touchedSpots.map((spot) {
-                                                final month = _getMonthName(
-                                                    spot.x.toInt());
-                                                return LineTooltipItem(
-                                                  '$month\n${_formatCurrency(spot.y)}',
-                                                  TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12.sp,
-                                                  ),
-                                                );
-                                              }).toList();
-                                            },
-                                          ),
-                                        ),
-                                        titlesData: FlTitlesData(
-                                          show: true,
-                                          rightTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          topTitles: const AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          bottomTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: true,
-                                              getTitlesWidget: (value, meta) {
-                                                return Transform.rotate(
-                                                  angle: -0.5,
-                                                  child: SizedBox(
-                                                    width: 24.w * 3,
-                                                    child: Text(
-                                                      _getMonthAbbr(
-                                                          value.toInt()),
-                                                      style: TextStyle(
-                                                        color:
-                                                            DefaultColors.grey,
-                                                        fontSize: 10.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      maxLines: 1,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              reservedSize: 45,
-                                            ),
-                                          ),
-                                          leftTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: true,
-                                              reservedSize: 45.w,
-                                              interval: _getOptimalInterval(
-                                                  _getMaxValue(monthlyData)),
-                                              getTitlesWidget: (value, meta) {
-                                                if (value < 0)
-                                                  return const SizedBox
-                                                      .shrink();
-                                                return Text(
-                                                  _formatCurrencyShort(value),
-                                                  style: TextStyle(
-                                                    color: DefaultColors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 8.sp,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        gridData: FlGridData(
-                                          show: true,
-                                          drawVerticalLine: false,
-                                          horizontalInterval:
-                                              _getOptimalInterval(
-                                                  _getMaxValue(monthlyData)),
-                                          getDrawingHorizontalLine: (value) {
-                                            return FlLine(
-                                              color: DefaultColors.grey
-                                                  .withOpacity(0.2),
-                                              strokeWidth: 1,
-                                            );
-                                          },
-                                        ),
-                                        borderData: FlBorderData(show: false),
-                                        lineBarsData: [
-                                          LineChartBarData(
-                                            spots: List.generate(12, (i) {
-                                              final month = i + 1;
-                                              final y = monthlyData[month] ?? 0;
-                                              return FlSpot(
-                                                  month.toDouble(), y);
-                                            }),
-                                            isCurved: true,
-                                            color: widget.categoryColor,
-                                            barWidth: 3,
-                                            isStrokeCapRound: true,
-                                            dotData: FlDotData(show: false),
-                                            belowBarData: BarAreaData(
-                                              show: true,
-                                              color: widget.categoryColor
-                                                  .withOpacity(0.10),
-                                            ),
-                                          ),
-                                          if (budget > 0)
-                                            LineChartBarData(
-                                              spots: List.generate(12, (i) {
-                                                final month = i + 1;
-                                                final hasTxn =
-                                                    (monthlyData[month] ?? 0) >
-                                                        0;
-                                                if (!hasTxn) return null;
-                                                return FlSpot(
-                                                    month.toDouble(), budget);
-                                              }).whereType<FlSpot>().toList(),
-                                              isCurved: false,
+                                  : SfCartesianChart(
+                                      margin: EdgeInsets.zero,
+                                      primaryXAxis: NumericAxis(
+                                        minimum: 1,
+                                        maximum: 12,
+                                        interval: 1,
+                                        majorGridLines:
+                                            const MajorGridLines(width: 0),
+                                        majorTickLines:
+                                            const MajorTickLines(size: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        axisLabelFormatter:
+                                            (AxisLabelRenderDetails args) {
+                                          final int m = args.value.toInt();
+                                          return ChartAxisLabel(
+                                            _getMonthAbbr(m),
+                                            TextStyle(
                                               color: DefaultColors.grey,
-                                              barWidth: 2,
-                                              isStrokeCapRound: true,
-                                              dotData: FlDotData(show: false),
+                                              fontSize: 10.sp,
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                        ],
+                                          );
+                                        },
+                                      ),
+                                      primaryYAxis: NumericAxis(
+                                        minimum: 0,
+                                        maximum: _getOptimalMaxY(monthlyData),
+                                        interval: _getOptimalInterval(
+                                            _getMaxValue(monthlyData)),
+                                        majorGridLines:
+                                            const MajorGridLines(width: 0),
+                                        majorTickLines:
+                                            const MajorTickLines(size: 0),
+                                        axisLine: const AxisLine(width: 0),
+                                        axisLabelFormatter:
+                                            (AxisLabelRenderDetails args) {
+                                          return ChartAxisLabel(
+                                            _formatCurrencyShort(
+                                                args.value.toDouble()),
+                                            TextStyle(
+                                              color: DefaultColors.grey,
+                                              fontSize: 8.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      plotAreaBorderWidth: 0,
+                                      series: <CartesianSeries<Map<int, double>,
+                                          num>>[
+                                        SplineAreaSeries<Map<int, double>, num>(
+                                          dataSource: List.generate(12, (i) {
+                                            final month = i + 1;
+                                            return {
+                                              month: (monthlyData[month] ?? 0.0)
+                                            };
+                                          }),
+                                          xValueMapper: (e, _) => e.keys.first,
+                                          yValueMapper: (e, _) =>
+                                              e.values.first,
+                                          color: widget.categoryColor
+                                              .withOpacity(0.10),
+                                          borderColor: widget.categoryColor,
+                                          borderWidth: 2,
+                                        ),
+                                        if (budget > 0)
+                                          SplineSeries<Map<int, double>, num>(
+                                            dataSource: List.generate(12, (i) {
+                                              final month = i + 1;
+                                              final hasTxn =
+                                                  (monthlyData[month] ?? 0) > 0;
+                                              return {
+                                                month: hasTxn
+                                                    ? budget.toDouble()
+                                                    : 0.0
+                                              };
+                                            }),
+                                            xValueMapper: (e, _) =>
+                                                e.keys.first,
+                                            yValueMapper: (e, _) =>
+                                                e.values.first,
+                                            color: DefaultColors.grey,
+                                            width: 4,
+                                          ),
+                                      ],
+                                      tooltipBehavior: TooltipBehavior(
+                                        enable: true,
+                                        header: '',
+                                        canShowMarker: false,
+                                        format: 'point.y',
                                       ),
                                     );
                             },
@@ -638,18 +545,19 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
         }
 
         String valueText = difference >= 0
-            ? 'Aumentou ${_formatCurrency(absoluteDifference)}'
-            : 'Diminuiu ${_formatCurrency(absoluteDifference)}';
+            ? 'Aumentou em ${_formatCurrency(absoluteDifference)}'
+            : 'Diminuiu em ${_formatCurrency(absoluteDifference)}';
 
         String budgetLine = '';
         if (budget > 0) {
           final double remaining = budget - currentValue;
+
           if (remaining >= 0) {
             budgetLine =
-                ' Sua meta mensal foi R\$ ${_formatCurrency(budget)} e faltou R\$ ${_formatCurrency(remaining)} para atingir.';
+                '. Sua meta mensal era de R\$ ${_formatCurrency(budget)}. Ainda faltam R\$ ${_formatCurrency(remaining)} para atingir.';
           } else {
             budgetLine =
-                ' Você ultrapassou R\$ ${_formatCurrency(remaining.abs())} da meta de orçamento.';
+                '. Sua meta mensal era de R\$ ${_formatCurrency(budget)}. Você ultrapassou em R\$ ${_formatCurrency(remaining.abs())}.';
           }
         }
 
@@ -1458,20 +1366,46 @@ class CategorySummaryAnalysisPage extends StatelessWidget {
           SizedBox(height: 40.h),
           LayoutBuilder(
             builder: (context, constraints) {
-              final double maxWidth = constraints.maxWidth;
-              // Tamanho responsivo para o donut dentro de uma linha com textos à direita
-              final double donutSize = maxWidth.isFinite
-                  ? (maxWidth * 0.096).clamp(50.0, 100.0)
-                  : 80.0;
-              final double donutStroke = (donutSize * 0.10).clamp(4.0, 10.0);
+              final double pct = (percentual.clamp(0, 100)) / 100.0;
 
-              return Center(
-                child: _CategoryDonutPercent(
-                  percent: percentual,
-                  color: categoryColor,
-                  size: donutSize,
-                  strokeWidth: donutStroke,
-                ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(999.r),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        widthFactor: pct.isNaN ? 0.0 : pct.clamp(0.0, 1.0),
+                        child: Container(
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: categoryColor,
+                            borderRadius: BorderRadius.circular(999.r),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${percentual.toStringAsFixed(1).replaceAll('.', ',')}%',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -1500,8 +1434,7 @@ class _CategoryDonutPercent extends StatelessWidget {
     final theme = Theme.of(context);
     final double clamped = percent.clamp(0, 100);
 
-    final double outerRadius = (size / 2).w;
-    final double centerRadius = ((size / 2) - strokeWidth).clamp(0, size / 2).w;
+    // outerRadius não é mais usado diretamente com Syncfusion Pie
 
     return SizedBox(
       width: size.w,
@@ -1509,26 +1442,32 @@ class _CategoryDonutPercent extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          PieChart(
-            PieChartData(
-              startDegreeOffset: -90,
-              sectionsSpace: 0,
-              centerSpaceRadius: centerRadius,
-              sections: [
-                PieChartSectionData(
-                  value: clamped <= 0 ? 0.0001 : clamped,
-                  color: color,
-                  showTitle: false,
-                  radius: outerRadius,
-                ),
-                PieChartSectionData(
-                  value: (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
-                  color: DefaultColors.greyLight,
-                  showTitle: false,
-                  radius: outerRadius,
-                ),
-              ],
-            ),
+          SfCircularChart(
+            margin: EdgeInsets.zero,
+            legend: Legend(isVisible: false),
+            series: <CircularSeries<Map<String, dynamic>, String>>[
+              PieSeries<Map<String, dynamic>, String>(
+                dataSource: [
+                  {
+                    'name': 'Filled',
+                    'value': clamped <= 0 ? 0.0001 : clamped,
+                    'color': color
+                  },
+                  {
+                    'name': 'Remain',
+                    'value': (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
+                    'color': DefaultColors.greyLight
+                  },
+                ],
+                xValueMapper: (Map<String, dynamic> e, _) =>
+                    (e['name'] as String),
+                yValueMapper: (Map<String, dynamic> e, _) =>
+                    (e['value'] as double),
+                pointColorMapper: (Map<String, dynamic> e, _) =>
+                    (e['color'] as Color),
+                dataLabelSettings: const DataLabelSettings(isVisible: false),
+              )
+            ],
           ),
           Text(
             '${clamped.toStringAsFixed(1).replaceAll('.', ',')}%',

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
@@ -232,25 +232,42 @@ class PortfolioDetailsPage extends StatelessWidget {
                   SizedBox(height: 8.h),
                   SizedBox(
                     height: 160.h,
-                    child: PieChart(
-                      PieChartData(
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 34.r,
-                        sections: [
-                          PieChartSectionData(
-                            value: income,
-                            color: DefaultColors.green,
-                            showTitle: false,
-                            radius: 50.r,
-                          ),
-                          PieChartSectionData(
-                            value: expenses,
-                            color: DefaultColors.red,
-                            showTitle: false,
-                            radius: 50.r,
-                          ),
-                        ],
-                      ),
+                    child: SfCircularChart(
+                      margin: EdgeInsets.zero,
+                      legend: Legend(isVisible: false),
+                      series: <CircularSeries<Map<String, dynamic>, String>>[
+                        PieSeries<Map<String, dynamic>, String>(
+                          dataSource: [
+                            {
+                              'name': 'Receita',
+                              'value': income,
+                              'color': DefaultColors.green
+                            },
+                            {
+                              'name': 'Despesas',
+                              'value': expenses,
+                              'color': DefaultColors.red
+                            },
+                          ],
+                          xValueMapper: (Map<String, dynamic> e, _) =>
+                              (e['name'] as String),
+                          yValueMapper: (Map<String, dynamic> e, _) =>
+                              (e['value'] as double),
+                          pointColorMapper: (Map<String, dynamic> e, _) =>
+                              (e['color'] as Color),
+                          dataLabelMapper: (Map<String, dynamic> e, _) {
+                            final double v = (e['value'] as double);
+                            final double tot = (income + expenses);
+                            final double pct = tot > 0 ? (v / tot) * 100 : 0;
+                            return '${(e['name'] as String)}\n${pct.toStringAsFixed(0)}%';
+                          },
+                          dataLabelSettings:
+                              const DataLabelSettings(isVisible: false),
+                          explode: true,
+                          explodeIndex: income >= expenses ? 0 : 1,
+                          explodeOffset: '8%',
+                        )
+                      ],
                     ),
                   ),
                   SizedBox(height: 8.h),

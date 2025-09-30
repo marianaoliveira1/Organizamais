@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -922,37 +923,59 @@ class _GraphicsPageState extends State<GraphicsPage>
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  PieChart(
-                    PieChartData(
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 26,
-                      centerSpaceColor: theme.cardColor,
-                      sections: [
-                        PieChartSectionData(
-                          value: fixedTotal,
-                          color: DefaultColors.darkBlue,
-                          title: '',
-                          radius: 50,
-                          showTitle: false,
-                        ),
-                        PieChartSectionData(
-                          value: variableTotal,
-                          color: DefaultColors.orangeDark,
-                          title: '',
-                          radius: 50,
-                          showTitle: false,
-                        ),
-                        PieChartSectionData(
-                          value: extraTotal,
-                          color: DefaultColors.plum,
-                          title: '',
-                          radius: 50,
-                          showTitle: false,
-                        ),
-                      ],
-                    ),
-                    swapAnimationDuration: const Duration(milliseconds: 700),
-                    swapAnimationCurve: Curves.easeOutCubic,
+                  SfCircularChart(
+                    margin: EdgeInsets.zero,
+                    legend: Legend(isVisible: false),
+                    series: <CircularSeries<Map<String, dynamic>, String>>[
+                      PieSeries<Map<String, dynamic>, String>(
+                        dataSource: [
+                          {
+                            'name': 'Fixas',
+                            'value': fixedTotal,
+                            'color': DefaultColors.darkBlue,
+                          },
+                          {
+                            'name': 'Variáveis',
+                            'value': variableTotal,
+                            'color': DefaultColors.orangeDark,
+                          },
+                          {
+                            'name': 'Extras',
+                            'value': extraTotal,
+                            'color': DefaultColors.plum,
+                          },
+                        ],
+                        xValueMapper: (Map<String, dynamic> e, _) =>
+                            (e['name'] as String),
+                        yValueMapper: (Map<String, dynamic> e, _) =>
+                            (e['value'] as double),
+                        pointColorMapper: (Map<String, dynamic> e, _) =>
+                            (e['color'] as Color),
+                        dataLabelMapper: (Map<String, dynamic> e, _) {
+                          final double v = (e['value'] as double);
+                          final double pct = total > 0 ? (v / total) * 100 : 0;
+                          return '${(e['name'] as String)}\n${pct.toStringAsFixed(0)}%';
+                        },
+                        // dataLabelSettings: DataLabelSettings(
+                        //   isVisible: true,
+                        //   labelPosition: ChartDataLabelPosition.inside,
+                        //   textStyle: TextStyle(
+                        //     fontSize: 10.sp,
+                        //     color: Colors.white,
+                        //     fontWeight: FontWeight.w600,
+                        //   ),
+                        // ),
+                        explode: true,
+                        explodeIndex: (fixedTotal >= variableTotal &&
+                                fixedTotal >= extraTotal)
+                            ? 0
+                            : (variableTotal >= fixedTotal &&
+                                    variableTotal >= extraTotal)
+                                ? 1
+                                : 2,
+                        explodeOffset: '8%',
+                      )
+                    ],
                   ),
                 ],
               ),
@@ -1222,88 +1245,43 @@ class _GraphicsPageState extends State<GraphicsPage>
                 Expanded(
                   child: Column(
                     children: [
-                      // Gráfico LineChart com fl_chart
+                      // Gráfico StepLine com Syncfusion
                       RepaintBoundary(
                         child: SizedBox(
                           height: 120.h,
-                          child: LineChart(
-                            LineChartData(
-                              lineTouchData: LineTouchData(
-                                handleBuiltInTouches: true,
-                                touchTooltipData: LineTouchTooltipData(
-                                  getTooltipColor: (touchedSpot) =>
-                                      DefaultColors.green.withOpacity(0.8),
-                                  getTooltipItems: (touchedSpots) {
-                                    return touchedSpots.map((touchedSpot) {
-                                      return LineTooltipItem(
-                                        currencyFormatter.format(touchedSpot.y),
-                                        TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 8.sp,
-                                        ),
-                                      );
-                                    }).toList();
-                                  },
-                                  tooltipPadding: EdgeInsets.symmetric(
-                                    horizontal: 6.w,
-                                    vertical: 4.h,
-                                  ),
-                                  tooltipRoundedRadius: 4.r,
-                                ),
-                              ),
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: false,
-                                horizontalInterval: data.isNotEmpty
-                                    ? (data.reduce((a, b) => a > b ? a : b) > 0
-                                        ? data.reduce((a, b) => a > b ? a : b) /
-                                            4
-                                        : 1)
-                                    : 1,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: DefaultColors.grey.withOpacity(0.2),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(show: false),
-                              borderData: FlBorderData(show: false),
-                              minX: 0,
-                              maxX: (data.length - 1).toDouble(),
-                              minY: 0,
-                              maxY: data.isNotEmpty &&
+                          child: SfCartesianChart(
+                            margin: EdgeInsets.zero,
+                            primaryXAxis: NumericAxis(
+                              isVisible: false,
+                              minimum: 0,
+                              maximum: (data.length - 1).toDouble(),
+                            ),
+                            primaryYAxis: NumericAxis(
+                              isVisible: false,
+                              minimum: 0,
+                              maximum: data.isNotEmpty &&
                                       data.reduce((a, b) => a > b ? a : b) > 0
                                   ? data.reduce((a, b) => a > b ? a : b) * 1.2
                                   : 100,
-                              lineBarsData: [
-                                LineChartBarData(
-                                  spots: data.asMap().entries.map((entry) {
-                                    return FlSpot(
-                                      entry.key.toDouble(),
-                                      entry.value,
-                                    );
-                                  }).toList(),
-                                  isCurved: true,
-                                  curveSmoothness: 0.3,
-                                  color: DefaultColors.green,
-                                  barWidth: 3,
-                                  isStrokeCapRound: true,
-                                  dotData: FlDotData(show: false),
-                                  belowBarData: BarAreaData(
-                                    show: true,
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        DefaultColors.green.withOpacity(0.3),
-                                        DefaultColors.green.withOpacity(0.1),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            ),
+                            plotAreaBorderWidth: 0,
+                            series: <CartesianSeries<MapEntry<int, double>,
+                                num>>[
+                              StackedLineSeries<MapEntry<int, double>, num>(
+                                dataSource: data.asMap().entries.toList(),
+                                xValueMapper: (e, _) => e.key,
+                                yValueMapper: (e, _) => e.value,
+                                color: DefaultColors.green,
+                                width: 2,
+                                markerSettings:
+                                    const MarkerSettings(isVisible: false),
+                              ),
+                            ],
+                            tooltipBehavior: TooltipBehavior(
+                              enable: true,
+                              canShowMarker: false,
+                              header: '',
+                              format: 'point.y',
                             ),
                           ),
                         ),
@@ -1612,16 +1590,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       (previousValue, element) => previousValue + (element['value'] as double),
     );
 
-    var chartData = data
-        .map((e) => PieChartSectionData(
-              value: e['value'] as double,
-              color: e['color'] as Color,
-              title: '',
-              radius: 50,
-              showTitle: false,
-              badgePositionPercentageOffset: 0.9,
-            ))
-        .toList();
+    // Usaremos 'data' diretamente como fonte para o Syncfusion Pie
 
     if (data.isEmpty) {
       return Center(
@@ -1663,15 +1632,34 @@ class _GraphicsPageState extends State<GraphicsPage>
                 child: RepaintBoundary(
                   child: SizedBox(
                     height: 180.h,
-                    child: PieChart(
-                      PieChartData(
-                        sectionsSpace: 0,
-                        centerSpaceRadius: 26,
-                        centerSpaceColor: theme.cardColor,
-                        sections: chartData,
-                      ),
-                      swapAnimationDuration: const Duration(milliseconds: 700),
-                      swapAnimationCurve: Curves.easeOutCubic,
+                    child: SfCircularChart(
+                      margin: EdgeInsets.zero,
+                      legend: Legend(isVisible: false),
+                      series: <CircularSeries<Map<String, dynamic>, String>>[
+                        PieSeries<Map<String, dynamic>, String>(
+                          dataSource: data,
+                          xValueMapper: (Map<String, dynamic> e, _) =>
+                              (e['name'] as String),
+                          yValueMapper: (Map<String, dynamic> e, _) =>
+                              (e['value'] as double),
+                          pointColorMapper: (Map<String, dynamic> e, _) =>
+                              (e['color'] as Color),
+                          dataLabelMapper: (Map<String, dynamic> e, _) {
+                            final double v = (e['value'] as double);
+                            final double pct =
+                                totalValue > 0 ? (v / totalValue) * 100 : 0;
+                            return '${(e['name'] as String)}\n${pct.toStringAsFixed(0)}%';
+                          },
+                          dataLabelSettings:
+                              const DataLabelSettings(isVisible: false),
+                          explode: true,
+                          explodeIndex: data.isEmpty ? null : 0,
+                          explodeOffset: '8%',
+                          sortingOrder: SortingOrder.descending,
+                          sortFieldValueMapper: (Map<String, dynamic> e, _) =>
+                              (e['value'] as double),
+                        )
+                      ],
                     ),
                   ),
                 ),

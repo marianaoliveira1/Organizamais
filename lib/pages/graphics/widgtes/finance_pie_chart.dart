@@ -1,4 +1,5 @@
-import 'package:fl_chart/fl_chart.dart';
+// import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -50,14 +51,21 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       var allTransactions = transactionController.transaction.toList();
 
       if (selectedMonth.isNotEmpty) {
-        final int currentYear = DateTime.now().year;
-        return allTransactions.where((transaction) {
-          if (transaction.paymentDay == null) return false;
-          DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String monthName = getAllMonths()[transactionDate.month - 1];
-          return monthName == selectedMonth &&
-              transactionDate.year == currentYear;
-        }).toList();
+        // selectedMonth chega como "Mês/AAAA"
+        final parts = selectedMonth.split('/');
+        final String monthName = parts.isNotEmpty ? parts[0] : selectedMonth;
+        final int year = parts.length > 1
+            ? int.tryParse(parts[1]) ?? DateTime.now().year
+            : DateTime.now().year;
+        final int monthIndex = getAllMonths().indexOf(monthName) + 1;
+        if (monthIndex > 0) {
+          return allTransactions.where((transaction) {
+            if (transaction.paymentDay == null) return false;
+            DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+            return transactionDate.month == monthIndex &&
+                transactionDate.year == year;
+          }).toList();
+        }
       }
 
       return allTransactions;
@@ -109,23 +117,29 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
             child: SizedBox(
               key: ValueKey(total.toStringAsFixed(2)),
               height: 180,
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      value: totalReceita,
-                      title: "",
-                      color: DefaultColors.green,
-                      radius: 50,
-                    ),
-                    PieChartSectionData(
-                      value: totalDespesas,
-                      title: "",
-                      color: DefaultColors.red,
-                      radius: 50,
-                    ),
-                  ],
-                ),
+              child: SfCircularChart(
+                margin: EdgeInsets.zero,
+                legend: Legend(isVisible: false),
+                series: <CircularSeries<_Slice, String>>[
+                  PieSeries<_Slice, String>(
+                      dataSource: <_Slice>[
+                        _Slice('Receita', totalReceita, DefaultColors.green),
+                        _Slice('Despesa', totalDespesas, DefaultColors.red),
+                      ],
+                      xValueMapper: (_Slice s, _) => s.label,
+                      yValueMapper: (_Slice s, _) => s.value,
+                      pointColorMapper: (_Slice s, _) => s.color,
+                      dataLabelMapper: (_Slice s, _) {
+                        final double pct =
+                            total > 0 ? (s.value / total) * 100 : 0;
+                        return '${s.label}\n${pct.toStringAsFixed(0)}%';
+                      },
+                      dataLabelSettings:
+                          const DataLabelSettings(isVisible: false),
+                      explode: true,
+                      explodeIndex: totalReceita >= totalDespesas ? 0 : 1,
+                      explodeOffset: '8%')
+                ],
               ),
             ),
           ),
@@ -156,4 +170,11 @@ class GraficoPorcengtagemReceitaEDespesa extends StatelessWidget {
       );
     });
   }
+}
+
+class _Slice {
+  _Slice(this.label, this.value, this.color);
+  final String label;
+  final double value;
+  final Color color;
 }

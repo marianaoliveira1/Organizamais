@@ -1,3 +1,4 @@
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -721,7 +722,7 @@ class _DonutPercent extends StatelessWidget {
 
     final double size = 60.w;
     final double outerRadius = (size / 2).w;
-    final double centerRadius = (outerRadius - 8.w).clamp(0, outerRadius);
+    // centerRadius não é mais usado com Syncfusion Pie
 
     return SizedBox(
       width: size,
@@ -729,26 +730,32 @@ class _DonutPercent extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          PieChart(
-            PieChartData(
-              startDegreeOffset: -90,
-              sectionsSpace: 0,
-              centerSpaceRadius: centerRadius,
-              sections: [
-                PieChartSectionData(
-                  value: clamped <= 0 ? 0.0001 : clamped,
-                  color: color,
-                  showTitle: false,
-                  radius: outerRadius,
-                ),
-                PieChartSectionData(
-                  value: (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
-                  color: DefaultColors.greyLight,
-                  showTitle: false,
-                  radius: outerRadius,
-                ),
-              ],
-            ),
+          SfCircularChart(
+            margin: EdgeInsets.zero,
+            legend: Legend(isVisible: false),
+            series: <CircularSeries<Map<String, dynamic>, String>>[
+              PieSeries<Map<String, dynamic>, String>(
+                dataSource: [
+                  {
+                    'name': 'Filled',
+                    'value': clamped <= 0 ? 0.0001 : clamped,
+                    'color': color
+                  },
+                  {
+                    'name': 'Remain',
+                    'value': (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
+                    'color': DefaultColors.greyLight
+                  },
+                ],
+                xValueMapper: (Map<String, dynamic> e, _) =>
+                    (e['name'] as String),
+                yValueMapper: (Map<String, dynamic> e, _) =>
+                    (e['value'] as double),
+                pointColorMapper: (Map<String, dynamic> e, _) =>
+                    (e['color'] as Color),
+                dataLabelSettings: const DataLabelSettings(isVisible: false),
+              )
+            ],
           ),
           Text(
             '${clamped.toStringAsFixed(1).replaceAll('.', ',')}%',
