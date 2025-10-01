@@ -2,6 +2,7 @@
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -1312,119 +1313,92 @@ class _GraphicsPageState extends State<GraphicsPage>
               children: [
                 SizedBox(
                   height: 180.h,
-                  child: BarChart(
-                    BarChartData(
-                      alignment: BarChartAlignment.spaceAround,
-                      maxY: (weeklyTotals.isNotEmpty
+                  child: SfCartesianChart(
+                    margin: EdgeInsets.zero,
+                    primaryXAxis: NumericAxis(
+                      minimum: 0,
+                      maximum: (weeklyTotals.length - 1).toDouble(),
+                      interval: 1,
+                      majorGridLines: const MajorGridLines(width: 0),
+                      majorTickLines: const MajorTickLines(size: 0),
+                      axisLine: const AxisLine(width: 0),
+                      axisLabelFormatter: (args) {
+                        final idx = args.value.toInt();
+                        final label = (idx >= 0 && idx < weekRangeLabels.length)
+                            ? weekRangeLabels[idx]
+                            : '';
+                        return ChartAxisLabel(
+                          label,
+                          TextStyle(fontSize: 11.sp, color: DefaultColors.grey),
+                        );
+                      },
+                    ),
+                    primaryYAxis: NumericAxis(
+                      minimum: 0,
+                      maximum: (weeklyTotals.isNotEmpty
                                   ? weeklyTotals.reduce((a, b) => a > b ? a : b)
                                   : 0) >
                               0
                           ? weeklyTotals.reduce((a, b) => a > b ? a : b) * 1.2
                           : 100,
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 32,
-                            getTitlesWidget: (value, meta) {
-                              String label;
-                              if (value >= 1000) {
-                                label = '${(value / 1000).round()}k';
-                              } else {
-                                label = value.round().toString();
-                              }
-                              return Padding(
-                                padding: EdgeInsets.only(right: 4.w),
-                                child: Text(
-                                  label,
-                                  style: TextStyle(
-                                    fontSize: 9.sp,
-                                    color: DefaultColors.grey,
-                                  ),
-                                  textAlign: TextAlign.right,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              final idx = value.toInt();
-                              if (idx < 0 || idx >= weeklyTotals.length) {
-                                return const SizedBox.shrink();
-                              }
-                              return Padding(
-                                padding: EdgeInsets.only(top: 4.h),
-                                child: Text(
-                                  weekRangeLabels[idx],
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    color: DefaultColors.grey,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        horizontalInterval: (weeklyTotals.isNotEmpty
-                                    ? weeklyTotals
-                                        .reduce((a, b) => a > b ? a : b)
-                                    : 0) >
-                                0
-                            ? (weeklyTotals.reduce((a, b) => a > b ? a : b) / 4)
-                            : 1,
-                        getDrawingHorizontalLine: (value) => FlLine(
+                      interval: (weeklyTotals.isNotEmpty
+                                  ? weeklyTotals.reduce((a, b) => a > b ? a : b)
+                                  : 0) >
+                              0
+                          ? (weeklyTotals.reduce((a, b) => a > b ? a : b) / 4)
+                          : 1,
+                      majorGridLines: MajorGridLines(
                           color: DefaultColors.grey.withOpacity(0.15),
-                          strokeWidth: 1,
-                        ),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      barGroups: List.generate(weeklyTotals.length, (i) {
-                        final y = weeklyTotals[i];
-                        return BarChartGroupData(
-                          x: i,
-                          barRods: [
-                            BarChartRodData(
-                              toY: y,
-                              color: DefaultColors.green,
-                              borderRadius: BorderRadius.circular(4.r),
-                              width: 14.w,
-                            ),
-                          ],
+                          width: 1),
+                      majorTickLines: const MajorTickLines(size: 0),
+                      axisLine: const AxisLine(width: 0),
+                      axisLabelFormatter: (args) {
+                        final value = args.value;
+                        final String label = value >= 1000
+                            ? '${(value / 1000).round()}k'
+                            : value.round().toString();
+                        return ChartAxisLabel(
+                          label,
+                          TextStyle(fontSize: 9.sp, color: DefaultColors.grey),
                         );
-                      }),
-                      barTouchData: BarTouchData(
-                        enabled: true,
-                        touchTooltipData: BarTouchTooltipData(
-                          getTooltipColor: (group) =>
-                              DefaultColors.green.withOpacity(0.85),
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            return BarTooltipItem(
-                              currencyFormatter.format(rod.toY),
-                              TextStyle(
+                      },
+                    ),
+                    plotAreaBorderWidth: 0,
+                    series: <CartesianSeries<MapEntry<int, double>, num>>[
+                      ColumnSeries<MapEntry<int, double>, num>(
+                        dataSource: weeklyTotals.asMap().entries.toList(),
+                        xValueMapper: (e, _) => e.key,
+                        yValueMapper: (e, _) => e.value,
+                        color: DefaultColors.green,
+                        borderRadius: BorderRadius.all(Radius.circular(4.r)),
+                        width: 0.6,
+                        spacing: 0.2,
+                        dataLabelSettings:
+                            const DataLabelSettings(isVisible: false),
+                      )
+                    ],
+                    tooltipBehavior: TooltipBehavior(
+                      enable: true,
+                      header: '',
+                      canShowMarker: false,
+                      builder: (data, point, series, pointIndex, seriesIndex) {
+                        final num y = point.y ?? 0;
+                        return Container(
+                          padding: EdgeInsets.all(6.w),
+                          decoration: BoxDecoration(
+                            color: DefaultColors.green.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Text(
+                            currencyFormatter.format(y),
+                            style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 10.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                                fontWeight: FontWeight.w600),
+                          ),
+                        );
+                      },
                     ),
-                    swapAnimationDuration: const Duration(milliseconds: 700),
-                    swapAnimationCurve: Curves.easeOutCubic,
                   ),
                 ),
                 SizedBox(height: 12.h),

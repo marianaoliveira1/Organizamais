@@ -16,6 +16,43 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
   const DespesasPorTipoDePagamento({super.key, required this.selectedMonth});
   final String selectedMonth;
 
+  String _normalizeMonthName(String name) {
+    final map = {
+      'jan': 'Janeiro',
+      'fev': 'Fevereiro',
+      'mar': 'Março',
+      'abr': 'Abril',
+      'mai': 'Maio',
+      'jun': 'Junho',
+      'jul': 'Julho',
+      'ago': 'Agosto',
+      'set': 'Setembro',
+      'out': 'Outubro',
+      'nov': 'Novembro',
+      'dez': 'Dezembro',
+    };
+    final key = name.trim().toLowerCase();
+    const fullMonths = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+    // se já for nome completo, mantém
+    for (final full in fullMonths) {
+      if (full.toLowerCase() == key) return full;
+    }
+    return map[key] ?? name;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -61,7 +98,9 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
 
       if (selectedMonth.isNotEmpty) {
         final parts = selectedMonth.split('/');
-        final String monthName = parts.isNotEmpty ? parts[0] : selectedMonth;
+        final String monthName = parts.isNotEmpty
+            ? _normalizeMonthName(parts[0])
+            : _normalizeMonthName(selectedMonth);
         final int year = parts.length == 2
             ? int.tryParse(parts[1]) ?? DateTime.now().year
             : DateTime.now().year;
@@ -122,19 +161,32 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
                 previousValue + (element['value'] as double),
           );
 
-          // Criar as seções do gráfico
-          var chartData = data
-              .map(
-                (e) => PieChartSectionData(
-                  value: e['value'] as double,
-                  color: e['color'] as Color,
-                  title: '', // Sem título
-                  radius: 50,
-                  showTitle: false,
-                  badgePositionPercentageOffset: 0.9,
-                ),
-              )
-              .toList();
+          // Criar as seções do gráfico pie com labels dentro e explosão no maior
+          final double maxVal = data.isEmpty
+              ? 0
+              : (data
+                  .map((e) => e['value'] as double)
+                  .reduce((a, b) => a > b ? a : b));
+          final int explodeIndex =
+              data.indexWhere((e) => (e['value'] as double) == maxVal);
+          var chartData = data.asMap().entries.map((entry) {
+            final double v = entry.value['value'] as double;
+            final String label = (entry.value['paymentType'] as String);
+            final double pct = totalValue > 0 ? (v / totalValue) * 100 : 0;
+            return PieChartSectionData(
+              value: v,
+              color: entry.value['color'] as Color,
+              title: '',
+              titleStyle: const TextStyle(),
+              radius: entry.key == explodeIndex ? 76 : 70,
+              showTitle: false,
+              badgePositionPercentageOffset: 0.9,
+              borderSide: BorderSide(
+                color: theme.scaffoldBackgroundColor,
+                width: 2,
+              ),
+            );
+          }).toList();
 
           if (data.isEmpty) {
             return Center(
@@ -157,13 +209,15 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
                   switchInCurve: Curves.easeOutCubic,
                   child: SizedBox(
                     key: ValueKey(totalValue.toStringAsFixed(2)),
-                    height: 180.h,
+                    height: 260.h,
                     child: PieChart(
                       PieChartData(
-                        sectionsSpace: 0,
-                        centerSpaceRadius: 26,
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 0,
                         centerSpaceColor: theme.cardColor,
+                        startDegreeOffset: -90,
                         sections: chartData,
+                        pieTouchData: PieTouchData(enabled: false),
                       ),
                     ),
                   ),
@@ -252,6 +306,46 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   final NumberFormat currencyFormatter;
   final DateFormat dateFormatter;
   final String selectedMonth;
+
+  // Normaliza abreviações (jan/fev/set ...) para o nome completo do mês
+  // ou retorna o próprio nome caso já esteja completo
+  String _normalizeMonthName(String name) {
+    final Map<String, String> abbrToFull = {
+      'jan': 'Janeiro',
+      'fev': 'Fevereiro',
+      'mar': 'Março',
+      'abr': 'Abril',
+      'mai': 'Maio',
+      'jun': 'Junho',
+      'jul': 'Julho',
+      'ago': 'Agosto',
+      'set': 'Setembro',
+      'out': 'Outubro',
+      'nov': 'Novembro',
+      'dez': 'Dezembro',
+    };
+    final key = name.trim().toLowerCase();
+    // Se já for mês completo (case-insensitive), mantém
+    const fullMonths = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+    for (final full in fullMonths) {
+      if (full.toLowerCase() == key) return full;
+    }
+    return abbrToFull[key] ?? name;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -430,10 +524,10 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                       int year;
                       if (selectedMonth.contains('/')) {
                         final parts = selectedMonth.split('/');
-                        monthName = parts[0];
+                        monthName = _normalizeMonthName(parts[0]);
                         year = int.tryParse(parts[1]) ?? DateTime.now().year;
                       } else {
-                        monthName = selectedMonth;
+                        monthName = _normalizeMonthName(selectedMonth);
                         year = DateTime.now().year;
                       }
 
@@ -445,8 +539,13 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                         return m == monthName && dt.year == year;
                       }).toList();
 
-                      final double totalReceitas =
-                          receitasMes.fold(0.0, (prev, e) {
+                      final double totalReceitas = tc.transaction.where((t) {
+                        if (t.type != TransactionType.receita) return false;
+                        if (t.paymentDay == null) return false;
+                        final dt = DateTime.parse(t.paymentDay!);
+                        final m = months[dt.month - 1];
+                        return m == monthName && dt.year == year;
+                      }).fold(0.0, (prev, e) {
                         return prev +
                             double.parse(
                               e.value.replaceAll('.', '').replaceAll(',', '.'),
@@ -636,7 +735,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
         selectedMonth.isEmpty || selectedIndex == (now.month - 1);
 
     if (isCurrentMonthSelected) {
-      // Mês atual até o dia de hoje; mês anterior até o mesmo dia
+      // Mês atual: compara até o mesmo dia
       currentMonthStart = DateTime(now.year, now.month, 1);
       currentMonthEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
@@ -647,23 +746,29 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       final prevDay = now.day > daysInPrevMonth ? daysInPrevMonth : now.day;
       previousMonthEnd = DateTime(prevYear, prevMonth, prevDay, 23, 59, 59);
     } else {
-      // Mês selecionado inteiro; mês anterior inteiro
+      // Mês selecionado pode ser passado ou futuro: se passado -> mês completo; se futuro -> mesmo dia de hoje
       final selectedMonthNumber =
           (selectedIndex >= 0 ? selectedIndex : now.month - 1) + 1;
       final selectedYear = now.year;
 
+      final bool isFuture = (selectedYear > now.year) ||
+          (selectedYear == now.year && selectedMonthNumber > now.month);
+
       currentMonthStart = DateTime(selectedYear, selectedMonthNumber, 1);
       final daysInSelected =
           DateTime(selectedYear, selectedMonthNumber + 1, 0).day;
+      final currentEndDay =
+          isFuture ? now.day.clamp(1, daysInSelected) : daysInSelected;
       currentMonthEnd = DateTime(
-          selectedYear, selectedMonthNumber, daysInSelected, 23, 59, 59);
+          selectedYear, selectedMonthNumber, currentEndDay, 23, 59, 59);
 
       final prevMonth = selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
       final prevYear =
           selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
       previousMonthStart = DateTime(prevYear, prevMonth, 1);
       final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
-      previousMonthEnd = DateTime(prevYear, prevMonth, daysInPrev, 23, 59, 59);
+      final prevEndDay = isFuture ? now.day.clamp(1, daysInPrev) : daysInPrev;
+      previousMonthEnd = DateTime(prevYear, prevMonth, prevEndDay, 23, 59, 59);
     }
 
     // Somar despesas por tipo dentro das janelas
@@ -791,32 +896,86 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     DateTime previousMonthStart;
     DateTime previousMonthEnd;
 
-    int selectedIndex = months.indexOf(selectedMonth);
+    int selectedIndex = -1;
     int selectedYear = now.year;
-    if (selectedMonth.contains('/')) {
-      final p = selectedMonth.split('/');
-      if (p.length == 2) {
-        selectedIndex = months.indexOf(p[0]);
-        selectedYear = int.tryParse(p[1]) ?? now.year;
-      }
+    String raw = selectedMonth.trim();
+    String mPart = raw;
+    String? yPart;
+    if (raw.contains('/')) {
+      final p = raw.split('/');
+      if (p.isNotEmpty) mPart = p[0].trim();
+      if (p.length > 1) yPart = p[1].trim();
     }
-
-    if (selectedIndex < 0) selectedIndex = now.month - 1;
+    if (yPart != null && yPart!.isNotEmpty) {
+      selectedYear = int.tryParse(yPart!) ?? now.year;
+    }
+    final Map<String, int> abbr = {
+      'jan': 1,
+      'fev': 2,
+      'mar': 3,
+      'abr': 4,
+      'mai': 5,
+      'jun': 6,
+      'jul': 7,
+      'ago': 8,
+      'set': 9,
+      'out': 10,
+      'nov': 11,
+      'dez': 12,
+    };
+    final Map<String, int> full = {
+      'janeiro': 1,
+      'fevereiro': 2,
+      'março': 3,
+      'marco': 3,
+      'abril': 4,
+      'maio': 5,
+      'junho': 6,
+      'julho': 7,
+      'agosto': 8,
+      'setembro': 9,
+      'outubro': 10,
+      'novembro': 11,
+      'dezembro': 12,
+    };
+    int? monthNum;
+    final lower = mPart.toLowerCase().replaceAll('.', '').trim();
+    monthNum = abbr[lower] ?? full[lower];
+    if (monthNum == null) {
+      final idx = months.indexOf(mPart);
+      if (idx >= 0) monthNum = idx + 1;
+    }
+    if (monthNum == null) {
+      selectedIndex = now.month - 1;
+    } else {
+      selectedIndex = monthNum - 1;
+    }
     final selectedMonthNumber = selectedIndex + 1;
 
+    final bool isCurrentSelected =
+        (selectedYear == now.year && selectedMonthNumber == now.month);
+    // Mês já fechado? Se não, aplica corte no mesmo dia
+    final bool isMonthClosed =
+        DateTime(selectedYear, selectedMonthNumber + 1, 1)
+            .isBefore(DateTime(now.year, now.month, 1));
+    final bool isCurrentOrFuture = !isMonthClosed;
     currentMonthStart = DateTime(selectedYear, selectedMonthNumber, 1);
-    final daysInSelected =
+    final int daysInSelected =
         DateTime(selectedYear, selectedMonthNumber + 1, 0).day;
-    final syncDay = now.day.clamp(1, daysInSelected);
+    final int currentEndDay =
+        isCurrentOrFuture ? now.day.clamp(1, daysInSelected) : daysInSelected;
     currentMonthEnd =
-        DateTime(selectedYear, selectedMonthNumber, syncDay, 23, 59, 59);
+        DateTime(selectedYear, selectedMonthNumber, currentEndDay, 23, 59, 59);
 
-    final prevMonth = selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
-    final prevYear = selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
+    final int prevMonth =
+        selectedMonthNumber == 1 ? 12 : selectedMonthNumber - 1;
+    final int prevYear =
+        selectedMonthNumber == 1 ? selectedYear - 1 : selectedYear;
     previousMonthStart = DateTime(prevYear, prevMonth, 1);
-    final daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
-    final prevSyncDay = now.day.clamp(1, daysInPrev);
-    previousMonthEnd = DateTime(prevYear, prevMonth, prevSyncDay, 23, 59, 59);
+    final int daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final int prevEndDay =
+        isCurrentOrFuture ? now.day.clamp(1, daysInPrev) : daysInPrev;
+    previousMonthEnd = DateTime(prevYear, prevMonth, prevEndDay, 23, 59, 59);
 
     double currentValue = 0.0;
     double previousValue = 0.0;
@@ -846,29 +1005,73 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
 
     late final Color sideColor;
     late final String text;
-    if (previousValue == 0 && currentValue > 0) {
-      sideColor = DefaultColors.redDark;
-      text =
-          'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.';
-    } else {
+    String _monthName(int m) {
+      const months = [
+        'janeiro',
+        'fevereiro',
+        'março',
+        'abril',
+        'maio',
+        'junho',
+        'julho',
+        'agosto',
+        'setembro',
+        'outubro',
+        'novembro',
+        'dezembro'
+      ];
+      return months[(m - 1).clamp(0, 11)];
+    }
+
+    if (isMonthClosed) {
       final diff = (currentValue - previousValue).abs();
-      final percentageChange =
-          ((currentValue - previousValue) / previousValue) * 100;
+      final double percentageChange = previousValue == 0
+          ? 100.0
+          : ((currentValue - previousValue) / previousValue) * 100;
+      final String monthLabel = _monthName(currentMonthEnd.month);
 
       if (currentValue > previousValue) {
         sideColor = DefaultColors.redDark;
-        text = 'Gasto maior: +${percentageChange.abs().toStringAsFixed(1)}% '
-            '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
-            'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        text =
+            'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+            'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+            'um gasto maior de R\$ ${_formatCurrency(diff)} (+${percentageChange.abs().toStringAsFixed(1)}%).';
       } else if (currentValue < previousValue) {
         sideColor = DefaultColors.greenDark;
-        text = 'Gasto menor: -${percentageChange.abs().toStringAsFixed(1)}% '
-            '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
-            'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        text =
+            'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+            'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+            'um gasto menor de R\$ ${_formatCurrency(diff)} (-${percentageChange.abs().toStringAsFixed(1)}%).';
       } else {
         sideColor = DefaultColors.grey;
+        text = 'Você gastou o mesmo valor em $monthLabel '
+            'que no mês anterior: R\$ ${_formatCurrency(currentValue)}';
+      }
+    } else {
+      if (previousValue == 0 && currentValue > 0) {
+        sideColor = DefaultColors.redDark;
         text =
-            'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}';
+            'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.';
+      } else {
+        final diff = (currentValue - previousValue).abs();
+        final percentageChange =
+            ((currentValue - previousValue) / previousValue) * 100;
+
+        if (currentValue > previousValue) {
+          sideColor = DefaultColors.redDark;
+          text = 'Gasto maior: +${percentageChange.abs().toStringAsFixed(1)}% '
+              '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
+              'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        } else if (currentValue < previousValue) {
+          sideColor = DefaultColors.greenDark;
+          text = 'Gasto menor: -${percentageChange.abs().toStringAsFixed(1)}% '
+              '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
+              'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        } else {
+          sideColor = DefaultColors.grey;
+          text =
+              'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}';
+        }
       }
     }
 
@@ -989,16 +1192,42 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       }
     }
 
-    // Construir texto explicativo
+    // Construir texto explicativo com nomes dos meses
     String explanationText = '';
     late final Color color;
     late final IconData icon;
+    String monthName(int y, int m) {
+      const list = [
+        'janeiro',
+        'fevereiro',
+        'março',
+        'abril',
+        'maio',
+        'junho',
+        'julho',
+        'agosto',
+        'setembro',
+        'outubro',
+        'novembro',
+        'dezembro'
+      ];
+      return list[(m - 1).clamp(0, 11)];
+    }
+
+    final String currentMonthLabel =
+        monthName(currentMonthEnd.year, currentMonthEnd.month);
+    final String previousMonthLabel =
+        monthName(previousMonthEnd.year, previousMonthEnd.month);
+    final bool isCurrentOrFuture = (currentMonthEnd.year > now.year) ||
+        (currentMonthEnd.year == now.year &&
+            currentMonthEnd.month >= now.month);
 
     if (previousValue == 0 && currentValue > 0) {
       color = DefaultColors.redDark; // aumento de despesa = ruim
       icon = Iconsax.arrow_circle_up;
-      explanationText =
-          'Aumentou 100.0% (R\$ ${_formatCurrency(currentValue)}) em comparação ao mesmo dia do mês anterior (R\$ 0,00), hoje R\$ ${_formatCurrency(currentValue)}';
+      explanationText = isCurrentOrFuture
+          ? 'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.'
+          : 'No mês de $previousMonthLabel você gastou R\$ 0,00 e em $currentMonthLabel R\$ ${_formatCurrency(currentValue)}; aumento de 100%.';
     } else if (previousValue == 0 && currentValue == 0) {
       return const SizedBox.shrink();
     } else {
@@ -1008,18 +1237,21 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       if (currentValue < previousValue) {
         color = DefaultColors.greenDark; // diminuiu = bom
         icon = Iconsax.arrow_circle_down;
-        explanationText =
-            'Diminuiu ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+        explanationText = isCurrentOrFuture
+            ? 'Gasto menor: -${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}'
+            : 'No mês de $previousMonthLabel você gastou R\$ ${_formatCurrency(previousValue)} e em $currentMonthLabel R\$ ${_formatCurrency(currentValue)}; gasto menor de R\$ ${_formatCurrency(diff)} (${percentageChange.abs().toStringAsFixed(1)}%).';
       } else if (currentValue > previousValue) {
         color = DefaultColors.redDark; // aumentou = ruim
         icon = Iconsax.arrow_circle_up;
-        explanationText =
-            'Aumentou ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)}), hoje R\$ ${_formatCurrency(currentValue)}';
+        explanationText = isCurrentOrFuture
+            ? 'Gasto maior: +${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}'
+            : 'No mês de $previousMonthLabel você gastou R\$ ${_formatCurrency(previousValue)} e em $currentMonthLabel R\$ ${_formatCurrency(currentValue)}; gasto maior de R\$ ${_formatCurrency(diff)} (+${percentageChange.abs().toStringAsFixed(1)}%).';
       } else {
         color = DefaultColors.grey; // igual
         icon = Iconsax.more_circle;
-        explanationText =
-            'Manteve o mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mesmo dia do mês anterior (R\$ ${_formatCurrency(previousValue)})';
+        explanationText = isCurrentOrFuture
+            ? 'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}'
+            : 'No mês de $previousMonthLabel e em $currentMonthLabel o gasto foi o mesmo: R\$ ${_formatCurrency(currentValue)}.';
       }
     }
 

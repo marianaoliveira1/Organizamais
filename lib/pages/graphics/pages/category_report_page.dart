@@ -40,22 +40,34 @@ class _CategoryReportPageState extends State<CategoryReportPage> {
         NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
     final TransactionController controller = Get.find<TransactionController>();
 
-    final int currentYear = DateTime.now().year;
-    final int currentMonthIndex = widget.selectedMonth.isEmpty
-        ? DateTime.now().month
-        : (getAllMonths().indexOf(widget.selectedMonth) + 1);
+    int selectedYear = DateTime.now().year;
+    int currentMonthIndex;
+    if (widget.selectedMonth.isEmpty) {
+      currentMonthIndex = DateTime.now().month;
+    } else {
+      final parts = widget.selectedMonth.split('/');
+      final String monthName =
+          parts.isNotEmpty ? parts[0] : widget.selectedMonth;
+      if (parts.length == 2) {
+        selectedYear = int.tryParse(parts[1]) ?? selectedYear;
+      }
+      final idx = getAllMonths().indexOf(monthName);
+      currentMonthIndex = idx >= 0 ? idx + 1 : DateTime.now().month;
+    }
 
-    final DateTime currentStart = DateTime(currentYear, currentMonthIndex, 1);
+    final DateTime currentStart = DateTime(selectedYear, currentMonthIndex, 1);
     final int lastDayCurrent =
-        DateTime(currentYear, currentMonthIndex + 1, 0).day;
-    final int endDayCurrent = DateTime.now().month == currentMonthIndex
+        DateTime(selectedYear, currentMonthIndex + 1, 0).day;
+    final int endDayCurrent = (DateTime.now().year == selectedYear &&
+            DateTime.now().month == currentMonthIndex)
         ? DateTime.now().day
         : lastDayCurrent;
     final DateTime currentEnd =
-        DateTime(currentYear, currentMonthIndex, endDayCurrent, 23, 59, 59);
+        DateTime(selectedYear, currentMonthIndex, endDayCurrent, 23, 59, 59);
 
     final int prevMonth = currentMonthIndex == 1 ? 12 : currentMonthIndex - 1;
-    final int prevYear = currentMonthIndex == 1 ? currentYear - 1 : currentYear;
+    final int prevYear =
+        currentMonthIndex == 1 ? selectedYear - 1 : selectedYear;
     final DateTime prevStart = DateTime(prevYear, prevMonth, 1);
     final int lastDayPrev = DateTime(prevYear, prevMonth + 1, 0).day;
     final int prevEndDay =
