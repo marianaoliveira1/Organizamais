@@ -26,6 +26,7 @@ import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
 import 'pages/category_report_page.dart';
 import 'pages/spending_shift_balance_page.dart';
+import 'pages/category_type_selection_page.dart';
 import '../resume/widgtes/text_not_transaction.dart';
 import '../../widgetes/info_card.dart';
 
@@ -626,8 +627,16 @@ class _GraphicsPageState extends State<GraphicsPage>
         // Fixas x Variáveis x Extras (InfoCard)
         InfoCard(
           title: 'Fixas x Variáveis x Extras',
-          icon: Icons.add,
-          onTap: () {},
+          icon: Iconsax.category,
+          onTap: () async {
+            final changed = await Navigator.of(context).push<bool>(
+              MaterialPageRoute(
+                  builder: (_) => const CategoryTypeSelectionPage()),
+            );
+            if (changed == true && mounted) {
+              setState(() {});
+            }
+          },
           backgroundColor: theme.cardColor,
           content: _entranceWrap(
             _buildEssentialsVsNonEssentialsChart(
@@ -760,7 +769,47 @@ class _GraphicsPageState extends State<GraphicsPage>
   Widget _buildEssentialsVsNonEssentialsChart(
       ThemeData theme,
       TransactionController transactionController,
-      NumberFormat currencyFormatter) {
+      NumberFormat currencyFormatter,
+      {Map<int, String> overrides = const {},
+      bool fromStream = false}) {
+    // Carrega classificações do Firestore e reconstrói reativamente
+    if (!fromStream) {
+      final user = Get.find<AuthController>().firebaseUser.value;
+      if (user != null) {
+        return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('categoryClassifications')
+              .snapshots(),
+          builder: (context, snapshot) {
+            final Map<int, String> map = {};
+            if (snapshot.hasData) {
+              for (final d in snapshot.data!.docs) {
+                final doc = d.data();
+                final int id =
+                    int.tryParse(d.id) ?? (doc['categoryId'] as int? ?? -1);
+                final String group =
+                    (doc['group'] as String? ?? '').toLowerCase();
+                if (id >= 0 &&
+                    (group == 'fixas' ||
+                        group == 'variaveis' ||
+                        group == 'extras')) {
+                  map[id] = group;
+                }
+              }
+            }
+            return _buildEssentialsVsNonEssentialsChart(
+              theme,
+              transactionController,
+              currencyFormatter,
+              overrides: map,
+              fromStream: true,
+            );
+          },
+        );
+      }
+    }
     final filteredTransactions = getFilteredTransactions(transactionController);
 
     double fixedTotal = 0.0;
@@ -854,9 +903,20 @@ class _GraphicsPageState extends State<GraphicsPage>
       if (containsAny(n, extraKeywords)) return 'extras';
       if (containsAny(n, fixedKeywords)) return 'fixas';
       if (containsAny(n, variableKeywords)) return 'variaveis';
+
+      // Override via Firestore classification
+      String? override;
+      try {
+        final user = Get.find<AuthController>().firebaseUser.value;
+        if (user != null) {
+          // Síncrono não é possível aqui; vamos ler snapshot acima
+        }
+      } catch (_) {}
       // default fallback
       return 'variaveis';
     }
+
+    // 'overrides' fornecido via StreamBuilder acima quando logado
 
     for (var t in filteredTransactions) {
       final double value =
@@ -866,7 +926,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           categoryId != null ? findCategoryById(categoryId) : null;
       final String? categoryName =
           category != null ? category['name'] as String? : null;
-      final group = classify(categoryName);
+      final group = overrides[categoryId ?? -1] ?? classify(categoryName);
       if (group == 'fixas') {
         fixedTotal += value;
         if (categoryName != null) usedFixedCategoryNames.add(categoryName);
@@ -1228,11 +1288,13 @@ class _GraphicsPageState extends State<GraphicsPage>
                     double value = maxValue - (stepValue * index);
 
                     return Container(
-                      height: 24.h,
+                      height: 28.h,
                       alignment: Alignment.centerRight,
-                      margin: EdgeInsets.only(bottom: index == 4 ? 0 : 4.h),
+                      margin: EdgeInsets.only(bottom: index == 4 ? 0 : 6.h),
                       child: Text(
-                        currencyFormatter.format(value),
+                        value >= 1000
+                            ? 'R\$ ${(value / 1000).round()}k'
+                            : 'R\$ ${value.round()}',
                         style: TextStyle(
                           fontSize: 8.sp,
                           color: DefaultColors.grey,
@@ -1256,14 +1318,24 @@ class _GraphicsPageState extends State<GraphicsPage>
                               isVisible: false,
                               minimum: 0,
                               maximum: (data.length - 1).toDouble(),
+                              majorGridLines: const MajorGridLines(width: 0),
                             ),
                             primaryYAxis: NumericAxis(
-                              isVisible: false,
+                              // Mantém eixos invisíveis, mas habilita linhas de grade
+                              isVisible: true,
                               minimum: 0,
                               maximum: data.isNotEmpty &&
                                       data.reduce((a, b) => a > b ? a : b) > 0
                                   ? data.reduce((a, b) => a > b ? a : b) * 1.2
                                   : 100,
+                              axisLine: const AxisLine(width: 0),
+                              majorTickLines: const MajorTickLines(size: 0),
+                              labelStyle: const TextStyle(
+                                  color: Colors.transparent, fontSize: 0),
+                              majorGridLines: MajorGridLines(
+                                color: DefaultColors.grey.withOpacity(0.15),
+                                width: 1,
+                              ),
                             ),
                             plotAreaBorderWidth: 0,
                             series: <CartesianSeries<MapEntry<int, double>,
@@ -1316,9 +1388,11 @@ class _GraphicsPageState extends State<GraphicsPage>
                   child: SfCartesianChart(
                     margin: EdgeInsets.zero,
                     primaryXAxis: NumericAxis(
-                      minimum: 0,
-                      maximum: (weeklyTotals.length - 1).toDouble(),
+                      minimum: -0.5,
+                      maximum: (weeklyTotals.length - 1 + 0.5).toDouble(),
                       interval: 1,
+                      rangePadding: ChartRangePadding.none,
+                      plotOffset: 12,
                       majorGridLines: const MajorGridLines(width: 0),
                       majorTickLines: const MajorTickLines(size: 0),
                       axisLine: const AxisLine(width: 0),
@@ -1329,7 +1403,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                             : '';
                         return ChartAxisLabel(
                           label,
-                          TextStyle(fontSize: 11.sp, color: DefaultColors.grey),
+                          TextStyle(fontSize: 9.sp, color: DefaultColors.grey),
                         );
                       },
                     ),
@@ -1339,7 +1413,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                                   ? weeklyTotals.reduce((a, b) => a > b ? a : b)
                                   : 0) >
                               0
-                          ? weeklyTotals.reduce((a, b) => a > b ? a : b) * 1.2
+                          ? weeklyTotals.reduce((a, b) => a > b ? a : b) * 1.3
                           : 100,
                       interval: (weeklyTotals.isNotEmpty
                                   ? weeklyTotals.reduce((a, b) => a > b ? a : b)
@@ -1371,8 +1445,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                         yValueMapper: (e, _) => e.value,
                         color: DefaultColors.green,
                         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-                        width: 0.6,
-                        spacing: 0.2,
+                        width: 0.45,
+                        spacing: 0.15,
                         dataLabelSettings:
                             const DataLabelSettings(isVisible: false),
                       )

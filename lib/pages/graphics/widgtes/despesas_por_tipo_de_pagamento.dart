@@ -117,7 +117,6 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
 
     return Column(
       children: [
-        SizedBox(height: 20.h),
         Obx(() {
           var filteredTransactions = getFilteredTransactions();
           var paymentTypes = filteredTransactions
@@ -209,7 +208,7 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
                   switchInCurve: Curves.easeOutCubic,
                   child: SizedBox(
                     key: ValueKey(totalValue.toStringAsFixed(2)),
-                    height: 260.h,
+                    height: 180.h,
                     child: PieChart(
                       PieChartData(
                         sectionsSpace: 2,
@@ -1050,27 +1049,52 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     } else {
       if (previousValue == 0 && currentValue > 0) {
         sideColor = DefaultColors.redDark;
+        final sameDayLabel =
+            '${previousMonthEnd.day} de ${_monthName(previousMonthEnd.month)}';
         text =
-            'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.';
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou 100%.';
       } else {
         final diff = (currentValue - previousValue).abs();
         final percentageChange =
             ((currentValue - previousValue) / previousValue) * 100;
+        final String monthLabel = _monthName(currentMonthEnd.month);
+        final bool isCurrentSelected =
+            (selectedYear == now.year && selectedMonthNumber == now.month);
 
-        if (currentValue > previousValue) {
-          sideColor = DefaultColors.redDark;
-          text = 'Gasto maior: +${percentageChange.abs().toStringAsFixed(1)}% '
-              '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
-              'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
-        } else if (currentValue < previousValue) {
-          sideColor = DefaultColors.greenDark;
-          text = 'Gasto menor: -${percentageChange.abs().toStringAsFixed(1)}% '
-              '(R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. '
-              'Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        if (isCurrentSelected) {
+          final sameDayLabel =
+              '${previousMonthEnd.day} de ${_monthName(previousMonthEnd.month)}';
+          if (currentValue > previousValue) {
+            sideColor = DefaultColors.redDark;
+            text =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${percentageChange.abs().toStringAsFixed(1)}%.';
+          } else if (currentValue < previousValue) {
+            sideColor = DefaultColors.greenDark;
+            text =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${percentageChange.abs().toStringAsFixed(1)}%.';
+          } else {
+            sideColor = DefaultColors.grey;
+            text =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou o mesmo valor.';
+          }
         } else {
-          sideColor = DefaultColors.grey;
-          text =
-              'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}';
+          if (currentValue > previousValue) {
+            sideColor = DefaultColors.redDark;
+            text =
+                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+                'um gasto maior de R\$ ${_formatCurrency(diff)} (+${percentageChange.abs().toStringAsFixed(1)}%).';
+          } else if (currentValue < previousValue) {
+            sideColor = DefaultColors.greenDark;
+            text =
+                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+                'um gasto menor de R\$ ${_formatCurrency(diff)} (-${percentageChange.abs().toStringAsFixed(1)}%).';
+          } else {
+            sideColor = DefaultColors.grey;
+            text =
+                'Mesmo valor do mês passado: R\$ ${_formatCurrency(currentValue)}';
+          }
         }
       }
     }
@@ -1225,8 +1249,9 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
     if (previousValue == 0 && currentValue > 0) {
       color = DefaultColors.redDark; // aumento de despesa = ruim
       icon = Iconsax.arrow_circle_up;
+      final diff = (currentValue - previousValue).abs();
       explanationText = isCurrentOrFuture
-          ? 'Gasto maior: +100% (R\$ ${_formatCurrency(currentValue)}) em relação ao mesmo dia do mês passado.'
+          ? 'Gasto maior: +100% (R\$ ${_formatCurrency(diff)}) em relação ao mesmo dia do mês passado. Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}'
           : 'No mês de $previousMonthLabel você gastou R\$ 0,00 e em $currentMonthLabel R\$ ${_formatCurrency(currentValue)}; aumento de 100%.';
     } else if (previousValue == 0 && currentValue == 0) {
       return const SizedBox.shrink();
@@ -1288,7 +1313,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   }
 
   String _formatCurrency(double value) {
-    return value.toStringAsFixed(2).replaceAll('.', ',');
+    final formatter = NumberFormat('#,##0.00', 'pt_BR');
+    return formatter.format(value);
   }
 
   String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {

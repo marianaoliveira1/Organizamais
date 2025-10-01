@@ -704,15 +704,38 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     DateTime previousMonthStart;
     DateTime previousMonthEnd;
 
-    final selectedIndex = months.indexOf(selMonthName);
+    String _normalizeMonthNameLocal(String name) {
+      final map = {
+        'jan': 'Janeiro',
+        'fev': 'Fevereiro',
+        'mar': 'Março',
+        'abr': 'Abril',
+        'mai': 'Maio',
+        'jun': 'Junho',
+        'jul': 'Julho',
+        'ago': 'Agosto',
+        'set': 'Setembro',
+        'out': 'Outubro',
+        'nov': 'Novembro',
+        'dez': 'Dezembro',
+      };
+      final lower = name.trim().toLowerCase();
+      for (final m in months) {
+        if (m.toLowerCase() == lower) return m;
+      }
+      return map[lower] ?? name;
+    }
+
+    final String selMonthNameNorm = _normalizeMonthNameLocal(selMonthName);
+    final selectedIndex = months.indexOf(selMonthNameNorm);
     final int selMonth =
         selectedIndex >= 0 ? selectedIndex + 1 : DateTime.now().month;
     currentMonthStart = DateTime(selYear, selMonth, 1);
     final daysInSelected = DateTime(selYear, selMonth + 1, 0).day;
     // Detectar se o mês selecionado já foi finalizado (fechado)
     final DateTime now = DateTime.now();
-    final bool isMonthClosed = DateTime(selYear, selMonth + 1, 1)
-        .isBefore(DateTime(now.year, now.month, 1));
+    final bool isMonthClosed =
+        (selYear < now.year) || (selYear == now.year && selMonth < now.month);
     final bool isCurrentOrFuture = !isMonthClosed;
 
     final int currentEndDay =
@@ -809,33 +832,13 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Calcular a diferença absoluta em R$
-    final absoluteDifference = (currentValue - previousValue).abs();
+    // Calcular a diferença absoluta em R$ (não mais usada diretamente no texto)
+    // final absoluteDifference = (currentValue - previousValue).abs();
 
     // Criar texto explicativo baseado na comparação real dos valores
     String explanationText = '';
 
-    String _formatPreviousMonthDate() {
-      final now = DateTime.now();
-      final previousMonth = DateTime(now.year, now.month - 1, now.day);
-
-      final months = [
-        'janeiro',
-        'fevereiro',
-        'março',
-        'abril',
-        'maio',
-        'junho',
-        'julho',
-        'agosto',
-        'setembro',
-        'outubro',
-        'novembro',
-        'dezembro'
-      ];
-
-      return '${now.day} de ${months[previousMonth.month - 1]}';
-    }
+    // Removido o detalhamento de data específica do mês anterior do texto
 
     // Texto: mês fechado usa "No mês passado... e agora em {mês}..."; caso contrário, usa comparação por mesmo dia
     String _monthNamePt(int m) {
@@ -857,8 +860,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     final DateTime now2 = DateTime.now();
-    final bool isMonthClosed2 = DateTime(selYear, selMonth + 1, 1)
-        .isBefore(DateTime(now2.year, now2.month, 1));
+    final bool isMonthClosed2 = (selYear < now2.year) ||
+        (selYear == now2.year && selMonth < now2.month);
 
     if (comparison.type == PercentageType.newData) {
       explanationText =
@@ -891,37 +894,62 @@ class WidgetListCategoryGraphics extends StatelessWidget {
               'um gasto menor de R\$ ${_formatCurrency(diff)} (-${pct.abs().toStringAsFixed(1)}%).';
         }
       } else {
-        if (currentValue < previousValue) {
-          explanationText =
-              'Gasto menor: -${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em relação ao mesmo dia do mês passado (${_formatPreviousMonthDate()}). Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
-        } else if (currentValue > previousValue) {
-          explanationText =
-              'Gasto maior: +${comparison.percentage.toStringAsFixed(1)}% (R\$ ${_formatCurrency(absoluteDifference)}) em relação ao mesmo dia do mês passado (${_formatPreviousMonthDate()}). Antes: R\$ ${_formatCurrency(previousValue)}, agora: R\$ ${_formatCurrency(currentValue)}';
+        final bool isCurrentSelected =
+            (selYear == now2.year && selMonth == now2.month);
+        final diff = (currentValue - previousValue).abs();
+        final pct2 = previousValue == 0
+            ? 100.0
+            : ((currentValue - previousValue) / previousValue) * 100;
+        final monthLabel = _monthNamePt(selMonth);
+        if (isCurrentSelected) {
+          final sameDayLabel =
+              '${previousMonthEnd.day} de ${_monthNamePt(previousMonthEnd.month)}';
+          if (currentValue > previousValue) {
+            explanationText =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${pct2.abs().toStringAsFixed(1)}%.';
+          } else if (currentValue < previousValue) {
+            explanationText =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${pct2.abs().toStringAsFixed(1)}%.';
+          } else {
+            explanationText =
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou o mesmo valor.';
+          }
         } else {
-          explanationText =
-              'Mesmo valor: R\$ ${_formatCurrency(currentValue)} em comparação ao mês passado (${_formatPreviousMonthDate()})';
+          if (currentValue > previousValue) {
+            explanationText =
+                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+                'um gasto maior de R\$ ${_formatCurrency(diff)} (+${pct2.abs().toStringAsFixed(1)}%).';
+          } else if (currentValue < previousValue) {
+            explanationText =
+                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
+                'um gasto menor de R\$ ${_formatCurrency(diff)} (-${pct2.abs().toStringAsFixed(1)}%).';
+          } else {
+            explanationText =
+                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, o mesmo valor.';
+          }
         }
       }
     }
 
     late final Color circleColor2;
-    late final IconData dirIcon2;
+    // late final IconData dirIcon2; // não utilizado
     switch (comparison.type) {
       case PercentageType.positive:
         circleColor2 = DefaultColors.greenDark;
-        dirIcon2 = Iconsax.arrow_circle_down;
         break;
       case PercentageType.negative:
         circleColor2 = DefaultColors.redDark;
-        dirIcon2 = Iconsax.arrow_circle_up;
         break;
       case PercentageType.neutral:
         circleColor2 = DefaultColors.grey;
-        dirIcon2 = Iconsax.more_circle;
         break;
       case PercentageType.newData:
         circleColor2 = DefaultColors.grey;
-        dirIcon2 = Iconsax.star_1;
         break;
     }
 
@@ -950,7 +978,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
   // Remover os métodos duplicados e usar apenas o serviço
   String _formatCurrency(double value) {
-    return value.toStringAsFixed(2).replaceAll('.', ',');
+    final formatter = NumberFormat('#,##0.00', 'pt_BR');
+    return formatter.format(value);
   }
 }
 
