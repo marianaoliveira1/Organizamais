@@ -18,6 +18,7 @@ import '../../model/transaction_model.dart';
 import '../initial/widget/custom_drawer.dart';
 import 'widget/financial_summary_cards.dart';
 import 'widget/monthly_financial_chart.dart';
+import 'widget/annual_balance_spline_chart.dart';
 import 'widget/widget_category_analise.dart';
 import '../resume/widgtes/text_not_transaction.dart';
 import 'widget/payment_type_analise_page.dart';
@@ -116,6 +117,8 @@ class MonthlyAnalysisPage extends StatelessWidget {
                       children: [
                         FinancialSummaryCards(),
                         MonthlyFinancialChart(),
+                        SizedBox(height: 16.h),
+                        AnnualBalanceSplineChart(),
                         Obx(
                           () {
                             var filteredTransactions = controller

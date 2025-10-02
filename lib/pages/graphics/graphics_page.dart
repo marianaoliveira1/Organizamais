@@ -2,7 +2,6 @@
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,7 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
-import 'package:organizamais/pages/graphics/widgtes/despesas_por_tipo_de_pagamento.dart';
+// import 'package:organizamais/pages/graphics/widgtes/despesas_por_tipo_de_pagamento.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
@@ -25,6 +24,7 @@ import 'widgtes/finance_pie_chart.dart';
 import 'widgtes/widget_list_category_graphics.dart';
 import 'pages/select_categories_page.dart';
 import 'pages/category_report_page.dart';
+import 'pages/weekly_report_page.dart';
 import 'pages/spending_shift_balance_page.dart';
 import 'pages/category_type_selection_page.dart';
 import '../resume/widgtes/text_not_transaction.dart';
@@ -63,25 +63,25 @@ List<String> _buildMonthYearOptions() {
   return result;
 }
 
-({int month, int year}) _parseSelectedMonthYear(String selected) {
-  if (selected.isEmpty) {
-    final now = DateTime.now();
-    return (month: now.month, year: now.year);
-  }
-  final parts = selected.split('/');
-  if (parts.length == 2) {
-    final name = parts[0];
-    final year = int.tryParse(parts[1]) ?? DateTime.now().year;
-    final idx = getAllMonths().indexOf(name);
-    final month = idx >= 0 ? idx + 1 : DateTime.now().month;
-    return (month: month, year: year);
-  }
-  final idx = getAllMonths().indexOf(selected);
-  return (
-    month: (idx >= 0 ? idx + 1 : DateTime.now().month),
-    year: DateTime.now().year
-  );
-}
+// ({int month, int year}) _parseSelectedMonthYear(String selected) {
+//   if (selected.isEmpty) {
+//     final now = DateTime.now();
+//     return (month: now.month, year: now.year);
+//   }
+//   final parts = selected.split('/');
+//   if (parts.length == 2) {
+//     final name = parts[0];
+//     final year = int.tryParse(parts[1]) ?? DateTime.now().year;
+//     final idx = getAllMonths().indexOf(name);
+//     final month = idx >= 0 ? idx + 1 : DateTime.now().month;
+//     return (month: month, year: year);
+//   }
+//   final idx = getAllMonths().indexOf(selected);
+//   return (
+//     month: (idx >= 0 ? idx + 1 : DateTime.now().month),
+//     year: DateTime.now().year
+//   );
+// }
 
 class GraphicsPage extends StatefulWidget {
   const GraphicsPage({super.key});
@@ -97,43 +97,11 @@ class _GraphicsPageState extends State<GraphicsPage>
   String selectedMonth =
       '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
   Set<int> _selectedCategoryIds = {};
-  final Set<int> _essentialCategoryIds = {
-    // Moradia / Aluguel / Financiamento / Condomínio / Contas / Manutenção
-    5, // Moradia
-    37, // Financiamento
-    90, // Condomínio
-    26, // Contas (água, luz, gás, internet)
-    19, // Manutenção e reparos
-    // Alimentação (Supermercado/Feira/Padaria)
-    1, // Alimentação
-    29, // Mercado
-    69, // Padaria
-    // Transporte (essencial)
-    17, // Transporte
-    28, // Combustível
-    93, // Transporte público
-    22, // Transporte por Aplicativo
-    71, // Pedágio/Estacionamento
-    70, // IPVA
-    32, // Seguro do Carro
-    92, // Manutenção do carro
-    // Saúde
-    15, // Saúde
-    36, // Plano de Saúde/Seguro de vida
-    24, // Farmácia
-    86, // Exames
-    87, // Consultas Médicas
-    // Educação
-    9, // Educação
-    94, // Escola / Material escolar
-    96, // Cursos
-    // Seguros e Obrigações
-    80, // Seguros
-    35, // Impostos
-    91, // IPTU
-  };
+  String?
+      _expandedPaymentType; // expande detalhes do tipo de pagamento no gráfico
+  // final Set<int> _essentialCategoryIds = const {}; // deprecado
   // Mapa para armazenar seleção de essenciais por mês (chave YYYY-MM)
-  final Map<String, Set<int>> _monthEssentialCategoryIds = {};
+  // final Map<String, Set<int>> _monthEssentialCategoryIds = {};
   bool _showWeekly = false;
   bool _showBarCategoryChart = false;
   // Flags para animação de entrada única
@@ -733,6 +701,45 @@ class _GraphicsPageState extends State<GraphicsPage>
             ],
           ),
         ),
+        SizedBox(height: 16.h),
+        // Relatório Semanal (InfoCard)
+        InfoCard(
+          title: 'Relatório Semanal',
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => WeeklyReportPage(selectedMonth: selectedMonth),
+              ),
+            );
+          },
+          backgroundColor: theme.cardColor,
+          content: Row(
+            children: [
+              Container(
+                width: 36.w,
+                height: 36.h,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(Iconsax.calendar_1,
+                    color: theme.primaryColor, size: 18.sp),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  "Veja receitas, despesas e saldo por semana, com pizza de gastos",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: theme.primaryColor),
+            ],
+          ),
+        ),
         SizedBox(height: 20.h),
         // Por tipo de pagamento (InfoCard)
         AdsBanner(),
@@ -744,7 +751,12 @@ class _GraphicsPageState extends State<GraphicsPage>
           onTap: () {},
           backgroundColor: theme.cardColor,
           content: _entranceWrap(
-            DespesasPorTipoDePagamento(selectedMonth: selectedMonth),
+            _buildPaymentTypePieSection(
+              theme,
+              transactionController,
+              currencyFormatter,
+              dateFormatter,
+            ),
           ),
         ),
         SizedBox(height: 20.h),
@@ -905,13 +917,13 @@ class _GraphicsPageState extends State<GraphicsPage>
       if (containsAny(n, variableKeywords)) return 'variaveis';
 
       // Override via Firestore classification
-      String? override;
-      try {
-        final user = Get.find<AuthController>().firebaseUser.value;
-        if (user != null) {
-          // Síncrono não é possível aqui; vamos ler snapshot acima
-        }
-      } catch (_) {}
+      // String? override;
+      // try {
+      //   final user = Get.find<AuthController>().firebaseUser.value;
+      //   if (user != null) {
+      //     // Síncrono não é possível aqui; vamos ler snapshot acima
+      //   }
+      // } catch (_) {}
       // default fallback
       return 'variaveis';
     }
@@ -1878,6 +1890,581 @@ class _GraphicsPageState extends State<GraphicsPage>
               },
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentTypePieSection(
+      ThemeData theme,
+      TransactionController transactionController,
+      NumberFormat currencyFormatter,
+      DateFormat dateFormatter) {
+    Color colorFor(String paymentType) {
+      switch (paymentType.toLowerCase()) {
+        case 'crédito':
+        case 'credito':
+          return DefaultColors.deepPurple;
+        case 'débito':
+        case 'debito':
+          return DefaultColors.darkBlue;
+        case 'dinheiro':
+          return DefaultColors.orangeDark;
+        case 'pix':
+          return DefaultColors.greenDark;
+        case 'boleto':
+          return DefaultColors.brown;
+        case 'transferência':
+        case 'transferencia':
+          return DefaultColors.blueGrey;
+        case 'cheque':
+          return DefaultColors.gold;
+        case 'vale':
+          return DefaultColors.lime;
+        case 'criptomoeda':
+          return DefaultColors.slateGrey;
+        case 'cupom':
+          return DefaultColors.hotPink;
+        default:
+          final fallback = [
+            DefaultColors.pastelBlue,
+            DefaultColors.pastelGreen,
+            DefaultColors.pastelPurple,
+            DefaultColors.pastelOrange,
+            DefaultColors.pastelPink,
+            DefaultColors.pastelTeal,
+            DefaultColors.pastelCyan,
+            DefaultColors.pastelLime,
+            DefaultColors.lavender,
+            DefaultColors.peach,
+            DefaultColors.mint,
+            DefaultColors.plum,
+            DefaultColors.turquoise,
+            DefaultColors.salmon,
+            DefaultColors.lightBlue,
+          ];
+          return fallback[paymentType.hashCode.abs() % fallback.length];
+      }
+    }
+
+    final txs = getFilteredTransactions(transactionController)
+        .where((e) => e.type == TransactionType.despesa)
+        .toList();
+    final Map<String, double> byType = {};
+    for (final t in txs) {
+      final key = (t.paymentType ?? 'Outros').trim();
+      byType[key] = (byType[key] ?? 0) +
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+    }
+    final data = byType.entries
+        .map((e) => {
+              'paymentType': e.key,
+              'value': e.value,
+              'color': colorFor(e.key),
+            })
+        .toList()
+      ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
+
+    final double total = data.fold(0.0, (s, e) => s + (e['value'] as double));
+    if (total <= 0) {
+      return Center(
+        child: Text(
+          'Sem dados para exibir por tipo de pagamento',
+          style: TextStyle(color: DefaultColors.grey, fontSize: 12.sp),
+        ),
+      );
+    }
+
+    final double maxVal =
+        data.map((e) => e['value'] as double).reduce((a, b) => a > b ? a : b);
+    final int explodeIndex =
+        data.indexWhere((e) => (e['value'] as double) == maxVal);
+
+    // Janela de comparação (mês selecionado vs mês anterior; mesmo dia se mês atual/futuro)
+    final DateTime now = DateTime.now();
+    int selMonth, selYear;
+    final partsMY = selectedMonth.split('/');
+    if (partsMY.length == 2) {
+      selYear = int.tryParse(partsMY[1]) ?? now.year;
+      selMonth = getAllMonths().indexOf(partsMY[0]) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    } else {
+      selYear = now.year;
+      selMonth = getAllMonths().indexOf(selectedMonth) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    }
+    final bool isMonthClosed =
+        (selYear < now.year) || (selYear == now.year && selMonth < now.month);
+    final DateTime curStart = DateTime(selYear, selMonth, 1);
+    final int daysInSel = DateTime(selYear, selMonth + 1, 0).day;
+    final int curEndDay =
+        isMonthClosed ? daysInSel : now.day.clamp(1, daysInSel);
+    final DateTime curEnd = DateTime(selYear, selMonth, curEndDay, 23, 59, 59);
+    final int prevMonth = selMonth == 1 ? 12 : selMonth - 1;
+    final int prevYear = selMonth == 1 ? selYear - 1 : selYear;
+    final DateTime prevStart = DateTime(prevYear, prevMonth, 1);
+    final int daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final int prevEndDay =
+        isMonthClosed ? daysInPrev : now.day.clamp(1, daysInPrev);
+    final DateTime prevEnd =
+        DateTime(prevYear, prevMonth, prevEndDay, 23, 59, 59);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: RepaintBoundary(
+            child: SizedBox(
+              height: 180.h,
+              child: SfCircularChart(
+                margin: EdgeInsets.zero,
+                legend: const Legend(isVisible: false),
+                series: <CircularSeries<Map<String, dynamic>, String>>[
+                  PieSeries<Map<String, dynamic>, String>(
+                    dataSource: data,
+                    xValueMapper: (e, _) => (e['paymentType'] as String),
+                    yValueMapper: (e, _) => (e['value'] as double),
+                    pointColorMapper: (e, _) => (e['color'] as Color),
+                    dataLabelMapper: (e, _) => '',
+                    dataLabelSettings:
+                        const DataLabelSettings(isVisible: false),
+                    explode: true,
+                    explodeIndex: explodeIndex < 0 ? 0 : explodeIndex,
+                    explodeOffset: '6%',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        ...[
+          for (final e in data) ...[
+            Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: InkWell(
+                onTap: () {
+                  final name = (e['paymentType'] as String);
+                  setState(() {
+                    _expandedPaymentType =
+                        _expandedPaymentType == name ? null : name;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 16.w,
+                      height: 16.w,
+                      decoration: BoxDecoration(
+                          color: (e['color'] as Color), shape: BoxShape.circle),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            (e['paymentType'] as String),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                          Text(
+                            '${(total > 0 ? ((e['value'] as double) / total * 100) : 0).toStringAsFixed(0)}% das despesas',
+                            style: TextStyle(
+                                fontSize: 10.sp, color: DefaultColors.grey),
+                          ),
+                          Builder(builder: (context) {
+                            final String name = (e['paymentType'] as String);
+                            double currentValue = 0.0;
+                            double previousValue = 0.0;
+                            for (final t in transactionController.transaction) {
+                              if (t.paymentDay == null ||
+                                  t.type != TransactionType.despesa) continue;
+                              final pt = t.paymentType;
+                              if (pt == null) continue;
+                              if (pt.trim().toLowerCase() !=
+                                  name.trim().toLowerCase()) continue;
+                              final d = DateTime.parse(t.paymentDay!);
+                              final v = double.parse(t.value
+                                  .replaceAll('.', '')
+                                  .replaceAll(',', '.'));
+                              if (d.isAfter(curStart
+                                      .subtract(const Duration(seconds: 1))) &&
+                                  d.isBefore(
+                                      curEnd.add(const Duration(seconds: 1)))) {
+                                currentValue += v;
+                              }
+                              if (d.isAfter(prevStart
+                                      .subtract(const Duration(seconds: 1))) &&
+                                  d.isBefore(prevEnd
+                                      .add(const Duration(seconds: 1)))) {
+                                previousValue += v;
+                              }
+                            }
+
+                            double changePct;
+                            IconData changeIcon;
+                            Color changeColor;
+                            if (previousValue == 0 && currentValue > 0) {
+                              changePct = 100.0;
+                              changeIcon = Iconsax.arrow_circle_up;
+                              changeColor = DefaultColors.redDark;
+                            } else if (previousValue > 0 && currentValue == 0) {
+                              changePct = -100.0;
+                              changeIcon = Iconsax.arrow_circle_down;
+                              changeColor = DefaultColors.greenDark;
+                            } else if (previousValue == 0 &&
+                                currentValue == 0) {
+                              changePct = 0.0;
+                              changeIcon = Iconsax.more_circle;
+                              changeColor = DefaultColors.grey;
+                            } else {
+                              final c = ((currentValue - previousValue) /
+                                      previousValue) *
+                                  100;
+                              changePct = c;
+                              if (c > 0) {
+                                changeIcon = Iconsax.arrow_circle_up;
+                                changeColor = DefaultColors.redDark;
+                              } else if (c < 0) {
+                                changeIcon = Iconsax.arrow_circle_down;
+                                changeColor = DefaultColors.greenDark;
+                              } else {
+                                changeIcon = Iconsax.more_circle;
+                                changeColor = DefaultColors.grey;
+                              }
+                            }
+
+                            final String changeLabel = changePct > 0
+                                ? '+${changePct.abs().toStringAsFixed(1)}%'
+                                : changePct < 0
+                                    ? '-${changePct.abs().toStringAsFixed(1)}%'
+                                    : '0.0%';
+
+                            return Row(
+                              children: [
+                                Icon(changeIcon,
+                                    size: 12.sp, color: changeColor),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  changeLabel,
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: changeColor,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          currencyFormatter.format(e['value'] as double),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                        Icon(
+                          _expandedPaymentType == (e['paymentType'] as String)
+                              ? Iconsax.arrow_up_24
+                              : Iconsax.arrow_down_1,
+                          color: theme.primaryColor,
+                          size: 12.sp,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_expandedPaymentType == (e['paymentType'] as String))
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: _buildPaymentTypeInlineDetails(
+                  theme: theme,
+                  paymentType: (e['paymentType'] as String),
+                  transactionController: transactionController,
+                  currencyFormatter: currencyFormatter,
+                  dateFormatter: dateFormatter,
+                ),
+              ),
+          ]
+        ]
+      ],
+    );
+  }
+
+  Widget _buildPaymentTypeInlineDetails({
+    required ThemeData theme,
+    required String paymentType,
+    required TransactionController transactionController,
+    required NumberFormat currencyFormatter,
+    required DateFormat dateFormatter,
+  }) {
+    final now = DateTime.now();
+    // Parse mês/ano selecionado
+    int selMonth, selYear;
+    final parts = selectedMonth.split('/');
+    if (parts.length == 2) {
+      selYear = int.tryParse(parts[1]) ?? now.year;
+      selMonth = getAllMonths().indexOf(parts[0]) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    } else {
+      selYear = now.year;
+      selMonth = getAllMonths().indexOf(selectedMonth) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    }
+
+    final bool isMonthClosed =
+        (selYear < now.year) || (selYear == now.year && selMonth < now.month);
+
+    // Janelas de comparação
+    final DateTime curStart = DateTime(selYear, selMonth, 1);
+    final int daysInSel = DateTime(selYear, selMonth + 1, 0).day;
+    final int curEndDay =
+        isMonthClosed ? daysInSel : now.day.clamp(1, daysInSel);
+    final DateTime curEnd = DateTime(selYear, selMonth, curEndDay, 23, 59, 59);
+
+    final int prevMonth = selMonth == 1 ? 12 : selMonth - 1;
+    final int prevYear = selMonth == 1 ? selYear - 1 : selYear;
+    final DateTime prevStart = DateTime(prevYear, prevMonth, 1);
+    final int daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final int prevEndDay =
+        isMonthClosed ? daysInPrev : now.day.clamp(1, daysInPrev);
+    final DateTime prevEnd =
+        DateTime(prevYear, prevMonth, prevEndDay, 23, 59, 59);
+
+    double currentValue = 0.0;
+    double previousValue = 0.0;
+    final filtered = transactionController.transaction.where((t) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa)
+        return false;
+      final pt = t.paymentType;
+      if (pt == null) return false;
+      return pt.trim().toLowerCase() == paymentType.trim().toLowerCase();
+    });
+    for (final t in filtered) {
+      final d = DateTime.parse(t.paymentDay!);
+      final v = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      if (d.isAfter(curStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(curEnd.add(const Duration(seconds: 1)))) {
+        currentValue += v;
+      }
+      if (d.isAfter(prevStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(prevEnd.add(const Duration(seconds: 1)))) {
+        previousValue += v;
+      }
+    }
+
+    // Texto de comparação
+    Color sideColor;
+    String text;
+    String monthNamePt(int m) {
+      const ms = [
+        'janeiro',
+        'fevereiro',
+        'março',
+        'abril',
+        'maio',
+        'junho',
+        'julho',
+        'agosto',
+        'setembro',
+        'outubro',
+        'novembro',
+        'dezembro'
+      ];
+      return ms[(m - 1).clamp(0, 11)];
+    }
+
+    if (currentValue == 0 && previousValue == 0) {
+      sideColor = DefaultColors.grey;
+      text =
+          'Mesmo valor: ${currencyFormatter.format(currentValue)} (igual ao mês passado, ${currencyFormatter.format(previousValue)})';
+    } else if (isMonthClosed) {
+      final diff = (currentValue - previousValue).abs();
+      final pct = previousValue == 0
+          ? 100.0
+          : ((currentValue - previousValue) / previousValue) * 100;
+      final ml = monthNamePt(selMonth);
+      if (currentValue > previousValue) {
+        sideColor = DefaultColors.redDark;
+        text =
+            'No mês passado você gastou ${currencyFormatter.format(previousValue)} e agora em $ml ${currencyFormatter.format(currentValue)}; gasto maior de ${currencyFormatter.format(diff)} (+${pct.abs().toStringAsFixed(1)}%).';
+      } else if (currentValue < previousValue) {
+        sideColor = DefaultColors.greenDark;
+        text =
+            'No mês passado você gastou ${currencyFormatter.format(previousValue)} e agora em $ml ${currencyFormatter.format(currentValue)}; gasto menor de ${currencyFormatter.format(diff)} (-${pct.abs().toStringAsFixed(1)}%).';
+      } else {
+        sideColor = DefaultColors.grey;
+        text =
+            'Você gastou o mesmo valor em $ml que no mês anterior: ${currencyFormatter.format(currentValue)}';
+      }
+    } else {
+      final diff = (currentValue - previousValue).abs();
+      final pct = previousValue == 0
+          ? 100.0
+          : ((currentValue - previousValue) / previousValue) * 100;
+      final sameDayLabel = '${prevEnd.day} de ${monthNamePt(prevEnd.month)}';
+      if (currentValue > previousValue) {
+        sideColor = DefaultColors.redDark;
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou ${currencyFormatter.format(currentValue)}, o que aumentou ${pct.abs().toStringAsFixed(1)}% (${currencyFormatter.format(diff)}).';
+      } else if (currentValue < previousValue) {
+        sideColor = DefaultColors.greenDark;
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou ${currencyFormatter.format(currentValue)}, o que diminuiu ${pct.abs().toStringAsFixed(1)}% (${currencyFormatter.format(diff)}).';
+      } else {
+        sideColor = DefaultColors.grey;
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou o mesmo valor: ${currencyFormatter.format(currentValue)}.';
+      }
+    }
+
+    // Transações recentes do método no mês selecionado
+    final List<TransactionModel> monthTxs = transactionController.transaction
+        .where((t) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa)
+        return false;
+      final pt = t.paymentType;
+      if (pt == null) return false;
+      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase())
+        return false;
+      final d = DateTime.parse(t.paymentDay!);
+      return d.year == selYear && d.month == selMonth;
+    }).toList()
+      ..sort((a, b) => DateTime.parse(b.paymentDay!)
+          .compareTo(DateTime.parse(a.paymentDay!)));
+
+    // Receita total do mês selecionado (mês inteiro)
+    final DateTime _monthStart = DateTime(selYear, selMonth, 1);
+    final DateTime _monthEnd = DateTime(selYear, selMonth + 1, 0, 23, 59, 59);
+    final double _totalReceitasMes = transactionController.transaction
+        .where((t) => t.type == TransactionType.receita && t.paymentDay != null)
+        .where((t) {
+      final d = DateTime.parse(t.paymentDay!);
+      return d.isAfter(_monthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(_monthEnd.add(const Duration(seconds: 1)));
+    }).fold(
+            0.0,
+            (prev, t) =>
+                prev +
+                double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    final double _percReceita =
+        _totalReceitasMes > 0 ? (currentValue / _totalReceitasMes * 100) : 0.0;
+    final String _monthLabelTitle = getAllMonths()[selMonth - 1];
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 6.h),
+          AdsBanner(),
+          SizedBox(height: 8.h),
+          // linha colorida do tamanho do texto + frase
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 3.w,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: sideColor,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: sideColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Text(
+            'Corresponde a ${_percReceita.toStringAsFixed(1)}% da sua receita de ${_monthLabelTitle}',
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          AdsBanner(),
+          SizedBox(height: 8.h),
+          Text('Transações recentes (${monthTxs.length})',
+              style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                  color: DefaultColors.grey20)),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: monthTxs.length,
+            separatorBuilder: (_, __) =>
+                Divider(height: 1, color: DefaultColors.grey20.withOpacity(.5)),
+            itemBuilder: (_, i) {
+              final t = monthTxs[i];
+              final v = double.parse(
+                  t.value.replaceAll('.', '').replaceAll(',', '.'));
+              final date = t.paymentDay != null
+                  ? dateFormatter.format(DateTime.parse(t.paymentDay!))
+                  : '';
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 200.w,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.title,
+                              style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.primaryColor),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
+                          SizedBox(height: 4.h),
+                          Text(date,
+                              style: TextStyle(
+                                  fontSize: 10.sp, color: DefaultColors.grey)),
+                        ],
+                      ),
+                    ),
+                    Text(currencyFormatter.format(v),
+                        style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w500,
+                            color: theme.primaryColor)),
+                  ],
+                ),
+              );
+            },
+          )
         ],
       ),
     );

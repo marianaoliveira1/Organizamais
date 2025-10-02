@@ -166,18 +166,70 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             SizedBox(height: 2.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Builder(builder: (context) {
                                   final double pctExpenses = totalValue > 0
                                       ? (valor / totalValue * 100)
                                       : 0.0;
-                                  return Text(
-                                    '${pctExpenses.toStringAsFixed(0)}% das despesas',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      color: DefaultColors.grey,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  // % da receita do mês selecionado
+                                  final TransactionController controller =
+                                      Get.find<TransactionController>();
+                                  final parts = monthName.split('/');
+                                  String selMonthName =
+                                      parts.isNotEmpty ? parts[0] : monthName;
+                                  final int selYear = parts.length == 2
+                                      ? int.tryParse(parts[1]) ??
+                                          DateTime.now().year
+                                      : DateTime.now().year;
+                                  // normaliza abreviações (jan, fev, ...)
+                                  const abbr = {
+                                    'jan': 'Janeiro',
+                                    'fev': 'Fevereiro',
+                                    'mar': 'Março',
+                                    'abr': 'Abril',
+                                    'mai': 'Maio',
+                                    'jun': 'Junho',
+                                    'jul': 'Julho',
+                                    'ago': 'Agosto',
+                                    'set': 'Setembro',
+                                    'out': 'Outubro',
+                                    'nov': 'Novembro',
+                                    'dez': 'Dezembro',
+                                  };
+                                  final key = selMonthName.trim().toLowerCase();
+                                  if (abbr.containsKey(key)) {
+                                    selMonthName = abbr[key]!;
+                                  }
+                                  double totalReceitaMes = 0.0;
+                                  for (final t in controller.transaction) {
+                                    if (t.paymentDay == null) continue;
+                                    if (t.type != TransactionType.receita)
+                                      continue;
+                                    final d = DateTime.parse(t.paymentDay!);
+                                    final mName = getAllMonths()[d.month - 1];
+                                    if (mName != selMonthName ||
+                                        d.year != selYear) continue;
+                                    totalReceitaMes += double.parse(
+                                      t.value
+                                          .replaceAll('.', '')
+                                          .replaceAll(',', '.'),
+                                    );
+                                  }
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${pctExpenses.toStringAsFixed(0)}% das despesas',
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          color: DefaultColors.grey,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 }),
                                 Obx(() => Icon(
@@ -907,11 +959,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           if (currentValue > previousValue) {
             explanationText =
                 'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${pct2.abs().toStringAsFixed(1)}%.';
+                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${pct2.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
           } else if (currentValue < previousValue) {
             explanationText =
                 'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${pct2.abs().toStringAsFixed(1)}%.';
+                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${pct2.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
           } else {
             explanationText =
                 'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou o mesmo valor.';

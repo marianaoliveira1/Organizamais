@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -200,37 +201,176 @@ class DespesasPorTipoDePagamento extends StatelessWidget {
             );
           }
 
+          // Gráfico principal: Pie (Syncfusion) por tipo de pagamento
           return Column(
             children: [
-              Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 650),
-                  switchInCurve: Curves.easeOutCubic,
-                  child: SizedBox(
-                    key: ValueKey(totalValue.toStringAsFixed(2)),
-                    height: 180.h,
-                    child: PieChart(
-                      PieChartData(
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 0,
-                        centerSpaceColor: theme.cardColor,
-                        startDegreeOffset: -90,
-                        sections: chartData,
-                        pieTouchData: PieTouchData(enabled: false),
+              RepaintBoundary(
+                child: SizedBox(
+                  height: 200.h,
+                  child: SfCircularChart(
+                    margin: EdgeInsets.zero,
+                    legend: const Legend(isVisible: false),
+                    series: <CircularSeries<Map<String, dynamic>, String>>[
+                      PieSeries<Map<String, dynamic>, String>(
+                        dataSource: data,
+                        xValueMapper: (e, _) => (e['paymentType'] as String),
+                        yValueMapper: (e, _) => (e['value'] as double),
+                        pointColorMapper: (e, _) => (e['color'] as Color),
+                        dataLabelMapper: (e, _) => '',
+                        dataLabelSettings:
+                            const DataLabelSettings(isVisible: false),
+                        explode: true,
+                        explodeIndex: explodeIndex < 0 ? 0 : explodeIndex,
+                        explodeOffset: '6%',
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
-              WidgetListPaymentTypeGraphics(
-                data: data,
-                totalValue: totalValue,
-                selectedPaymentType: selectedPaymentType,
-                theme: theme,
-                currencyFormatter: currencyFormatter,
-                dateFormatter: dateFormatter,
-                selectedMonth: selectedMonth,
-              ),
+              SizedBox(height: 12.h),
+/*
+              Obx(() {
+                if (selectedPaymentType.value == null) {
+                  return const SizedBox();
+                }
+
+                var chartTxs = filteredTransactions
+                    ? filteredTransactions
+                    : filteredTransactions.where((t) {
+                      final pt = t.paymentType;
+                      if (pt == null) return false;
+                      return pt.trim().toLowerCase() ==
+                          selectedPaymentType.value!.trim().toLowerCase();
+                    }).toList();
+
+                // Determina mês/ano selecionado
+                final parts = selectedMonth.split('/');
+                final String mName = parts.isNotEmpty
+                    ? _normalizeMonthName(parts[0])
+                    : _normalizeMonthName(selectedMonth);
+                final int year = parts.length == 2
+                    ? int.tryParse(parts[1]) ?? DateTime.now().year
+                    : DateTime.now().year;
+                final int monthIndex = getAllMonths().indexOf(mName) + 1;
+                final int daysInMonth = DateTime(year, monthIndex + 1, 0).day;
+
+                // Agrega por dia
+                final Map<int, double> dailyTotals = {
+                  for (int d = 1; d <= daysInMonth; d++) d: 0.0
+                };
+                for (final t in chartTxs) {
+                  if (t.paymentDay == null) continue;
+                  final dt = DateTime.parse(t.paymentDay!);
+                  if (dt.year == year && dt.month == monthIndex) {
+                    final val = double.parse(
+                        t.value.replaceAll('.', '').replaceAll(',', '.'));
+                    dailyTotals[dt.day] = (dailyTotals[dt.day] ?? 0) + val;
+                  }
+                }
+                final List<double> dailyData = [
+                  for (int d = 1; d <= daysInMonth; d++) dailyTotals[d] ?? 0.0
+                ];
+
+                // Agrega por semana (1-7, 8-14, 15-21, 22-28, 29-fim)
+                final ranges = [
+                  [1, 7],
+                  [8, 14],
+                  [15, 21],
+                  [22, 28],
+                  [29, daysInMonth],
+                ];
+                final List<double> weeklyTotals = ranges
+                    .map((r) => dailyData
+                        .sublist(r[0] - 1, r[1])
+                        .fold(0.0, (s, v) => s + v))
+                    .toList();
+                final List<String> weekLabels = ranges
+                    .map((r) => '${r[0]}-${r[1]}')
+                    .toList(growable: false);
+
+                // UI igual ao _buildCategoryChart (botões diário/semanal + gráfico)
+                return Container(
+                  margin: EdgeInsets.only(bottom: 24.h),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 14.w,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (showWeekly.value) showWeekly.value = false;
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: !showWeekly.value
+                                        ? DefaultColors.green
+                                        : DefaultColors.grey.withOpacity(0.3),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Despesas diárias',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: !showWeekly.value
+                                        ? theme.primaryColor
+                                        : DefaultColors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (!showWeekly.value) showWeekly.value = true;
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: showWeekly.value
+                                        ? DefaultColors.green
+                                        : DefaultColors.grey.withOpacity(0.3),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Despesas semanais',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: showWeekly.value
+                                        ? theme.primaryColor
+                                        : DefaultColors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      // ... restante do bloco removido ...
+                    ],
+                  ),
+                );
+              }),
+*/
             ],
           );
         }),
@@ -388,11 +528,11 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                     children: [
                       // Ícone/Cor do tipo de pagamento
                       Container(
-                        width: 22.w,
-                        height: 22.h,
+                        width: 14.w,
+                        height: 14.h,
                         decoration: BoxDecoration(
                           color: paymentTypeColor,
-                          borderRadius: BorderRadius.circular(12.r),
+                          shape: BoxShape.circle,
                         ),
                         child: Center(
                             // child: Text(
@@ -453,11 +593,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
                               textAlign: TextAlign.end,
                             ),
                           ),
-                          Icon(
-                            Iconsax.arrow_down5,
-                            color: DefaultColors.grey,
-                            size: 16.h,
-                          ),
+                          Icon(Icons.chevron_right,
+                              color: DefaultColors.grey, size: 16.h),
                         ],
                       ),
                     ],
@@ -998,10 +1135,6 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       }
     }
 
-    if (currentValue == 0 && previousValue == 0) {
-      return const SizedBox.shrink();
-    }
-
     late final Color sideColor;
     late final String text;
     String _monthName(int m) {
@@ -1020,6 +1153,40 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
         'dezembro'
       ];
       return months[(m - 1).clamp(0, 11)];
+    }
+
+    if (currentValue == 0 && previousValue == 0) {
+      sideColor = DefaultColors.grey;
+      text = 'Sem dados para comparação nos períodos atual e anterior.';
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: DefaultColors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Iconsax.more_circle,
+              size: 14.sp,
+              color: sideColor,
+            ),
+            SizedBox(width: 4.w),
+            Flexible(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: sideColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     if (isMonthClosed) {
@@ -1067,11 +1234,11 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
           if (currentValue > previousValue) {
             sideColor = DefaultColors.redDark;
             text =
-                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${percentageChange.abs().toStringAsFixed(1)}%.';
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
           } else if (currentValue < previousValue) {
             sideColor = DefaultColors.greenDark;
             text =
-                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${percentageChange.abs().toStringAsFixed(1)}%.';
+                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${percentageChange.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
           } else {
             sideColor = DefaultColors.grey;
             text =
