@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
+import 'package:organizamais/widgetes/info_card.dart';
 
 class AnnualBalanceSplineChart extends StatelessWidget {
   @override
@@ -17,85 +18,69 @@ class AnnualBalanceSplineChart extends StatelessWidget {
     final int year = DateTime.now().year;
     final List<_Point> points = _buildAnnualBalance(controller, year);
 
-    return Container(
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Saldo do ano (${year})',
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-              color: theme.primaryColor,
+    return InfoCard(
+      title: 'Saldo acumulado ao longo do ano',
+      onTap: null,
+      content: SizedBox(
+        height: 220.h,
+        child: SfCartesianChart(
+          margin: EdgeInsets.zero,
+          plotAreaBorderWidth: 0,
+          tooltipBehavior: TooltipBehavior(
+            enable: true,
+            format: r'R$ {point.y}',
+          ),
+          primaryXAxis: CategoryAxis(
+            majorGridLines: const MajorGridLines(width: 0),
+            majorTickLines: const MajorTickLines(width: 0),
+            axisLine: const AxisLine(width: 0),
+            interval: 1,
+            labelIntersectAction: AxisLabelIntersectAction.rotate45,
+            labelRotation: 0,
+            labelStyle: TextStyle(
+              color: DefaultColors.grey,
+              fontSize: 10.sp,
             ),
           ),
-          SizedBox(height: 10.h),
-          SizedBox(
-            height: 220.h,
-            child: SfCartesianChart(
-              margin: EdgeInsets.zero,
-              plotAreaBorderWidth: 0,
-              tooltipBehavior: TooltipBehavior(
-                enable: true,
-                format: 'R\$ {point.y}',
-              ),
-              primaryXAxis: CategoryAxis(
-                majorGridLines: const MajorGridLines(width: 0),
-                majorTickLines: const MajorTickLines(width: 0),
-                axisLine: const AxisLine(width: 0),
-                interval: 1,
-                labelIntersectAction: AxisLabelIntersectAction.rotate45,
-                labelRotation: 0,
-                labelStyle: TextStyle(
-                  color: DefaultColors.grey,
-                  fontSize: 10.sp,
-                ),
-              ),
-              primaryYAxis: NumericAxis(
-                majorGridLines: MajorGridLines(
-                  width: 1,
-                  color: theme.primaryColor.withOpacity(0.08),
-                ),
-                axisLine: const AxisLine(width: 0),
-                majorTickLines: const MajorTickLines(width: 0),
-                labelStyle: TextStyle(
-                  color: DefaultColors.grey,
-                  fontSize: 10.sp,
-                ),
-                numberFormat: NumberFormat.currency(
-                  locale: 'pt_BR',
-                  symbol: 'R\$',
-                  decimalDigits: 2,
-                ),
-              ),
-              series: <CartesianSeries<_Point, String>>[
-                ColumnSeries<_Point, String>(
-                  dataSource: points,
-                  xValueMapper: (p, _) => p.m,
-                  yValueMapper: (p, _) => p.y,
-                  pointColorMapper: (p, _) => p.y >= 0
-                      ? DefaultColors.greenDark
-                      : DefaultColors.redDark,
-                  borderRadius: BorderRadius.circular(6.r),
-                  width: 0.6,
-                  enableTooltip: true,
-                  dataLabelSettings: const DataLabelSettings(isVisible: false),
-                ),
-              ],
+          primaryYAxis: NumericAxis(
+            majorGridLines: MajorGridLines(
+              width: 1,
+              color: theme.primaryColor.withOpacity(0.08),
+            ),
+            axisLine: const AxisLine(width: 0),
+            majorTickLines: const MajorTickLines(width: 0),
+            labelStyle: TextStyle(
+              color: DefaultColors.grey,
+              fontSize: 10.sp,
+            ),
+            numberFormat: NumberFormat.currency(
+              locale: 'pt_BR',
+              symbol: 'R\$',
+              decimalDigits: 2,
             ),
           ),
-        ],
+          series: <CartesianSeries<_Point, String>>[
+            ColumnSeries<_Point, String>(
+              dataSource: points,
+              xValueMapper: (p, _) => p.m,
+              yValueMapper: (p, _) => p.y,
+              pointColorMapper: (p, _) =>
+                  p.y >= 0 ? DefaultColors.greenDark : DefaultColors.redDark,
+              borderRadius: BorderRadius.circular(6.r),
+              width: 0.6,
+              enableTooltip: true,
+              dataLabelSettings: const DataLabelSettings(isVisible: false),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   List<_Point> _buildAnnualBalance(TransactionController c, int year) {
     final List<_Point> out = [];
+    final DateTime _now = DateTime.now();
+    final DateTime _today = DateTime(_now.year, _now.month, _now.day);
     final months = const [
       'Jan',
       'Fev',
@@ -117,7 +102,9 @@ class AnnualBalanceSplineChart extends StatelessWidget {
       for (final t in c.transaction) {
         if (t.paymentDay == null) continue;
         final d = DateTime.parse(t.paymentDay!);
+        final DateTime dOnly = DateTime(d.year, d.month, d.day);
         if (d.year != year || d.month != m) continue;
+        if (dOnly.isAfter(_today)) continue; // only up to today
         final v =
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
         if (t.type == TransactionType.receita) {

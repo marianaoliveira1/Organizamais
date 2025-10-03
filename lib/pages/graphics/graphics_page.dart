@@ -96,6 +96,16 @@ class _GraphicsPageState extends State<GraphicsPage>
   final Map<int, GlobalKey> _monthItemKeys = {}; // keys para centralizar
   String selectedMonth =
       '${getAllMonths()[DateTime.now().month - 1]}/${DateTime.now().year}';
+  // Controller obtido uma vez (evita Get.put no build)
+  final TransactionController _transactionController =
+      Get.isRegistered<TransactionController>()
+          ? Get.find<TransactionController>()
+          : Get.put(TransactionController());
+  Worker? _cacheWorker;
+  // Caches simples por mês para reduzir recomputações pesadas em build
+  final Map<String, List<TransactionModel>> _cacheFilteredDespesasByMonth = {};
+  final Map<String, Map<String, dynamic>> _cacheSparklineByMonth = {};
+  final Map<String, List<double>> _cacheWeeklyTotalsByMonth = {};
   Set<int> _selectedCategoryIds = {};
   String?
       _expandedPaymentType; // expande detalhes do tipo de pagamento no gráfico
@@ -115,6 +125,11 @@ class _GraphicsPageState extends State<GraphicsPage>
   void initState() {
     super.initState();
     _monthScrollController = ScrollController();
+    // Limpa caches quando as transações mudarem
+    _cacheWorker = ever<List<TransactionModel>>(
+      _transactionController.transactionRx,
+      (_) => _invalidateCaches(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _playIntroMonthScroll();
     });
@@ -226,15 +241,21 @@ class _GraphicsPageState extends State<GraphicsPage>
   @override
   void dispose() {
     _monthScrollController.dispose();
+    _cacheWorker?.dispose();
     super.dispose();
+  }
+
+  void _invalidateCaches() {
+    _cacheFilteredDespesasByMonth.clear();
+    _cacheSparklineByMonth.clear();
+    _cacheWeeklyTotalsByMonth.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
-    final TransactionController transactionController =
-        Get.put(TransactionController());
+    final TransactionController transactionController = _transactionController;
 
     // Formatador de moeda brasileira
     final currencyFormatter = NumberFormat.currency(
@@ -701,7 +722,10 @@ class _GraphicsPageState extends State<GraphicsPage>
             ],
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 20.h),
+
+        AdsBanner(),
+        SizedBox(height: 20.h),
         // Relatório Semanal (InfoCard)
         InfoCard(
           title: 'Relatório Semanal',
@@ -1120,26 +1144,33 @@ class _GraphicsPageState extends State<GraphicsPage>
 
   List<TransactionModel> getFilteredTransactions(
       TransactionController transactionController) {
-    var despesas = transactionController.transaction
-        .where((e) => e.type == TransactionType.despesa)
-        .toList();
-
-    final parts = this.selectedMonth.split('/');
-    final String monthName = parts.isNotEmpty ? parts[0] : this.selectedMonth;
+    final parts = selectedMonth.split('/');
+    final String monthName = parts.isNotEmpty ? parts[0] : selectedMonth;
     final int year = parts.length == 2
         ? int.tryParse(parts[1]) ?? DateTime.now().year
         : DateTime.now().year;
 
-    return despesas.where((transaction) {
-      if (transaction.paymentDay == null) return false;
-      DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-      String m = getAllMonths()[transactionDate.month - 1];
-      return m == monthName && transactionDate.year == year;
-    }).toList();
+    final String cacheKey = '$monthName/$year';
+    final cached = _cacheFilteredDespesasByMonth[cacheKey];
+    if (cached != null) return cached;
+
+    final despesas = transactionController.transaction
+        .where((e) => e.type == TransactionType.despesa && e.paymentDay != null)
+        .where((t) {
+      final d = DateTime.parse(t.paymentDay!);
+      return getAllMonths()[d.month - 1] == monthName && d.year == year;
+    }).toList(growable: false);
+
+    _cacheFilteredDespesasByMonth[cacheKey] = despesas;
+    return despesas;
   }
 
   Map<String, dynamic> getSparklineData(
       TransactionController transactionController, DateFormat dayFormatter) {
+    final String cacheKey = selectedMonth;
+    final cached = _cacheSparklineByMonth[cacheKey];
+    if (cached != null) return cached;
+
     var filteredTransactions = getFilteredTransactions(transactionController);
 
     final parts = this.selectedMonth.split('/');
@@ -1185,12 +1216,14 @@ class _GraphicsPageState extends State<GraphicsPage>
       values.add(dailyTotals[day]!);
     }
 
-    return {
+    final result = {
       'data': sparklineData,
       'labels': labels,
       'dates': dates,
       'values': values,
     };
+    _cacheSparklineByMonth[cacheKey] = result;
+    return result;
   }
 
   Widget _buildLineChart(
@@ -1200,6 +1233,8 @@ class _GraphicsPageState extends State<GraphicsPage>
       DateFormat dayFormatter) {
     var sparklineData = getSparklineData(transactionController, dayFormatter);
     List<double> data = sparklineData['data'];
+    final List<String> dayLabels =
+        (sparklineData['labels'] as List<String>).toList();
 
     final weeklyTotals = _getWeeklyTotals(transactionController);
     final weekRangeLabels = _getWeekRangeLabels();
@@ -1286,109 +1321,110 @@ class _GraphicsPageState extends State<GraphicsPage>
           ),
           SizedBox(height: 16.h),
           if (!_showWeekly)
-            Row(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Coluna com os valores (vertical)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: List.generate(5, (index) {
-                    double maxValue = data.isNotEmpty
-                        ? data.reduce((a, b) => a > b ? a : b)
-                        : 0;
-                    double stepValue = maxValue / 4;
-                    double value = maxValue - (stepValue * index);
-
-                    return Container(
-                      height: 28.h,
-                      alignment: Alignment.centerRight,
-                      margin: EdgeInsets.only(bottom: index == 4 ? 0 : 6.h),
-                      child: Text(
-                        value >= 1000
-                            ? 'R\$ ${(value / 1000).round()}k'
-                            : 'R\$ ${value.round()}',
-                        style: TextStyle(
-                          fontSize: 8.sp,
-                          color: DefaultColors.grey,
-                        ),
+                RepaintBoundary(
+                  child: SizedBox(
+                    height: 120.h,
+                    child: SfCartesianChart(
+                      margin: EdgeInsets.zero,
+                      plotAreaBorderWidth: 0,
+                      primaryXAxis: CategoryAxis(
+                        labelPlacement: LabelPlacement.onTicks,
+                        arrangeByIndex: true,
+                        interval: 1,
+                        majorGridLines: const MajorGridLines(width: 0),
+                        axisLine: const AxisLine(width: 0),
+                        majorTickLines: const MajorTickLines(size: 0),
+                        labelIntersectAction: AxisLabelIntersectAction.hide,
+                        axisLabelFormatter: (args) {
+                          // Mostrar dias de 2 em 2: 1, 3, 5, ... e sempre o último dia
+                          final String raw = args.text;
+                          int day =
+                              int.tryParse(raw) ?? (dayLabels.indexOf(raw) + 1);
+                          final int lastDay = dayLabels.length;
+                          final bool show =
+                              (day > 0 && (day % 2 == 1)) || day == lastDay;
+                          return ChartAxisLabel(
+                            show ? day.toString() : '',
+                            TextStyle(
+                                fontSize: 6.sp, color: DefaultColors.grey),
+                          );
+                        },
+                        labelStyle: TextStyle(
+                            fontSize: 6.sp, color: DefaultColors.grey),
                       ),
-                    );
-                  }),
-                ),
-                SizedBox(width: 8.w),
-                // Área principal do gráfico
-                Expanded(
-                  child: Column(
-                    children: [
-                      // Gráfico StepLine com Syncfusion
-                      RepaintBoundary(
-                        child: SizedBox(
-                          height: 120.h,
-                          child: SfCartesianChart(
-                            margin: EdgeInsets.zero,
-                            primaryXAxis: NumericAxis(
-                              isVisible: false,
-                              minimum: 0,
-                              maximum: (data.length - 1).toDouble(),
-                              majorGridLines: const MajorGridLines(width: 0),
-                            ),
-                            primaryYAxis: NumericAxis(
-                              // Mantém eixos invisíveis, mas habilita linhas de grade
-                              isVisible: true,
-                              minimum: 0,
-                              maximum: data.isNotEmpty &&
-                                      data.reduce((a, b) => a > b ? a : b) > 0
-                                  ? data.reduce((a, b) => a > b ? a : b) * 1.2
-                                  : 100,
-                              axisLine: const AxisLine(width: 0),
-                              majorTickLines: const MajorTickLines(size: 0),
-                              labelStyle: const TextStyle(
-                                  color: Colors.transparent, fontSize: 0),
-                              majorGridLines: MajorGridLines(
-                                color: DefaultColors.grey.withOpacity(0.15),
-                                width: 1,
-                              ),
-                            ),
-                            plotAreaBorderWidth: 0,
-                            series: <CartesianSeries<MapEntry<int, double>,
-                                num>>[
-                              StackedLineSeries<MapEntry<int, double>, num>(
-                                dataSource: data.asMap().entries.toList(),
-                                xValueMapper: (e, _) => e.key,
-                                yValueMapper: (e, _) => e.value,
-                                color: DefaultColors.green,
-                                width: 2,
-                                markerSettings:
-                                    const MarkerSettings(isVisible: false),
-                              ),
-                            ],
-                            tooltipBehavior: TooltipBehavior(
-                              enable: true,
-                              canShowMarker: false,
-                              header: '',
-                              format: 'point.y',
-                            ),
-                          ),
+                      primaryYAxis: NumericAxis(
+                        isVisible: true,
+                        minimum: 0,
+                        maximum: data.isNotEmpty &&
+                                data.reduce((a, b) => a > b ? a : b) > 0
+                            ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                            : 100,
+                        interval: ((data.isNotEmpty &&
+                                    data.reduce((a, b) => a > b ? a : b) > 0
+                                ? data.reduce((a, b) => a > b ? a : b) * 1.2
+                                : 100) /
+                            4),
+                        axisLine: const AxisLine(width: 0),
+                        majorTickLines: const MajorTickLines(size: 0),
+                        labelStyle: TextStyle(
+                            color: DefaultColors.grey, fontSize: 9.sp),
+                        majorGridLines: MajorGridLines(
+                          color: DefaultColors.grey.withOpacity(0.12),
+                          width: 0.6,
                         ),
+                        axisLabelFormatter: (args) {
+                          final num v = args.value;
+                          return ChartAxisLabel(
+                            currencyFormatter.format(v),
+                            TextStyle(
+                                fontSize: 9.sp, color: DefaultColors.grey),
+                          );
+                        },
                       ),
-                      SizedBox(height: 8.h),
-                      // Labels dos dias
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: (sparklineData['labels'] as List<String>)
-                            .map((day) {
-                          return Text(
-                            day,
-                            style: TextStyle(
-                              fontSize: 6.sp,
-                              color: DefaultColors.grey,
+                      series: <CartesianSeries<MapEntry<int, double>, String>>[
+                        LineSeries<MapEntry<int, double>, String>(
+                          dataSource: data.asMap().entries.toList(),
+                          xValueMapper: (e, _) =>
+                              (e.key >= 0 && e.key < dayLabels.length)
+                                  ? dayLabels[e.key]
+                                  : '',
+                          yValueMapper: (e, _) => e.value,
+                          color: DefaultColors.green,
+                          width: 2,
+                          markerSettings:
+                              const MarkerSettings(isVisible: false),
+                        ),
+                      ],
+                      tooltipBehavior: TooltipBehavior(
+                        enable: true,
+                        canShowMarker: false,
+                        header: '',
+                        builder:
+                            (data, point, series, pointIndex, seriesIndex) {
+                          final num y = point.y ?? 0;
+                          return Container(
+                            padding: EdgeInsets.all(6.w),
+                            decoration: BoxDecoration(
+                              color: DefaultColors.green.withOpacity(0.85),
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            child: Text(
+                              currencyFormatter.format(y),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600),
                             ),
                           );
-                        }).toList(),
+                        },
                       ),
-                    ],
+                    ),
                   ),
                 ),
+                SizedBox(height: 8.h),
               ],
             ),
           if (_showWeekly)
@@ -1399,25 +1435,18 @@ class _GraphicsPageState extends State<GraphicsPage>
                   height: 180.h,
                   child: SfCartesianChart(
                     margin: EdgeInsets.zero,
-                    primaryXAxis: NumericAxis(
-                      minimum: -0.5,
-                      maximum: (weeklyTotals.length - 1 + 0.5).toDouble(),
-                      interval: 1,
+                    primaryXAxis: CategoryAxis(
+                      labelPlacement: LabelPlacement.onTicks,
                       rangePadding: ChartRangePadding.none,
                       plotOffset: 12,
-                      majorGridLines: const MajorGridLines(width: 0),
+                      majorGridLines: MajorGridLines(
+                        color: DefaultColors.grey.withOpacity(0.12),
+                        width: 1,
+                      ),
                       majorTickLines: const MajorTickLines(size: 0),
                       axisLine: const AxisLine(width: 0),
-                      axisLabelFormatter: (args) {
-                        final idx = args.value.toInt();
-                        final label = (idx >= 0 && idx < weekRangeLabels.length)
-                            ? weekRangeLabels[idx]
-                            : '';
-                        return ChartAxisLabel(
-                          label,
+                      labelStyle:
                           TextStyle(fontSize: 9.sp, color: DefaultColors.grey),
-                        );
-                      },
                     ),
                     primaryYAxis: NumericAxis(
                       minimum: 0,
@@ -1427,22 +1456,21 @@ class _GraphicsPageState extends State<GraphicsPage>
                               0
                           ? weeklyTotals.reduce((a, b) => a > b ? a : b) * 1.3
                           : 100,
-                      interval: (weeklyTotals.isNotEmpty
-                                  ? weeklyTotals.reduce((a, b) => a > b ? a : b)
-                                  : 0) >
-                              0
-                          ? (weeklyTotals.reduce((a, b) => a > b ? a : b) / 4)
-                          : 1,
+                      interval: ((weeklyTotals.isNotEmpty
+                                  ? weeklyTotals
+                                          .reduce((a, b) => a > b ? a : b) *
+                                      1.3
+                                  : 100) /
+                              6)
+                          .clamp(1, double.infinity),
                       majorGridLines: MajorGridLines(
                           color: DefaultColors.grey.withOpacity(0.15),
                           width: 1),
                       majorTickLines: const MajorTickLines(size: 0),
                       axisLine: const AxisLine(width: 0),
                       axisLabelFormatter: (args) {
-                        final value = args.value;
-                        final String label = value >= 1000
-                            ? '${(value / 1000).round()}k'
-                            : value.round().toString();
+                        final num value = args.value;
+                        final String label = currencyFormatter.format(value);
                         return ChartAxisLabel(
                           label,
                           TextStyle(fontSize: 9.sp, color: DefaultColors.grey),
@@ -1450,10 +1478,10 @@ class _GraphicsPageState extends State<GraphicsPage>
                       },
                     ),
                     plotAreaBorderWidth: 0,
-                    series: <CartesianSeries<MapEntry<int, double>, num>>[
-                      ColumnSeries<MapEntry<int, double>, num>(
+                    series: <CartesianSeries<MapEntry<int, double>, String>>[
+                      ColumnSeries<MapEntry<int, double>, String>(
                         dataSource: weeklyTotals.asMap().entries.toList(),
-                        xValueMapper: (e, _) => e.key,
+                        xValueMapper: (e, _) => weekRangeLabels[e.key],
                         yValueMapper: (e, _) => e.value,
                         color: DefaultColors.green,
                         borderRadius: BorderRadius.all(Radius.circular(4.r)),
@@ -1552,6 +1580,10 @@ class _GraphicsPageState extends State<GraphicsPage>
   }
 
   List<double> _getWeeklyTotals(TransactionController transactionController) {
+    final String cacheKey = selectedMonth;
+    final cached = _cacheWeeklyTotalsByMonth[cacheKey];
+    if (cached != null) return cached;
+
     final filteredTransactions = getFilteredTransactions(transactionController);
     final List<double> weeklyTotals = List<double>.filled(5, 0.0);
     for (var t in filteredTransactions) {
@@ -1563,6 +1595,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       weeklyTotals[weekIndex] += value;
     }
+    _cacheWeeklyTotalsByMonth[cacheKey] = weeklyTotals;
     return weeklyTotals;
   }
 

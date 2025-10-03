@@ -152,20 +152,30 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.h),
-              Text('Resumo geral',
-                  style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: theme.primaryColor)),
+              SizedBox(height: 20.h),
+              AdsBanner(),
+              SizedBox(height: 20.h),
+              Text(
+                'Resumo geral',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: DefaultColors.grey,
+                ),
+              ),
               SizedBox(height: 8.h),
               _buildSummaryCards(theme, data),
-              SizedBox(height: 16.h),
-              Text('Distribuição dos gastos',
-                  style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: theme.primaryColor)),
+              SizedBox(height: 20.h),
+              AdsBanner(),
+              SizedBox(height: 20.h),
+              Text(
+                'Distribuição dos gastos',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: DefaultColors.grey,
+                ),
+              ),
               SizedBox(height: 10.h),
               if (chartData.isEmpty)
                 Center(
@@ -262,6 +272,9 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                     ),
                   );
                 }).toList(),
+                SizedBox(height: 20.h),
+                AdsBanner(),
+                SizedBox(height: 20.h),
               ],
             ],
           ),
@@ -277,59 +290,115 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Receitas',
-                    style:
-                        TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
-                SizedBox(height: 2.h),
-                Text(_currency.format(data.totalIncome),
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: DefaultColors.greenDark,
-                        fontWeight: FontWeight.w700)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Despesas',
-                    style:
-                        TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
-                SizedBox(height: 2.h),
-                Text(_currency.format(data.totalExpense),
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: DefaultColors.redDark,
-                        fontWeight: FontWeight.w700)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Saldo',
-                    style:
-                        TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
-                SizedBox(height: 2.h),
-                Text(
-                  _currency.format(data.totalIncome - data.totalExpense),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Saldo',
                   style: TextStyle(
-                    fontSize: 13.sp,
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.w700,
-                  ),
+                    fontSize: 12.sp,
+                    color: DefaultColors.grey,
+                  )),
+              SizedBox(height: 2.h),
+              Text(
+                _currency.format(data.totalIncome - data.totalExpense),
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+          SizedBox(
+            height: 10.h,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Receitas',
+                      style: TextStyle(
+                          fontSize: 12.sp, color: DefaultColors.grey)),
+                  SizedBox(height: 2.h),
+                  Text(_currency.format(data.totalIncome),
+                      style: TextStyle(
+                          fontSize: 18.sp,
+                          color: DefaultColors.greenDark,
+                          fontWeight: FontWeight.w700)),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Despesas',
+                      style: TextStyle(
+                          fontSize: 12.sp, color: DefaultColors.grey)),
+                  SizedBox(height: 2.h),
+                  Text(_currency.format(data.totalExpense),
+                      style: TextStyle(
+                          fontSize: 18.sp,
+                          color: DefaultColors.redDark,
+                          fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ],
+          ),
+          // Expanded(
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text('Receitas',
+          //           style:
+          //               TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
+          //       SizedBox(height: 2.h),
+          //       Text(_currency.format(data.totalIncome),
+          //           style: TextStyle(
+          //               fontSize: 13.sp,
+          //               color: DefaultColors.greenDark,
+          //               fontWeight: FontWeight.w700)),
+          //     ],
+          //   ),
+          // ),
+          // Expanded(
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text('Despesas',
+          //           style:
+          //               TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
+          //       SizedBox(height: 2.h),
+          //       Text(_currency.format(data.totalExpense),
+          //           style: TextStyle(
+          //               fontSize: 13.sp,
+          //               color: DefaultColors.redDark,
+          //               fontWeight: FontWeight.w700)),
+          //     ],
+          //   ),
+          // ),
+          // Expanded(
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text('Saldo',
+          //           style:
+          //               TextStyle(fontSize: 11.sp, color: DefaultColors.grey)),
+          //       SizedBox(height: 2.h),
+          //       Text(
+          //         _currency.format(data.totalIncome - data.totalExpense),
+          //         style: TextStyle(
+          //           fontSize: 13.sp,
+          //           color: theme.primaryColor,
+          //           fontWeight: FontWeight.w700,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
