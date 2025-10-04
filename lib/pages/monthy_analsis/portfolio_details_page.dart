@@ -85,7 +85,14 @@ class PortfolioDetailsPage extends StatelessWidget {
                               monthData,
                               transactionController,
                             )),
-                    SizedBox(height: 16.h),
+
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    AdsBanner(),
+                    SizedBox(
+                      height: 10.h,
+                    ),
                     _buildFinalAverages(theme, formatter, monthlyData),
                   ],
                 ),

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../controller/goal_controller.dart';
 import '../../../model/transaction_model.dart';
@@ -205,6 +206,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 6.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             Row(
               children: [
                 Expanded(
@@ -252,7 +260,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             Row(
               children: [
                 _metricPill(theme,
@@ -276,7 +290,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                     currency: currency),
               ],
             ),
-            SizedBox(height: 16.h),
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             if (catData.isNotEmpty) ...[
               Text('Por categoria',
                   style: TextStyle(
@@ -370,6 +390,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                   style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
               SizedBox(height: 12.h),
             ],
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             Text('Parcelas do mês (${parcelas.length})',
                 style: TextStyle(
                     color: theme.primaryColor,
@@ -451,7 +478,10 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                 },
               ),
             ],
-            SizedBox(height: 16.h),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             if (payData.isNotEmpty) ...[
               Text('Por tipo de pagamento',
                   style: TextStyle(
@@ -533,7 +563,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                   );
                 },
               ),
-              SizedBox(height: 16.h),
+              SizedBox(
+                height: 10.h,
+              ),
+              AdsBanner(),
+              SizedBox(
+                height: 10.h,
+              ),
               // Contas fixas do mês
               Builder(builder: (context) {
                 final fixedList = txs
@@ -613,6 +649,13 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
               Text('Sem despesas por tipo neste mês',
                   style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
             ],
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
           ],
         ),
       ),

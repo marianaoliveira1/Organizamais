@@ -8,6 +8,8 @@ import 'package:organizamais/controller/auth_controller.dart';
 import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 
+import '../../../ads_banner/ads_banner.dart';
+
 class CategoryTypeSelectionPage extends StatefulWidget {
   const CategoryTypeSelectionPage({super.key});
 
@@ -113,6 +115,10 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                SizedBox(
+                  height: 10.h,
+                ),
+                AdsBanner(),
                 Padding(
                   padding: EdgeInsets.all(12.w),
                   child: TextField(
@@ -129,6 +135,10 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                     onChanged: (v) => setState(() => _query = v),
                   ),
                 ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                AdsBanner(),
                 Expanded(
                   child: ListView.separated(
                     itemCount: filtered.length,
@@ -174,6 +184,10 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                     },
                   ),
                 ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                AdsBanner(),
                 SafeArea(
                   child: Padding(
                     padding: EdgeInsets.all(12.w),
@@ -202,6 +216,10 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                       ),
                     ),
                   ),
+                ),
+                AdsBanner(),
+                SizedBox(
+                  height: 6.h,
                 )
               ],
             ),
