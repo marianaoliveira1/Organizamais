@@ -470,10 +470,7 @@ class _CategoryReportPageState extends State<CategoryReportPage> {
                                                   ? (d.badge == 'Nova no mês'
                                                       ? 'Novo'
                                                       : '—')
-                                                  : ((d.percent! >= 0
-                                                          ? '+'
-                                                          : '-') +
-                                                      '${d.percent!.abs().toStringAsFixed(1)}%'),
+                                                  : ('${d.percent! >= 0 ? '+' : '-'}${d.percent!.abs().toStringAsFixed(1)}%'),
                                               style: TextStyle(
                                                 color: diffColor,
                                                 fontWeight: FontWeight.w600,

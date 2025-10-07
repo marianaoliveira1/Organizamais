@@ -16,6 +16,7 @@ import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
 import '../../../ads_banner/ads_banner.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class WidgetListCategoryGraphics extends StatelessWidget {
   const WidgetListCategoryGraphics({
@@ -173,15 +174,15 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       ? (valor / totalValue * 100)
                                       : 0.0;
                                   // % da receita do mês selecionado
-                                  final TransactionController controller =
-                                      Get.find<TransactionController>();
+                                  // final TransactionController controller =
+                                  //     Get.find<TransactionController>();
                                   final parts = monthName.split('/');
                                   String selMonthName =
                                       parts.isNotEmpty ? parts[0] : monthName;
-                                  final int selYear = parts.length == 2
-                                      ? int.tryParse(parts[1]) ??
-                                          DateTime.now().year
-                                      : DateTime.now().year;
+                                  // final int selYear = parts.length == 2
+                                  //     ? int.tryParse(parts[1]) ??
+                                  //         DateTime.now().year
+                                  //     : DateTime.now().year;
                                   // normaliza abreviações (jan, fev, ...)
                                   const abbr = {
                                     'jan': 'Janeiro',
@@ -201,22 +202,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   if (abbr.containsKey(key)) {
                                     selMonthName = abbr[key]!;
                                   }
-                                  double totalReceitaMes = 0.0;
-                                  for (final t in controller.transaction) {
-                                    if (t.paymentDay == null) continue;
-                                    if (t.type != TransactionType.receita)
-                                      continue;
-                                    final d = DateTime.parse(t.paymentDay!);
-                                    final mName = getAllMonths()[d.month - 1];
-                                    if (mName != selMonthName ||
-                                        d.year != selYear) continue;
-                                    totalReceitaMes += double.parse(
-                                      t.value
-                                          .replaceAll('.', '')
-                                          .replaceAll(',', '.'),
-                                    );
-                                  }
-
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -493,7 +478,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           );
                         }),
                       ],
-                      _buildCategoryMonthComparison(categoryId, theme),
+                      _buildCategoryMonthComparison(
+                        context,
+                        categoryId,
+                        theme,
+                        categoryName: (item['name'] as String? ?? ''),
+                        categoryIcon: item['icon'] as String?,
+                        categoryColor: categoryColor,
+                      ),
                       SizedBox(
                         height: 10.h,
                       ),
@@ -740,7 +732,9 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryMonthComparison(int categoryId, ThemeData theme) {
+  Widget _buildCategoryMonthComparison(
+      BuildContext context, int categoryId, ThemeData theme,
+      {String? categoryName, String? categoryIcon, Color? categoryColor}) {
     final TransactionController transactionController =
         Get.find<TransactionController>();
 
@@ -756,7 +750,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     DateTime previousMonthStart;
     DateTime previousMonthEnd;
 
-    String _normalizeMonthNameLocal(String name) {
+    String normalizeMonthNameLocal(String name) {
       final map = {
         'jan': 'Janeiro',
         'fev': 'Fevereiro',
@@ -778,7 +772,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       return map[lower] ?? name;
     }
 
-    final String selMonthNameNorm = _normalizeMonthNameLocal(selMonthName);
+    final String selMonthNameNorm = normalizeMonthNameLocal(selMonthName);
     final selectedIndex = months.indexOf(selMonthNameNorm);
     final int selMonth =
         selectedIndex >= 0 ? selectedIndex + 1 : DateTime.now().month;
@@ -893,7 +887,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     // Removido o detalhamento de data específica do mês anterior do texto
 
     // Texto: mês fechado usa "No mês passado... e agora em {mês}..."; caso contrário, usa comparação por mesmo dia
-    String _monthNamePt(int m) {
+    String monthNamePt(int m) {
       const ms = [
         'janeiro',
         'fevereiro',
@@ -921,7 +915,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     } else if (comparison.type == PercentageType.neutral) {
       if (isMonthClosed2) {
         explanationText =
-            'Você gastou o mesmo valor em ${_monthNamePt(selMonth)} '
+            'Você gastou o mesmo valor em ${monthNamePt(selMonth)} '
             'que no mês anterior: R\$ ${_formatCurrency(currentValue)}';
       } else {
         explanationText =
@@ -933,7 +927,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         final pct = previousValue == 0
             ? 100.0
             : ((currentValue - previousValue) / previousValue) * 100;
-        final monthLabel = _monthNamePt(selMonth);
+        final monthLabel = monthNamePt(selMonth);
         if (currentValue > previousValue) {
           explanationText =
               'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
@@ -952,10 +946,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         final pct2 = previousValue == 0
             ? 100.0
             : ((currentValue - previousValue) / previousValue) * 100;
-        final monthLabel = _monthNamePt(selMonth);
+        final monthLabel = monthNamePt(selMonth);
         if (isCurrentSelected) {
           final sameDayLabel =
-              '${previousMonthEnd.day} de ${_monthNamePt(previousMonthEnd.month)}';
+              '${previousMonthEnd.day} de ${monthNamePt(previousMonthEnd.month)}';
           if (currentValue > previousValue) {
             explanationText =
                 'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
@@ -1013,14 +1007,265 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           Container(width: 3.w, color: circleColor2),
           SizedBox(width: 6.w),
           Flexible(
-            child: Text(
-              explanationText,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: circleColor2,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  explanationText,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: circleColor2,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+                SizedBox(height: 6.h),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                      minimumSize: Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: () async {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: theme.cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(16.r)),
+                        ),
+                        builder: (ctx) {
+                          bool isLoading = false;
+                          return StatefulBuilder(
+                            builder: (ctx, setState) {
+                              Future<void> handleWatch() async {
+                                if (isLoading) return;
+                                setState(() => isLoading = true);
+                                final ok = await AdsRewardedPremium.show();
+                                setState(() => isLoading = false);
+                                if (ok) {
+                                  Navigator.of(ctx).pop();
+                                  Get.to(() => _SameDayComparePage(
+                                        categoryId: categoryId,
+                                        monthName: monthName,
+                                        categoryName: (categoryName ?? ''),
+                                        categoryIcon: categoryIcon,
+                                        categoryColor: categoryColor,
+                                      ));
+                                }
+                              }
+
+                              return Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    16.w,
+                                    16.h,
+                                    16.w,
+                                    16.h +
+                                        MediaQuery.of(ctx).viewInsets.bottom),
+                                child: SingleChildScrollView(
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(height: 16.h),
+                                      AdsBanner(),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w, vertical: 18.h),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 50.w,
+                                              height: 50.h,
+                                              decoration: BoxDecoration(
+                                                color: (categoryColor ??
+                                                    theme.primaryColor),
+                                                borderRadius:
+                                                    BorderRadius.circular(12.r),
+                                              ),
+                                              child: Icon(Iconsax.lock,
+                                                  color: Colors.white,
+                                                  size: 22.sp),
+                                            ),
+                                            SizedBox(width: 10.w),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Comparação mensal',
+                                                  style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: theme.primaryColor,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 2.h),
+                                                Text(
+                                                  '(mesmo dia)'.toLowerCase(),
+                                                  style: TextStyle(
+                                                    fontSize: 12.sp,
+                                                    color: theme.primaryColor
+                                                        .withOpacity(.9),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 6.h),
+                                      Text(
+                                        'Entenda como seus hábitos financeiros evoluem a cada mês. 🚀',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w800,
+                                          color: theme.primaryColor,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        'Assista a um vídeo rápido e descubra como comparar seus gastos mês a mês para tomar decisões financeiras mais inteligentes',
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: DefaultColors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 14.h),
+                                      InkWell(
+                                        onTap: isLoading ? null : handleWatch,
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.w, vertical: 12.h),
+                                          decoration: BoxDecoration(
+                                            color: (categoryColor ??
+                                                theme.primaryColor),
+                                            borderRadius:
+                                                BorderRadius.circular(12.r),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (!isLoading)
+                                                Image.asset(
+                                                  'assets/images/video.png',
+                                                  width: 18.w,
+                                                  height: 18.h,
+                                                  errorBuilder: (_, __, ___) =>
+                                                      Icon(
+                                                    Iconsax.play,
+                                                    color: Colors.white,
+                                                    size: 16.sp,
+                                                  ),
+                                                )
+                                              else
+                                                SizedBox(
+                                                  width: 18.w,
+                                                  height: 18.h,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                                Color>(
+                                                            Colors.white),
+                                                  ),
+                                                ),
+                                              SizedBox(width: 10.w),
+                                              Text(
+                                                isLoading
+                                                    ? 'Carregando...'
+                                                    : 'Assistir vídeo (30s)',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      AdsBanner(),
+                                      SizedBox(height: 16.h),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _ModalBullet(
+                                              text:
+                                                  'Compare resultados - Veja como seus gastos evoluem',
+                                              color: const Color(0xFF7C3AED)),
+                                          SizedBox(height: 8.h),
+                                          _ModalBullet(
+                                              text:
+                                                  'Reconheça padrões - Tome controle total do seu dinheiro',
+                                              color: const Color(0xFF0EA5E9)),
+                                          SizedBox(height: 8.h),
+                                          _ModalBullet(
+                                              text:
+                                                  'Economize mais - Descubra onde pode reduzir custos',
+                                              color: const Color(0xFF10B981)),
+                                        ],
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(),
+                                        child: Text(
+                                          'Agora não',
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "📊",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'Ver comparação completa',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1035,44 +1280,364 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   }
 }
 
-// (Removido) _buildCollapsedComparisonPercent e _buildDeltaChip não são mais usados.
-
-class _BudgetDonut extends StatelessWidget {
-  final double percent; // 0..100
-  final Color color;
-
-  const _BudgetDonut({required this.percent, required this.color});
+class _SameDayComparePage extends StatelessWidget {
+  final int categoryId;
+  final String monthName;
+  final String? categoryName;
+  final String? categoryIcon;
+  final Color? categoryColor;
+  const _SameDayComparePage(
+      {required this.categoryId,
+      required this.monthName,
+      this.categoryName,
+      this.categoryIcon,
+      this.categoryColor});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final double clamped = percent.clamp(0, 100);
-    return Container(
-      width: 56.w,
-      height: 56.w,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: theme.primaryColor.withOpacity(.15)),
+    final TransactionController controller = Get.find<TransactionController>();
+    final now = DateTime.now();
+    final parts = monthName.split('/');
+    String selMonth = parts.isNotEmpty ? parts[0] : monthName;
+    int selYear =
+        parts.length == 2 ? int.tryParse(parts[1]) ?? now.year : now.year;
+    final months = getAllMonths();
+    final map = {
+      'jan': 'Janeiro',
+      'fev': 'Fevereiro',
+      'mar': 'Março',
+      'abr': 'Abril',
+      'mai': 'Maio',
+      'jun': 'Junho',
+      'jul': 'Julho',
+      'ago': 'Agosto',
+      'set': 'Setembro',
+      'out': 'Outubro',
+      'nov': 'Novembro',
+      'dez': 'Dezembro',
+    };
+    final key = selMonth.trim().toLowerCase();
+    if (map.containsKey(key)) selMonth = map[key]!;
+    int monthIdx = months.indexOf(selMonth);
+    if (monthIdx < 0) monthIdx = now.month - 1;
+    final day = now.day; // mesmo dia
+
+    // Gera lista somando do dia 1 até o mesmo dia para cada mês
+    final List<Map<String, dynamic>> rowsAll = [];
+    for (int i = 0; i < 12; i++) {
+      final m = monthIdx + 1 - i;
+      final y = selYear - ((m <= 0) ? ((-m) ~/ 12) + 1 : 0);
+      final normM = ((m - 1) % 12) + 1;
+      final int lastDay = DateTime(y, normM + 1, 0).day;
+      final int selDay = day.clamp(1, lastDay);
+      final DateTime start = DateTime(y, normM, 1);
+      final DateTime end = DateTime(y, normM, selDay, 23, 59, 59);
+      final double total = controller.transaction.where((t) {
+        if (t.paymentDay == null) return false;
+        if (t.type != TransactionType.despesa) return false;
+        if (t.category != categoryId) return false;
+        final d = DateTime.parse(t.paymentDay!);
+        return !d.isBefore(start) && !d.isAfter(end);
+      }).fold<double>(
+          0.0,
+          (s, t) =>
+              s +
+              double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+      rowsAll.add({
+        'label':
+            '1–${selDay.toString().padLeft(2, '0')} de ${months[normM - 1]} de $y',
+        'value': total,
+        'date': end,
+      });
+    }
+
+    // Manter somente os meses do ano atual
+    final List<Map<String, dynamic>> rows =
+        rowsAll.where((e) => (e['date'] as DateTime).year == now.year).toList();
+
+    // Calcula variações em relação ao mês seguinte na lista (comparação mês a mês)
+    for (int i = 0; i < rows.length - 1; i++) {
+      final cur = rows[i]['value'] as double;
+      final prev = rows[i + 1]['value'] as double;
+      rows[i]['diff'] = cur - prev;
+      rows[i]['pct'] =
+          prev == 0 ? (cur > 0 ? 100.0 : 0.0) : ((cur - prev) / prev) * 100.0;
+    }
+
+    final currency = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+
+    final String categoryTitle = (categoryName ?? '');
+    final String? categoryIconPath = categoryIcon;
+    final Color headerColor =
+        (categoryColor ?? theme.primaryColor.withOpacity(0.08));
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(
+          'Comparação por dia',
+          style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor),
+        ),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircularProgressIndicator(
-            value: (clamped / 100.0),
-            strokeWidth: 6.w,
-            color: color,
-            backgroundColor: theme.primaryColor.withOpacity(.08),
-          ),
-          Text(
-            '${clamped.toStringAsFixed(0)}%',
-            style: TextStyle(
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w700,
-              color: theme.primaryColor,
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 12.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AdsBanner(),
+            SizedBox(height: 20.h),
+            Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    (categoryColor ?? theme.primaryColor),
+                    (categoryColor ?? theme.primaryColor).withOpacity(0.80),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 46.w,
+                    height: 46.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Center(
+                      child: (categoryIconPath != null &&
+                              categoryIconPath.isNotEmpty)
+                          ? Image.asset(categoryIconPath,
+                              width: 28.w, height: 28.h)
+                          : Icon(Iconsax.category,
+                              size: 20.sp, color: theme.primaryColor),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          categoryTitle.isEmpty ? 'Categoria' : categoryTitle,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'Acompanhe seus gastos mensais',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )
-        ],
+            SizedBox(height: 20.h),
+            AdsBanner(),
+            SizedBox(height: 20.h),
+            Expanded(
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
+                itemCount: rows.length,
+                separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                itemBuilder: (_, i) {
+                  final r = rows[i];
+                  final double v = r['value'] as double;
+                  final double? pct = r['pct'] as double?;
+                  final double? diff = r['diff'] as double?;
+                  Color c;
+                  IconData icon;
+                  String delta;
+                  if (pct == null || diff == null) {
+                    c = DefaultColors.grey;
+                    icon = Iconsax.more_circle;
+                    delta = '0,0%';
+                  } else if (diff > 0) {
+                    c = DefaultColors.redDark;
+                    icon = Iconsax.arrow_circle_up;
+                    delta = '+${pct.abs().toStringAsFixed(1)}%';
+                  } else if (diff < 0) {
+                    c = DefaultColors.greenDark;
+                    icon = Iconsax.arrow_circle_down;
+                    delta = '-${pct.abs().toStringAsFixed(1)}%';
+                  } else {
+                    c = DefaultColors.grey;
+                    icon = Iconsax.more_circle;
+                    delta = '0,0%';
+                  }
+                  final String diffValueText = diff == null
+                      ? currency.format(0)
+                      : '${diff > 0 ? '+' : diff < 0 ? '-' : ''}${currency.format((diff).abs())}';
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border(
+                        left: BorderSide(
+                          color: theme.primaryColor.withOpacity(0.7),
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                r['label'] as String,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: c.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(999.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(icon, size: 12.sp, color: c),
+                                    SizedBox(width: 6.w),
+                                    Text(
+                                      delta,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: c,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6.w),
+                                    Text(
+                                      '($diffValueText)',
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: c,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          currency.format(v),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w700,
+                            color: theme.primaryColor,
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+class _ModalBullet extends StatelessWidget {
+  final String text;
+  final Color color;
+  const _ModalBullet({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final parts = text.split(' - ');
+    final String title = parts.isNotEmpty ? parts.first : text;
+    final String desc = parts.length > 1 ? parts.sublist(1).join(' - ') : '';
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 12.w,
+          height: 12.h,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Container(
+              width: 6.w,
+              height: 6.h,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: title,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                if (desc.isNotEmpty)
+                  TextSpan(
+                    text: ' - $desc',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: DefaultColors.grey,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// (Removido) _buildCollapsedComparisonPercent e _buildDeltaChip não são mais usados.
+
+// _BudgetDonut removido por não ser utilizado

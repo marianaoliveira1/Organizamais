@@ -45,7 +45,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
 
   String _invoiceKey(String? cardIdOrNull, String cardName, _CycleDates cycle) {
     final String cardKey = cardIdOrNull ?? cardName;
-    return '${cardKey}-${cycle.paymentDate.year}-${cycle.paymentDate.month}';
+    return '$cardKey-${cycle.paymentDate.year}-${cycle.paymentDate.month}';
   }
 
   bool _isInvoicePaid(
@@ -119,7 +119,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           // Rodapé com total gasto no crédito (dinâmico conforme estado da fatura)
           if (index == cards.length) {
             // Helpers locais para somar por período e calcular ciclo
-            DateTime _safeDate(String iso) {
+            DateTime safeDate(String iso) {
               try {
                 return DateTime.parse(iso);
               } catch (_) {
@@ -127,13 +127,13 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               }
             }
 
-            double _sumTransactionsInRangeFooter(
+            double sumTransactionsInRangeFooter(
               Iterable<TransactionModel> all,
               String cardName,
               DateTime start,
               DateTime end,
             ) {
-              double _parseAmountString(String raw) {
+              double parseAmountString(String raw) {
                 String s = raw.replaceAll('R\$', '').trim();
                 if (s.contains(',')) {
                   s = s.replaceAll('.', '').replaceAll(',', '.');
@@ -147,15 +147,15 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                 if (t.paymentDay == null) return false;
                 if (t.type != TransactionType.despesa) return false;
                 if ((t.paymentType ?? '') != cardName) return false;
-                final d = _safeDate(t.paymentDay!);
+                final d = safeDate(t.paymentDay!);
                 return !d.isBefore(start) && !d.isAfter(end);
               }).fold<double>(
-                  0.0, (sum, t) => sum + _parseAmountString(t.value));
+                  0.0, (sum, t) => sum + parseAmountString(t.value));
             }
 
-            _CycleDates _computeCycleDatesFooter(
+            _CycleDates computeCycleDatesFooter(
                 DateTime ref, int closingDay, int paymentDay) {
-              DateTime _dateWithDay(int year, int month, int day) {
+              DateTime dateWithDay(int year, int month, int day) {
                 final int lastDayOfMonth = DateTime(year, month + 1, 0).day;
                 final int safeDay =
                     day > lastDayOfMonth ? lastDayOfMonth : (day < 1 ? 1 : day);
@@ -163,17 +163,17 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               }
 
               final DateTime closingThisMonth =
-                  _dateWithDay(ref.year, ref.month, closingDay);
+                  dateWithDay(ref.year, ref.month, closingDay);
               final bool afterOrOnClosingThisMonth =
                   !ref.isBefore(closingThisMonth);
               final DateTime lastClosingEvent = afterOrOnClosingThisMonth
                   ? closingThisMonth
-                  : _dateWithDay(ref.year, ref.month - 1, closingDay);
-              final DateTime previousClosingEvent = _dateWithDay(
+                  : dateWithDay(ref.year, ref.month - 1, closingDay);
+              final DateTime previousClosingEvent = dateWithDay(
                   lastClosingEvent.year,
                   lastClosingEvent.month - 1,
                   closingDay);
-              final DateTime nextClosingEvent = _dateWithDay(
+              final DateTime nextClosingEvent = dateWithDay(
                   lastClosingEvent.year,
                   lastClosingEvent.month + 1,
                   closingDay);
@@ -185,9 +185,9 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               final DateTime openEnd =
                   nextClosingEvent.subtract(const Duration(days: 1));
               final DateTime paymentDate = paymentDay > closingDay
-                  ? _dateWithDay(
+                  ? dateWithDay(
                       lastClosingEvent.year, lastClosingEvent.month, paymentDay)
-                  : _dateWithDay(lastClosingEvent.year,
+                  : dateWithDay(lastClosingEvent.year,
                       lastClosingEvent.month + 1, paymentDay);
               return _CycleDates(
                 closedStart: closedStart,
@@ -203,14 +203,14 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               final int cClosing = c.closingDay ?? 1;
               final int cPayment = c.paymentDay ?? 1;
               final _CycleDates cyc =
-                  _computeCycleDatesFooter(now, cClosing, cPayment);
-              final double cClosed = _sumTransactionsInRangeFooter(
+                  computeCycleDatesFooter(now, cClosing, cPayment);
+              final double cClosed = sumTransactionsInRangeFooter(
                 transactions,
                 c.name,
                 cyc.closedStart,
                 cyc.closedEnd,
               );
-              final double cNext = _sumTransactionsInRangeFooter(
+              final double cNext = sumTransactionsInRangeFooter(
                 transactions,
                 c.name,
                 cyc.openStart,
@@ -252,7 +252,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
 
           final card = cards[index];
           // Helpers
-          DateTime _safeDate(String iso) {
+          DateTime safeDate(String iso) {
             try {
               return DateTime.parse(iso);
             } catch (_) {
@@ -260,13 +260,13 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
             }
           }
 
-          double _sumTransactionsInRange(
+          double sumTransactionsInRange(
             Iterable<TransactionModel> all,
             String cardName,
             DateTime start,
             DateTime end,
           ) {
-            double _parseAmountString(String raw) {
+            double parseAmountString(String raw) {
               String s = raw.replaceAll('R\$', '').trim();
               if (s.contains(',')) {
                 s = s.replaceAll('.', '').replaceAll(',', '.');
@@ -280,18 +280,18 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               if (t.paymentDay == null) return false;
               if (t.type != TransactionType.despesa) return false;
               if ((t.paymentType ?? '') != cardName) return false;
-              final d = _safeDate(t.paymentDay!);
+              final d = safeDate(t.paymentDay!);
               return !d.isBefore(start) && !d.isAfter(end);
             }).fold<double>(0.0, (sum, t) {
-              final v = _parseAmountString(t.value);
+              final v = parseAmountString(t.value);
               return sum + v;
             });
           }
 
-          _CycleDates _computeCycleDates(
+          _CycleDates computeCycleDates(
               DateTime ref, int closingDay, int paymentDay) {
             // Função para criar datas garantindo o último dia do mês quando necessário
-            DateTime _dateWithDay(int year, int month, int day) {
+            DateTime dateWithDay(int year, int month, int day) {
               final int lastDayOfMonth = DateTime(year, month + 1, 0).day;
               final int safeDay =
                   day > lastDayOfMonth ? lastDayOfMonth : (day < 1 ? 1 : day);
@@ -300,17 +300,17 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
 
             // Determina o último evento de fechamento relativo a 'ref'
             final DateTime closingThisMonth =
-                _dateWithDay(ref.year, ref.month, closingDay);
+                dateWithDay(ref.year, ref.month, closingDay);
             final bool afterOrOnClosingThisMonth =
                 !ref.isBefore(closingThisMonth);
 
             final DateTime lastClosingEvent = afterOrOnClosingThisMonth
                 ? closingThisMonth
-                : _dateWithDay(ref.year, ref.month - 1, closingDay);
+                : dateWithDay(ref.year, ref.month - 1, closingDay);
 
-            final DateTime previousClosingEvent = _dateWithDay(
+            final DateTime previousClosingEvent = dateWithDay(
                 lastClosingEvent.year, lastClosingEvent.month - 1, closingDay);
-            final DateTime nextClosingEvent = _dateWithDay(
+            final DateTime nextClosingEvent = dateWithDay(
                 lastClosingEvent.year, lastClosingEvent.month + 1, closingDay);
 
             // Compras no dia do fechamento pertencem à próxima fatura
@@ -327,10 +327,10 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
             // Data de pagamento referente ao fechamento mais recente
             // Regra: se paymentDay > closingDay, pagamento ocorre no MESMO mês do fechamento; caso contrário, no mês SEGUINTE
             final DateTime paymentDate = paymentDay > closingDay
-                ? _dateWithDay(
+                ? dateWithDay(
                     lastClosingEvent.year, lastClosingEvent.month, paymentDay)
-                : _dateWithDay(lastClosingEvent.year,
-                    lastClosingEvent.month + 1, paymentDay);
+                : dateWithDay(lastClosingEvent.year, lastClosingEvent.month + 1,
+                    paymentDay);
 
             return _CycleDates(
               closedStart: closedStart,
@@ -346,16 +346,16 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           final int paymentDay = card.paymentDay ?? 1;
 
           final _CycleDates cycle =
-              _computeCycleDates(now, closingDay, paymentDay);
+              computeCycleDates(now, closingDay, paymentDay);
 
           // Soma por período fechado (ciclo anterior) e próximo (ciclo aberto pós-fechamento)
-          double closedAmount = _sumTransactionsInRange(
+          double closedAmount = sumTransactionsInRange(
             transactions,
             card.name,
             cycle.closedStart,
             cycle.closedEnd,
           );
-          double nextAmount = _sumTransactionsInRange(
+          double nextAmount = sumTransactionsInRange(
             transactions,
             card.name,
             cycle.openStart,
@@ -371,11 +371,14 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
               _isInvoicePaid(card.id, card.name, cycle, card.paidInvoices);
           final bool showClosedSection = invoiceClosed && !wasMarkedPaid;
 
-          // Valor ativo usado na barra: antes do pagamento e após fechamento usa-se o fechado,
-          // caso contrário usa-se o valor do ciclo em aberto (acumulando para a próxima fatura)
-          final double spent = showClosedSection ? closedAmount : nextAmount;
+          // Para a barra de progresso e "faltam X para o limite":
+          // - Quando a fatura está fechada e ainda não paga, continue exibindo o uso total do limite
+          //   somando o valor fechado + o ciclo aberto (compras após o fechamento).
+          // - Fora desse período, exiba apenas o ciclo aberto normalmente.
+          final double spent =
+              showClosedSection ? (closedAmount + nextAmount) : nextAmount;
 
-          double _normalizeLimit(double rawLimit) {
+          double normalizeLimit(double rawLimit) {
             // Normalização simples: se parece ter 1 zero a mais, divide por 10.
             if (rawLimit >= 100000 && rawLimit % 10000 == 0) {
               return rawLimit / 10.0;
@@ -384,7 +387,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           }
 
           final double rawLimit = card.limit ?? 0.0;
-          final double limit = _normalizeLimit(rawLimit);
+          final double limit = normalizeLimit(rawLimit);
           final bool hasLimit = limit > 0;
           final double usagePercent = hasLimit ? (spent / limit) * 100.0 : 0.0;
           final double ratio = (usagePercent / 100).clamp(0.0, 1.0);
@@ -397,7 +400,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
           final String percentLabel = '${(ratio * 100).toStringAsFixed(0)}%';
           final String? statusText = showClosedSection ? 'Fechada' : null;
           // Labels de data e vencimento no estilo "upcoming payment"
-          String _formatMonthDay(DateTime d) =>
+          String formatMonthDay(DateTime d) =>
               DateFormat('d MMM', 'pt_BR').format(d).toLowerCase();
           final DateTime today = DateTime(now.year, now.month, now.day);
           final int daysUntilDue = cycle.paymentDate.difference(today).inDays;
@@ -782,7 +785,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              _formatMonthDay(cycle.paymentDate),
+                              formatMonthDay(cycle.paymentDate),
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: DefaultColors.grey20,
@@ -871,7 +874,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _formatMonthDay(cycle.paymentDate),
+                                  formatMonthDay(cycle.paymentDate),
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     color: theme.primaryColor,
@@ -891,7 +894,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  _formatMonthDay(cycle.openStart),
+                                  formatMonthDay(cycle.openStart),
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     color: theme.primaryColor,

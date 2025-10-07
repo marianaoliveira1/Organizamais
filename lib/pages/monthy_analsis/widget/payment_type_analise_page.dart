@@ -240,8 +240,9 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
                                     interval: _getOptimalInterval(
                                         _getMaxValue(monthlyData)),
                                     getTitlesWidget: (value, meta) {
-                                      if (value < 0)
+                                      if (value < 0) {
                                         return const SizedBox.shrink();
+                                      }
                                       return Text(
                                         _formatCurrencyShort(value),
                                         style: TextStyle(
@@ -299,8 +300,7 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
                           ),
                           SizedBox(height: 16.h),
                           ...analysis
-                              .map((item) => _buildAnalysisItem(item, theme))
-                              .toList(),
+                              .map((item) => _buildAnalysisItem(item, theme)),
                         ],
                       ),
                     ),

@@ -62,10 +62,8 @@ class _AddGoalPageState extends State<AddGoalPage> {
         final t = Theme.of(ctx);
         return Theme(
           data: t.copyWith(
-            dialogBackgroundColor: theme.cardColor,
             colorScheme: t.colorScheme.copyWith(
               surface: theme.cardColor,
-              background: theme.cardColor,
               primary: theme.primaryColor,
               onPrimary: theme.cardColor,
               onSurface: theme.primaryColor,
@@ -75,6 +73,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
                 foregroundColor: theme.primaryColor,
               ),
             ),
+            dialogTheme: DialogThemeData(backgroundColor: theme.cardColor),
           ),
           child: child ?? const SizedBox.shrink(),
         );

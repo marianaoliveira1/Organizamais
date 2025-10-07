@@ -161,8 +161,8 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Checkbox(
                 checkColor: theme.cardColor,
-                fillColor: MaterialStateProperty.resolveWith(
-                  (states) => states.contains(MaterialState.selected)
+                fillColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected)
                       ? theme.primaryColor
                       : null,
                 ),

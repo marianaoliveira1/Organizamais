@@ -35,7 +35,7 @@ class DefaultTitleCard extends StatelessWidget {
             if (suffix != null) ...[
               SizedBox(width: 6.w),
               Text(
-                '(${suffix})',
+                '($suffix)',
                 style: TextStyle(
                   color: DefaultColors.grey,
                   fontWeight: FontWeight.w500,

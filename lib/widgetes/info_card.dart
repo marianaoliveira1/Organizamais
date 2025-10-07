@@ -12,7 +12,7 @@ class InfoCard extends StatelessWidget {
   final void Function()? onIconTap;
   final Color? backgroundColor;
 
-  InfoCard({
+  const InfoCard({
     super.key,
     required this.title,
     this.icon,

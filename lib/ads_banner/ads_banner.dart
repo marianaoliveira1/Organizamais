@@ -145,3 +145,42 @@ class AdsInterstitial {
     return completer.future;
   }
 }
+
+// Rewarded ad helper (watch-to-unlock flow)
+class AdsRewardedPremium {
+  static Future<bool> show() async {
+    final Completer<bool> completer = Completer<bool>();
+    bool earned = false;
+    debugPrint('AdsRewardedPremium.show: load start');
+    await RewardedAd.load(
+      adUnitId: 'ca-app-pub-8308246738505070/6946853855',
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('AdsRewardedPremium.show: loaded');
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              debugPrint('AdsRewardedPremium.show: dismissed, earned=$earned');
+              if (!completer.isCompleted) completer.complete(earned);
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              debugPrint('AdsRewardedPremium.show: failed to show $error');
+              if (!completer.isCompleted) completer.complete(false);
+            },
+          );
+          ad.show(onUserEarnedReward: (ad, reward) {
+            debugPrint('AdsRewardedPremium.show: reward earned');
+            earned = true;
+          });
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('AdsRewardedPremium.show: failed to load $error');
+          if (!completer.isCompleted) completer.complete(false);
+        },
+      ),
+    );
+    return completer.future;
+  }
+}

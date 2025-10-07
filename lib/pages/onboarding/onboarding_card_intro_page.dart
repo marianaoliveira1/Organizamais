@@ -5,7 +5,6 @@ import 'package:organizamais/utils/color.dart';
 import '../../routes/route.dart';
 import '../../controller/auth_controller.dart';
 import '../initial/pages/add_card_page.dart';
-import '../initial/pages/fixed_accotuns_page.dart';
 
 class OnboardingCardIntroPage extends StatelessWidget {
   const OnboardingCardIntroPage({super.key});

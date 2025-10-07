@@ -113,7 +113,7 @@ class _GraphicsPageState extends State<GraphicsPage>
   // Mapa para armazenar seleção de essenciais por mês (chave YYYY-MM)
   // final Map<String, Set<int>> _monthEssentialCategoryIds = {};
   bool _showWeekly = false;
-  bool _showBarCategoryChart = false;
+  final bool _showBarCategoryChart = false;
   // Flags para animação de entrada única
   static bool _didEntranceAnimateOnce = false;
   bool _shouldPlayEntrance = false;
@@ -125,6 +125,10 @@ class _GraphicsPageState extends State<GraphicsPage>
   void initState() {
     super.initState();
     _monthScrollController = ScrollController();
+    // Preload an interstitial ad early to improve show rate
+    try {
+      AdsInterstitial.preload();
+    } catch (_) {}
     // Limpa caches quando as transações mudarem
     _cacheWorker = ever<List<TransactionModel>>(
       _transactionController.transactionRx,
@@ -642,7 +646,15 @@ class _GraphicsPageState extends State<GraphicsPage>
         // Balanço de troca de gastos (InfoCard)
         InfoCard(
           title: 'Balanço de Gastos por Categoria',
-          onTap: () {
+          onTap: () async {
+            try {
+              await AdsInterstitial.preload();
+              final shown = await AdsInterstitial.showIfReady();
+              if (!shown) {
+                await AdsInterstitial.show();
+              }
+            } catch (_) {}
+            if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => SpendingShiftBalancePage(
@@ -685,7 +697,15 @@ class _GraphicsPageState extends State<GraphicsPage>
         // Relatório Mensal (InfoCard)
         InfoCard(
           title: 'Relatório Mensal',
-          onTap: () {
+          onTap: () async {
+            try {
+              await AdsInterstitial.preload();
+              final shown = await AdsInterstitial.showIfReady();
+              if (!shown) {
+                await AdsInterstitial.show();
+              }
+            } catch (_) {}
+            if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => CategoryReportPage(
@@ -729,7 +749,15 @@ class _GraphicsPageState extends State<GraphicsPage>
         // Relatório Semanal (InfoCard)
         InfoCard(
           title: 'Relatório Semanal',
-          onTap: () {
+          onTap: () async {
+            try {
+              await AdsInterstitial.preload();
+              final shown = await AdsInterstitial.showIfReady();
+              if (!shown) {
+                await AdsInterstitial.show();
+              }
+            } catch (_) {}
+            if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => WeeklyReportPage(selectedMonth: selectedMonth),
@@ -1173,8 +1201,8 @@ class _GraphicsPageState extends State<GraphicsPage>
 
     var filteredTransactions = getFilteredTransactions(transactionController);
 
-    final parts = this.selectedMonth.split('/');
-    final String monthName = parts.isNotEmpty ? parts[0] : this.selectedMonth;
+    final parts = selectedMonth.split('/');
+    final String monthName = parts.isNotEmpty ? parts[0] : selectedMonth;
     final int selectedMonthIndex = getAllMonths().indexOf(monthName);
     final int selectedYear = parts.length == 2
         ? int.tryParse(parts[1]) ?? DateTime.now().year
@@ -2115,11 +2143,15 @@ class _GraphicsPageState extends State<GraphicsPage>
                             double previousValue = 0.0;
                             for (final t in transactionController.transaction) {
                               if (t.paymentDay == null ||
-                                  t.type != TransactionType.despesa) continue;
+                                  t.type != TransactionType.despesa) {
+                                continue;
+                              }
                               final pt = t.paymentType;
                               if (pt == null) continue;
                               if (pt.trim().toLowerCase() !=
-                                  name.trim().toLowerCase()) continue;
+                                  name.trim().toLowerCase()) {
+                                continue;
+                              }
                               final d = DateTime.parse(t.paymentDay!);
                               final v = double.parse(t.value
                                   .replaceAll('.', '')
@@ -2279,8 +2311,9 @@ class _GraphicsPageState extends State<GraphicsPage>
     double currentValue = 0.0;
     double previousValue = 0.0;
     final filtered = transactionController.transaction.where((t) {
-      if (t.paymentDay == null || t.type != TransactionType.despesa)
+      if (t.paymentDay == null || t.type != TransactionType.despesa) {
         return false;
+      }
       final pt = t.paymentType;
       if (pt == null) return false;
       return pt.trim().toLowerCase() == paymentType.trim().toLowerCase();
@@ -2366,12 +2399,14 @@ class _GraphicsPageState extends State<GraphicsPage>
     // Transações recentes do método no mês selecionado
     final List<TransactionModel> monthTxs = transactionController.transaction
         .where((t) {
-      if (t.paymentDay == null || t.type != TransactionType.despesa)
+      if (t.paymentDay == null || t.type != TransactionType.despesa) {
         return false;
+      }
       final pt = t.paymentType;
       if (pt == null) return false;
-      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase())
+      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase()) {
         return false;
+      }
       final d = DateTime.parse(t.paymentDay!);
       return d.year == selYear && d.month == selMonth;
     }).toList()
@@ -2379,22 +2414,22 @@ class _GraphicsPageState extends State<GraphicsPage>
           .compareTo(DateTime.parse(a.paymentDay!)));
 
     // Receita total do mês selecionado (mês inteiro)
-    final DateTime _monthStart = DateTime(selYear, selMonth, 1);
-    final DateTime _monthEnd = DateTime(selYear, selMonth + 1, 0, 23, 59, 59);
-    final double _totalReceitasMes = transactionController.transaction
+    final DateTime monthStart = DateTime(selYear, selMonth, 1);
+    final DateTime monthEnd = DateTime(selYear, selMonth + 1, 0, 23, 59, 59);
+    final double totalReceitasMes = transactionController.transaction
         .where((t) => t.type == TransactionType.receita && t.paymentDay != null)
         .where((t) {
       final d = DateTime.parse(t.paymentDay!);
-      return d.isAfter(_monthStart.subtract(const Duration(seconds: 1))) &&
-          d.isBefore(_monthEnd.add(const Duration(seconds: 1)));
+      return d.isAfter(monthStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(monthEnd.add(const Duration(seconds: 1)));
     }).fold(
             0.0,
             (prev, t) =>
                 prev +
                 double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
-    final double _percReceita =
-        _totalReceitasMes > 0 ? (currentValue / _totalReceitasMes * 100) : 0.0;
-    final String _monthLabelTitle = getAllMonths()[selMonth - 1];
+    final double percReceita =
+        totalReceitasMes > 0 ? (currentValue / totalReceitasMes * 100) : 0.0;
+    final String monthLabelTitle = getAllMonths()[selMonth - 1];
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
@@ -2436,7 +2471,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           ),
           SizedBox(height: 10.h),
           Text(
-            'Corresponde a ${_percReceita.toStringAsFixed(1)}% da sua receita de ${_monthLabelTitle}',
+            'Corresponde a ${percReceita.toStringAsFixed(1)}% da sua receita de $monthLabelTitle',
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.w600,

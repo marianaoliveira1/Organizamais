@@ -109,32 +109,6 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
             s + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
   }
 
-  Future<double> _fetchGoalDepositsForMonth() async {
-    final goals = Get.find<GoalController>().goal;
-    if (goals.isEmpty) return 0.0;
-    final DateTime start = DateTime(_selectedYear, _selectedMonth, 1);
-    final DateTime end =
-        DateTime(_selectedYear, _selectedMonth + 1, 0, 23, 59, 59);
-    double total = 0.0;
-    for (final g in goals) {
-      if (g.id == null) continue;
-      try {
-        final qs = await FirebaseFirestore.instance
-            .collection('goals')
-            .doc(g.id!)
-            .collection('transactions')
-            .where('isAddition', isEqualTo: true)
-            .where('date', isGreaterThanOrEqualTo: start)
-            .where('date', isLessThanOrEqualTo: end)
-            .get();
-        for (final d in qs.docs) {
-          total += (d.data()['amount'] as num?)?.toDouble() ?? 0.0;
-        }
-      } catch (_) {}
-    }
-    return total;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

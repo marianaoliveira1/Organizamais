@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/spending_goal_controller.dart';
 import '../../../model/spending_goal_model.dart';
-import '../../../utils/color.dart';
 import '../../../widgetes/currency_ipunt_formated.dart';
 import '../../transaction/pages/category_page.dart';
 

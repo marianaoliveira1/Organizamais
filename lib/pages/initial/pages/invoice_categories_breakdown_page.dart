@@ -167,7 +167,7 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
-                    'No mês anterior você gastou ${currency.format(prevTotal)}, e neste mês foram ${currency.format(total)}; houve ${verb} de ${currency.format(diff.abs())}.',
+                    'No mês anterior você gastou ${currency.format(prevTotal)}, e neste mês foram ${currency.format(total)}; houve $verb de ${currency.format(diff.abs())}.',
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -279,7 +279,7 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                pct.toStringAsFixed(1) + '% do total',
+                                '${pct.toStringAsFixed(1)}% do total',
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: DefaultColors.grey20,
@@ -415,15 +415,17 @@ class _BankAssetIcon extends StatelessWidget {
 
     // Mapeamentos diretos comuns
     if (n.contains('nubank')) return 'assets/icon-bank/nubank.png';
-    if (n.contains('itau') || n.contains('itaú'))
+    if (n.contains('itau') || n.contains('itaú')) {
       return 'assets/icon-bank/itau.png';
+    }
     if (n.contains('santander')) return 'assets/icon-bank/santander.png';
     if (n.contains('bradesco')) return 'assets/icon-bank/bradesco.png';
     if (n.contains('inter')) return 'assets/icon-bank/inter.png';
     if (n.contains('c6')) return 'assets/icon-bank/c6.png';
     if (n.contains('caixa')) return 'assets/icon-bank/caixa.png';
-    if (n.contains('banco do brasil') || n.contains('bb'))
+    if (n.contains('banco do brasil') || n.contains('bb')) {
       return 'assets/icon-bank/banco-do-brasil.png';
+    }
     if (n.contains('safra')) return 'assets/icon-bank/safra.png';
     if (n.contains('original')) return 'assets/icon-bank/original.png';
     if (n.contains('pagbank')) return 'assets/icon-bank/pagbank.png';
@@ -433,12 +435,14 @@ class _BankAssetIcon extends StatelessWidget {
     if (n.contains('xp')) return 'assets/icon-bank/xp.png';
     if (n.contains('sicredi')) return 'assets/icon-bank/sicredi.png';
     if (n.contains('sicoob')) return 'assets/icon-bank/sicoob.png';
-    if (n.contains('will bank') || n.contains('willbank'))
+    if (n.contains('will bank') || n.contains('willbank')) {
       return 'assets/icon-bank/will-bank.png';
+    }
 
     // Bandeiras e carteiras (somente as que existem nas assets)
-    if (n.contains('amex') || n.contains('american express'))
+    if (n.contains('amex') || n.contains('american express')) {
       return 'assets/icon-bank/american-express.png';
+    }
     if (n.contains('paypal')) return 'assets/icon-bank/pay-pal.png';
     if (n.contains('mercado pago')) return 'assets/icon-bank/mercado-pago.png';
 
@@ -487,13 +491,13 @@ class _CardLogo extends StatelessWidget {
       // ignore: unused_catch_clause
     }
 
-    if (assetPath == null || assetPath!.isEmpty) {
+    if (assetPath == null || assetPath.isEmpty) {
       return _BankAssetIcon(cardName: cardName);
     }
 
     return Center(
       child: Image.asset(
-        assetPath!,
+        assetPath,
         width: 50.w,
         height: 50.w,
         fit: BoxFit.contain,

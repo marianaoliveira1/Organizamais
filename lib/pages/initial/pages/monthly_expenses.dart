@@ -78,7 +78,7 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                   return _query.isEmpty || name.contains(_query);
                 }).toList();
 
-                int _nameCompare(
+                int nameCompare(
                     Map<String, dynamic> a, Map<String, dynamic> b) {
                   final String an =
                       (a['name'] as String? ?? '').toString().toLowerCase();
@@ -87,17 +87,17 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                   return an.compareTo(bn);
                 }
 
-                bool _hasBudget(Map<String, dynamic> c) {
+                bool hasBudget(Map<String, dynamic> c) {
                   final int id = (c['id'] as int?) ?? -1;
                   return budgets.containsKey(id);
                 }
 
                 final List<Map<String, dynamic>> withBudget =
-                    filtered.where(_hasBudget).toList()..sort(_nameCompare);
+                    filtered.where(hasBudget).toList()..sort(nameCompare);
                 final List<Map<String, dynamic>> withoutBudget = filtered
-                    .where((c) => !_hasBudget(c))
+                    .where((c) => !hasBudget(c))
                     .toList()
-                  ..sort(_nameCompare);
+                  ..sort(nameCompare);
 
                 final List<Map<String, dynamic>> cats = <Map<String, dynamic>>[
                   ...withBudget,

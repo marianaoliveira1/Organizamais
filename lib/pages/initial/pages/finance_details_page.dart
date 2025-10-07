@@ -508,7 +508,9 @@ class FinanceDetailsPage extends StatelessWidget {
 
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.receita) continue;
+          transaction.type != TransactionType.receita) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -543,7 +545,9 @@ class FinanceDetailsPage extends StatelessWidget {
 
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.despesa) continue;
+          transaction.type != TransactionType.despesa) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);

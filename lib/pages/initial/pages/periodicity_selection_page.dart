@@ -325,12 +325,14 @@ class _PeriodicitySelectionPageState extends State<PeriodicitySelectionPage> {
                           if (selectedFrequency == 'mensal' ||
                               selectedFrequency == 'bimestral' ||
                               selectedFrequency == 'trimestral') {
-                            if (monthlyDayController.text.isEmpty)
+                            if (monthlyDayController.text.isEmpty) {
                               invalid = true;
+                            }
                           } else if (selectedFrequency == 'quinzenal') {
                             if (biweeklyDay1Controller.text.isEmpty ||
-                                biweeklyDay2Controller.text.isEmpty)
+                                biweeklyDay2Controller.text.isEmpty) {
                               invalid = true;
+                            }
                           } else if (selectedFrequency == 'semanal') {
                             if (selectedWeeklyWeekday == null) invalid = true;
                           }

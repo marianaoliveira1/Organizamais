@@ -326,7 +326,9 @@ class PercentageCalculationService {
 
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.receita) continue;
+          transaction.type != TransactionType.receita) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -361,7 +363,9 @@ class PercentageCalculationService {
 
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.despesa) continue;
+          transaction.type != TransactionType.despesa) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -394,7 +398,9 @@ class PercentageCalculationService {
   ) {
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.receita) continue;
+          transaction.type != TransactionType.receita) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -426,7 +432,9 @@ class PercentageCalculationService {
   ) {
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
-          transaction.type != TransactionType.despesa) continue;
+          transaction.type != TransactionType.despesa) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -656,7 +664,9 @@ class PercentageCalculationService {
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
           transaction.type != TransactionType.despesa ||
-          transaction.category != categoryId) continue;
+          transaction.category != categoryId) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -684,7 +694,9 @@ class PercentageCalculationService {
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
           transaction.type != TransactionType.despesa ||
-          transaction.category != categoryId) continue;
+          transaction.category != categoryId) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
@@ -711,7 +723,9 @@ class PercentageCalculationService {
     for (final transaction in transactions) {
       if (transaction.paymentDay == null ||
           transaction.type != TransactionType.despesa ||
-          transaction.category != categoryId) continue;
+          transaction.category != categoryId) {
+        continue;
+      }
 
       try {
         final paymentDate = DateTime.parse(transaction.paymentDay!);

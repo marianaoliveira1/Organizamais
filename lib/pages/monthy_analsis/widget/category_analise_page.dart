@@ -1425,8 +1425,8 @@ class _CategoryDonutPercent extends StatelessWidget {
   const _CategoryDonutPercent({
     required this.percent,
     required this.color,
-    this.size = 54,
-    this.strokeWidth = 7,
+    this.size = 56,
+    this.strokeWidth = 6,
   });
 
   @override

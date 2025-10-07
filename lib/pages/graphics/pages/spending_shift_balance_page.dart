@@ -83,21 +83,21 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     final bool saved = netDelta < 0;
 
     // Receita e saldo (mês atual)
-    final int _cy = currentYearMonth ~/ 100;
-    final int _cm = currentYearMonth % 100;
+    final int cy = currentYearMonth ~/ 100;
+    final int cm = currentYearMonth % 100;
     double incomeCurrent = 0.0;
     double incomePrevious = 0.0;
     for (final t in transactionController.transaction) {
       if (t.paymentDay == null) continue;
       if (t.type != TransactionType.receita) continue;
       final DateTime d = DateTime.parse(t.paymentDay!);
-      if (d.year == _cy && d.month == _cm) {
+      if (d.year == cy && d.month == cm) {
         incomeCurrent +=
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       }
-      final int _py = previousYearMonth ~/ 100;
-      final int _pm = previousYearMonth % 100;
-      if (d.year == _py && d.month == _pm) {
+      final int py = previousYearMonth ~/ 100;
+      final int pm = previousYearMonth % 100;
+      if (d.year == py && d.month == pm) {
         incomePrevious +=
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       }
@@ -154,12 +154,12 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     if (data.items.isEmpty) return const SizedBox.shrink();
 
     // Nome do mês anterior com base na seleção da tela
-    final int _ym = _resolveYearMonth(widget.selectedMonth);
-    final int _pym = _previousYearMonth(_ym);
-    final String _prevMonthName = _months()[(_pym % 100) - 1];
+    final int ym = _resolveYearMonth(widget.selectedMonth);
+    final int pym = _previousYearMonth(ym);
+    final String prevMonthName = _months()[(pym % 100) - 1];
 
     // Index by category name to aggregate curated comparisons
-    final Map<String, _FoodItemShift> _byName = {
+    final Map<String, _FoodItemShift> byName = {
       for (final it in data.items) it.name: it
     };
 
@@ -341,10 +341,10 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
 
     // Removed _sumPrev: now comparisons use only current month totals
 
-    double _sumCurr(List<String> names) {
+    double sumCurr(List<String> names) {
       double s = 0.0;
       for (final n in names) {
-        final it = _byName[n];
+        final it = byName[n];
         if (it != null) s += it.current;
       }
       return s;
@@ -360,13 +360,13 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       }
     }
 
-    double _netSum = 0.0;
-    double _baseSum = 0.0;
+    double netSum = 0.0;
+    double baseSum = 0.0;
     for (final pr in pairRules) {
       final String leftName = pr.left;
       final String rightName = pr.right;
-      final double lc = _sumCurr([leftName]);
-      final double rc = _sumCurr([rightName]);
+      final double lc = sumCurr([leftName]);
+      final double rc = sumCurr([rightName]);
 
       if (lc == 0 && rc == 0) continue;
 
@@ -381,8 +381,8 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       final double leftShare = base > 0 ? (lc / base) * 100.0 : 0.0;
       final double rightShare = base > 0 ? (rc / base) * 100.0 : 0.0;
 
-      _netSum += diff;
-      _baseSum += base;
+      netSum += diff;
+      baseSum += base;
 
       rows.add(Container(
         margin: EdgeInsets.only(bottom: 8.h),
@@ -461,7 +461,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
             ),
             SizedBox(height: 2.h),
             Text(
-              '$_prevMonthName vs atual: ${currencyFormatter.format(lc)} ↔️ ${currencyFormatter.format(rc)}',
+              '$prevMonthName vs atual: ${currencyFormatter.format(lc)} ↔️ ${currencyFormatter.format(rc)}',
               style: TextStyle(
                 fontSize: 11.sp,
                 color: DefaultColors.grey,
@@ -470,9 +470,9 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
             ),
             SizedBox(height: 2.h),
             Builder(builder: (_) {
-              final double leftPrev = (_byName[leftName]?.previous ?? 0.0);
+              final double leftPrev = (byName[leftName]?.previous ?? 0.0);
               final double leftCurr = lc;
-              final double rightPrev = (_byName[rightName]?.previous ?? 0.0);
+              final double rightPrev = (byName[rightName]?.previous ?? 0.0);
               final double rightCurr = rc;
 
               final double leftDelta =
@@ -540,7 +540,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
           : 'Impacto final: ${net.isNegative ? '-' : '+'}${currencyFormatter.format(net.abs())}';
     }
 
-    final double netDelta = _netSum;
+    final double netDelta = netSum;
     final bool netPositive = netDelta > 0.5;
     final bool netNeutral = netDelta.abs() < 0.5;
     final String resumo = netNeutral
@@ -794,7 +794,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                         ),
                         if (insightSave != null)
                           TextSpan(
-                            text: ' ' + insightSave,
+                            text: ' $insightSave',
                             style: TextStyle(
                               fontSize: 12.sp,
                               color: theme.primaryColor,
@@ -904,11 +904,11 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
       String left = '';
       if (decItem != null && decPct > 0.5) {
         left =
-            'Você gastou ${decPct.toStringAsFixed(0)}% menos em ${decItem!.name} em relação ao mês passado';
+            'Você gastou ${decPct.toStringAsFixed(0)}% menos em ${decItem.name} em relação ao mês passado';
       }
       String right = '';
       if (incItem != null && incPct > 0.5) {
-        right = 'aumentou ${incPct.toStringAsFixed(0)}% em ${incItem!.name}';
+        right = 'aumentou ${incPct.toStringAsFixed(0)}% em ${incItem.name}';
       }
       if (left.isEmpty && right.isEmpty) {
         return 'Seus gastos ficaram estáveis em relação ao mês passado.';
@@ -1104,7 +1104,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
-                    'Maior aumento: ${incItem!.name} (+${incPct.toStringAsFixed(0)}%)',
+                    'Maior aumento: ${incItem.name} (+${incPct.toStringAsFixed(0)}%)',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: theme.primaryColor,
@@ -1122,7 +1122,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
-                    'Maior economia: ${decItem!.name} (-${decPct.toStringAsFixed(0)}%)',
+                    'Maior economia: ${decItem.name} (-${decPct.toStringAsFixed(0)}%)',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: theme.primaryColor,
@@ -1145,7 +1145,6 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
     required String title,
     required String value,
     required String pctText,
-    String? subtitle,
     String? deltaCurrencyText,
     required Color color,
     required IconData arrowIcon,
@@ -1347,7 +1346,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                     ],
                   ),
                 );
-              }).toList(),
+              }),
               SizedBox(height: 6.h),
               SizedBox(height: 6.h),
               Builder(builder: (_) {

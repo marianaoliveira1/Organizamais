@@ -271,7 +271,7 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 SizedBox(height: 20.h),
                 AdsBanner(),
                 SizedBox(height: 20.h),

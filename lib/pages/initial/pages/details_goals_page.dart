@@ -297,7 +297,7 @@ class GoalDetailsPage extends StatelessWidget {
                                           dueOnly.difference(todayOnly).inDays;
                                     } catch (_) {}
                                     final String daysLabel = daysLeft > 0
-                                        ? 'Faltam ${daysLeft} dia${daysLeft == 1 ? '' : 's'}'
+                                        ? 'Faltam $daysLeft dia${daysLeft == 1 ? '' : 's'}'
                                         : (daysLeft == 0
                                             ? 'Vence hoje'
                                             : 'Atrasada há ${daysLeft.abs()} dia${daysLeft.abs() == 1 ? '' : 's'}');
@@ -1190,7 +1190,7 @@ void _showTipsBottomSheet(BuildContext context, GoalModel goal) {
   final DateTime today = DateTime.now();
   final DateTime start = DateTime(today.year, today.month, today.day);
   final DateTime end = deadline != null
-      ? DateTime(deadline!.year, deadline!.month, deadline!.day)
+      ? DateTime(deadline.year, deadline.month, deadline.day)
       : start;
   final int totalDays = end.isAfter(start) ? end.difference(start).inDays : 0;
 

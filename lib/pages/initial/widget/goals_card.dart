@@ -14,7 +14,7 @@ import '../pages/details_goals_page.dart';
 import '../../transaction/pages/category_page.dart';
 
 class GoalsCard extends StatelessWidget {
-  const GoalsCard();
+  const GoalsCard({super.key});
 
   @override
   Widget build(BuildContext context) {

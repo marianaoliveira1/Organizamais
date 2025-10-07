@@ -8,7 +8,7 @@ import 'package:organizamais/pages/resume/widgtes/month_selector_resume.dart';
 import 'transaction_list_resume.dart';
 
 class ResumeContent extends StatelessWidget {
-  ResumeContent({super.key});
+  const ResumeContent({super.key});
 
   static final TransactionController _transactionController =
       Get.put(TransactionController());

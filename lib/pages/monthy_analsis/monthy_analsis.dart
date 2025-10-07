@@ -13,7 +13,7 @@ import 'package:organizamais/utils/color.dart';
 
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 
-import '../../ads_banner/ads_banner.dart';
+// import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';
 import '../../model/transaction_model.dart';
 
@@ -26,6 +26,7 @@ import '../resume/widgtes/text_not_transaction.dart';
 import 'widget/payment_type_analise_page.dart';
 import 'package:organizamais/widgetes/info_card.dart';
 import 'widget/monthly_summary_page.dart';
+import '../../ads_banner/ads_banner.dart';
 
 class MonthlyAnalysisPage extends StatefulWidget {
   const MonthlyAnalysisPage({super.key});
@@ -37,7 +38,7 @@ class MonthlyAnalysisPage extends StatefulWidget {
 class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
   // Dropdown: mês/ano
   int _selectedMonth = DateTime.now().month;
-  int _selectedYear = DateTime.now().year;
+  final int _selectedYear = DateTime.now().year;
 
   static const List<String> _monthsPt = [
     'Janeiro',
@@ -497,7 +498,11 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                         // Botão de acesso ao resumo mensal
                         InfoCard(
                           title: 'Resumo Mensal',
-                          onTap: () {
+                          onTap: () async {
+                            // Exibe anúncio de tela cheia e depois navega
+                            try {
+                              await AdsInterstitial.show();
+                            } catch (_) {}
                             Get.to(() => MonthlySummaryPage(
                                   initialMonth: _selectedMonth,
                                   initialYear: _selectedYear,

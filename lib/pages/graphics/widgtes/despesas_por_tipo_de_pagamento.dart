@@ -1042,8 +1042,8 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       if (p.isNotEmpty) mPart = p[0].trim();
       if (p.length > 1) yPart = p[1].trim();
     }
-    if (yPart != null && yPart!.isNotEmpty) {
-      selectedYear = int.tryParse(yPart!) ?? now.year;
+    if (yPart != null && yPart.isNotEmpty) {
+      selectedYear = int.tryParse(yPart) ?? now.year;
     }
     final Map<String, int> abbr = {
       'jan': 1,
@@ -1137,7 +1137,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
 
     late final Color sideColor;
     late final String text;
-    String _monthName(int m) {
+    String monthName(int m) {
       const months = [
         'janeiro',
         'fevereiro',
@@ -1194,7 +1194,7 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       final double percentageChange = previousValue == 0
           ? 100.0
           : ((currentValue - previousValue) / previousValue) * 100;
-      final String monthLabel = _monthName(currentMonthEnd.month);
+      final String monthLabel = monthName(currentMonthEnd.month);
 
       if (currentValue > previousValue) {
         sideColor = DefaultColors.redDark;
@@ -1217,20 +1217,20 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
       if (previousValue == 0 && currentValue > 0) {
         sideColor = DefaultColors.redDark;
         final sameDayLabel =
-            '${previousMonthEnd.day} de ${_monthName(previousMonthEnd.month)}';
+            '${previousMonthEnd.day} de ${monthName(previousMonthEnd.month)}';
         text =
             'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou 100%.';
       } else {
         final diff = (currentValue - previousValue).abs();
         final percentageChange =
             ((currentValue - previousValue) / previousValue) * 100;
-        final String monthLabel = _monthName(currentMonthEnd.month);
+        final String monthLabel = monthName(currentMonthEnd.month);
         final bool isCurrentSelected =
             (selectedYear == now.year && selectedMonthNumber == now.month);
 
         if (isCurrentSelected) {
           final sameDayLabel =
-              '${previousMonthEnd.day} de ${_monthName(previousMonthEnd.month)}';
+              '${previousMonthEnd.day} de ${monthName(previousMonthEnd.month)}';
           if (currentValue > previousValue) {
             sideColor = DefaultColors.redDark;
             text =

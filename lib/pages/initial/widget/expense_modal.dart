@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 
 class ExpenseModal extends StatefulWidget {
-  ExpenseModal({super.key});
+  const ExpenseModal({super.key});
 
   @override
   State<ExpenseModal> createState() => _ExpenseModalState();

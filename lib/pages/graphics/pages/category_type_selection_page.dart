@@ -5,7 +5,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:organizamais/controller/auth_controller.dart';
-import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/pages/transaction/pages/category_page.dart';
 
 import '../../../ads_banner/ads_banner.dart';

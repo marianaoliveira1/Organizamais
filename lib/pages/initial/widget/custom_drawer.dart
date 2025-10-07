@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:organizamais/pages/initial/pages/economic_types_page.dart';
 import 'package:organizamais/pages/initial/pages/contact_us_page.dart';
 
 import '../../../controller/auth_controller.dart';

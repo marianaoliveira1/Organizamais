@@ -10,6 +10,8 @@ import '../../../utils/color.dart';
 import 'package:organizamais/widgetes/info_card.dart';
 
 class AnnualBalanceSplineChart extends StatelessWidget {
+  const AnnualBalanceSplineChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -79,8 +81,8 @@ class AnnualBalanceSplineChart extends StatelessWidget {
 
   List<_Point> _buildAnnualBalance(TransactionController c, int year) {
     final List<_Point> out = [];
-    final DateTime _now = DateTime.now();
-    final DateTime _today = DateTime(_now.year, _now.month, _now.day);
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
     final months = const [
       'Jan',
       'Fev',
@@ -104,7 +106,7 @@ class AnnualBalanceSplineChart extends StatelessWidget {
         final d = DateTime.parse(t.paymentDay!);
         final DateTime dOnly = DateTime(d.year, d.month, d.day);
         if (d.year != year || d.month != m) continue;
-        if (dOnly.isAfter(_today)) continue; // only up to today
+        if (dOnly.isAfter(today)) continue; // only up to today
         final v =
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
         if (t.type == TransactionType.receita) {

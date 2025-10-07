@@ -326,8 +326,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
                                   ),
                                 ],
                               ),
-                            ))
-                        .toList(),
+                            )),
                   ],
                 ),
               ),

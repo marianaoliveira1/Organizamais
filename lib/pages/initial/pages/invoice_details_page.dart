@@ -33,7 +33,7 @@ class InvoiceDetailsPage extends StatelessWidget {
     final TransactionController txController =
         Get.find<TransactionController>();
 
-    double _parseAmount(String raw) {
+    double parseAmount(String raw) {
       String s = raw.replaceAll('R\$', '').trim();
       if (s.contains(',')) {
         s = s.replaceAll('.', '').replaceAll(',', '.');
@@ -61,8 +61,7 @@ class InvoiceDetailsPage extends StatelessWidget {
         return db.compareTo(da);
       });
 
-    final double total =
-        list.fold(0.0, (sum, t) => sum + _parseAmount(t.value));
+    final double total = list.fold(0.0, (sum, t) => sum + parseAmount(t.value));
 
     String formatDate(DateTime d) => DateFormat('dd/MM/yyyy').format(d);
 
@@ -232,7 +231,7 @@ class InvoiceDetailsPage extends StatelessWidget {
                               ),
                               SizedBox(width: 8.w),
                               Text(
-                                currency.format(_parseAmount(t.value)),
+                                currency.format(parseAmount(t.value)),
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w700,

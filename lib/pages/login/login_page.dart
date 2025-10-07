@@ -163,8 +163,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Checkbox(
                   checkColor: theme.cardColor,
-                  fillColor: MaterialStateProperty.resolveWith(
-                    (states) => states.contains(MaterialState.selected)
+                  fillColor: WidgetStateProperty.resolveWith(
+                    (states) => states.contains(WidgetState.selected)
                         ? theme.primaryColor
                         : null,
                   ),
