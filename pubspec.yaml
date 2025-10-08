@@ -60,6 +60,7 @@ dependencies:
   timezone: ^0.9.4
   url_launcher: ^6.3.0
   syncfusion_flutter_charts: 31.1.19
+  firebase_analytics: ^11.6.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
