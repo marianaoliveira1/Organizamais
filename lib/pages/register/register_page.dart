@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../controller/auth_controller.dart';
+import '../../services/analytics_service.dart';
 import '../../widgtes/default_button.dart';
 import '../../widgtes/default_button_google.dart';
 import '../../widgtes/default_continue_com.dart';
@@ -22,7 +23,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AnalyticsService _analyticsService = AnalyticsService();
   bool acceptedPrivacy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _analyticsService.logScreenView('register_page');
+  }
 
   @override
   void dispose() {
@@ -167,7 +175,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       : null,
                 ),
                 value: acceptedPrivacy,
-                onChanged: (v) => setState(() => acceptedPrivacy = v ?? false),
+                onChanged: (v) {
+                  setState(() => acceptedPrivacy = v ?? false);
+                  if (v == true) {
+                    _analyticsService.logPrivacyPolicyAccepted();
+                  }
+                },
                 visualDensity: VisualDensity.compact,
               ),
               Expanded(
@@ -182,7 +195,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => showPrivacyPolicyDialog(context),
+                      onTap: () {
+                        _analyticsService.logPrivacyPolicyViewed();
+                        showPrivacyPolicyDialog(context);
+                      },
                       child: Text(
                         "Termos de Uso e Política de Privacidade",
                         style: TextStyle(

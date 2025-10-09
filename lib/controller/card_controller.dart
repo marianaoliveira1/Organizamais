@@ -4,11 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 import '../model/cards_model.dart';
+import '../services/analytics_service.dart';
 import 'auth_controller.dart';
 
 class CardController extends GetxController {
   var card = <CardsModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? cardStream;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   void startCardStream() {
     cardStream = FirebaseFirestore.instance
@@ -33,6 +35,10 @@ class CardController extends GetxController {
     await FirebaseFirestore.instance.collection('cards').add(
           cardWithUserId.toMap(),
         );
+
+    // Log analytics event
+    await _analyticsService.logAddCard(card.name);
+
     Get.snackbar('Sucesso', 'Cartão adicionado com sucesso');
   }
 
@@ -41,11 +47,24 @@ class CardController extends GetxController {
     await FirebaseFirestore.instance.collection('cards').doc(card.id).update(
           card.toMap(),
         );
+
+    // Log analytics event
+    await _analyticsService.logUpdateCard(card.name);
+
     Get.snackbar('Sucesso', 'Cartão atualizado com sucesso');
   }
 
   Future<void> deleteCard(String id) async {
+    // Get card name for analytics before deletion
+    final cardToDelete = card.firstWhereOrNull((c) => c.id == id);
+
     await FirebaseFirestore.instance.collection('cards').doc(id).delete();
+
+    // Log analytics event
+    if (cardToDelete != null) {
+      await _analyticsService.logDeleteCard(cardToDelete.name);
+    }
+
     Get.snackbar('Sucesso', 'Cartão removido com sucesso');
   }
 

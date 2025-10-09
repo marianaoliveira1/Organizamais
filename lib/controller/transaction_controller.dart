@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
+import 'package:organizamais/services/analytics_service.dart';
 import '../model/transaction_model.dart';
 import '../model/percentage_result.dart';
 import '../services/percentage_calculation_service.dart';
@@ -11,6 +12,7 @@ class TransactionController extends GetxController {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? transactionStream;
   final _transaction = <TransactionModel>[].obs;
   final _isLoading = true.obs;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   FixedAccountsController get fixedAccountsController =>
       Get.find<FixedAccountsController>();
@@ -338,17 +340,18 @@ class TransactionController extends GetxController {
 
   Future<void> addTransaction(TransactionModel transaction,
       {bool isInstallment = false, int installments = 1}) async {
+    final value = double.parse(transaction.value
+        .replaceAll('R\$', '')
+        .trim()
+        .replaceAll('.', '')
+        .replaceAll(',', '.'));
+
     if (isInstallment) {
       for (var i = 0; i < installments; i++) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
         final newPaymentDay =
             DateTime(paymentDate.year, paymentDate.month + i, paymentDate.day)
                 .toString();
-        final value = double.parse(transaction.value
-            .replaceAll('R\$', '')
-            .trim()
-            .replaceAll('.', '')
-            .replaceAll(',', '.'));
         final localizedValue = value / installments;
         final localizedValueString =
             localizedValue.toStringAsFixed(2).replaceAll('.', ',');
@@ -370,25 +373,67 @@ class TransactionController extends GetxController {
             transactionWithUserId.toMap(),
           );
     }
+
+    // Log analytics event
+    await _analyticsService.logAddTransaction(
+      type: transaction.type.toString().split('.').last,
+      value: value,
+      category: transaction.category?.toString(),
+      paymentType: transaction.paymentType,
+      isInstallment: isInstallment,
+    );
+
     Get.snackbar('Sucesso', 'Transação adicionada com sucesso');
   }
 
   Future<void> updateTransaction(TransactionModel transaction) async {
     if (transaction.id == null) return;
+
+    final value = double.parse(transaction.value
+        .replaceAll('R\$', '')
+        .trim()
+        .replaceAll('.', '')
+        .replaceAll(',', '.'));
+
     await FirebaseFirestore.instance
         .collection('transactions')
         .doc(transaction.id!)
         .update(
           transaction.toMap(),
         );
+
+    // Log analytics event
+    await _analyticsService.logUpdateTransaction(
+      type: transaction.type.toString().split('.').last,
+      value: value,
+    );
+
     Get.snackbar('Sucesso', 'Transação atualizada com sucesso');
   }
 
   Future<void> deleteTransaction(String id) async {
+    // Find the transaction to get its details for analytics
+    final trans = _transaction.firstWhereOrNull((t) => t.id == id);
+
     await FirebaseFirestore.instance
         .collection('transactions')
         .doc(id)
         .delete();
+
+    // Log analytics event
+    if (trans != null) {
+      final value = double.parse(trans.value
+          .replaceAll('R\$', '')
+          .trim()
+          .replaceAll('.', '')
+          .replaceAll(',', '.'));
+
+      await _analyticsService.logDeleteTransaction(
+        type: trans.type.toString().split('.').last,
+        value: value,
+      );
+    }
+
     Get.snackbar('Sucesso', 'Transação removida com sucesso');
   }
 

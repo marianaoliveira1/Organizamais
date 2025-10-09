@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
 import 'package:organizamais/model/transaction_model.dart';
+import 'package:organizamais/services/analytics_service.dart';
 import 'package:organizamais/utils/color.dart';
 
 import '../../ads_banner/ads_banner.dart';
@@ -40,6 +41,7 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController dayOfTheMonthController = TextEditingController();
   final TextEditingController paymentTypeController = TextEditingController();
   final TextEditingController installmentsController = TextEditingController();
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   bool _isInstallment = false;
   int _installments = 1;
@@ -60,6 +62,11 @@ class _TransactionPageState extends State<TransactionPage> {
     setState(() {
       _selectedType = type;
     });
+    // Log analytics event
+    _analyticsService.logEvent(
+      name: 'transaction_type_selected',
+      parameters: {'type': type.toString().split('.').last},
+    );
   }
 
   Color _getTypeColor(TransactionType type) {
@@ -128,6 +135,8 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void initState() {
     super.initState();
+    _analyticsService.logScreenView('transaction_page');
+
     if (widget.transaction != null) {
       titleController.text = widget.transaction!.title;
       valuecontroller.text = widget.transaction!.value.startsWith('R\$ ')
@@ -244,6 +253,9 @@ class _TransactionPageState extends State<TransactionPage> {
                           setState(() {
                             categoryId = category;
                           });
+                          // Log analytics event
+                          _analyticsService
+                              .logCategorySelected(category.toString());
                         },
                       ),
                     ],

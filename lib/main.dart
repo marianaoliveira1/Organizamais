@@ -20,6 +20,7 @@ import 'controller/card_controller.dart';
 import 'controller/transaction_controller.dart';
 import 'routes/route.dart';
 import 'services/notification_service.dart';
+import 'services/analytics_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,9 @@ void main() async {
   } catch (e) {
     print('Error initializing notifications: $e');
   }
+
+  // Initialize Analytics Service
+  AnalyticsService();
 
   runApp(const MyApp());
 }

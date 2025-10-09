@@ -7,19 +7,21 @@ import 'package:get/get.dart';
 import 'package:organizamais/controller/auth_controller.dart';
 
 import '../model/fixed_account_model.dart';
+import '../services/analytics_service.dart';
 import '../services/notification_service.dart';
 
 class FixedAccountsController extends GetxController {
   final _allFixedAccounts = <FixedAccountModel>[].obs;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? fixedAccountsStream;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   var isLoading = true.obs;
 
   List<FixedAccountModel> get fixedAccounts {
     final now = DateTime.now();
-    final currentMonthStart = DateTime(now.year, now.month, 1);
 
     return _allFixedAccounts.where((account) {
+      final currentMonthStart = DateTime(now.year, now.month, 1);
       // Show account if it was never deactivated
       if (account.deactivatedAt == null) return true;
 
@@ -31,7 +33,6 @@ class FixedAccountsController extends GetxController {
 
   List<FixedAccountModel> get fixedAccountsWithDeactivated {
     final now = DateTime.now();
-    final currentMonthStart = DateTime(now.year, now.month, 1);
 
     return _allFixedAccounts.where((account) {
       // Show account if it was never deactivated
@@ -80,6 +81,20 @@ class FixedAccountsController extends GetxController {
     await FirebaseFirestore.instance.collection('fixedAccounts').add(
           fixedAccountWithUserId.toMap(),
         );
+
+    // Log analytics event
+    final value = double.tryParse(fixedAccount.value
+            .split('\$')
+            .last
+            .replaceAll('.', '')
+            .replaceAll(',', '.')) ??
+        0.0;
+    await _analyticsService.logAddFixedAccount(
+      accountName: fixedAccount.title,
+      value: value,
+      frequency: fixedAccount.frequency ?? 'mensal',
+    );
+
     Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
     await NotificationService().scheduleDueDay(fixedAccountWithUserId);
   }
@@ -95,6 +110,10 @@ class FixedAccountsController extends GetxController {
         .update(
           fixedAccount.toMap(),
         );
+
+    // Log analytics event
+    await _analyticsService.logUpdateFixedAccount(fixedAccount.title);
+
     Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');
     await NotificationService().scheduleDueDay(fixedAccount);
   }
@@ -125,10 +144,20 @@ class FixedAccountsController extends GetxController {
   }
 
   Future<void> deleteFixedAccount(String id) async {
+    // Get fixed account name for analytics before deletion
+    final accountToDelete =
+        _allFixedAccounts.firstWhereOrNull((a) => a.id == id);
+
     await FirebaseFirestore.instance
         .collection('fixedAccounts')
         .doc(id)
         .delete();
+
+    // Log analytics event
+    if (accountToDelete != null) {
+      await _analyticsService.logDeleteFixedAccount(accountToDelete.title);
+    }
+
     Get.snackbar('Sucesso', 'Conta fixa removida permanentemente');
     await NotificationService().cancelFor(id);
   }

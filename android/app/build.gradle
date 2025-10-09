@@ -30,7 +30,7 @@ android {
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         // versionCode = flutter.versionCode
-        versionCode = 138
+        versionCode = 139
         versionName = flutter.versionName
     }
 

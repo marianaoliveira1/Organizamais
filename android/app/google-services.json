@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "1008402942918-6j9ff3moet0qioqv1op61etqqemlc2a6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.organizamais",
+            "certificate_hash": "325df7848e8137824dad5b6e68cc776245853aae"
+          }
+        },
+        {
+          "client_id": "1008402942918-6oncmp2gd9826dg6a5puto2hu6de6mee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.organizamais",
+            "certificate_hash": "0115d92be5110180ea900203bdf4f9db470cf1f3"
+          }
+        },
+        {
           "client_id": "1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -49,6 +65,38 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1008402942918-33vun1kgo6akj1eli6lu8err3g742t74.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.organiza.organizamais",
+            "certificate_hash": "0374c98c481be6df9c762ab1f5ee841b36aaf418"
+          }
+        },
+        {
+          "client_id": "1008402942918-g7gqs12p7h858ln7mneiq33q4nk9i0ms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.organiza.organizamais",
+            "certificate_hash": "325df7848e8137824dad5b6e68cc776245853aae"
+          }
+        },
+        {
+          "client_id": "1008402942918-ohcepfq1kseqrqaevjlsmo1b574m1r6t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.organiza.organizamais",
+            "certificate_hash": "f8ae5c2bb045f7a5657a86d8caf3b9e3db9a7376"
+          }
+        },
+        {
+          "client_id": "1008402942918-vpn7o7djbt46r8crn961u5nrqhhofehi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.organiza.organizamais",
+            "certificate_hash": "0115d92be5110180ea900203bdf4f9db470cf1f3"
+          }
+        },
         {
           "client_id": "1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com",
           "client_type": 3

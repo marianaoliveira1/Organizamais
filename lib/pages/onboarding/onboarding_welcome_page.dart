@@ -4,9 +4,23 @@ import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../routes/route.dart';
 import '../../controller/auth_controller.dart';
+import '../../services/analytics_service.dart';
 
-class OnboardingWelcomePage extends StatelessWidget {
+class OnboardingWelcomePage extends StatefulWidget {
   const OnboardingWelcomePage({super.key});
+
+  @override
+  State<OnboardingWelcomePage> createState() => _OnboardingWelcomePageState();
+}
+
+class _OnboardingWelcomePageState extends State<OnboardingWelcomePage> {
+  final AnalyticsService _analyticsService = AnalyticsService();
+
+  @override
+  void initState() {
+    super.initState();
+    _analyticsService.logScreenView('onboarding_welcome_page');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +50,9 @@ class OnboardingWelcomePage extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () {
+                      _analyticsService.logEvent(
+                        name: 'onboarding_skipped',
+                      );
                       AuthController.instance.isOnboarding = false;
                       Get.offAllNamed(Routes.HOME);
                     },
@@ -60,7 +77,12 @@ class OnboardingWelcomePage extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => Get.offAllNamed(Routes.CARD_INTRO),
+                    onPressed: () {
+                      _analyticsService.logEvent(
+                        name: 'onboarding_started',
+                      );
+                      Get.offAllNamed(Routes.CARD_INTRO);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: DefaultColors.green,
                       padding: EdgeInsets.symmetric(vertical: 14.h),

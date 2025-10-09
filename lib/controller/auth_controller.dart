@@ -9,12 +9,14 @@ import 'package:organizamais/controller/card_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/controller/goal_controller.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
+import 'package:organizamais/services/analytics_service.dart';
 import '../routes/route.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AnalyticsService _analyticsService = AnalyticsService();
   Rx<User?> firebaseUser = Rx<User?>(null);
   var isLoading = false.obs;
   var loadedOtherControllers = false;
@@ -154,6 +156,9 @@ class AuthController extends GetxController {
       // Update local observable to reflect the new displayName immediately
       firebaseUser.value = _auth.currentUser;
 
+      // Log analytics event
+      await _analyticsService.logSignUp('email');
+
       _hideLoadingDialog();
       isOnboarding = true;
       Get.offAllNamed(Routes.ONBOARD_WELCOME);
@@ -182,6 +187,10 @@ class AuthController extends GetxController {
       _showLoadingDialog();
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      // Log analytics event
+      await _analyticsService.logLogin('email');
+
       _hideLoadingDialog();
     } on FirebaseAuthException catch (e) {
       _hideLoadingDialog();
@@ -231,12 +240,27 @@ class AuthController extends GetxController {
           "email": googleUser.email,
           "uid": userCredential.user!.uid,
         });
+
+        // Log analytics event for new user
+        await _analyticsService.logSignUp('google');
+
         isOnboarding = true;
         _hideLoadingDialog();
         Get.offAllNamed(Routes.ONBOARD_WELCOME);
         return;
       }
+
+      // Log analytics event for existing user
+      await _analyticsService.logLogin('google');
+      // Usuário já existente: garantir atualização do estado e navegar para HOME
+      try {
+        await userCredential.user?.reload();
+        firebaseUser.value = _auth.currentUser;
+      } catch (_) {}
       _hideLoadingDialog();
+      if (Get.currentRoute != Routes.HOME) {
+        Get.offAllNamed(Routes.HOME);
+      }
     } on FirebaseAuthException catch (e) {
       print(e);
       _hideLoadingDialog();
@@ -260,6 +284,9 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     try {
+      // Log analytics event
+      await _analyticsService.logLogout();
+
       await _auth.signOut();
       loadedOtherControllers = false;
       Get.snackbar(
@@ -286,6 +313,9 @@ class AuthController extends GetxController {
       _showLoadingDialog();
 
       await _auth.sendPasswordResetEmail(email: email);
+
+      // Log analytics event
+      await _analyticsService.logPasswordReset();
 
       Get.snackbar(
         "E-mail enviado",
@@ -323,6 +353,9 @@ class AuthController extends GetxController {
       // Get the current user
       final user = firebaseUser.value;
       if (user != null) {
+        // Log analytics event before deletion
+        await _analyticsService.logDeleteAccount();
+
         // Delete the user account
         await user.delete();
 

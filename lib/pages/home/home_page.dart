@@ -13,6 +13,7 @@ import 'package:organizamais/pages/monthy_analsis/monthy_analsis.dart';
 
 import 'package:organizamais/pages/resume/resume_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
+import 'package:organizamais/services/analytics_service.dart';
 import 'package:organizamais/utils/color.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   int _selectedIndex = 0;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   final List<Widget> _pages = [
     const InitialPage(),
@@ -42,6 +44,7 @@ class _HomePageState extends State<HomePage>
     if (_selectedIndex == index) return;
 
     if (index == 2) {
+      _analyticsService.logScreenView('transaction_page');
       Get.to(() => TransactionPage())?.then((result) {
         if (result != null && result is int && mounted) {
           setState(() {
@@ -50,6 +53,22 @@ class _HomePageState extends State<HomePage>
         }
       });
     } else {
+      // Log screen view based on index
+      switch (index) {
+        case 0:
+          _analyticsService.logScreenView('initial_page');
+          break;
+        case 1:
+          _analyticsService.logScreenView('graphics_page');
+          break;
+        case 3:
+          _analyticsService.logScreenView('resume_page');
+          break;
+        case 4:
+          _analyticsService.logScreenView('monthly_analysis_page');
+          break;
+      }
+
       setState(() {
         _selectedIndex = index;
       });

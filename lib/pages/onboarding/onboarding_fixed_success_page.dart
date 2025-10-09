@@ -4,9 +4,23 @@ import 'package:get/get.dart';
 import 'package:organizamais/utils/color.dart';
 import '../../routes/route.dart';
 import '../../controller/auth_controller.dart';
+import '../../services/analytics_service.dart';
 
-class OnboardingFixedSuccessPage extends StatelessWidget {
+class OnboardingFixedSuccessPage extends StatefulWidget {
   const OnboardingFixedSuccessPage({super.key});
+
+  @override
+  State<OnboardingFixedSuccessPage> createState() => _OnboardingFixedSuccessPageState();
+}
+
+class _OnboardingFixedSuccessPageState extends State<OnboardingFixedSuccessPage> {
+  final AnalyticsService _analyticsService = AnalyticsService();
+
+  @override
+  void initState() {
+    super.initState();
+    _analyticsService.logScreenView('onboarding_fixed_success_page');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +55,7 @@ class OnboardingFixedSuccessPage extends StatelessWidget {
             SizedBox(height: 32.h),
             ElevatedButton(
               onPressed: () {
+                _analyticsService.logOnboardingCompleted();
                 AuthController.instance.isOnboarding = false;
                 Get.offAllNamed(Routes.HOME);
               },
