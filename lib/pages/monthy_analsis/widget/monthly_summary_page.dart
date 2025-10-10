@@ -128,14 +128,51 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
       final v = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
       categorias[id] = (categorias[id] ?? 0.0) + v;
     }
-    final catData = categorias.entries
-        .map((e) => {
-              'category': e.key,
-              'value': e.value,
-              'name': findCategoryById(e.key)?['name'],
-              'color': findCategoryById(e.key)?['color'],
-            })
-        .toList()
+    // Análise por categoria com dia da semana preferido
+    final catData = categorias.entries.map((e) {
+      final categoryId = e.key;
+      final categoryTxs = txs
+          .where((t) =>
+              t.type == TransactionType.despesa &&
+              t.category == categoryId &&
+              t.paymentDay != null)
+          .toList();
+
+      // Calcular dia da semana mais comum para esta categoria
+      final weekdayMap = <int, double>{};
+      for (final t in categoryTxs) {
+        final dt = DateTime.parse(t.paymentDay!);
+        final weekday = dt.weekday;
+        final val =
+            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+        weekdayMap[weekday] = (weekdayMap[weekday] ?? 0.0) + val;
+      }
+
+      String? weekdayPattern;
+      if (weekdayMap.isNotEmpty && categoryTxs.length >= 2) {
+        final maxWeekday =
+            weekdayMap.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+        const weekdayNames = [
+          '',
+          'segundas',
+          'terças',
+          'quartas',
+          'quintas',
+          'sextas',
+          'sábados',
+          'domingos'
+        ];
+        weekdayPattern = 'Você gasta mais nas ${weekdayNames[maxWeekday]}';
+      }
+
+      return {
+        'category': e.key,
+        'value': e.value,
+        'name': findCategoryById(e.key)?['name'],
+        'color': findCategoryById(e.key)?['color'],
+        'weekdayPattern': weekdayPattern,
+      };
+    }).toList()
       ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
     final totalCat =
         catData.fold<double>(0.0, (s, m) => s + (m['value'] as double));
@@ -163,6 +200,26 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
       ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
     final payTotal =
         payData.fold<double>(0.0, (s, m) => s + (m['value'] as double));
+
+    // Análise de pico de gastos por dia do mês
+    final dayOfMonthMap = <int, double>{};
+    for (final t in txs.where(
+        (t) => t.type == TransactionType.despesa && t.paymentDay != null)) {
+      final dt = DateTime.parse(t.paymentDay!);
+      final day = dt.day;
+      final val =
+          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      dayOfMonthMap[day] = (dayOfMonthMap[day] ?? 0.0) + val;
+    }
+
+    String? peakDayMessage;
+    if (dayOfMonthMap.isNotEmpty) {
+      final peakDay =
+          dayOfMonthMap.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+      final peakValue = dayOfMonthMap[peakDay]!;
+      peakDayMessage =
+          'Seu pico de gastos foi no dia $peakDay (${currency.format(peakValue)})';
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -271,13 +328,48 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
             SizedBox(
               height: 10.h,
             ),
+            SizedBox(height: 8.h),
+            if (peakDayMessage != null) ...[
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+                decoration: BoxDecoration(
+                  color: DefaultColors.grey20.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.insights,
+                        size: 16.sp,
+                        color: theme.primaryColor.withOpacity(0.7)),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        peakDayMessage,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 8.h),
+            ],
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
             if (catData.isNotEmpty) ...[
               Text('Por categoria',
                   style: TextStyle(
                       color: theme.primaryColor,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600)),
-              SizedBox(height: 8.h),
               SizedBox(
                 height: 180.h,
                 child: SfCircularChart(
@@ -333,14 +425,30 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                         ),
                         SizedBox(width: 8.w),
                         Expanded(
-                          child: Text(
-                            (e['name'] as String? ?? ''),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (e['name'] as String? ?? ''),
+                                style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w600),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (e['weekdayPattern'] != null) ...[
+                                SizedBox(height: 2.h),
+                                Text(
+                                  e['weekdayPattern'] as String,
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         SizedBox(width: 8.w),

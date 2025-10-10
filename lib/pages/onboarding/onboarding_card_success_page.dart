@@ -19,7 +19,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '🎯 Cartão adicionado com sucesso! Seu dinheiro já tá mais organizado que fila de banco em segunda-feira.',
+              '🎯 Cartão adicionado com sucesso! ',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -29,7 +29,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             Text(
-              '💡 Agora, que tal uma conta fixa? Para aquelas despesas que são tão certas quanto chorar em filme da Disney! 🥲',
+              'Agora, garanta que nada passe despercebido. Cadastre uma conta fixa e acompanhe seus gastos essenciais.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -50,7 +50,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Criar minha conta fixa! 🛡️',
+                'Adicionar conta fixa',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

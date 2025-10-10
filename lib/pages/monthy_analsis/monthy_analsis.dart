@@ -536,7 +536,7 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 10.h),
+                        SizedBox(height: 16.h),
                         MonthlyFinancialChart(),
                         SizedBox(height: 16.h),
                         AdsBanner(),

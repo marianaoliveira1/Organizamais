@@ -32,7 +32,7 @@ class OnboardingCardIntroPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '💳 Vamos cadastrar só um cartãozinho pra começar (prometo que não dói 😅)',
+              'Adicione seu cartão e comece a enxergar pra onde seu dinheiro realmente vai — com clareza e sem esforço. 📊',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -40,7 +40,17 @@ class OnboardingCardIntroPage extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 32.h),
+            SizedBox(height: 20.h),
+            Text(
+              'Seus gastos, todos organizados em um só lugar.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 36.h),
             ElevatedButton(
               onPressed: () => Get.to(() =>
                   const AddCardPage(isEditing: false, fromOnboarding: true)),
@@ -52,7 +62,7 @@ class OnboardingCardIntroPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Claro, vamos lá! 💪',
+                'Adicionar cartão',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

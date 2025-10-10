@@ -110,10 +110,16 @@ class PercentageDisplayWidget extends StatelessWidget {
         circleColor = DefaultColors.grey;
       } else if (curr > prev) {
         iconData = Iconsax.arrow_circle_up;
-        circleColor = DefaultColors.greenDark;
+        // Para despesas, aumento é ruim (vermelho), para outros é bom (verde)
+        circleColor = explanationType == PercentageExplanationType.expense
+            ? DefaultColors.redDark
+            : DefaultColors.greenDark;
       } else {
         iconData = Iconsax.arrow_circle_down;
-        circleColor = DefaultColors.redDark;
+        // Para despesas, diminuição é bom (verde), para outros é ruim (vermelho)
+        circleColor = explanationType == PercentageExplanationType.expense
+            ? DefaultColors.greenDark
+            : DefaultColors.redDark;
       }
     } else {
       switch (effectiveResult.type) {

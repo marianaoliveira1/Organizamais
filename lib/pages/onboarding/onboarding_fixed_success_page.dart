@@ -10,10 +10,12 @@ class OnboardingFixedSuccessPage extends StatefulWidget {
   const OnboardingFixedSuccessPage({super.key});
 
   @override
-  State<OnboardingFixedSuccessPage> createState() => _OnboardingFixedSuccessPageState();
+  State<OnboardingFixedSuccessPage> createState() =>
+      _OnboardingFixedSuccessPageState();
 }
 
-class _OnboardingFixedSuccessPageState extends State<OnboardingFixedSuccessPage> {
+class _OnboardingFixedSuccessPageState
+    extends State<OnboardingFixedSuccessPage> {
   final AnalyticsService _analyticsService = AnalyticsService();
 
   @override
@@ -34,7 +36,7 @@ class _OnboardingFixedSuccessPageState extends State<OnboardingFixedSuccessPage>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '✨ Conquista desbloqueada: Adulto Responsável! 🏆 Sua conta fixa foi criada e já está trabalhando para você! 💸',
+              'Tudo pronto! Agora você tem o controle real das suas finanças — simples, visual e no seu ritmo. 📈 ',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -44,7 +46,7 @@ class _OnboardingFixedSuccessPageState extends State<OnboardingFixedSuccessPage>
             ),
             SizedBox(height: 8.h),
             Text(
-              'E lá vamos nós! Sua jornada rumo ao controle total começou... Prepare-se para vitórias épicas! ⚔️',
+              'E lá vamos nós! Sua jornada rumo ao controle total começou... ',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: DefaultColors.grey,
@@ -67,7 +69,7 @@ class _OnboardingFixedSuccessPageState extends State<OnboardingFixedSuccessPage>
                 ),
               ),
               child: Text(
-                'Iniciar minha vida organizada! 🚀',
+                'Ir para o app 🚀',
                 style: TextStyle(
                   color: theme.cardColor,
                   fontSize: 14.sp,

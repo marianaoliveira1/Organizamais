@@ -188,6 +188,12 @@ class FinanceDetailsPage extends StatelessWidget {
     final difference = currentValue - previousValue;
     final isPositive = difference >= 0;
 
+    // Para despesas, inverter a lógica de cores da diferença
+    final bool isExpense = type == PercentageExplanationType.expense;
+    final Color differenceColor = isExpense
+        ? (isPositive ? DefaultColors.red : DefaultColors.green)
+        : (isPositive ? DefaultColors.green : DefaultColors.red);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -211,11 +217,20 @@ class FinanceDetailsPage extends StatelessWidget {
                     builder: (context) {
                       final bool increased = currentValue > previousValue;
                       final bool equal = currentValue == previousValue;
+
+                      // Para despesas, inverter a lógica de cores
+                      final bool isExpense =
+                          type == PercentageExplanationType.expense;
                       final Color circleColor = equal
                           ? DefaultColors.grey
                           : (increased
-                              ? DefaultColors.greenDark
-                              : DefaultColors.redDark);
+                              ? (isExpense
+                                  ? DefaultColors.redDark
+                                  : DefaultColors.greenDark)
+                              : (isExpense
+                                  ? DefaultColors.greenDark
+                                  : DefaultColors.redDark));
+
                       final IconData dirIcon = equal
                           ? Iconsax.more_circle
                           : (increased
@@ -272,11 +287,20 @@ class FinanceDetailsPage extends StatelessWidget {
                           ((curr - prev) / prev.abs()) * 100.0;
                       final bool increased = curr > prev;
                       final bool equal = computedPercent == 0;
+
+                      // Para despesas, inverter a lógica de cores
+                      final bool isExpense =
+                          type == PercentageExplanationType.expense;
                       final Color color = equal
                           ? DefaultColors.grey
                           : (increased
-                              ? DefaultColors.greenDark
-                              : DefaultColors.redDark);
+                              ? (isExpense
+                                  ? DefaultColors.redDark
+                                  : DefaultColors.greenDark)
+                              : (isExpense
+                                  ? DefaultColors.greenDark
+                                  : DefaultColors.redDark));
+
                       final IconData icon = equal
                           ? Iconsax.more_circle
                           : (increased
@@ -372,7 +396,7 @@ class FinanceDetailsPage extends StatelessWidget {
             Text(
               '${isPositive ? '+' : ''}${formatter.format(difference)}',
               style: TextStyle(
-                color: isPositive ? DefaultColors.green : DefaultColors.red,
+                color: differenceColor,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
               ),

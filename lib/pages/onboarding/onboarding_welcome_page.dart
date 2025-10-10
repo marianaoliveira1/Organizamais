@@ -34,7 +34,7 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '🎉 Uhuul! Sua vida organizada vai ficar mais divertida que abrir um pacote de biscoito e virar todos inteiros! 🍪',
+              'Bem-vindo(a) ao seu novo jeito de organizar as finanças — simples, inteligente e feito pra facilitar sua vida. ✨',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
@@ -64,7 +64,7 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage> {
                       ),
                     ),
                     child: Text(
-                      'Pular": "Tô com pressa, me leva direto ao show! 🚀',
+                      'Pular por agora',
                       style: TextStyle(
                         color: DefaultColors.green,
                         fontSize: 12.sp,
@@ -91,7 +91,7 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage> {
                       ),
                     ),
                     child: Text(
-                      'Bora nessa aventura organizacional! 🌟',
+                      'Bora começar 🚀',
                       style: TextStyle(
                         color: theme.cardColor,
                         fontSize: 12.sp,
