@@ -5,11 +5,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:organizamais/controller/card_controller.dart';
 import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/controller/goal_controller.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/services/analytics_service.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import '../routes/route.dart';
 
 class AuthController extends GetxController {
@@ -28,6 +30,15 @@ class AuthController extends GetxController {
     firebaseUser.bindStream(_auth.userChanges());
     ever(firebaseUser, _setInitialScreen);
     ever(firebaseUser, _loadOtherComponents);
+    ever<User?>(firebaseUser, (u) async {
+      try {
+        await FirebaseCrashlytics.instance.setUserIdentifier(u?.uid ?? 'guest');
+        await FirebaseCrashlytics.instance
+            .setCustomKey('user_email', u?.email ?? '');
+        await FirebaseCrashlytics.instance.setCustomKey(
+            'user_is_anonymous', (u?.isAnonymous ?? true).toString());
+      } catch (_) {}
+    });
   }
 
   updateDisplayName(String displayName) async {
@@ -108,6 +119,10 @@ class AuthController extends GetxController {
       final String trimmedEmail = email.trim();
       final String trimmedPassword = password.trim();
 
+      FirebaseCrashlytics.instance.log('Auth.register start');
+      FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'email_register');
+      FirebaseCrashlytics.instance.setCustomKey('register_email', trimmedEmail);
+
       if (trimmedName.isEmpty ||
           trimmedEmail.isEmpty ||
           trimmedPassword.isEmpty) {
@@ -162,14 +177,26 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       isOnboarding = true;
       Get.offAllNamed(Routes.ONBOARD_WELCOME);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'register FirebaseAuthException',
+        information: ['email=${email.trim()}'],
+      );
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao cadastrar",
         _getAuthErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
-    } catch (e) {
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'register unexpected error',
+        information: ['email=${email.trim()}'],
+      );
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao cadastrar",
@@ -183,6 +210,9 @@ class AuthController extends GetxController {
 
   Future<void> login(String email, String password) async {
     try {
+      FirebaseCrashlytics.instance.log('Auth.login start');
+      FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'email_login');
+      FirebaseCrashlytics.instance.setCustomKey('login_email', email.trim());
       isLoading(true);
       _showLoadingDialog();
 
@@ -192,14 +222,26 @@ class AuthController extends GetxController {
       await _analyticsService.logLogin('email');
 
       _hideLoadingDialog();
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'login FirebaseAuthException',
+        information: ['email=${email.trim()}'],
+      );
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao entrar",
         _getAuthErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
-    } catch (e) {
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'login unexpected error',
+        information: ['email=${email.trim()}'],
+      );
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao entrar",
@@ -213,15 +255,33 @@ class AuthController extends GetxController {
 
   Future<void> loginWithGoogle() async {
     try {
+      final Trace perfTrace =
+          FirebasePerformance.instance.newTrace('auth_google_login');
+      await perfTrace.start();
+      FirebaseCrashlytics.instance.log('Auth.loginWithGoogle start');
+      FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'google_login');
       _showLoadingDialog();
 
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        throw Exception("Login cancelado pelo usuário");
+        final cancellation = Exception("Login cancelado pelo usuário");
+        FirebaseCrashlytics.instance.recordError(
+          cancellation,
+          StackTrace.current,
+          reason: 'google sign-in cancelled',
+          information: ['stage=google_sign_in'],
+        );
+        throw cancellation;
       }
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+      FirebaseCrashlytics.instance
+          .setCustomKey('google_email', googleUser.email);
+      FirebaseCrashlytics.instance.setCustomKey('google_has_access_token',
+          (googleAuth.accessToken != null).toString());
+      FirebaseCrashlytics.instance.setCustomKey(
+          'google_has_id_token', (googleAuth.idToken != null).toString());
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -229,6 +289,8 @@ class AuthController extends GetxController {
 
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
+      await FirebaseCrashlytics.instance
+          .setUserIdentifier(userCredential.user?.uid ?? '');
       DocumentSnapshot userDoc = await _firestore
           .collection("users")
           .doc(userCredential.user!.uid)
@@ -261,7 +323,20 @@ class AuthController extends GetxController {
       if (Get.currentRoute != Routes.HOME) {
         Get.offAllNamed(Routes.HOME);
       }
-    } on FirebaseAuthException catch (e) {
+      await perfTrace.stop();
+    } on FirebaseAuthException catch (e, st) {
+      try {
+        final Trace t =
+            FirebasePerformance.instance.newTrace('auth_google_login_error');
+        await t.start();
+        await t.stop();
+      } catch (_) {}
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'google login FirebaseAuthException',
+        information: ['stage=signInWithCredential'],
+      );
       print(e);
       _hideLoadingDialog();
       Get.snackbar(
@@ -269,7 +344,19 @@ class AuthController extends GetxController {
         _getAuthErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
-    } catch (e) {
+    } catch (e, st) {
+      try {
+        final Trace t = FirebasePerformance.instance
+            .newTrace('auth_google_login_unexpected');
+        await t.start();
+        await t.stop();
+      } catch (_) {}
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'google login unexpected error',
+        information: ['stage=unknown'],
+      );
       _hideLoadingDialog();
       Get.snackbar(
         "Erro ao entrar com Google",
@@ -284,6 +371,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     try {
+      FirebaseCrashlytics.instance.log('Auth.logout start');
       // Log analytics event
       await _analyticsService.logLogout();
 
@@ -296,7 +384,8 @@ class AuthController extends GetxController {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } catch (e) {
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(e, st, reason: 'logout error');
       Get.snackbar(
         "Erro ao sair",
         e.toString(),
@@ -309,6 +398,8 @@ class AuthController extends GetxController {
 
   Future<void> resetPassword(String email) async {
     try {
+      FirebaseCrashlytics.instance.log('Auth.resetPassword start');
+      FirebaseCrashlytics.instance.setCustomKey('reset_email', email.trim());
       isLoading(true);
       _showLoadingDialog();
 
@@ -324,7 +415,13 @@ class AuthController extends GetxController {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'resetPassword FirebaseAuthException',
+        information: ['email=${email.trim()}'],
+      );
       Get.snackbar(
         "Erro ao redefinir senha",
         _getAuthErrorMessage(e),
@@ -332,7 +429,13 @@ class AuthController extends GetxController {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } catch (e) {
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'resetPassword unexpected error',
+        information: ['email=${email.trim()}'],
+      );
       Get.snackbar(
         "Erro inesperado",
         e.toString(),
@@ -350,6 +453,7 @@ class AuthController extends GetxController {
 
   void deleteAccount() async {
     try {
+      FirebaseCrashlytics.instance.log('Auth.deleteAccount start');
       // Get the current user
       final user = firebaseUser.value;
       if (user != null) {
@@ -373,8 +477,10 @@ class AuthController extends GetxController {
           colorText: Colors.white,
         );
       }
-    } catch (e) {
+    } catch (e, st) {
       print('Error deleting account: $e');
+      FirebaseCrashlytics.instance
+          .recordError(e, st, reason: 'deleteAccount error');
       Get.snackbar(
         'Erro',
         'Não foi possível deletar sua conta. Tente fazer login novamente e repetir a operação.',

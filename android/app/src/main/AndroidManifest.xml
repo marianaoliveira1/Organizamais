@@ -8,6 +8,14 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
 
+        <!-- FCM default channel and small icon -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="org_default_channel" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/launcher_icon" />
+
              <meta-data
                 android:name="com.google.android.gms.ads.APPLICATION_ID"
                 android:value="ca-app-pub-8308246738505070~5520038492" />

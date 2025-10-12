@@ -6,6 +6,7 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -30,7 +31,7 @@ android {
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         // versionCode = flutter.versionCode
-        versionCode = 142
+        versionCode = 144
         versionName = flutter.versionName
     }
 
@@ -48,6 +49,17 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.release
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled true
+                unstrippedNativeLibsDir 'build/app/intermediates/merged_native_libs/release/out/lib'
+            }
+        }
+        debug {
+            // Disable mapping/native upload for debug builds
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+                nativeSymbolUploadEnabled false
+            }
         }
     }
     packaging {

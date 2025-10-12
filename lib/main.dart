@@ -1,6 +1,10 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'dart:async';
+import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -21,6 +25,9 @@ import 'controller/transaction_controller.dart';
 import 'routes/route.dart';
 import 'services/notification_service.dart';
 import 'services/analytics_service.dart';
+import 'services/messaging_service.dart';
+import 'services/remote_config_service.dart';
+import 'services/performance_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,10 +39,34 @@ void main() async {
     print('Error initializing Firebase: $e');
   }
 
+  // Configure Crashlytics collection and global error handlers
   try {
-    await MobileAds.instance.initialize();
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+    // Forward Flutter framework errors to Crashlytics
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+    };
+
+    // Catch unhandled async errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
   } catch (e) {
-    print('Error initializing MobileAds: $e');
+    debugPrint('Crashlytics setup failed: $e');
+  }
+
+  if (kReleaseMode) {
+    try {
+      await MobileAds.instance.initialize();
+    } catch (e) {
+      print('Error initializing MobileAds: $e');
+    }
+  } else {
+    debugPrint('MobileAds disabled in debug mode');
   }
 
   try {
@@ -50,10 +81,28 @@ void main() async {
     print('Error initializing notifications: $e');
   }
 
-  // Initialize Analytics Service
+  // Initialize Firebase services
   AnalyticsService();
+  await RemoteConfigService().init();
+  await PerformanceService().init();
+  await MessagingService().init();
+  // Debug: print FCM token
+  if (kDebugMode) {
+    try {
+      final token = await MessagingService().getToken();
+      debugPrint('FCM token: $token');
+    } catch (_) {}
+  }
 
-  runApp(const MyApp());
+  await runZonedGuarded<Future<void>>(() async {
+    runApp(const MyApp());
+  }, (Object error, StackTrace stack) async {
+    try {
+      await FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    } catch (e) {
+      debugPrint('Failed to record zone error to Crashlytics: $e');
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {

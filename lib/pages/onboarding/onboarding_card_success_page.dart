@@ -29,7 +29,7 @@ class OnboardingCardSuccessPage extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             Text(
-              'Agora, garanta que nada passe despercebido. Cadastre uma conta fixa e acompanhe seus gastos essenciais.',
+              'Agora, garanta que nada passe despercebido. Cadastre uma conta fixa e a/companhe seus gastos essenciais.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,

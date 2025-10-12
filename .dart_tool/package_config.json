@@ -212,6 +212,72 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "firebase_crashlytics",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_crashlytics-4.3.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_crashlytics_platform_interface",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_crashlytics_platform_interface-3.8.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_messaging",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_messaging-15.2.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_messaging_platform_interface",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_messaging_platform_interface-4.6.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_messaging_web",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_messaging_web-3.10.10",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "firebase_performance",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_performance-0.10.1+10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_performance_platform_interface",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_performance_platform_interface-0.1.5+10",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_performance_web",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_performance_web-0.1.7+16",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "firebase_remote_config",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_remote_config-5.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_remote_config_platform_interface",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_remote_config_platform_interface-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "firebase_remote_config_web",
+      "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/firebase_remote_config_web-1.8.9",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "fixnum",
       "rootUri": "file:///home/mariana/.pub-cache/hosted/pub.dev/fixnum-1.1.1",
       "packageUri": "lib/",

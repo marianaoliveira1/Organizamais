@@ -497,13 +497,52 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                       SizedBox(
                         height: 10.h,
                       ),
-                      Text(
-                        "Transações recentes (${categoryTransactions.length})",
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: DefaultColors.grey20,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Transações recentes (${categoryTransactions.length})",
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                              color: DefaultColors.grey20,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              try {
+                                await AdsInterstitial.preload();
+                                final shown =
+                                    await AdsInterstitial.showIfReady();
+                                if (!shown) {
+                                  await AdsInterstitial.show();
+                                }
+                              } catch (_) {}
+                              Get.to(() => _CategoryMonthComparePage(
+                                    categoryId: categoryId,
+                                    categoryName:
+                                        (item['name'] as String? ?? ''),
+                                    categoryColor: categoryColor,
+                                    selectedMonthName: monthName,
+                                  ));
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Iconsax.calendar_2,
+                                    size: 14.sp, color: theme.primaryColor),
+                                SizedBox(width: 6.w),
+                                Text(
+                                  'Ver mês atual e anterior',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       ListView.separated(
                         shrinkWrap: true,
@@ -1280,6 +1319,328 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   }
 }
 
+class _CategoryMonthComparePage extends StatelessWidget {
+  const _CategoryMonthComparePage(
+      {required this.categoryId,
+      required this.categoryName,
+      this.categoryColor,
+      this.selectedMonthName});
+
+  final int categoryId;
+  final String categoryName;
+  final Color? categoryColor;
+  final String? selectedMonthName;
+
+  String _monthLabel(DateTime date) {
+    final months = getAllMonths();
+    return '${months[date.month - 1]} / ${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    // Header/AppBar color fixed to grey20 as requested
+    const Color headerColor = DefaultColors.grey20;
+
+    // Determine selected month/year based on the provided label
+    final DateTime now = DateTime.now();
+    final String raw = (selectedMonthName ?? '').trim();
+    final List<String> parts = raw.isNotEmpty ? raw.split('/') : <String>[];
+    final String selMonthName = parts.isNotEmpty ? parts[0].trim() : raw;
+    final int selYear = parts.length >= 2
+        ? int.tryParse(parts[1].trim()) ?? now.year
+        : now.year;
+    final months = getAllMonths();
+    int monthIdx = months.indexOf(selMonthName);
+    if (monthIdx < 0) monthIdx = now.month - 1;
+
+    // Build ranges relative to the selected month
+    final DateTime currentStart = DateTime(selYear, monthIdx + 1, 1);
+    final DateTime previousStart = DateTime(selYear, monthIdx, 1);
+    final DateTime previousEnd = DateTime(selYear, monthIdx + 1, 0);
+    final TransactionController txController =
+        Get.find<TransactionController>();
+
+    List<TransactionModel> forRange(DateTime start, DateTime end) {
+      return txController.transaction.where((t) {
+        if (t.type != TransactionType.despesa) return false;
+        if (t.category != categoryId) return false;
+        if (t.paymentDay == null) return false;
+        final d = DateTime.parse(t.paymentDay!);
+        return !d.isBefore(start) && !d.isAfter(end);
+      }).toList()
+        ..sort((a, b) {
+          if (a.paymentDay == null || b.paymentDay == null) return 0;
+          return DateTime.parse(b.paymentDay!)
+              .compareTo(DateTime.parse(a.paymentDay!));
+        });
+    }
+
+    final List<TransactionModel> currentMonth = forRange(
+      currentStart,
+      DateTime(now.year, now.month + 1, 0),
+    );
+    final List<TransactionModel> previousMonth = forRange(
+      previousStart,
+      previousEnd,
+    );
+
+    String formatDate(String? iso) {
+      if (iso == null) return '';
+      final d = DateTime.parse(iso);
+      return DateFormat('dd').format(d); // ex.: 09
+    }
+
+    String formatValue(String v) {
+      final n =
+          double.tryParse(v.replaceAll('.', '').replaceAll(',', '.')) ?? 0.0;
+      final NumberFormat f =
+          NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+      return f.format(n);
+    }
+
+    // old buildColumn removed in favor of styled monthCard UI
+
+    double sum(List<TransactionModel> txs) {
+      double s = 0;
+      for (final t in txs) {
+        s +=
+            double.tryParse(t.value.replaceAll('.', '').replaceAll(',', '.')) ??
+                0.0;
+      }
+      return s;
+    }
+
+    final double totalPrev = sum(previousMonth);
+    final double totalCurr = sum(currentMonth);
+    final double totalAll = totalPrev + totalCurr;
+    final int totalCount = previousMonth.length + currentMonth.length;
+    final NumberFormat currency =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$ ');
+
+    Widget statCard(IconData icon, String label, String value) {
+      return Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10.r,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 34.w,
+                  height: 34.h,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(icon, color: theme.primaryColor, size: 18.sp),
+                ),
+                SizedBox(width: 12.w),
+                Text(
+                  label,
+                  style:
+                      TextStyle(fontSize: 12.sp, color: DefaultColors.grey20),
+                ),
+              ],
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              value,
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget monthHeader(String title, double total) {
+      return Container(
+        decoration: BoxDecoration(
+          color: DefaultColors.backgroundgreyDark,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(14.r),
+            topRight: Radius.circular(14.r),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 2.h),
+            Text(title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.sp,
+                )),
+            SizedBox(height: 4.h),
+            Text(currency.format(total),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14.sp,
+                )),
+          ],
+        ),
+      );
+    }
+
+    Widget monthItem(TransactionModel t) {
+      return Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 12.sp,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Iconsax.calendar_1, size: 14.h),
+                    SizedBox(width: 8.w),
+                    Text(
+                      formatDate(t.paymentDay),
+                      style: TextStyle(
+                        color: DefaultColors.grey,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  formatValue(t.value),
+                  style: TextStyle(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Divider(
+              height: 1,
+              color: DefaultColors.grey20.withOpacity(.3),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget monthCard(String title, List<TransactionModel> txs, double total) {
+      return Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              monthHeader(title, total),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    ...txs.map((t) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: monthItem(t),
+                        )),
+                    if (txs.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Sem transações'),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(categoryName),
+        backgroundColor: headerColor,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child:
+                        statCard(Iconsax.box, 'Total Entregas', '$totalCount')),
+                SizedBox(width: 12.w),
+                Expanded(
+                    child: statCard(Iconsax.activity, 'Total Geral',
+                        currency.format(totalAll))),
+              ],
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                monthCard(_monthLabel(previousStart), previousMonth, totalPrev),
+                const SizedBox(width: 16),
+                monthCard(_monthLabel(currentStart), currentMonth, totalCurr),
+              ],
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SameDayComparePage extends StatelessWidget {
   final int categoryId;
   final String monthName;
@@ -1369,8 +1730,6 @@ class _SameDayComparePage extends StatelessWidget {
 
     final String categoryTitle = (categoryName ?? '');
     final String? categoryIconPath = categoryIcon;
-    final Color headerColor =
-        (categoryColor ?? theme.primaryColor.withOpacity(0.08));
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

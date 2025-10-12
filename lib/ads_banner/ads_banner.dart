@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:organizamais/services/remote_config_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:async';
 
@@ -16,7 +18,11 @@ class _AdsBannerState extends State<AdsBanner> {
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    if (kReleaseMode && RemoteConfigService().showAds) {
+      _loadBannerAd();
+    } else {
+      debugPrint('AdsBanner: debug mode, skipping banner load');
+    }
   }
 
   void _loadBannerAd() {
@@ -48,6 +54,11 @@ class _AdsBannerState extends State<AdsBanner> {
 
   @override
   Widget build(BuildContext context) {
+    if (!kReleaseMode || !RemoteConfigService().showAds) {
+      // Keep layout consistent in debug builds by reserving banner space
+      return const SizedBox(height: 50);
+    }
+
     if (_isAdLoaded && _bannerAd != null) {
       return Align(
         alignment: Alignment.center,
@@ -69,6 +80,10 @@ class AdsInterstitial {
   static bool _isLoading = false;
 
   static Future<void> preload() async {
+    if (!kReleaseMode) {
+      debugPrint('AdsInterstitial.preload: debug mode, skipping');
+      return;
+    }
     if (_ad != null || _isLoading) return;
     debugPrint('AdsInterstitial.preload: start');
     _isLoading = true;
@@ -91,6 +106,10 @@ class AdsInterstitial {
   }
 
   static Future<bool> showIfReady() async {
+    if (!kReleaseMode) {
+      debugPrint('AdsInterstitial.showIfReady: debug mode, skipping');
+      return false;
+    }
     final ad = _ad;
     debugPrint('AdsInterstitial.showIfReady: ready=${ad != null}');
     if (ad == null) return false;
@@ -114,6 +133,10 @@ class AdsInterstitial {
   }
 
   static Future<void> show() async {
+    if (!kReleaseMode) {
+      debugPrint('AdsInterstitial.show: debug mode, skipping');
+      return;
+    }
     final Completer<void> completer = Completer<void>();
     debugPrint('AdsInterstitial.show: load-then-show start');
     await InterstitialAd.load(
@@ -149,6 +172,10 @@ class AdsInterstitial {
 // Rewarded ad helper (watch-to-unlock flow)
 class AdsRewardedPremium {
   static Future<bool> show() async {
+    if (!kReleaseMode) {
+      debugPrint('AdsRewardedPremium.show: debug mode, skipping');
+      return false;
+    }
     final Completer<bool> completer = Completer<bool>();
     bool earned = false;
     debugPrint('AdsRewardedPremium.show: load start');
