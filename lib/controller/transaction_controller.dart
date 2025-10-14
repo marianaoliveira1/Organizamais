@@ -26,11 +26,11 @@ class TransactionController extends GetxController {
     for (final e in fixedAccountsController.allFixedAccounts) {
       final frequency = e.frequency ?? 'mensal';
       if (frequency == 'semanal') {
-        // Generate weekly entries across a wide date range (approx 5 years past/future)
+        // Generate weekly entries within a tighter window (~1 year past/future)
         final int weekday = (e.weeklyWeekday ?? 1).clamp(1, 7);
-        // from 5 years ago to 5 years ahead
-        final DateTime start = DateTime(today.year - 5, today.month, today.day);
-        final DateTime end = DateTime(today.year + 5, today.month, today.day);
+        // from 1 year ago to 1 year ahead
+        final DateTime start = DateTime(today.year - 1, today.month, today.day);
+        final DateTime end = DateTime(today.year + 1, today.month, today.day);
         // Find first occurrence on/after start matching weekday
         DateTime cursor = start;
         while (cursor.weekday != weekday) {
@@ -62,9 +62,9 @@ class TransactionController extends GetxController {
           cursor = cursor.add(const Duration(days: 7));
         }
       } else {
-        // mensal or quinzenal handled monthly over a wide range
-        // limit to a narrower window to improve performance (~10 years range)
-        for (var i = -120; i <= 120; i++) {
+        // mensal or quinzenal handled monthly over a narrower window
+        // limit to ~24 months around current month to improve performance
+        for (var i = -12; i <= 12; i++) {
           final transactionMonth = today.month + i;
           final transactionYear = today.year +
               (transactionMonth > 12
@@ -346,7 +346,11 @@ class TransactionController extends GetxController {
         .replaceAll('.', '')
         .replaceAll(',', '.'));
 
+    final userId = Get.find<AuthController>().firebaseUser.value?.uid;
+
     if (isInstallment) {
+      // Batch write installments to reduce round-trips
+      final WriteBatch batch = FirebaseFirestore.instance.batch();
       for (var i = 0; i < installments; i++) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
         final newPaymentDay =
@@ -355,27 +359,38 @@ class TransactionController extends GetxController {
         final localizedValue = value / installments;
         final localizedValueString =
             localizedValue.toStringAsFixed(2).replaceAll('.', ',');
-        var transactionWithUserId = transaction.copyWith(
-          userId: Get.find<AuthController>().firebaseUser.value?.uid,
-          value: localizedValueString,
-          paymentDay: newPaymentDay,
-          title: 'Parcela ${i + 1}: ${transaction.title}',
-        );
-        FirebaseFirestore.instance.collection('transactions').add(
+        final txData = transaction
+            .copyWith(
+              userId: userId,
+              value: localizedValueString,
+              paymentDay: newPaymentDay,
+              title: 'Parcela ${i + 1}: ${transaction.title}',
+            )
+            .toMap();
+        final docRef =
+            FirebaseFirestore.instance.collection('transactions').doc();
+        batch.set(docRef, txData);
+      }
+      await batch.commit();
+    } else {
+      // Optimistic UI: add locally with a temporary id, rollback on error
+      final String tempId =
+          'local_${DateTime.now().microsecondsSinceEpoch.toString()}';
+      final localTx = transaction.copyWith(id: tempId);
+      _transaction.insert(0, localTx);
+      try {
+        var transactionWithUserId = transaction.copyWith(userId: userId);
+        await FirebaseFirestore.instance.collection('transactions').add(
               transactionWithUserId.toMap(),
             );
+      } catch (e) {
+        _transaction.removeWhere((t) => t.id == tempId);
+        rethrow;
       }
-    } else {
-      var transactionWithUserId = transaction.copyWith(
-        userId: Get.find<AuthController>().firebaseUser.value?.uid,
-      );
-      await FirebaseFirestore.instance.collection('transactions').add(
-            transactionWithUserId.toMap(),
-          );
     }
 
-    // Log analytics event
-    await _analyticsService.logAddTransaction(
+    // Log analytics event (non-blocking)
+    _analyticsService.logAddTransaction(
       type: transaction.type.toString().split('.').last,
       value: value,
       category: transaction.category?.toString(),
@@ -395,15 +410,30 @@ class TransactionController extends GetxController {
         .replaceAll('.', '')
         .replaceAll(',', '.'));
 
-    await FirebaseFirestore.instance
-        .collection('transactions')
-        .doc(transaction.id!)
-        .update(
-          transaction.toMap(),
-        );
+    // Optimistic UI: update locally and rollback on error
+    final int idx = _transaction.indexWhere((t) => t.id == transaction.id);
+    TransactionModel? previous;
+    if (idx != -1) {
+      previous = _transaction[idx];
+      _transaction[idx] = transaction;
+    }
 
-    // Log analytics event
-    await _analyticsService.logUpdateTransaction(
+    try {
+      await FirebaseFirestore.instance
+          .collection('transactions')
+          .doc(transaction.id!)
+          .update(
+            transaction.toMap(),
+          );
+    } catch (e) {
+      if (idx != -1 && previous != null) {
+        _transaction[idx] = previous;
+      }
+      rethrow;
+    }
+
+    // Log analytics event (non-blocking)
+    _analyticsService.logUpdateTransaction(
       type: transaction.type.toString().split('.').last,
       value: value,
     );
@@ -415,12 +445,26 @@ class TransactionController extends GetxController {
     // Find the transaction to get its details for analytics
     final trans = _transaction.firstWhereOrNull((t) => t.id == id);
 
-    await FirebaseFirestore.instance
-        .collection('transactions')
-        .doc(id)
-        .delete();
+    // Optimistic UI: remove locally and rollback on error
+    final removedIndex = _transaction.indexWhere((t) => t.id == id);
+    TransactionModel? removedItem;
+    if (removedIndex != -1) {
+      removedItem = _transaction.removeAt(removedIndex);
+    }
 
-    // Log analytics event
+    try {
+      await FirebaseFirestore.instance
+          .collection('transactions')
+          .doc(id)
+          .delete();
+    } catch (e) {
+      if (removedItem != null) {
+        _transaction.insert(removedIndex, removedItem);
+      }
+      rethrow;
+    }
+
+    // Log analytics event (non-blocking)
     if (trans != null) {
       final value = double.parse(trans.value
           .replaceAll('R\$', '')
@@ -428,7 +472,7 @@ class TransactionController extends GetxController {
           .replaceAll('.', '')
           .replaceAll(',', '.'));
 
-      await _analyticsService.logDeleteTransaction(
+      _analyticsService.logDeleteTransaction(
         type: trans.type.toString().split('.').last,
         value: value,
       );

@@ -78,25 +78,37 @@ class FixedAccountsController extends GetxController {
   Future<void> addFixedAccount(FixedAccountModel fixedAccount) async {
     var fixedAccountWithUserId = fixedAccount.copyWith(
         userId: Get.find<AuthController>().firebaseUser.value?.uid);
-    await FirebaseFirestore.instance.collection('fixedAccounts').add(
-          fixedAccountWithUserId.toMap(),
-        );
 
-    // Log analytics event
+    // UI otimista: inserir localmente e reverter se falhar
+    final String tempId =
+        'local_${DateTime.now().microsecondsSinceEpoch.toString()}';
+    final local = fixedAccountWithUserId.copyWith(id: tempId);
+    _allFixedAccounts.insert(0, local);
+    try {
+      await FirebaseFirestore.instance.collection('fixedAccounts').add(
+            fixedAccountWithUserId.toMap(),
+          );
+    } catch (e) {
+      _allFixedAccounts.removeWhere((a) => a.id == tempId);
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
     final value = double.tryParse(fixedAccount.value
             .split('\$')
             .last
             .replaceAll('.', '')
             .replaceAll(',', '.')) ??
         0.0;
-    await _analyticsService.logAddFixedAccount(
+    _analyticsService.logAddFixedAccount(
       accountName: fixedAccount.title,
       value: value,
       frequency: fixedAccount.frequency ?? 'mensal',
     );
 
     Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
-    await NotificationService().scheduleDueDay(fixedAccountWithUserId);
+    // Reagendar notificação (não bloqueante)
+    NotificationService().scheduleDueDay(fixedAccountWithUserId);
   }
 
   Future<void> updateFixedAccount(FixedAccountModel fixedAccount) async {
@@ -104,42 +116,94 @@ class FixedAccountsController extends GetxController {
       // print(fixedAccount.id);
       throw Exception('Fixed account id is null');
     }
-    await FirebaseFirestore.instance
-        .collection('fixedAccounts')
-        .doc(fixedAccount.id)
-        .update(
-          fixedAccount.toMap(),
-        );
+    // UI otimista com rollback
+    final int idx =
+        _allFixedAccounts.indexWhere((a) => a.id == fixedAccount.id);
+    FixedAccountModel? prev;
+    if (idx != -1) {
+      prev = _allFixedAccounts[idx];
+      _allFixedAccounts[idx] = fixedAccount;
+    }
 
-    // Log analytics event
-    await _analyticsService.logUpdateFixedAccount(fixedAccount.title);
+    try {
+      await FirebaseFirestore.instance
+          .collection('fixedAccounts')
+          .doc(fixedAccount.id)
+          .update(
+            fixedAccount.toMap(),
+          );
+    } catch (e) {
+      if (idx != -1 && prev != null) {
+        _allFixedAccounts[idx] = prev;
+      }
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
+    _analyticsService.logUpdateFixedAccount(fixedAccount.title);
 
     Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');
-    await NotificationService().scheduleDueDay(fixedAccount);
+    // Reagendar notificação (não bloqueante)
+    NotificationService().scheduleDueDay(fixedAccount);
   }
 
   Future<void> disableFixedAccount(String id) async {
-    await FirebaseFirestore.instance
-        .collection('fixedAccounts')
-        .doc(id)
-        .update({
-      'deactivatedAt': DateTime.now().toIso8601String(),
-    });
+    // UI otimista
+    final int idx = _allFixedAccounts.indexWhere((a) => a.id == id);
+    DateTime? prevDate;
+    if (idx != -1) {
+      prevDate = _allFixedAccounts[idx].deactivatedAt;
+      _allFixedAccounts[idx] =
+          _allFixedAccounts[idx].copyWith(deactivatedAt: DateTime.now());
+    }
+    try {
+      await FirebaseFirestore.instance
+          .collection('fixedAccounts')
+          .doc(id)
+          .update({
+        'deactivatedAt': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      if (idx != -1) {
+        _allFixedAccounts[idx] = _allFixedAccounts[idx].copyWith(
+          deactivatedAt: prevDate,
+        );
+      }
+      rethrow;
+    }
     Get.snackbar('Sucesso', 'Conta fixa desabilitada com sucesso');
-    await NotificationService().cancelFor(id);
+    NotificationService().cancelFor(id);
   }
 
   Future<void> reactivateFixedAccount(String id) async {
-    await FirebaseFirestore.instance
-        .collection('fixedAccounts')
-        .doc(id)
-        .update({
-      'deactivatedAt': null,
-    });
+    // UI otimista
+    final int idx = _allFixedAccounts.indexWhere((a) => a.id == id);
+    DateTime? prevDate;
+    if (idx != -1) {
+      prevDate = _allFixedAccounts[idx].deactivatedAt;
+      _allFixedAccounts[idx] = _allFixedAccounts[idx].copyWith(
+        deactivatedAt: null,
+      );
+    }
+    try {
+      await FirebaseFirestore.instance
+          .collection('fixedAccounts')
+          .doc(id)
+          .update({
+        'deactivatedAt': null,
+      });
+    } catch (e) {
+      if (idx != -1) {
+        _allFixedAccounts[idx] = _allFixedAccounts[idx].copyWith(
+          deactivatedAt: prevDate,
+        );
+      }
+      rethrow;
+    }
     Get.snackbar('Sucesso', 'Conta fixa reativada com sucesso');
     final account = _allFixedAccounts.firstWhereOrNull((a) => a.id == id);
     if (account != null) {
-      await NotificationService().scheduleDueDay(account);
+      NotificationService().scheduleDueDay(account);
     }
   }
 
@@ -148,17 +212,31 @@ class FixedAccountsController extends GetxController {
     final accountToDelete =
         _allFixedAccounts.firstWhereOrNull((a) => a.id == id);
 
-    await FirebaseFirestore.instance
-        .collection('fixedAccounts')
-        .doc(id)
-        .delete();
+    // UI otimista com rollback
+    final removedIndex = _allFixedAccounts.indexWhere((a) => a.id == id);
+    FixedAccountModel? removedItem;
+    if (removedIndex != -1) {
+      removedItem = _allFixedAccounts.removeAt(removedIndex);
+    }
 
-    // Log analytics event
+    try {
+      await FirebaseFirestore.instance
+          .collection('fixedAccounts')
+          .doc(id)
+          .delete();
+    } catch (e) {
+      if (removedItem != null) {
+        _allFixedAccounts.insert(removedIndex, removedItem);
+      }
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
     if (accountToDelete != null) {
-      await _analyticsService.logDeleteFixedAccount(accountToDelete.title);
+      _analyticsService.logDeleteFixedAccount(accountToDelete.title);
     }
 
     Get.snackbar('Sucesso', 'Conta fixa removida permanentemente');
-    await NotificationService().cancelFor(id);
+    NotificationService().cancelFor(id);
   }
 }

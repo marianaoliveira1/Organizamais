@@ -32,24 +32,50 @@ class CardController extends GetxController {
   Future<void> addCard(CardsModel card) async {
     var cardWithUserId = card.copyWith(
         userId: Get.find<AuthController>().firebaseUser.value?.uid);
-    await FirebaseFirestore.instance.collection('cards').add(
-          cardWithUserId.toMap(),
-        );
 
-    // Log analytics event
-    await _analyticsService.logAddCard(card.name);
+    // UI otimista com id temporário
+    final String tempId =
+        'local_${DateTime.now().microsecondsSinceEpoch.toString()}';
+    final local = cardWithUserId.copyWith(id: tempId);
+    this.card.insert(0, local);
+    try {
+      await FirebaseFirestore.instance.collection('cards').add(
+            cardWithUserId.toMap(),
+          );
+    } catch (e) {
+      this.card.removeWhere((c) => c.id == tempId);
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
+    _analyticsService.logAddCard(card.name);
 
     Get.snackbar('Sucesso', 'Cartão adicionado com sucesso');
   }
 
   Future<void> updateCard(CardsModel card) async {
     if (card.id == null) return;
-    await FirebaseFirestore.instance.collection('cards').doc(card.id).update(
-          card.toMap(),
-        );
+    // UI otimista com rollback
+    final int idx = this.card.indexWhere((c) => c.id == card.id);
+    CardsModel? prev;
+    if (idx != -1) {
+      prev = this.card[idx];
+      this.card[idx] = card;
+    }
 
-    // Log analytics event
-    await _analyticsService.logUpdateCard(card.name);
+    try {
+      await FirebaseFirestore.instance.collection('cards').doc(card.id).update(
+            card.toMap(),
+          );
+    } catch (e) {
+      if (idx != -1 && prev != null) {
+        this.card[idx] = prev;
+      }
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
+    _analyticsService.logUpdateCard(card.name);
 
     Get.snackbar('Sucesso', 'Cartão atualizado com sucesso');
   }
@@ -58,11 +84,25 @@ class CardController extends GetxController {
     // Get card name for analytics before deletion
     final cardToDelete = card.firstWhereOrNull((c) => c.id == id);
 
-    await FirebaseFirestore.instance.collection('cards').doc(id).delete();
+    // UI otimista com rollback
+    final removedIndex = card.indexWhere((c) => c.id == id);
+    CardsModel? removedItem;
+    if (removedIndex != -1) {
+      removedItem = card.removeAt(removedIndex);
+    }
 
-    // Log analytics event
+    try {
+      await FirebaseFirestore.instance.collection('cards').doc(id).delete();
+    } catch (e) {
+      if (removedItem != null) {
+        card.insert(removedIndex, removedItem);
+      }
+      rethrow;
+    }
+
+    // Log analytics (não bloqueante)
     if (cardToDelete != null) {
-      await _analyticsService.logDeleteCard(cardToDelete.name);
+      _analyticsService.logDeleteCard(cardToDelete.name);
     }
 
     Get.snackbar('Sucesso', 'Cartão removido com sucesso');

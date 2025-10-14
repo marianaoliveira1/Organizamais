@@ -344,7 +344,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
               ),
             ),
 
-            // Lista de transações da categoria expandida
+            // Lista de transações da categoria expandida na pagina de gráfico a parte que clica
             Obx(
               () {
                 if (selectedCategoryId.value != categoryId) {
@@ -526,20 +526,24 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                     selectedMonthName: monthName,
                                   ));
                             },
-                            child: Row(
-                              children: [
-                                Icon(Iconsax.calendar_2,
-                                    size: 14.sp, color: theme.primaryColor),
-                                SizedBox(width: 6.w),
-                                Text(
-                                  'Ver mês atual e anterior',
-                                  style: TextStyle(
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.primaryColor,
-                                  ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                                vertical: 6.h,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: theme.primaryColor.withOpacity(.3)),
+                                borderRadius: BorderRadius.circular(16.r),
+                              ),
+                              child: Text(
+                                'Ver mês atual e anterior',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.primaryColor,
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
@@ -950,7 +954,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     if (comparison.type == PercentageType.newData) {
       explanationText =
-          'Nova categoria: R\$ ${_formatCurrency(currentValue)} (sem dados no mês passado)';
+          'Nova categoria adicionada: R\$ ${_formatCurrency(currentValue)} (sem registros no mês anterior)';
     } else if (comparison.type == PercentageType.neutral) {
       if (isMonthClosed2) {
         explanationText =
@@ -958,7 +962,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             'que no mês anterior: R\$ ${_formatCurrency(currentValue)}';
       } else {
         explanationText =
-            'Mesmo valor: R\$ ${_formatCurrency(currentValue)} (igual ao mês passado, R\$ ${_formatCurrency(previousValue)})';
+            'Mesmo valor neste mês: R\$ ${_formatCurrency(currentValue)} '
+            '(igual ao mês passado, R\$ ${_formatCurrency(previousValue)})';
       }
     } else {
       if (isMonthClosed2) {
@@ -969,14 +974,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         final monthLabel = monthNamePt(selMonth);
         if (currentValue > previousValue) {
           explanationText =
-              'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
-              'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
-              'um gasto maior de R\$ ${_formatCurrency(diff)} (+${pct.abs().toStringAsFixed(1)}%).';
+              'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
+              'um aumento de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
+              '(+${pct.abs().toStringAsFixed(1)}%).';
         } else {
           explanationText =
-              'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
-              'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
-              'um gasto menor de R\$ ${_formatCurrency(diff)} (-${pct.abs().toStringAsFixed(1)}%).';
+              'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
+              'uma redução de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
+              '(-${pct.abs().toStringAsFixed(1)}%).';
         }
       } else {
         final bool isCurrentSelected =
@@ -986,36 +991,39 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             ? 100.0
             : ((currentValue - previousValue) / previousValue) * 100;
         final monthLabel = monthNamePt(selMonth);
+
         if (isCurrentSelected) {
           final sameDayLabel =
               '${previousMonthEnd.day} de ${monthNamePt(previousMonthEnd.month)}';
           if (currentValue > previousValue) {
             explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que aumentou ${pct2.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
+                'No mesmo dia do mês passado ($sameDayLabel), você havia gasto R\$ ${_formatCurrency(previousValue)}. '
+                'Agora, o valor é R\$ ${_formatCurrency(currentValue)}, um aumento de ${pct2.abs().toStringAsFixed(1)}% '
+                '(R\$ ${_formatCurrency(diff)} a mais).';
           } else if (currentValue < previousValue) {
             explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora gastou R\$ ${_formatCurrency(currentValue)}, o que diminuiu ${pct2.abs().toStringAsFixed(1)}% (R\$ ${_formatCurrency(diff)}).';
+                'No mesmo dia do mês passado ($sameDayLabel), você havia gasto R\$ ${_formatCurrency(previousValue)}. '
+                'Agora, o valor é R\$ ${_formatCurrency(currentValue)}, uma redução de ${pct2.abs().toStringAsFixed(1)}% '
+                '(R\$ ${_formatCurrency(diff)} a menos).';
           } else {
             explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel) você gastou R\$ ${_formatCurrency(previousValue)}, e agora gastou o mesmo valor.';
+                'No mesmo dia do mês passado ($sameDayLabel), você gastou R\$ ${_formatCurrency(previousValue)}, '
+                'o mesmo valor que agora.';
           }
         } else {
           if (currentValue > previousValue) {
             explanationText =
-                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
-                'um gasto maior de R\$ ${_formatCurrency(diff)} (+${pct2.abs().toStringAsFixed(1)}%).';
+                'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
+                'um aumento de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
+                '(+${pct2.abs().toStringAsFixed(1)}%).';
           } else if (currentValue < previousValue) {
             explanationText =
-                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, '
-                'um gasto menor de R\$ ${_formatCurrency(diff)} (-${pct2.abs().toStringAsFixed(1)}%).';
+                'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
+                'uma redução de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
+                '(-${pct2.abs().toStringAsFixed(1)}%).';
           } else {
             explanationText =
-                'No mês passado você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'e agora em $monthLabel gastou R\$ ${_formatCurrency(currentValue)}, o mesmo valor.';
+                'Em $monthLabel, seus gastos permaneceram iguais ao mês anterior: R\$ ${_formatCurrency(currentValue)}.';
           }
         }
       }
@@ -1282,25 +1290,34 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         },
                       );
                     },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "📊",
-                          style: TextStyle(
-                            fontSize: 12.sp,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.3)),
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Ver comparação completa',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: DefaultColors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 6.w),
-                        Text(
-                          'Ver comparação completa',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.w600,
+                          SizedBox(width: 6.w),
+                          Icon(
+                            Iconsax.arrow_right_1,
+                            color: DefaultColors.grey,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1378,7 +1395,8 @@ class _CategoryMonthComparePage extends StatelessWidget {
 
     final List<TransactionModel> currentMonth = forRange(
       currentStart,
-      DateTime(now.year, now.month + 1, 0),
+      // Use the end of the selected month, not the current month
+      DateTime(selYear, monthIdx + 2, 0),
     );
     final List<TransactionModel> previousMonth = forRange(
       previousStart,
