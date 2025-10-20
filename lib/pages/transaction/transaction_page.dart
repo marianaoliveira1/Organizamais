@@ -72,11 +72,11 @@ class _TransactionPageState extends State<TransactionPage> {
   Color _getTypeColor(TransactionType type) {
     switch (type) {
       case TransactionType.receita:
-        return Colors.green;
+        return DefaultColors.green;
       case TransactionType.despesa:
-        return Colors.red;
+        return DefaultColors.red;
       case TransactionType.transferencia:
-        return Colors.grey;
+        return DefaultColors.grey;
     }
   }
 
@@ -170,8 +170,8 @@ class _TransactionPageState extends State<TransactionPage> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
               color: _selectedType == TransactionType.receita
-                  ? Colors.green
-                  : Colors.red,
+                  ? DefaultColors.green
+                  : DefaultColors.red,
               child: Column(
                 children: [
                   SizedBox(height: 20.h),

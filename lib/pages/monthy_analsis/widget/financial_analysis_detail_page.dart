@@ -352,15 +352,15 @@ class FinancialAnalysisDetailPage extends StatelessWidget {
         String message;
 
         if (saldoDiff > 0) {
-          cardColor = Colors.green;
+          cardColor = DefaultColors.green;
           icon = Iconsax.arrow_circle_up;
           message = "Melhoria no saldo!";
         } else if (saldoDiff >= -100) {
-          cardColor = Colors.orange;
+          cardColor = DefaultColors.orange;
           icon = Iconsax.arrow_right_2;
           message = "Saldo estável";
         } else {
-          cardColor = Colors.red;
+          cardColor = DefaultColors.red;
           icon = Iconsax.arrow_down_2;
           message = "Atenção ao saldo!";
         }

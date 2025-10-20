@@ -24,6 +24,151 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
     required this.percentual,
   });
 
+  Widget _buildPercentBar(double percent, Color color, ThemeData theme) {
+    final double clamped = percent.clamp(0, 100);
+    final double widthFactor = clamped / 100.0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 12.h,
+          decoration: BoxDecoration(
+            color: theme.primaryColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: FractionallySizedBox(
+              widthFactor: widthFactor,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(999.r),
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          '${clamped.toStringAsFixed(1).replaceAll('.', ',')}%',
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w700,
+            color: theme.primaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMonthlyStats(List<TransactionModel> transactions,
+      ThemeData theme, NumberFormat currencyFormatter) {
+    // Estatísticas por mês (soma mensal), não por transação individual
+    final int currentYear = DateTime.now().year;
+    final Map<int, double> monthSum = {for (int m = 1; m <= 12; m++) m: 0.0};
+    final Set<int> monthsWithData = {};
+    for (final t in transactions) {
+      if (t.paymentDay == null) continue;
+      final dt = DateTime.parse(t.paymentDay!);
+      if (dt.year != currentYear) continue;
+      final double v =
+          double.tryParse(t.value.replaceAll('.', '').replaceAll(',', '.')) ??
+              0.0;
+      monthSum[dt.month] = (monthSum[dt.month] ?? 0.0) + v;
+      monthsWithData.add(dt.month);
+    }
+
+    final List<double> values =
+        monthsWithData.map((m) => monthSum[m] ?? 0.0).toList();
+    double minV = 0.0;
+    double maxV = 0.0;
+    double avg = 0.0;
+    if (values.isNotEmpty) {
+      minV = values.reduce((a, b) => a < b ? a : b);
+      maxV = values.reduce((a, b) => a > b ? a : b);
+      avg = values.reduce((a, b) => a + b) / values.length;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Média Mensal',
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            color: DefaultColors.grey20,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          currencyFormatter.format(avg),
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w700,
+            color: theme.primaryColor,
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Menor Gasto',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: DefaultColors.grey20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    currencyFormatter.format(minV),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: DefaultColors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Maior Gasto',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: DefaultColors.grey20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    currencyFormatter.format(maxV),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: DefaultColors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final NumberFormat currencyFormatter =
@@ -65,7 +210,7 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Análise - $paymentType',
+          paymentType,
           style: TextStyle(fontSize: 18.sp),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -140,20 +285,29 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
                             color: DefaultColors.grey,
                           ),
                         ),
-                        SizedBox(height: 50.h),
-                        // small donut percent (centered)
-                        Center(
-                          child: _DonutPercent(
-                            percent: percentual,
-                            color: paymentColor,
-                          ),
-                        ),
-                        SizedBox(height: 30.h),
+                        SizedBox(height: 12.h),
+                        // progress percent bar instead of donut
+                        _buildPercentBar(percentual, paymentColor, theme),
+                        SizedBox(height: 12.h),
                       ],
                     ),
                   ),
                   SizedBox(height: 24.h),
-
+                  AdsBanner(),
+                  SizedBox(height: 24.h),
+                  // Monthly summary stats (Avg / Min / Max)
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: _buildMonthlyStats(
+                        transactions, theme, currencyFormatter),
+                  ),
+                  SizedBox(height: 24.h),
+                  AdsBanner(),
+                  SizedBox(height: 24.h),
                   // Monthly chart
                   Container(
                     padding: EdgeInsets.all(16.w),
@@ -172,6 +326,9 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
                             color: DefaultColors.grey20,
                           ),
                         ),
+                        SizedBox(height: 16.h),
+                        // Progress bar: this payment type over the year
+
                         SizedBox(height: 16.h),
                         SizedBox(
                           height: 220.h,

@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'insights_forecast_page.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/graphics_page.dart';
@@ -491,24 +492,57 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                       ),
 
                       _buildExpenseOverIncomeLine(categoryId, theme),
-                      SizedBox(height: 6.h),
+                      SizedBox(height: 14.h),
+                      // Insights button
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: theme.primaryColor.withOpacity(.2)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 8.h),
+                            foregroundColor: theme.primaryColor,
+                          ),
+                          onPressed: () async {
+                            try {
+                              await AdsInterstitial.preload();
+                              final shown = await AdsInterstitial.showIfReady();
+                              if (!shown) await AdsInterstitial.show();
+                            } catch (_) {}
+                            Get.to(() => InsightsForecastPage(
+                                  categoryId: categoryId,
+                                  monthName: monthName,
+                                  categoryName: (item['name'] as String? ?? ''),
+                                  categoryColor: categoryColor,
+                                ));
+                          },
+                          icon: Icon(Iconsax.lamp, size: 14.sp),
+                          label: Text('Insights',
+                              style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
 
                       AdsBanner(),
                       SizedBox(
-                        height: 10.h,
+                        height: 16.h,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Transações recentes (${categoryTransactions.length})",
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              color: DefaultColors.grey20,
-                            ),
-                          ),
-                          InkWell(
+                          Text('Transações (${categoryTransactions.length})',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: DefaultColors.grey,
+                                fontWeight: FontWeight.w700,
+                              )),
+                          SizedBox(width: 12.w),
+                          GestureDetector(
                             onTap: () async {
                               try {
                                 await AdsInterstitial.preload();
@@ -528,20 +562,15 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                                vertical: 6.h,
-                              ),
+                                  horizontal: 10.w, vertical: 6.h),
                               decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: theme.primaryColor.withOpacity(.3)),
+                                border: Border.all(color: theme.primaryColor),
                                 borderRadius: BorderRadius.circular(16.r),
                               ),
                               child: Text(
                                 'Ver mês atual e anterior',
                                 style: TextStyle(
                                   fontSize: 10.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.primaryColor,
                                 ),
                               ),
                             ),
@@ -765,12 +794,41 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     final pct = (totalCategoria / totalReceitaMes) * 100.0;
 
-    return Text(
-      'Corresponde a ${pct.toStringAsFixed(1)}% do valor que você recebe no mês.',
-      style: TextStyle(
-        fontSize: 12.sp,
-        color: theme.primaryColor,
-        fontWeight: FontWeight.bold,
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: DefaultColors.grey20.withOpacity(.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Isso corresponde do seu salário mensal',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: DefaultColors.grey,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  '${pct.toStringAsFixed(1).replaceAll('.', ',')}%',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -924,12 +982,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     // Calcular a diferença absoluta em R$ (não mais usada diretamente no texto)
     // final absoluteDifference = (currentValue - previousValue).abs();
 
-    // Criar texto explicativo baseado na comparação real dos valores
-    String explanationText = '';
-
-    // Removido o detalhamento de data específica do mês anterior do texto
-
-    // Texto: mês fechado usa "No mês passado... e agora em {mês}..."; caso contrário, usa comparação por mesmo dia
+    // Utilitários de texto para mês
     String monthNamePt(int m) {
       const ms = [
         'janeiro',
@@ -949,381 +1002,279 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     }
 
     final DateTime now2 = DateTime.now();
-    final bool isMonthClosed2 = (selYear < now2.year) ||
-        (selYear == now2.year && selMonth < now2.month);
 
-    if (comparison.type == PercentageType.newData) {
-      explanationText =
-          'Nova categoria adicionada: R\$ ${_formatCurrency(currentValue)} (sem registros no mês anterior)';
-    } else if (comparison.type == PercentageType.neutral) {
-      if (isMonthClosed2) {
-        explanationText =
-            'Você gastou o mesmo valor em ${monthNamePt(selMonth)} '
-            'que no mês anterior: R\$ ${_formatCurrency(currentValue)}';
-      } else {
-        explanationText =
-            'Mesmo valor neste mês: R\$ ${_formatCurrency(currentValue)} '
-            '(igual ao mês passado, R\$ ${_formatCurrency(previousValue)})';
-      }
-    } else {
-      if (isMonthClosed2) {
-        final diff = (currentValue - previousValue).abs();
-        final pct = previousValue == 0
-            ? 100.0
-            : ((currentValue - previousValue) / previousValue) * 100;
-        final monthLabel = monthNamePt(selMonth);
-        if (currentValue > previousValue) {
-          explanationText =
-              'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
-              'um aumento de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
-              '(+${pct.abs().toStringAsFixed(1)}%).';
-        } else {
-          explanationText =
-              'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
-              'uma redução de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
-              '(-${pct.abs().toStringAsFixed(1)}%).';
-        }
-      } else {
-        final bool isCurrentSelected =
-            (selYear == now2.year && selMonth == now2.month);
-        final diff = (currentValue - previousValue).abs();
-        final pct2 = previousValue == 0
-            ? 100.0
-            : ((currentValue - previousValue) / previousValue) * 100;
-        final monthLabel = monthNamePt(selMonth);
+    // Gradient header like the reference card
+    final sameDayText =
+        '${previousMonthEnd.day} de ${monthNamePt(previousMonthEnd.month)}';
+    final double delta = currentValue - previousValue;
+    final bool isNeutral = delta.abs() < 0.0001;
+    final bool increased = delta > 0;
+    final pctDisp =
+        previousValue == 0 ? 100.0 : (delta / previousValue) * 100.0;
+    final diffAbs = delta.abs();
 
-        if (isCurrentSelected) {
-          final sameDayLabel =
-              '${previousMonthEnd.day} de ${monthNamePt(previousMonthEnd.month)}';
-          if (currentValue > previousValue) {
-            explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel), você havia gasto R\$ ${_formatCurrency(previousValue)}. '
-                'Agora, o valor é R\$ ${_formatCurrency(currentValue)}, um aumento de ${pct2.abs().toStringAsFixed(1)}% '
-                '(R\$ ${_formatCurrency(diff)} a mais).';
-          } else if (currentValue < previousValue) {
-            explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel), você havia gasto R\$ ${_formatCurrency(previousValue)}. '
-                'Agora, o valor é R\$ ${_formatCurrency(currentValue)}, uma redução de ${pct2.abs().toStringAsFixed(1)}% '
-                '(R\$ ${_formatCurrency(diff)} a menos).';
-          } else {
-            explanationText =
-                'No mesmo dia do mês passado ($sameDayLabel), você gastou R\$ ${_formatCurrency(previousValue)}, '
-                'o mesmo valor que agora.';
-          }
-        } else {
-          if (currentValue > previousValue) {
-            explanationText =
-                'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
-                'um aumento de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
-                '(+${pct2.abs().toStringAsFixed(1)}%).';
-          } else if (currentValue < previousValue) {
-            explanationText =
-                'Em $monthLabel, seus gastos foram de R\$ ${_formatCurrency(currentValue)}, '
-                'uma redução de R\$ ${_formatCurrency(diff)} em relação ao mês anterior '
-                '(-${pct2.abs().toStringAsFixed(1)}%).';
-          } else {
-            explanationText =
-                'Em $monthLabel, seus gastos permaneceram iguais ao mês anterior: R\$ ${_formatCurrency(currentValue)}.';
-          }
-        }
-      }
-    }
+    // Status helpers
+    final bool isNewCategory = comparison.type == PercentageType.newData ||
+        (previousValue == 0 && currentValue > 0);
 
-    late final Color circleColor2;
-    // late final IconData dirIcon2; // não utilizado
-    switch (comparison.type) {
-      case PercentageType.positive:
-        circleColor2 = DefaultColors.greenDark;
-        break;
-      case PercentageType.negative:
-        circleColor2 = DefaultColors.redDark;
-        break;
-      case PercentageType.neutral:
-        circleColor2 = DefaultColors.grey;
-        break;
-      case PercentageType.newData:
-        circleColor2 = DefaultColors.grey;
-        break;
-    }
+    // Gradient colors per state
+    final List<Color> gradColors = isNewCategory
+        ? [DefaultColors.grey, DefaultColors.darkGrey]
+        : isNeutral
+            ? [DefaultColors.grey, DefaultColors.darkGrey]
+            : increased
+                ? [DefaultColors.redDark, DefaultColors.red.withOpacity(0.5)]
+                : [
+                    DefaultColors.greenDark,
+                    DefaultColors.green.withOpacity(0.5)
+                  ];
 
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
+    // Header text per state
+// Header text per state
+// Header text per state
+    final String headerText = isNewCategory
+        ? 'Categoria nova adicionada — ainda não há dados para comparar com o mês anterior.'
+        : (isNeutral
+            ? 'Nenhuma variação em relação ao mês anterior.'
+            : 'No mesmo dia do mês passado ($sameDayText), seus gastos eram de R\$ ${_formatCurrency(previousValue)}. '
+                'Atualmente, estão em R\$ ${_formatCurrency(currentValue)}, representando ${increased ? 'um aumento' : 'uma redução'} de ${pctDisp.abs().toStringAsFixed(1)}% '
+                '(R\$ ${_formatCurrency(diffAbs)} ${increased ? 'a mais' : 'a menos'}).');
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradColors,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      padding: EdgeInsets.all(12.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 3.w, color: circleColor2),
-          SizedBox(width: 6.w),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  explanationText,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: circleColor2,
-                    fontWeight: FontWeight.w600,
+          SizedBox(height: 8.h),
+          Text(
+            headerText,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 12.h),
+          // CTA: Ver comparação completa (com rewarded)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: Colors.white30),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r)),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              ),
+              onPressed: () async {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: theme.cardColor,
+                  isScrollControlled: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16.r)),
                   ),
-                  textAlign: TextAlign.start,
-                ),
-                SizedBox(height: 6.h),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                      minimumSize: Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    onPressed: () async {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: theme.cardColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(16.r)),
-                        ),
-                        builder: (ctx) {
-                          bool isLoading = false;
-                          return StatefulBuilder(
-                            builder: (ctx, setState) {
-                              Future<void> handleWatch() async {
-                                if (isLoading) return;
-                                setState(() => isLoading = true);
-                                final ok = await AdsRewardedPremium.show();
-                                setState(() => isLoading = false);
-                                if (ok) {
-                                  Navigator.of(ctx).pop();
-                                  Get.to(() => _SameDayComparePage(
-                                        categoryId: categoryId,
-                                        monthName: monthName,
-                                        categoryName: (categoryName ?? ''),
-                                        categoryIcon: categoryIcon,
-                                        categoryColor: categoryColor,
-                                      ));
-                                }
-                              }
+                  builder: (ctx) {
+                    bool isLoading = false;
+                    return StatefulBuilder(
+                      builder: (ctx, setState) {
+                        Future<void> handleWatch() async {
+                          if (isLoading) return;
+                          setState(() => isLoading = true);
+                          final ok = await AdsRewardedPremium.show();
+                          setState(() => isLoading = false);
+                          if (ok) {
+                            Navigator.of(ctx).pop();
+                            Get.to(() => _CategoryMonthComparePage(
+                                  categoryId: categoryId,
+                                  categoryName: (categoryName ?? ''),
+                                  categoryColor: categoryColor,
+                                  selectedMonthName: monthName,
+                                ));
+                          }
+                        }
 
-                              return Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                    16.w,
-                                    16.h,
-                                    16.w,
-                                    16.h +
-                                        MediaQuery.of(ctx).viewInsets.bottom),
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                        return Container(
+                          padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w,
+                              24.h + MediaQuery.of(ctx).viewInsets.bottom),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 50.w,
+                                    height: 50.h,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          theme.primaryColor.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(24.r),
+                                    ),
+                                    child: Icon(
+                                      Iconsax.lock,
+                                      size: 16.sp,
+                                      color: theme.primaryColor,
+                                    ),
+                                  ), // Título
+
+                                  Column(
                                     children: [
-                                      SizedBox(height: 16.h),
-                                      AdsBanner(),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 16.w, vertical: 18.h),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              width: 50.w,
-                                              height: 50.h,
-                                              decoration: BoxDecoration(
-                                                color: (categoryColor ??
-                                                    theme.primaryColor),
-                                                borderRadius:
-                                                    BorderRadius.circular(12.r),
-                                              ),
-                                              child: Icon(Iconsax.lock,
-                                                  color: Colors.white,
-                                                  size: 22.sp),
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Comparação mensal',
-                                                  style: TextStyle(
-                                                    fontSize: 18.sp,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: theme.primaryColor,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 2.h),
-                                                Text(
-                                                  '(mesmo dia)'.toLowerCase(),
-                                                  style: TextStyle(
-                                                    fontSize: 12.sp,
-                                                    color: theme.primaryColor
-                                                        .withOpacity(.9),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 6.h),
                                       Text(
-                                        'Entenda como seus hábitos financeiros evoluem a cada mês. 🚀',
+                                        'Comparação mensal',
                                         style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16.sp,
                                           color: theme.primaryColor,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
                                       SizedBox(height: 8.h),
                                       Text(
-                                        'Assista a um vídeo rápido e descubra como comparar seus gastos mês a mês para tomar decisões financeiras mais inteligentes',
+                                        '(mesmo dia)',
                                         style: TextStyle(
                                           fontSize: 12.sp,
-                                          color: DefaultColors.grey,
+                                          color: Colors.white70,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      SizedBox(height: 14.h),
-                                      InkWell(
-                                        onTap: isLoading ? null : handleWatch,
-                                        borderRadius:
-                                            BorderRadius.circular(12.r),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w, vertical: 12.h),
-                                          decoration: BoxDecoration(
-                                            color: (categoryColor ??
-                                                theme.primaryColor),
-                                            borderRadius:
-                                                BorderRadius.circular(12.r),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              if (!isLoading)
-                                                Image.asset(
-                                                  'assets/images/video.png',
-                                                  width: 18.w,
-                                                  height: 18.h,
-                                                  errorBuilder: (_, __, ___) =>
-                                                      Icon(
-                                                    Iconsax.play,
-                                                    color: Colors.white,
-                                                    size: 16.sp,
-                                                  ),
-                                                )
-                                              else
-                                                SizedBox(
-                                                  width: 18.w,
-                                                  height: 18.h,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                                Color>(
-                                                            Colors.white),
-                                                  ),
-                                                ),
-                                              SizedBox(width: 10.w),
-                                              Text(
-                                                isLoading
-                                                    ? 'Carregando...'
-                                                    : 'Assistir vídeo (30s)',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(height: 24.h),
+
+                              // Descrição principal
+                              Text(
+                                'Entenda como seus hábitos financeiros evoluem a cada mês. 🚀',
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.3,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 16.h),
+
+                              // Subtítulo
+                              Text(
+                                'Assista a um vídeo rápido e descubra como comparar seus gastos mês a mês para tomar decisões financeiras mais inteligentes',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.white70,
+                                  height: 1.4,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 32.h),
+
+                              // Botão assistir vídeo
+                              InkWell(
+                                onTap: isLoading ? null : handleWatch,
+                                borderRadius: BorderRadius.circular(16.r),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryColor,
+                                    borderRadius: BorderRadius.circular(16.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            theme.primaryColor.withOpacity(0.3),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (!isLoading)
+                                        Icon(Iconsax.play,
+                                            color: theme.primaryColor,
+                                            size: 20.sp)
+                                      else
+                                        SizedBox(
+                                          width: 20.w,
+                                          height: 20.h,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    theme.primaryColor),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(height: 16.h),
-                                      AdsBanner(),
-                                      SizedBox(height: 16.h),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _ModalBullet(
-                                              text:
-                                                  'Compare resultados - Veja como seus gastos evoluem',
-                                              color: const Color(0xFF7C3AED)),
-                                          SizedBox(height: 8.h),
-                                          _ModalBullet(
-                                              text:
-                                                  'Reconheça padrões - Tome controle total do seu dinheiro',
-                                              color: const Color(0xFF0EA5E9)),
-                                          SizedBox(height: 8.h),
-                                          _ModalBullet(
-                                              text:
-                                                  'Economize mais - Descubra onde pode reduzir custos',
-                                              color: const Color(0xFF10B981)),
-                                        ],
-                                      ),
-                                      SizedBox(height: 12.h),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(ctx).pop(),
-                                        child: Text(
-                                          'Agora não',
-                                          style: TextStyle(
-                                            color: DefaultColors.grey,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      SizedBox(width: 12.w),
+                                      Text(
+                                        isLoading
+                                            ? 'Carregando...'
+                                            : 'Assistir vídeo (30s)',
+                                        style: TextStyle(
+                                          color: theme.primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.sp,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 6.h,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: theme.primaryColor.withOpacity(.3)),
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Ver comparação completa',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: DefaultColors.grey,
-                              fontWeight: FontWeight.w600,
-                            ),
+                              ),
+                              SizedBox(height: 32.h),
+
+                              // Benefícios
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _BenefitItem(
+                                    color: Colors.purple,
+                                    title: 'Compare resultados',
+                                    description:
+                                        'Veja como seus gastos evoluem',
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  _BenefitItem(
+                                    color: Colors.blue,
+                                    title: 'Reconheça padrões',
+                                    description:
+                                        'Tome controle total do seu dinheiro',
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  _BenefitItem(
+                                    color: Colors.teal,
+                                    title: 'Economize mais',
+                                    description:
+                                        'Descubra onde pode reduzir custos',
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 6.w),
-                          Icon(
-                            Iconsax.arrow_right_1,
-                            color: DefaultColors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+              icon: Icon(Iconsax.arrow_right_3, size: 14.sp),
+              label: Text('Ver comparação completa',
+                  style:
+                      TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700)),
             ),
           ),
+
+// Widget auxiliar para os benefícios
         ],
       ),
     );
@@ -1333,6 +1284,61 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   String _formatCurrency(double value) {
     final formatter = NumberFormat('#,##0.00', 'pt_BR');
     return formatter.format(value);
+  }
+}
+
+class _BenefitItem extends StatelessWidget {
+  final Color color;
+  final String title;
+  final String description;
+
+  const _BenefitItem({
+    required this.color,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 8.w,
+          height: 8.h,
+          margin: EdgeInsets.only(top: 6.h),
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: Colors.white60,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

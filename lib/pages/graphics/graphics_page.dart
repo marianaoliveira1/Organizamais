@@ -2431,6 +2431,13 @@ class _GraphicsPageState extends State<GraphicsPage>
         totalReceitasMes > 0 ? (currentValue / totalReceitasMes * 100) : 0.0;
     final String monthLabelTitle = getAllMonths()[selMonth - 1];
 
+    // Choose gradient colors based on sideColor (increase/red, decrease/green, neutral/grey)
+    final List<Color> gradColors = sideColor == DefaultColors.redDark
+        ? [DefaultColors.redDark, DefaultColors.red]
+        : (sideColor == DefaultColors.greenDark
+            ? [DefaultColors.greenDark, DefaultColors.green]
+            : [DefaultColors.grey, DefaultColors.darkGrey]);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
       decoration: BoxDecoration(
@@ -2443,42 +2450,64 @@ class _GraphicsPageState extends State<GraphicsPage>
           SizedBox(height: 6.h),
           AdsBanner(),
           SizedBox(height: 8.h),
-          // linha colorida do tamanho do texto + frase
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          // Gradient header card
+          Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: gradColors,
+              ),
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 3.w,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: sideColor,
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: sideColor),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 10.h),
-          Text(
-            'Corresponde a ${percReceita.toStringAsFixed(1)}% da sua receita de $monthLabelTitle',
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              color: theme.primaryColor,
+          SizedBox(height: 16.h),
+          // Salary proportion card
+          Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: DefaultColors.grey20.withOpacity(.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Isso corresponde do seu salário mensal',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: DefaultColors.grey,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  '${percReceita.toStringAsFixed(1).replaceAll('.', ',')}%',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           AdsBanner(),
           SizedBox(height: 8.h),
           Text('Transações recentes (${monthTxs.length})',
