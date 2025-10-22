@@ -66,7 +66,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "Compração entre os meses",
+                      "Comparação entre os meses",
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,

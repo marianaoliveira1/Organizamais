@@ -190,7 +190,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       hintStyle: TextStyle(
                         color: DefaultColors.white,
                         fontWeight: FontWeight.w500,
-                        fontSize: 42.sp,
+                        fontSize: 44.sp,
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide.none,
@@ -201,12 +201,13 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                     style: TextStyle(
                       color: DefaultColors.white,
-                      fontSize: 42.sp,
+                      fontSize: 44.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [CurrencyInputFormatter()],
                   ),
+                  SizedBox(height: 10.h),
                 ],
               ),
             ),

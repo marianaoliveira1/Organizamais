@@ -5,7 +5,9 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'analise_mensal_parcial.dart';
 import 'insights_forecast_page.dart';
+import 'comparison_by_day_page.dart';
 
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/pages/graphics/graphics_page.dart';
@@ -17,6 +19,7 @@ import 'package:organizamais/utils/color.dart';
 import 'package:organizamais/model/transaction_model.dart';
 
 import '../../../ads_banner/ads_banner.dart';
+import 'two_months_comparison_page.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class WidgetListCategoryGraphics extends StatelessWidget {
@@ -430,7 +433,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                               Text(
                                 currencyFormatter.format(valor),
                                 style: TextStyle(
-                                  fontSize: 26.sp,
+                                  fontSize: 28.sp,
                                   fontWeight: FontWeight.w700,
                                   color: theme.primaryColor,
                                 ),
@@ -438,11 +441,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                               Text(
                                 'de ${currencyFormatter.format(b)}',
                                 style: TextStyle(
-                                  fontSize: 12.sp,
+                                  fontSize: 14.sp,
                                   color: DefaultColors.grey,
                                 ),
                               ),
-                              SizedBox(height: 6.h),
                             ],
                           );
                         }),
@@ -469,7 +471,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   ? 'Você ultrapassou seu valor de gasto mensal em R\$ ${currencyFormatter.format(remaining.abs())}.'
                                   : 'Sua meta mensal é de R\$ ${currencyFormatter.format(budget)} e faltam R\$ ${currencyFormatter.format(remaining)} para chegar ao total.',
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                                 color: exceeded
                                     ? DefaultColors.redDark
@@ -479,6 +481,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           );
                         }),
                       ],
+                      SizedBox(
+                        height: 10.h,
+                      ),
+
                       _buildCategoryMonthComparison(
                         context,
                         categoryId,
@@ -552,11 +558,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   await AdsInterstitial.show();
                                 }
                               } catch (_) {}
-                              Get.to(() => _CategoryMonthComparePage(
+                              Get.to(() => TwoMonthsComparisonPage(
                                     categoryId: categoryId,
-                                    categoryName:
-                                        (item['name'] as String? ?? ''),
-                                    categoryColor: categoryColor,
+                                    title: (item['name'] as String? ?? ''),
+                                    iconPath: item['icon'] as String?,
                                     selectedMonthName: monthName,
                                   ));
                             },
@@ -722,16 +727,39 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
       if (monthName.isNotEmpty) {
         final parts = monthName.split('/');
-        final String targetMonthName = parts.isNotEmpty ? parts[0] : monthName;
+        final String rawMonth = parts.isNotEmpty ? parts[0].trim() : monthName;
         final int targetYear = parts.length == 2
-            ? int.tryParse(parts[1]) ?? DateTime.now().year
+            ? int.tryParse(parts[1].trim()) ?? DateTime.now().year
             : DateTime.now().year;
+        String normalizeMonthNameLocal(String name) {
+          final months = getAllMonths();
+          final map = {
+            'jan': 'Janeiro',
+            'fev': 'Fevereiro',
+            'mar': 'Março',
+            'abr': 'Abril',
+            'mai': 'Maio',
+            'jun': 'Junho',
+            'jul': 'Julho',
+            'ago': 'Agosto',
+            'set': 'Setembro',
+            'out': 'Outubro',
+            'nov': 'Novembro',
+            'dez': 'Dezembro',
+          };
+          final lower = name.trim().toLowerCase();
+          for (final m in months) {
+            if (m.toLowerCase() == lower) return m;
+          }
+          return map[lower] ?? name;
+        }
+
+        final String targetMonthName = normalizeMonthNameLocal(rawMonth);
+        final int targetMonthIdx = getAllMonths().indexOf(targetMonthName) + 1;
         return despesas.where((transaction) {
           if (transaction.paymentDay == null) return false;
           DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
-          String transactionMonthName =
-              getAllMonths()[transactionDate.month - 1];
-          return transactionMonthName == targetMonthName &&
+          return transactionDate.month == targetMonthIdx &&
               transactionDate.year == targetYear;
         }).toList();
       }
@@ -765,22 +793,46 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     // Receita total do mês selecionado
     double totalReceitaMes = 0.0;
+    final parts = monthName.split('/');
+    final String rawMonth = parts.isNotEmpty ? parts[0].trim() : monthName;
+    final int selYear = parts.length == 2
+        ? int.tryParse(parts[1].trim()) ?? DateTime.now().year
+        : DateTime.now().year;
+    String normalizeMonthNameLocal(String name) {
+      final months = getAllMonths();
+      final map = {
+        'jan': 'Janeiro',
+        'fev': 'Fevereiro',
+        'mar': 'Março',
+        'abr': 'Abril',
+        'mai': 'Maio',
+        'jun': 'Junho',
+        'jul': 'Julho',
+        'ago': 'Agosto',
+        'set': 'Setembro',
+        'out': 'Outubro',
+        'nov': 'Novembro',
+        'dez': 'Dezembro',
+      };
+      final lower = name.trim().toLowerCase();
+      for (final m in months) {
+        if (m.toLowerCase() == lower) return m;
+      }
+      return map[lower] ?? name;
+    }
+
+    final String selMonthName = normalizeMonthNameLocal(rawMonth);
+    final int selMonthIdx = getAllMonths().indexOf(selMonthName) + 1;
     for (final t in controller.transaction) {
       if (t.paymentDay == null) continue;
       if (t.type != TransactionType.receita) continue;
       final d = DateTime.parse(t.paymentDay!);
-      final parts = monthName.split('/');
-      final String selMonthName = parts.isNotEmpty ? parts[0] : monthName;
-      final int selYear = parts.length == 2
-          ? int.tryParse(parts[1]) ?? DateTime.now().year
-          : DateTime.now().year;
-      final String mName = getAllMonths()[d.month - 1];
-      if (mName != selMonthName || d.year != selYear) continue;
+      if (d.year != selYear || d.month != selMonthIdx) continue;
       totalReceitaMes +=
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
     }
 
-    if (totalReceitaMes <= 0) return const SizedBox.shrink();
+    // Não esconda se não houver receita; mostre 0%
 
     // Despesa total da categoria no mês selecionado
     double totalCategoria = 0.0;
@@ -792,7 +844,8 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
     if (totalCategoria <= 0) return const SizedBox.shrink();
 
-    final pct = (totalCategoria / totalReceitaMes) * 100.0;
+    final pct =
+        totalReceitaMes > 0 ? (totalCategoria / totalReceitaMes) * 100.0 : 0.0;
 
     return Container(
       padding: EdgeInsets.all(14.w),
@@ -811,7 +864,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                 Text(
                   'Isso corresponde do seu salário mensal',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 12.sp,
                     color: DefaultColors.grey,
                     fontWeight: FontWeight.w700,
                   ),
@@ -820,7 +873,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                 Text(
                   '${pct.toStringAsFixed(1).replaceAll('.', ',')}%',
                   style: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: 14.sp,
                     color: theme.primaryColor,
                     fontWeight: FontWeight.w800,
                   ),
@@ -1023,22 +1076,22 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         : isNeutral
             ? [DefaultColors.grey, DefaultColors.darkGrey]
             : increased
-                ? [DefaultColors.redDark, DefaultColors.red.withOpacity(0.5)]
+                ? [DefaultColors.red.withOpacity(0.5), DefaultColors.redDark]
                 : [
-                    DefaultColors.greenDark,
-                    DefaultColors.green.withOpacity(0.5)
+                    DefaultColors.green.withOpacity(0.5),
+                    DefaultColors.greenDark
                   ];
 
     // Header text per state
 // Header text per state
 // Header text per state
     final String headerText = isNewCategory
-        ? 'Categoria nova adicionada — ainda não há dados para comparar com o mês anterior.'
+        ? 'É uma categoria nova e, por isso, ainda não temos dados para comparação com o mês anterior.'
         : (isNeutral
-            ? 'Nenhuma variação em relação ao mês anterior.'
-            : 'No mesmo dia do mês passado ($sameDayText), seus gastos eram de R\$ ${_formatCurrency(previousValue)}. '
-                'Atualmente, estão em R\$ ${_formatCurrency(currentValue)}, representando ${increased ? 'um aumento' : 'uma redução'} de ${pctDisp.abs().toStringAsFixed(1)}% '
-                '(R\$ ${_formatCurrency(diffAbs)} ${increased ? 'a mais' : 'a menos'}).');
+            ? 'Sem variação: Seus valores permaneceram estáveis, registrando 0% de mudança em relação ao mês passado.'
+            : 'Seus gastos ${increased ? 'aumentaram' : 'diminuíram'} em ${pctDisp.abs().toStringAsFixed(1)}% '
+                '(${increased ? 'R\$ ${_formatCurrency(diffAbs)} a mais' : 'R\$ ${_formatCurrency(diffAbs)} a menos'}). '
+                'No mês passado o valor era R\$ ${_formatCurrency(previousValue)}, e agora está em R\$ ${_formatCurrency(currentValue)}.');
 
     return Container(
       decoration: BoxDecoration(
@@ -1058,7 +1111,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
             headerText,
             style: TextStyle(
                 color: Colors.white,
-                fontSize: 13.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 12.h),
@@ -1093,13 +1146,17 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           setState(() => isLoading = false);
                           if (ok) {
                             Navigator.of(ctx).pop();
-                            Get.to(() => _CategoryMonthComparePage(
-                                  categoryId: categoryId,
-                                  categoryName: (categoryName ?? ''),
-                                  categoryColor: categoryColor,
-                                  selectedMonthName: monthName,
-                                ));
+                            Get.to(
+                                () => Get.to(() => AnaliseMensalParcialWidget(
+                                      categoryId: categoryId,
+                                      categoryName: (categoryName ?? ''),
+                                      categoryIcon: categoryIcon,
+                                      categoryColor: categoryColor,
+                                      selectedMonthName: monthName,
+                                    )));
                           }
+
+                          // }
                         }
 
                         return Container(
@@ -1117,16 +1174,20 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color:
                                           theme.primaryColor.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(24.r),
+                                      borderRadius: BorderRadius.circular(12.r),
                                     ),
                                     child: Icon(
                                       Iconsax.lock,
-                                      size: 16.sp,
+                                      size: 20.sp,
                                       color: theme.primaryColor,
                                     ),
                                   ), // Título
-
+                                  SizedBox(
+                                    width: 20.w,
+                                  ),
                                   Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Comparação mensal',
@@ -1158,21 +1219,21 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                               Text(
                                 'Entenda como seus hábitos financeiros evoluem a cada mês. 🚀',
                                 style: TextStyle(
-                                  fontSize: 18.sp,
-                                  color: Colors.white,
+                                  fontSize: 14.sp,
+                                  color: theme.primaryColor,
                                   fontWeight: FontWeight.bold,
                                   height: 1.3,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 16.h),
+                              SizedBox(height: 14.h),
 
                               // Subtítulo
                               Text(
                                 'Assista a um vídeo rápido e descubra como comparar seus gastos mês a mês para tomar decisões financeiras mais inteligentes',
                                 style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.white70,
+                                  fontSize: 12.sp,
+                                  color: theme.primaryColor.withOpacity(.7),
                                   height: 1.4,
                                 ),
                                 textAlign: TextAlign.center,
@@ -1185,18 +1246,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16.r),
                                 child: Container(
                                   width: double.infinity,
-                                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                                  padding: EdgeInsets.symmetric(vertical: 14.h),
                                   decoration: BoxDecoration(
                                     color: theme.primaryColor,
                                     borderRadius: BorderRadius.circular(16.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            theme.primaryColor.withOpacity(0.3),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1206,6 +1259,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                             color: theme.primaryColor,
                                             size: 20.sp)
                                       else
+                                        // ignore: dead_code
                                         SizedBox(
                                           width: 20.w,
                                           height: 20.h,
@@ -1219,12 +1273,13 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       SizedBox(width: 12.w),
                                       Text(
                                         isLoading
+                                            // ignore: dead_code
                                             ? 'Carregando...'
                                             : 'Assistir vídeo (30s)',
                                         style: TextStyle(
-                                          color: theme.primaryColor,
+                                          color: theme.cardColor,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16.sp,
+                                          fontSize: 14.sp,
                                         ),
                                       ),
                                     ],
@@ -1267,10 +1322,17 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   },
                 );
               },
-              icon: Icon(Iconsax.arrow_right_3, size: 14.sp),
+              icon: Icon(
+                Iconsax.arrow_right_3,
+                size: 14.sp,
+                color: DefaultColors.white,
+              ),
               label: Text('Ver comparação completa',
-                  style:
-                      TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700)),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: DefaultColors.white,
+                  )),
             ),
           ),
 
@@ -1315,26 +1377,27 @@ class _BenefitItem extends StatelessWidget {
         ),
         SizedBox(width: 12.w),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: "$title - ",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Colors.white60,
+                TextSpan(
+                  text: description,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.white60,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            softWrap: true,
           ),
         ),
       ],
@@ -1775,17 +1838,6 @@ class _SameDayComparePage extends StatelessWidget {
             SizedBox(height: 20.h),
             Container(
               padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    (categoryColor ?? theme.primaryColor),
-                    (categoryColor ?? theme.primaryColor).withOpacity(0.80),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
               child: Row(
                 children: [
                   Container(

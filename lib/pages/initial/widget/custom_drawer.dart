@@ -12,6 +12,7 @@ import '../pages/monthly_expenses.dart';
 import 'logout_button.dart';
 import 'logout_confirmation_dialog.dart';
 import 'setting_item.dart';
+import '../pages/premium_page.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -69,6 +70,12 @@ class CustomDrawer extends StatelessWidget {
               onTap: () => Get.to(() => const MonthlyExpenses()),
             ),
             _buildDivider(),
+            // SettingItem(
+            //   icon: Iconsax.crown,
+            //   title: 'Seja Premium',
+            //   onTap: () => Get.to(() => const PremiumPage()),
+            // ),
+            // _buildDivider(),
             SettingItem(
               icon: Iconsax.message,
               title: 'Fale conosco',

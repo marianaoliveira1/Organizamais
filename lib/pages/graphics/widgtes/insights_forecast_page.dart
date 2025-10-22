@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
@@ -145,6 +146,8 @@ class InsightsForecastPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            AdsBanner(),
+            SizedBox(height: 16.h),
             // Headline numbers
             Row(
               children: [
@@ -170,6 +173,8 @@ class InsightsForecastPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.h),
+            AdsBanner(),
+            SizedBox(height: 16.h),
             Row(
               children: [
                 Expanded(
@@ -196,6 +201,9 @@ class InsightsForecastPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.h),
+            SizedBox(height: 12.h),
+            AdsBanner(),
+            SizedBox(height: 16.h),
             _metricCard(
               theme: theme,
               label: 'Total até agora',
@@ -223,8 +231,10 @@ class InsightsForecastPage extends StatelessWidget {
                 ),
               ),
             ),
+
+            SizedBox(height: 12.h),
+            AdsBanner(),
             SizedBox(height: 16.h),
-            // Trend chart
             SizedBox(
               height: 220.h,
               child: SfCartesianChart(
@@ -260,8 +270,9 @@ class InsightsForecastPage extends StatelessWidget {
                 ],
               ),
             ),
+            SizedBox(height: 12.h),
+            AdsBanner(),
             SizedBox(height: 16.h),
-            // Explanation blocks
             _infoBox(
               theme: theme,
               color: const Color(0xFF7C3AED),
@@ -277,6 +288,9 @@ class InsightsForecastPage extends StatelessWidget {
               body:
                   'Some o que já gastou neste mês (${currency.format(spentSoFar)}), calcule a média diária (${currency.format(dailyAvg)}), multiplique pelos dias restantes ($remainingDays), e ajuste +/−15% para ter um intervalo realista.',
             ),
+            SizedBox(height: 12.h),
+            AdsBanner(),
+            SizedBox(height: 16.h),
           ],
         ),
       ),

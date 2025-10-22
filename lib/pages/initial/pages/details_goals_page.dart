@@ -12,7 +12,6 @@ import '../../transaction/pages/category_page.dart';
 import 'add_goal_page.dart';
 import '../../../widgetes/currency_ipunt_formated.dart';
 import '../../../utils/color.dart';
-import '../../../routes/route.dart';
 
 class GoalDetailsPage extends StatelessWidget {
   final GoalModel initialGoal;
@@ -124,7 +123,12 @@ class GoalDetailsPage extends StatelessWidget {
               );
               if (confirmed == true) {
                 await goalController.deleteGoal(initialGoal.id!);
-                Get.offAllNamed(Routes.INITIAL);
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
               }
             },
           ),

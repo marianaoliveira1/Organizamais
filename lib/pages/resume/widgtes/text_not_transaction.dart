@@ -10,6 +10,7 @@ class DefaultTextNotTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -17,7 +18,7 @@ class DefaultTextNotTransaction extends StatelessWidget {
         Text(
           "Nenhum lançamento no período",
           style: TextStyle(
-            color: DefaultColors.black,
+            color: theme.primaryColor,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),

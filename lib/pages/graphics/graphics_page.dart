@@ -117,6 +117,51 @@ class _GraphicsPageState extends State<GraphicsPage>
   // Flags para animação de entrada única
   static bool _didEntranceAnimateOnce = false;
   bool _shouldPlayEntrance = false;
+  int _classificationVersion = 0; // força rebuild do gráfico de classificações
+  Map<int, String> _classificationOverrides = {};
+  Map<String, String> _classificationOverridesByName = {};
+
+  Future<void> _reloadClassificationOverrides() async {
+    try {
+      final user = Get.find<AuthController>().firebaseUser.value;
+      Map<int, String> map = {};
+      Map<String, String> byName = {};
+      if (user != null) {
+        final snap = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('categoryClassifications')
+            .get();
+        for (final d in snap.docs) {
+          final doc = d.data();
+          final int id =
+              int.tryParse(d.id) ?? (doc['categoryId'] as int? ?? -1);
+          final String group = (doc['group'] as String? ?? '').toLowerCase();
+          if (id >= 0 &&
+              (group == 'fixas' || group == 'variaveis' || group == 'extras')) {
+            map[id] = group;
+            final info = findCategoryById(id);
+            final String? name = (info != null ? info['name'] as String? : null)
+                ?.trim()
+                .toLowerCase();
+            if (name != null && name.isNotEmpty) byName[name] = group;
+          }
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _classificationOverrides = map;
+        _classificationOverridesByName = byName;
+        _classificationVersion++;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _classificationVersion++;
+      });
+    }
+  }
+
   bool _entranceVisible = false;
   int _scrollRetries = 0;
   bool _didIntroScroll = false;
@@ -125,6 +170,8 @@ class _GraphicsPageState extends State<GraphicsPage>
   void initState() {
     super.initState();
     _monthScrollController = ScrollController();
+    // Precarrega overrides ao abrir a página (se usuário logado)
+    _reloadClassificationOverrides();
     // Preload an interstitial ad early to improve show rate
     try {
       AdsInterstitial.preload();
@@ -622,20 +669,33 @@ class _GraphicsPageState extends State<GraphicsPage>
           title: 'Fixas x Variáveis x Extras',
           icon: Iconsax.category,
           onTap: () async {
-            final changed = await Navigator.of(context).push<bool>(
+            await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                   builder: (_) => const CategoryTypeSelectionPage()),
             );
-            if (changed == true && mounted) {
-              setState(() {});
-            }
+            if (!mounted) return;
+            await _reloadClassificationOverrides();
+          },
+          onIconTap: () async {
+            await Navigator.of(context).push<bool>(
+              MaterialPageRoute(
+                  builder: (_) => const CategoryTypeSelectionPage()),
+            );
+            if (!mounted) return;
+            await _reloadClassificationOverrides();
           },
           backgroundColor: theme.cardColor,
           content: _entranceWrap(
-            _buildEssentialsVsNonEssentialsChart(
-              theme,
-              transactionController,
-              currencyFormatter,
+            KeyedSubtree(
+              key: ValueKey(_classificationVersion),
+              child: _buildEssentialsVsNonEssentialsChart(
+                theme,
+                transactionController,
+                currencyFormatter,
+                overrides: _classificationOverrides,
+                overridesByName: _classificationOverridesByName,
+                fromStream: true,
+              ),
             ),
           ),
         ),
@@ -835,6 +895,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       TransactionController transactionController,
       NumberFormat currencyFormatter,
       {Map<int, String> overrides = const {},
+      Map<String, String> overridesByName = const {},
       bool fromStream = false}) {
     // Carrega classificações do Firestore e reconstrói reativamente
     if (!fromStream) {
@@ -848,6 +909,7 @@ class _GraphicsPageState extends State<GraphicsPage>
               .snapshots(),
           builder: (context, snapshot) {
             final Map<int, String> map = {};
+            final Map<String, String> byName = {};
             if (snapshot.hasData) {
               for (final d in snapshot.data!.docs) {
                 final doc = d.data();
@@ -860,6 +922,12 @@ class _GraphicsPageState extends State<GraphicsPage>
                         group == 'variaveis' ||
                         group == 'extras')) {
                   map[id] = group;
+                  final info = findCategoryById(id);
+                  final String? name =
+                      (info != null ? info['name'] as String? : null)
+                          ?.trim()
+                          .toLowerCase();
+                  if (name != null && name.isNotEmpty) byName[name] = group;
                 }
               }
             }
@@ -868,6 +936,7 @@ class _GraphicsPageState extends State<GraphicsPage>
               transactionController,
               currencyFormatter,
               overrides: map,
+              overridesByName: byName,
               fromStream: true,
             );
           },
@@ -990,7 +1059,15 @@ class _GraphicsPageState extends State<GraphicsPage>
           categoryId != null ? findCategoryById(categoryId) : null;
       final String? categoryName =
           category != null ? category['name'] as String? : null;
-      final group = overrides[categoryId ?? -1] ?? classify(categoryName);
+      final String? normalizedName =
+          categoryName != null ? categoryName.trim().toLowerCase() : null;
+      final int? resolvedId = (category != null
+              ? (category['id'] is int ? category['id'] as int : null)
+              : null) ??
+          categoryId;
+      final group = overrides[resolvedId ?? -1] ??
+          (normalizedName != null ? overridesByName[normalizedName] : null) ??
+          classify(categoryName);
       if (group == 'fixas') {
         fixedTotal += value;
         if (categoryName != null) usedFixedCategoryNames.add(categoryName);
@@ -1961,50 +2038,130 @@ class _GraphicsPageState extends State<GraphicsPage>
       TransactionController transactionController,
       NumberFormat currencyFormatter,
       DateFormat dateFormatter) {
-    Color colorFor(String paymentType) {
-      switch (paymentType.toLowerCase()) {
-        case 'crédito':
+    Color pickBaseColorFor(String paymentType) {
+      String canonical = paymentType.trim().toLowerCase();
+      canonical = canonical.replaceAll(RegExp(r'\s+'), ' ');
+      Color distinctHslColor(String key) {
+        int h = 0;
+        for (final c in key.codeUnits) {
+          h = (h * 131 + c) & 0x7fffffff;
+        }
+        double hue = (h % 360).toDouble();
+        double sat = 0.72;
+        double light = 0.54;
+        final List<Color> reserved = [
+          DefaultColors.deepPurple,
+          DefaultColors.darkBlue,
+          DefaultColors.orangeDark,
+          DefaultColors.graphite,
+          DefaultColors.brown,
+          DefaultColors.blueGrey,
+          DefaultColors.gold,
+          DefaultColors.lime,
+          DefaultColors.turquoise,
+          DefaultColors.slateGrey,
+          DefaultColors.hotPink,
+        ];
+        final List<double> reservedHues = reserved
+            .map((c) => HSLColor.fromColor(c).hue)
+            .toList(growable: false);
+        double delta(double a, double b) {
+          final d = (a - b).abs();
+          return d > 180 ? 360 - d : d;
+        }
+
+        int attempts = 0;
+        while (attempts < 36 && reservedHues.any((rh) => delta(hue, rh) < 12)) {
+          hue = (hue + 17) % 360;
+          attempts++;
+        }
+        // Verdes próximos ao PIX ficam mais claros para diferenciar
+        if (hue >= 90 && hue <= 150) {
+          sat = 0.55;
+          light = 0.68;
+        }
+        return HSLColor.fromAHSL(1.0, hue, sat, light).toColor();
+      }
+
+      if (canonical.contains('cartão') || canonical.contains('cartao')) {
+        // Regras específicas por nome de cartão (bancos principais)
+        final n = canonical;
+        if (n.contains('nubank')) return DefaultColors.deepPurple; // roxo
+        if (n.contains('inter')) return DefaultColors.orangeDark; // laranja
+        if (n.contains('santander')) return Colors.redAccent; // vermelho
+        if (n.contains('bradesco')) return DefaultColors.hotPink; // rosa
+        if (n.contains('banco do brasil') || n.contains('bb'))
+          return Colors.amber; // amarelo
+        if (n.contains('caixa')) return DefaultColors.darkBlue; // azul
+
+        // Demais cartões: paleta pastel estável
+        final cardPalette = <Color>[
+          DefaultColors.pastelPurple,
+          DefaultColors.pastelOrange,
+          DefaultColors.pastelPink,
+          DefaultColors.pastelTeal,
+          DefaultColors.pastelCyan,
+          DefaultColors.lavender,
+          DefaultColors.peach,
+          DefaultColors.mint,
+          DefaultColors.salmon,
+          DefaultColors.lightBlue,
+        ];
+        int h = 0;
+        for (final c in paymentType.codeUnits) {
+          h = (h * 131 + c) & 0x7fffffff;
+        }
+        return cardPalette[h % cardPalette.length];
+      }
+      // Normalizações e sinônimos
+      if (canonical.contains('cartão') || canonical.contains('cartao')) {
+        canonical = 'cartao';
+      } else if (canonical.contains('crédito') ||
+          canonical.contains('credito')) {
+        canonical = 'credito';
+      } else if (canonical.contains('débito') || canonical.contains('debito')) {
+        canonical = 'debito';
+      } else if (canonical.contains('transferência') ||
+          canonical.contains('transferencia')) {
+        canonical = 'transferencia';
+      } else if (canonical.contains('vale refe')) {
+        canonical = 'vale_refeicao';
+      } else if (canonical == 'vr' || canonical == 'vale-refeicao') {
+        canonical = 'vale_refeicao';
+      } else if (canonical == 'ted' ||
+          canonical.contains('transferência eletrônica')) {
+        canonical = 'ted';
+      }
+
+      switch (canonical) {
+        case 'cartao':
+          return DefaultColors.deepPurple; // Cartão genérico
         case 'credito':
           return DefaultColors.deepPurple;
-        case 'débito':
         case 'debito':
           return DefaultColors.darkBlue;
         case 'dinheiro':
           return DefaultColors.orangeDark;
         case 'pix':
-          return DefaultColors.greenDark;
+          return DefaultColors.greenDark; // mantém verde forte só para PIX
         case 'boleto':
           return DefaultColors.brown;
-        case 'transferência':
         case 'transferencia':
           return DefaultColors.blueGrey;
         case 'cheque':
           return DefaultColors.gold;
         case 'vale':
-          return DefaultColors.lime;
+          return DefaultColors.pastelLime;
+        case 'vale_refeicao':
+          return DefaultColors.pastelLime; // Vale Refeição mais claro
+        case 'ted':
+          return DefaultColors.turquoise; // TED (azul-esverdeado)
         case 'criptomoeda':
           return DefaultColors.slateGrey;
         case 'cupom':
-          return DefaultColors.hotPink;
+          return DefaultColors.pastelPink;
         default:
-          final fallback = [
-            DefaultColors.pastelBlue,
-            DefaultColors.pastelGreen,
-            DefaultColors.pastelPurple,
-            DefaultColors.pastelOrange,
-            DefaultColors.pastelPink,
-            DefaultColors.pastelTeal,
-            DefaultColors.pastelCyan,
-            DefaultColors.pastelLime,
-            DefaultColors.lavender,
-            DefaultColors.peach,
-            DefaultColors.mint,
-            DefaultColors.plum,
-            DefaultColors.turquoise,
-            DefaultColors.salmon,
-            DefaultColors.lightBlue,
-          ];
-          return fallback[paymentType.hashCode.abs() % fallback.length];
+          return distinctHslColor(canonical);
       }
     }
 
@@ -2017,11 +2174,43 @@ class _GraphicsPageState extends State<GraphicsPage>
       byType[key] = (byType[key] ?? 0) +
           double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
     }
+    // Garante distinção de cores por rótulo atual
+    final labels = byType.keys.toList();
+    final Map<String, Color> baseColors = {
+      for (final k in labels) k: pickBaseColorFor(k),
+    };
+    // Ajuste simples para distanciar matizes vizinhos
+    final List<String> order = baseColors.keys.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final Map<String, Color> distinctColors = {};
+    final List<double> usedHues = [];
+    double hueOf(Color c) => HSLColor.fromColor(c).hue;
+    double satOf(Color c) => HSLColor.fromColor(c).saturation;
+    double lightOf(Color c) => HSLColor.fromColor(c).lightness;
+    double deltaHue(double a, double b) {
+      final d = (a - b).abs();
+      return d > 180 ? 360 - d : d;
+    }
+
+    for (final k in order) {
+      final Color bc = baseColors[k]!;
+      double h = hueOf(bc);
+      final double s = satOf(bc);
+      final double l = lightOf(bc);
+      int attempts = 0;
+      while (attempts < 36 && usedHues.any((u) => deltaHue(h, u) < 18)) {
+        h = (h + 23) % 360;
+        attempts++;
+      }
+      usedHues.add(h);
+      distinctColors[k] = HSLColor.fromAHSL(1.0, h, s, l).toColor();
+    }
+
     final data = byType.entries
         .map((e) => {
               'paymentType': e.key,
               'value': e.value,
-              'color': colorFor(e.key),
+              'color': distinctColors[e.key]!,
             })
         .toList()
       ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
@@ -2429,7 +2618,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
     final double percReceita =
         totalReceitasMes > 0 ? (currentValue / totalReceitasMes * 100) : 0.0;
-    final String monthLabelTitle = getAllMonths()[selMonth - 1];
+    // removed unused monthLabelTitle
 
     // Choose gradient colors based on sideColor (increase/red, decrease/green, neutral/grey)
     final List<Color> gradColors = sideColor == DefaultColors.redDark
@@ -2490,7 +2679,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 Text(
                   'Isso corresponde do seu salário mensal',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 12.sp,
                     color: DefaultColors.grey,
                     fontWeight: FontWeight.w700,
                   ),
@@ -2499,7 +2688,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 Text(
                   '${percReceita.toStringAsFixed(1).replaceAll('.', ',')}%',
                   style: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: 14.sp,
                     color: theme.primaryColor,
                     fontWeight: FontWeight.w800,
                   ),
