@@ -33,12 +33,22 @@ class TransactionsList extends StatelessWidget {
         );
       }
 
-      // Ordena as transações da mais recente para a mais antiga
-      final sortedTransactions = transactionController.transaction.toList()
+      // Usa helper para incluir contas fixas no mês selecionado
+      final parts = selectedMonth.value.split('/');
+      final String monthName =
+          parts.isNotEmpty ? parts[0] : selectedMonth.value;
+      final int year = parts.length == 2
+          ? int.tryParse(parts[1]) ?? DateTime.now().year
+          : DateTime.now().year;
+      final List<String> months = ResumeContent.getAllMonths();
+      final int month = months.indexOf(monthName) + 1;
+
+      final monthTransactions = transactionController.getTransactionsForMonth(
+          year, month)
         ..sort((a, b) => DateTime.parse(b.paymentDay!)
             .compareTo(DateTime.parse(a.paymentDay!)));
 
-      final groupedTransactions = _groupTransactionsByDate(sortedTransactions);
+      final groupedTransactions = _groupTransactionsByDate(monthTransactions);
 
       return ListView.builder(
         shrinkWrap: true,

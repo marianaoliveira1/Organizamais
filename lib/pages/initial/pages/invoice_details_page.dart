@@ -171,7 +171,9 @@ class InvoiceDetailsPage extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(
+              height: 10.h,
+            ),
             Text(
               "Transações",
               style: TextStyle(

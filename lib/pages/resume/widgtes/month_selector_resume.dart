@@ -30,9 +30,8 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
   final Map<int, GlobalKey> _itemKeys = {};
 
   List<String> _buildMonthYearOptions() {
-    final now = DateTime.now();
-    final int currentYear = now.year;
-    final int nextYear = now.year + 1;
+    // Lista fixa solicitada: 2025 a 2030
+    final List<int> years = [2025, 2026, 2027, 2028, 2029, 2030];
     const List<String> months = [
       'Janeiro',
       'Fevereiro',
@@ -48,11 +47,10 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
       'Dezembro'
     ];
     final List<String> result = [];
-    for (final m in months) {
-      result.add('$m/$currentYear');
-    }
-    for (final m in months) {
-      result.add('$m/$nextYear');
+    for (final y in years) {
+      for (final m in months) {
+        result.add('$m/$y');
+      }
     }
     return result;
   }

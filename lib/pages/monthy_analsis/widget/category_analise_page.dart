@@ -413,10 +413,7 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
               );
             },
           ),
-          AdsBanner(),
-          SizedBox(
-            height: 20.h,
-          ),
+
           // Dicas Personalizadas
           // Container(
           //   padding: EdgeInsets.all(16.w),
@@ -869,6 +866,7 @@ class CategoryAnalysisPage extends StatelessWidget {
                   // Card com média mensal
                   _buildMonthlyAverageCard(context, theme),
                   SizedBox(height: 24.h),
+
                   AdsBanner(),
                   SizedBox(height: 24.h),
 

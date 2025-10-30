@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -207,6 +208,11 @@ class _AddCardPageState extends State<AddCardPage> {
                 ),
               ),
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+                DayRangeFormatter(max: 31),
+              ],
             ),
             SizedBox(height: 10.h),
             DefaultTitleTransaction(title: "Paga no dia"),
@@ -243,6 +249,11 @@ class _AddCardPageState extends State<AddCardPage> {
                 ),
               ),
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+                DayRangeFormatter(max: 31),
+              ],
             ),
             SizedBox(height: 16.h),
             InkWell(
@@ -396,6 +407,42 @@ class _AddCardPageState extends State<AddCardPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Formata entrada numérica para restringir o valor máximo por dígitos.
+class DayRangeFormatter extends TextInputFormatter {
+  final int max;
+  const DayRangeFormatter({this.max = 31});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+    if (text.isEmpty) return newValue;
+
+    // Mantém apenas dígitos (já garantido pelo Filtering, mas por segurança)
+    final digits = text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) {
+      return const TextEditingValue(
+          text: '', selection: TextSelection.collapsed(offset: 0));
+    }
+
+    int value = int.tryParse(digits) ?? 0;
+    if (value == 0) {
+      // Evita 00/0
+      return const TextEditingValue(
+          text: '', selection: TextSelection.collapsed(offset: 0));
+    }
+    if (value > max) value = max;
+
+    final textOut = value.toString();
+    return TextEditingValue(
+      text: textOut,
+      selection: TextSelection.collapsed(offset: textOut.length),
     );
   }
 }

@@ -49,16 +49,14 @@ List<String> getAllMonths() {
 }
 
 List<String> _buildMonthYearOptions() {
-  final now = DateTime.now();
-  final int currentYear = now.year;
-  final int nextYear = now.year + 1;
+  // Lista fixa solicitada: 2025 a 2030
+  final List<int> years = [2025, 2026, 2027, 2028, 2029, 2030];
   final months = getAllMonths();
   final List<String> result = [];
-  for (final m in months) {
-    result.add('$m/$currentYear');
-  }
-  for (final m in months) {
-    result.add('$m/$nextYear');
+  for (final y in years) {
+    for (final m in months) {
+      result.add('$m/$y');
+    }
   }
   return result;
 }
@@ -601,9 +599,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           _buildLineChart(
               theme, transactionController, currencyFormatter, dayFormatter),
         ),
-        AdsBanner(),
-        SizedBox(height: 20.h),
-        // Pie Chart - Despesas por categoria (InfoCard)
+
         InfoCard(
           title: 'Despesas por categoria',
           icon: Iconsax.category,
@@ -699,8 +695,6 @@ class _GraphicsPageState extends State<GraphicsPage>
             ),
           ),
         ),
-        SizedBox(height: 20.h),
-        AdsBanner(),
         SizedBox(height: 20.h),
 
         // Balanço de troca de gastos (InfoCard)
@@ -804,8 +798,6 @@ class _GraphicsPageState extends State<GraphicsPage>
         ),
         SizedBox(height: 20.h),
 
-        AdsBanner(),
-        SizedBox(height: 20.h),
         // Relatório Semanal (InfoCard)
         InfoCard(
           title: 'Relatório Semanal',
@@ -853,11 +845,10 @@ class _GraphicsPageState extends State<GraphicsPage>
           ),
         ),
         SizedBox(height: 20.h),
-        // Por tipo de pagamento (InfoCard)
+
         AdsBanner(),
-        SizedBox(
-          height: 20.h,
-        ),
+        SizedBox(height: 24.h),
+
         InfoCard(
           title: 'Por tipo de pagamento',
           onTap: () {},
@@ -871,10 +862,8 @@ class _GraphicsPageState extends State<GraphicsPage>
             ),
           ),
         ),
-        SizedBox(height: 20.h),
 
-        AdsBanner(),
-        SizedBox(height: 20.h),
+        SizedBox(height: 24.h),
 
         // Receita x Despesa (%) (InfoCard)
         InfoCard(
@@ -885,7 +874,11 @@ class _GraphicsPageState extends State<GraphicsPage>
             GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
           ),
         ),
-        SizedBox(height: 20.h),
+
+        SizedBox(height: 24.h),
+
+        AdsBanner(),
+        SizedBox(height: 24.h),
       ],
     );
   }
@@ -1255,16 +1248,16 @@ class _GraphicsPageState extends State<GraphicsPage>
         ? int.tryParse(parts[1]) ?? DateTime.now().year
         : DateTime.now().year;
 
+    final int monthIndex = getAllMonths().indexOf(monthName) + 1;
     final String cacheKey = '$monthName/$year';
     final cached = _cacheFilteredDespesasByMonth[cacheKey];
     if (cached != null) return cached;
 
-    final despesas = transactionController.transaction
-        .where((e) => e.type == TransactionType.despesa && e.paymentDay != null)
-        .where((t) {
-      final d = DateTime.parse(t.paymentDay!);
-      return getAllMonths()[d.month - 1] == monthName && d.year == year;
-    }).toList(growable: false);
+    // Usa o novo helper para incluir contas fixas do mês selecionado
+    final despesas = transactionController.getTransactionsForMonth(
+        year, monthIndex, type: TransactionType.despesa)
+      ..sort((a, b) => DateTime.parse(a.paymentDay!)
+          .compareTo(DateTime.parse(b.paymentDay!)));
 
     _cacheFilteredDespesasByMonth[cacheKey] = despesas;
     return despesas;

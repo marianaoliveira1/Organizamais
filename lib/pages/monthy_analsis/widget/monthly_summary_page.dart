@@ -292,43 +292,59 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
               ],
             ),
             SizedBox(
-              height: 10.h,
+              height: 16.h,
             ),
-            AdsBanner(),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 14.w),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Saldo (linha superior)
+                  Row(
+                    children: [
+                      _metricPill(
+                        theme,
+                        label: 'Saldo',
+                        value: saldo,
+                        color: saldo >= 0
+                            ? DefaultColors.greenDark
+                            : DefaultColors.redDark,
+                        currency: currency,
+                        valueFontSize: 16,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  // Receitas e Despesas (linha inferior)
+                  Row(
+                    children: [
+                      _metricPill(
+                        theme,
+                        label: 'Receitas',
+                        value: receitas,
+                        color: DefaultColors.greenDark,
+                        currency: currency,
+                      ),
+                      SizedBox(width: 8.w),
+                      _metricPill(
+                        theme,
+                        label: 'Despesas',
+                        value: despesas,
+                        color: DefaultColors.redDark,
+                        currency: currency,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             SizedBox(
-              height: 10.h,
+              height: 16.h,
             ),
-            Row(
-              children: [
-                _metricPill(theme,
-                    label: 'Saldo',
-                    value: saldo,
-                    color: saldo >= 0
-                        ? DefaultColors.greenDark
-                        : DefaultColors.redDark,
-                    currency: currency),
-                SizedBox(width: 8.w),
-                _metricPill(theme,
-                    label: 'Receitas',
-                    value: receitas,
-                    color: DefaultColors.greenDark,
-                    currency: currency),
-                SizedBox(width: 8.w),
-                _metricPill(theme,
-                    label: 'Despesas',
-                    value: despesas,
-                    color: theme.primaryColor,
-                    currency: currency),
-              ],
-            ),
-            SizedBox(
-              height: 10.h,
-            ),
-            AdsBanner(),
-            SizedBox(
-              height: 10.h,
-            ),
-            SizedBox(height: 8.h),
             if (peakDayMessage != null) ...[
               Container(
                 padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
@@ -339,14 +355,14 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                 child: Row(
                   children: [
                     Icon(Icons.insights,
-                        size: 16.sp,
+                        size: 18.sp,
                         color: theme.primaryColor.withOpacity(0.7)),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
                         peakDayMessage,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 13.sp,
                           color: theme.primaryColor,
                           fontWeight: FontWeight.w500,
                         ),
@@ -357,10 +373,6 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
               ),
               SizedBox(height: 8.h),
             ],
-            SizedBox(
-              height: 10.h,
-            ),
-            AdsBanner(),
             SizedBox(
               height: 10.h,
             ),
@@ -475,10 +487,6 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
             SizedBox(
               height: 10.h,
             ),
-            AdsBanner(),
-            SizedBox(
-              height: 10.h,
-            ),
             Text('Parcelas do mês (${parcelas.length})',
                 style: TextStyle(
                     color: theme.primaryColor,
@@ -560,10 +568,6 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
                 },
               ),
             ],
-            AdsBanner(),
-            SizedBox(
-              height: 10.h,
-            ),
             if (payData.isNotEmpty) ...[
               Text('Por tipo de pagamento',
                   style: TextStyle(
@@ -648,10 +652,7 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
               SizedBox(
                 height: 10.h,
               ),
-              AdsBanner(),
-              SizedBox(
-                height: 10.h,
-              ),
+
               // Contas fixas do mês
               Builder(builder: (context) {
                 final fixedList = txs
@@ -748,28 +749,24 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
       {required String label,
       required double value,
       required Color color,
-      required NumberFormat currency}) {
+      required NumberFormat currency,
+      double valueFontSize = 18}) {
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: color.withOpacity(.15)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
-            SizedBox(height: 2.h),
-            Text(currency.format(value),
-                style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w700,
-                    color: color)),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: TextStyle(fontSize: 12.sp, color: DefaultColors.grey)),
+          SizedBox(height: 4.h),
+          Text(
+            currency.format(value),
+            style: TextStyle(
+              fontSize: valueFontSize.sp,
+              fontWeight: FontWeight.w800,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

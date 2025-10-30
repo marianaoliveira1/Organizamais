@@ -751,8 +751,6 @@ class GoalDetailsPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10.h),
-                    AdsBanner(),
-                    SizedBox(height: 10.h),
                   ],
                 );
               },
@@ -864,6 +862,10 @@ class GoalDetailsPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  AdsBanner(),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                   Text(
                     'Adicionar valor',
                     style: TextStyle(

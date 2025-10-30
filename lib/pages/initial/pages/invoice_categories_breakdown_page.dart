@@ -110,7 +110,7 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Categorias do cartão'),
+        title: Text(cardName),
         backgroundColor: theme.scaffoldBackgroundColor,
       ),
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -122,44 +122,20 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
             children: [
               AdsBanner(),
               SizedBox(height: 12.h),
-              // Cabeçalho (ícone do cartão + nome)
-              Row(
-                children: [
-                  _CardLogo(cardName: cardName),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          cardName,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                            color: theme.primaryColor,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
 
-              SizedBox(height: 20.h),
               // Bloco informativo ANTES do gráfico
               Builder(builder: (context) {
                 final double diff = total - prevTotal;
                 final bool increased = diff > 0;
                 final String verb = increased
-                    ? 'aumentou'
-                    : (diff < 0 ? 'diminuiu' : 'manteve');
+                    ? 'um aumento'
+                    : (diff < 0 ? 'uma redução' : 'manutenção');
                 final Color color = diff > 0
                     ? DefaultColors.redDark
                     : (diff < 0 ? DefaultColors.greenDark : DefaultColors.grey);
                 final String prevMonthName =
                     DateFormat('MMMM', 'pt_BR').format(prevMonthStart);
+
                 return Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
@@ -167,7 +143,9 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
-                    'No mês anterior você gastou ${currency.format(prevTotal)}, e neste mês foram ${currency.format(total)}; houve $verb de ${currency.format(diff.abs())}.',
+                    diff == 0
+                        ? 'Seus gastos se mantiveram iguais em relação a $prevMonthName.'
+                        : 'No mês passado, você gastou ${currency.format(prevTotal)}, e neste mês o total foi de ${currency.format(total)} — representando $verb de ${currency.format(diff.abs())}.',
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -178,9 +156,6 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
                 );
               }),
 
-              SizedBox(height: 20.h),
-
-              AdsBanner(),
               SizedBox(height: 20.h),
               Container(
                 padding: EdgeInsets.all(14.w),
@@ -235,8 +210,6 @@ class InvoiceCategoriesBreakdownPage extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
 
-              AdsBanner(),
-              SizedBox(height: 20.h),
               // Lista de categorias
               ListView.separated(
                 shrinkWrap: true,

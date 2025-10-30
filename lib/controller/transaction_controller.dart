@@ -26,11 +26,10 @@ class TransactionController extends GetxController {
     for (final e in fixedAccountsController.allFixedAccounts) {
       final frequency = e.frequency ?? 'mensal';
       if (frequency == 'semanal') {
-        // Generate weekly entries within a tighter window (~1 year past/future)
+        // Gera lançamentos semanais de ~2 anos para trás até dez/2030
         final int weekday = (e.weeklyWeekday ?? 1).clamp(1, 7);
-        // from 1 year ago to 1 year ahead
-        final DateTime start = DateTime(today.year - 1, today.month, today.day);
-        final DateTime end = DateTime(today.year + 1, today.month, today.day);
+        final DateTime start = DateTime(today.year - 2, 1, 1);
+        final DateTime end = DateTime(2030, 12, 31);
         // Find first occurrence on/after start matching weekday
         DateTime cursor = start;
         while (cursor.weekday != weekday) {
@@ -62,9 +61,9 @@ class TransactionController extends GetxController {
           cursor = cursor.add(const Duration(days: 7));
         }
       } else {
-        // mensal or quinzenal handled monthly over a narrower window
-        // limit to ~24 months around current month to improve performance
-        for (var i = -12; i <= 12; i++) {
+        // Mensal/quinzenal/bimestral/trimestral: amplia para até Dez/2030
+        final int monthsForward = (2030 - today.year) * 12 + (12 - today.month);
+        for (var i = -12; i <= monthsForward; i++) {
           final transactionMonth = today.month + i;
           final transactionYear = today.year +
               (transactionMonth > 12
@@ -147,6 +146,115 @@ class TransactionController extends GetxController {
 
   // Exposição reativa para rebuilds em UI que precisam reagir a alterações de transações
   RxList<TransactionModel> get transactionRx => _transaction;
+
+  // Retorna transações (incluindo contas fixas geradas) para um mês/ano específicos
+  List<TransactionModel> getTransactionsForMonth(int year, int month,
+      {TransactionType? type}) {
+    final DateTime start = DateTime(year, month, 1);
+    final DateTime end = DateTime(year, month + 1, 0, 23, 59, 59);
+
+    // 1) Transações reais do Firestore no intervalo
+    final List<TransactionModel> real = _transaction.where((t) {
+      if (t.paymentDay == null) return false;
+      try {
+        final d = DateTime.parse(t.paymentDay!);
+        return (d.isAfter(start.subtract(const Duration(seconds: 1))) &&
+            d.isBefore(end.add(const Duration(seconds: 1))) &&
+            (type == null || t.type == type));
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+
+    // 2) Contas fixas geradas apenas para o mês/ano solicitados
+    final List<TransactionModel> fixed = <TransactionModel>[];
+    for (final e in fixedAccountsController.allFixedAccounts) {
+      final String freq = e.frequency ?? 'mensal';
+
+      bool isAfterStartDate(DateTime d) {
+        if (e.startMonth != null && e.startYear != null) {
+          final startDate = DateTime(e.startYear!, e.startMonth!, 1);
+          return !d.isBefore(startDate);
+        }
+        return true;
+      }
+
+      bool isBeforeDeactivation(DateTime d) {
+        if (e.deactivatedAt == null) return true;
+        return !e.deactivatedAt!.isBefore(d);
+      }
+
+      if (freq == 'semanal') {
+        final int weekday = (e.weeklyWeekday ?? 1).clamp(1, 7);
+        DateTime cursor = start;
+        // avança até o weekday desejado
+        while (cursor.weekday != weekday) {
+          cursor = cursor.add(const Duration(days: 1));
+          if (cursor.isAfter(end)) break;
+        }
+        while (!cursor.isAfter(end)) {
+          if (isAfterStartDate(cursor) && isBeforeDeactivation(cursor)) {
+            fixed.add(TransactionModel(
+              id: e.id,
+              value: e.value.split('\$').last,
+              type: TransactionType.despesa,
+              paymentDay: cursor.toString(),
+              title: "Conta fixa: ${e.title}",
+              paymentType: e.paymentType,
+              category: e.category,
+            ));
+          }
+          cursor = cursor.add(const Duration(days: 7));
+        }
+      } else {
+        final int lastDay = DateTime(year, month + 1, 0).day;
+        List<int> days;
+        if (freq == 'quinzenal' &&
+            e.biweeklyDays != null &&
+            e.biweeklyDays!.length >= 2) {
+          days = e.biweeklyDays!;
+        } else {
+          days = [int.tryParse(e.paymentDay) ?? 1];
+        }
+
+        bool shouldGenerateForInterval() {
+          if (freq == 'bimestral' || freq == 'trimestral') {
+            final int startRefMonth = e.startMonth ?? month;
+            final int startRefYear = e.startYear ?? year;
+            final int diff =
+                ((year - startRefYear) * 12) + (month - startRefMonth);
+            return diff >= 0 &&
+                (freq == 'bimestral' ? diff % 2 == 0 : diff % 3 == 0);
+          }
+          return true; // mensal/quinzenal
+        }
+
+        if (!shouldGenerateForInterval()) continue;
+
+        for (final d in days) {
+          final int day = d.clamp(1, 31);
+          final int effectiveDay = day <= lastDay ? day : lastDay;
+          final DateTime date = DateTime(year, month, effectiveDay);
+          if (!isAfterStartDate(date) || !isBeforeDeactivation(date)) continue;
+          fixed.add(TransactionModel(
+            id: e.id,
+            value: e.value.split('\$').last,
+            type: TransactionType.despesa,
+            paymentDay: date.toString(),
+            title: "Conta fixa: ${e.title}",
+            paymentType: e.paymentType,
+            category: e.category,
+          ));
+        }
+      }
+    }
+
+    final all = [...real, ...fixed];
+    if (type != null) {
+      return all.where((t) => t.type == type).toList();
+    }
+    return all;
+  }
 
   get isFirstDay {
     final today = DateTime.now();

@@ -153,8 +153,6 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
                 ],
               ),
               SizedBox(height: 20.h),
-              AdsBanner(),
-              SizedBox(height: 20.h),
               Text(
                 'Resumo geral',
                 style: TextStyle(
@@ -165,8 +163,6 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
               ),
               SizedBox(height: 8.h),
               _buildSummaryCards(theme, data),
-              SizedBox(height: 20.h),
-              AdsBanner(),
               SizedBox(height: 20.h),
               Text(
                 'Distribuição dos gastos',

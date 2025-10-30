@@ -140,7 +140,6 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
                 // SizedBox(height: 16.h),
                 _buildHighlightsCard(theme, data),
                 SizedBox(height: 16.h),
-                AdsBanner(),
               ],
             ),
           ),

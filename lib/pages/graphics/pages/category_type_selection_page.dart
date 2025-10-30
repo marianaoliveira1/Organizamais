@@ -134,10 +134,6 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                     onChanged: (v) => setState(() => _query = v),
                   ),
                 ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                AdsBanner(),
                 Expanded(
                   child: ListView.separated(
                     itemCount: filtered.length,
@@ -186,7 +182,6 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                 SizedBox(
                   height: 10.h,
                 ),
-                AdsBanner(),
                 SafeArea(
                   child: Padding(
                     padding: EdgeInsets.all(12.w),
@@ -216,10 +211,6 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                     ),
                   ),
                 ),
-                AdsBanner(),
-                SizedBox(
-                  height: 6.h,
-                )
               ],
             ),
     );

@@ -8,6 +8,7 @@ import 'package:organizamais/utils/color.dart';
 
 import '../../../ads_banner/ads_banner.dart';
 import '../../../model/transaction_model.dart';
+import '../../../controller/transaction_controller.dart';
 
 final List<Map<String, dynamic>> categories_expenses = [
   // ========== MORADIA E CASA ==========
@@ -995,6 +996,8 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final TransactionController transactionController =
+        Get.find<TransactionController>();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -1050,6 +1053,10 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
           ),
           // Macrocategorias chips
+          SizedBox(
+            height: 10.h,
+          ),
+
           Container(
             height: 50.h,
             margin: EdgeInsets.symmetric(vertical: 6.h),
@@ -1057,34 +1064,6 @@ class _CategoryPageState extends State<CategoryPage> {
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               children: [
-                // "Todas" chip
-                // Container(
-                //   margin: EdgeInsets.only(right: 8.w),
-                //   child: FilterChip(
-                //     label: Text(
-                //       'Todas',
-                //       style: TextStyle(
-                //         fontSize: 12.sp,
-                //         fontWeight: FontWeight.w500,
-                //         color: selectedMacrocategoria == null
-                //           ? Colors.white
-                //           : theme.primaryColor,
-                //       ),
-                //     ),
-                //     selected: selectedMacrocategoria == null,
-                //     onSelected: (selected) {
-                //       _selectMacrocategoria(null);
-                //     },
-                //     backgroundColor: theme.cardColor,
-                //     selectedColor: theme.primaryColor,
-                //     side: BorderSide(
-                //       color: selectedMacrocategoria == null
-                //         ? theme.primaryColor
-                //         : theme.primaryColor.withOpacity(0.3),
-                //     ),
-                //   ),
-                // ),
-                // Macrocategorias chips
                 ...macrocategorias.map((macrocategoria) => Container(
                       margin: EdgeInsets.only(right: 8.w),
                       child: FilterChip(
@@ -1133,13 +1112,17 @@ class _CategoryPageState extends State<CategoryPage> {
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
                       final category = filteredCategories[index];
+                      final int categoryId = (category['id'] as int);
+                      final TransactionType currentType =
+                          widget.transactionType ?? TransactionType.despesa;
+
                       return Container(
                         margin: EdgeInsets.only(
-                          bottom: 10.h,
+                          bottom: 12.h,
                         ),
                         padding: EdgeInsets.symmetric(
-                          vertical: 6.h,
-                          horizontal: 6.w,
+                          vertical: 4.h,
+                          horizontal: 4.w,
                         ),
                         decoration: BoxDecoration(
                           color: theme.cardColor,
@@ -1149,22 +1132,57 @@ class _CategoryPageState extends State<CategoryPage> {
                         ),
                         child: ListTile(
                           leading: CircleAvatar(
+                            radius: 26.r,
                             backgroundColor: DefaultColors.grey.withOpacity(
                               .1,
                             ),
                             child: Image.asset(
                               category['icon'],
-                              height: 20.h,
+                              height: 24.h,
                             ),
                           ),
                           title: Text(
                             category['name'],
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                               color: theme.primaryColor,
                             ),
                           ),
+                          subtitle: Obx(() {
+                            // Rebuild when Firestore transactions change
+                            transactionController.transactionRx;
+
+                            final DateTime now = DateTime.now();
+                            final DateTime todayOnly =
+                                DateTime(now.year, now.month, now.day);
+
+                            // Usa a lista combinada (inclui contas fixas geradas)
+                            final int count =
+                                transactionController.transaction.where((t) {
+                              if (t.category != categoryId ||
+                                  t.type != currentType) {
+                                return false;
+                              }
+                              if (t.paymentDay == null) return true;
+                              try {
+                                final d = DateTime.parse(t.paymentDay!);
+                                final dOnly = DateTime(d.year, d.month, d.day);
+                                return dOnly.isBefore(todayOnly) ||
+                                    dOnly.isAtSameMomentAs(todayOnly);
+                              } catch (_) {
+                                return false;
+                              }
+                            }).length;
+
+                            return Text(
+                              '$count transação${count == 1 ? '' : 's'}',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: theme.hintColor,
+                              ),
+                            );
+                          }),
                           onTap: () {
                             Get.back(
                               result: category['id'],
