@@ -61,7 +61,7 @@ class PercentageExplanationDialog extends StatelessWidget {
         children: [
           AdsBanner(),
           SizedBox(
-            height: 20.h,
+            height: 10.h,
           ),
           // Indicador visual
           Container(
@@ -101,7 +101,7 @@ class PercentageExplanationDialog extends StatelessWidget {
             _getExplanation(),
             style: TextStyle(
               color: theme.primaryColor,
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               height: 1.4,
             ),
           ),
@@ -190,7 +190,7 @@ class PercentageExplanationDialog extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 6.h),
 
           // Nota explicativa
           Container(
@@ -205,7 +205,7 @@ class PercentageExplanationDialog extends StatelessWidget {
                 Icon(
                   Icons.info_outline,
                   color: DefaultColors.grey,
-                  size: 16.sp,
+                  size: 14.sp,
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
@@ -213,7 +213,7 @@ class PercentageExplanationDialog extends StatelessWidget {
                     _getNote(),
                     style: TextStyle(
                       color: DefaultColors.grey,
-                      fontSize: 11.sp,
+                      fontSize: 10.sp,
                     ),
                   ),
                 ),
@@ -229,7 +229,7 @@ class PercentageExplanationDialog extends StatelessWidget {
             'Ok',
             style: TextStyle(
               color: theme.primaryColor,
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w600,
             ),
           ),

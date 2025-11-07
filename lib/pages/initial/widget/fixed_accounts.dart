@@ -478,8 +478,8 @@ class FixedAccounts extends StatelessWidget {
           FixedAccountUtils.formatCurrency(totalValue.toString()),
           style: TextStyle(
             color: theme.primaryColor,
-            fontWeight: FontWeight.w500,
-            fontSize: 11.sp,
+            fontWeight: FontWeight.bold,
+            fontSize: 12.sp,
           ),
         ),
       );

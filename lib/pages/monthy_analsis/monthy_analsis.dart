@@ -152,311 +152,6 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
     return total;
   }
 
-  Widget _buildMonthlyAnalysisSection(
-      ThemeData theme, TransactionController controller) {
-    final currency =
-        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
-    final txs = _filterMonth(controller.transaction);
-    final receitas = _sumByType(txs, TransactionType.receita);
-    final despesas = _sumByType(txs, TransactionType.despesa);
-    final saldo = receitas - despesas;
-
-    // Categorias (despesa) do mês
-    final categorias = <int, double>{};
-    for (final t in txs.where(
-        (t) => t.type == TransactionType.despesa && t.category != null)) {
-      final id = t.category!;
-      final v = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-      categorias[id] = (categorias[id] ?? 0.0) + v;
-    }
-    final catData = categorias.entries
-        .map((e) => {
-              'category': e.key,
-              'value': e.value,
-              'name': findCategoryById(e.key)?['name'],
-              'color': findCategoryById(e.key)?['color'],
-            })
-        .toList()
-      ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
-    final totalCat =
-        catData.fold<double>(0.0, (s, m) => s + (m['value'] as double));
-
-    // Parcelas do mês
-    final parcelas = txs.where((t) => t.title.contains('Parcela')).toList();
-    final totalParcelas = parcelas.fold<double>(
-        0.0,
-        (s, p) =>
-            s + double.parse(p.value.replaceAll('.', '').replaceAll(',', '.')));
-
-    // Por tipo de pagamento (despesa)
-    final byType = <String, double>{};
-    for (final t in txs.where((t) => t.type == TransactionType.despesa)) {
-      final key = (t.paymentType ?? 'Outros').trim();
-      final val =
-          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-      byType[key] = (byType[key] ?? 0.0) + val;
-    }
-    final payData = byType.entries
-        .map((e) => {
-              'paymentType': e.key,
-              'value': e.value,
-              'color': _getPaymentTypeColor(e.key),
-            })
-        .toList()
-      ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
-    final payTotal =
-        payData.fold<double>(0.0, (s, m) => s + (m['value'] as double));
-
-    return InfoCard(
-      title: 'Análise Mensal',
-      icon: Iconsax.calendar_1,
-      onTap: () {},
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border:
-                        Border.all(color: theme.primaryColor.withOpacity(.25)),
-                  ),
-                  child: DropdownButton<int>(
-                    isExpanded: true,
-                    value: _selectedMonth,
-                    underline: const SizedBox.shrink(),
-                    items: List.generate(
-                        12,
-                        (i) => DropdownMenuItem<int>(
-                              value: i + 1,
-                              child: Text(_monthsPt[i],
-                                  style: TextStyle(
-                                      color: theme.primaryColor,
-                                      fontSize: 12.sp)),
-                            )),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _selectedMonth = v);
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  border:
-                      Border.all(color: theme.primaryColor.withOpacity(.25)),
-                ),
-                child: Text('$_selectedYear',
-                    style: TextStyle(
-                        color: theme.primaryColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600)),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              _metricPill(theme,
-                  label: 'Saldo',
-                  value: saldo,
-                  color: saldo >= 0
-                      ? DefaultColors.greenDark
-                      : DefaultColors.redDark,
-                  currency: currency),
-              SizedBox(width: 8.w),
-              _metricPill(theme,
-                  label: 'Receitas',
-                  value: receitas,
-                  color: DefaultColors.greenDark,
-                  currency: currency),
-              SizedBox(width: 8.w),
-              _metricPill(theme,
-                  label: 'Despesas',
-                  value: despesas,
-                  color: theme.primaryColor,
-                  currency: currency),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          // Categorias (pizza)
-          if (catData.isNotEmpty) ...[
-            Text('Por categoria',
-                style: TextStyle(
-                    color: theme.primaryColor,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600)),
-            SizedBox(height: 8.h),
-            SizedBox(
-              height: 180.h,
-              child: SfCircularChart(
-                margin: EdgeInsets.zero,
-                legend: const Legend(isVisible: false),
-                series: <CircularSeries<Map<String, dynamic>, String>>[
-                  PieSeries<Map<String, dynamic>, String>(
-                    dataSource: catData,
-                    xValueMapper: (e, _) => (e['name'] as String? ?? ''),
-                    yValueMapper: (e, _) => (e['value'] as double),
-                    pointColorMapper: (e, _) =>
-                        (e['color'] as Color?) ??
-                        theme.primaryColor.withOpacity(.3),
-                    dataLabelSettings:
-                        const DataLabelSettings(isVisible: false),
-                    dataLabelMapper: (e, _) {
-                      final v = (e['value'] as double);
-                      final pct = totalCat > 0 ? (v / totalCat) * 100 : 0;
-                      return '${(e['name'] as String? ?? '')}\n${pct.toStringAsFixed(0)}%';
-                    },
-                    explode: true,
-                    explodeIndex: 0,
-                    explodeOffset: '8%',
-                    sortingOrder: SortingOrder.descending,
-                    sortFieldValueMapper: (e, _) => (e['value'] as double),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 12.h),
-          ] else ...[
-            Text('Sem despesas categorizadas neste mês',
-                style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
-            SizedBox(height: 12.h),
-          ],
-
-          // Parcelas
-          Text('Parcelas do mês (${parcelas.length})',
-              style: TextStyle(
-                  color: theme.primaryColor,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600)),
-          SizedBox(height: 6.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(parcelas.isEmpty ? 'Nenhuma parcela' : 'Total',
-                  style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
-              Text(currency.format(totalParcelas),
-                  style: TextStyle(
-                      color: theme.primaryColor,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600)),
-            ],
-          ),
-          SizedBox(height: 16.h),
-
-          // Depósitos em metas financeiras
-          FutureBuilder<double>(
-            future: _fetchGoalDepositsForMonth(),
-            builder: (context, snapshot) {
-              final val = snapshot.data ?? 0.0;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Depósitos em metas',
-                      style: TextStyle(
-                          color: theme.primaryColor,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600)),
-                  SizedBox(height: 6.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Total no mês',
-                          style: TextStyle(
-                              fontSize: 10.sp, color: DefaultColors.grey)),
-                      Text(currency.format(val),
-                          style: TextStyle(
-                              color: theme.primaryColor,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-          SizedBox(height: 16.h),
-
-          // Tipos de pagamento
-          if (payData.isNotEmpty) ...[
-            Text('Por tipo de pagamento',
-                style: TextStyle(
-                    color: theme.primaryColor,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600)),
-            SizedBox(height: 8.h),
-            SizedBox(
-              height: 180.h,
-              child: SfCircularChart(
-                margin: EdgeInsets.zero,
-                legend: const Legend(isVisible: false),
-                series: <CircularSeries<Map<String, dynamic>, String>>[
-                  PieSeries<Map<String, dynamic>, String>(
-                    dataSource: payData,
-                    xValueMapper: (e, _) => (e['paymentType'] as String),
-                    yValueMapper: (e, _) => (e['value'] as double),
-                    pointColorMapper: (e, _) => (e['color'] as Color),
-                    dataLabelSettings:
-                        const DataLabelSettings(isVisible: false),
-                    dataLabelMapper: (e, _) {
-                      final v = (e['value'] as double);
-                      final pct = payTotal > 0 ? (v / payTotal) * 100 : 0;
-                      return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
-                    },
-                    explode: true,
-                    explodeIndex: 0,
-                    explodeOffset: '8%',
-                    sortingOrder: SortingOrder.descending,
-                    sortFieldValueMapper: (e, _) => (e['value'] as double),
-                  )
-                ],
-              ),
-            ),
-          ] else ...[
-            Text('Sem despesas por tipo neste mês',
-                style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _metricPill(ThemeData theme,
-      {required String label,
-      required double value,
-      required Color color,
-      required NumberFormat currency}) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: color.withOpacity(.15)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
-            SizedBox(height: 2.h),
-            Text(currency.format(value),
-                style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w700,
-                    color: color)),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -481,57 +176,74 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
             SizedBox(
               height: 20.h,
             ),
-            // Year selector (2025 / 2026)
-            SizedBox(
-              height: 40.h,
-              child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                scrollDirection: Axis.horizontal,
-                itemCount: 6,
-                separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                itemBuilder: (context, index) {
-                  final List<int> years = [2025, 2026, 2027, 2028, 2029, 2030];
-                  final int year = years[index];
-                  final bool selected = _selectedYear == year;
-                  return InkWell(
-                    onTap: () => setState(() => _selectedYear = year),
-                    borderRadius: BorderRadius.circular(999.r),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8.h, horizontal: 60.w),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(999.r),
-                        border: Border.all(
-                          color: selected
-                              ? DefaultColors.greenDark
-                              : theme.primaryColor.withOpacity(.35),
-                          width: selected ? 2 : 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$year',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 10.h),
             Obx(() {
               final yearTransactions =
                   _filterYear(controller.transaction, _selectedYear);
               if (yearTransactions.isEmpty) {
                 return Expanded(
-                  child: Center(
-                    child: DefaultTextNotTransaction(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40.h,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 6,
+                            separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                            itemBuilder: (context, index) {
+                              final List<int> years = [
+                                2025,
+                                2026,
+                                2027,
+                                2028,
+                                2029,
+                                2030
+                              ];
+                              final int year = years[index];
+                              final bool selected = _selectedYear == year;
+                              return InkWell(
+                                onTap: () =>
+                                    setState(() => _selectedYear = year),
+                                borderRadius: BorderRadius.circular(999.r),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8.h, horizontal: 50.w),
+                                  decoration: BoxDecoration(
+                                    color: theme.scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(999.r),
+                                    border: Border.all(
+                                      color: selected
+                                          ? DefaultColors.greenDark
+                                          : theme.primaryColor.withOpacity(.35),
+                                      width: selected ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$year',
+                                      style: TextStyle(
+                                        color: theme.primaryColor,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        Expanded(
+                          child: Center(
+                            child: DefaultTextNotTransaction(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
@@ -543,6 +255,58 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                     ),
                     child: Column(
                       children: [
+                        // Year selector (2025 / 2030) moved inside scroll
+                        SizedBox(
+                          height: 40.h,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 6,
+                            separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                            itemBuilder: (context, index) {
+                              final List<int> years = [
+                                2025,
+                                2026,
+                                2027,
+                                2028,
+                                2029,
+                                2030
+                              ];
+                              final int year = years[index];
+                              final bool selected = _selectedYear == year;
+                              return InkWell(
+                                onTap: () =>
+                                    setState(() => _selectedYear = year),
+                                borderRadius: BorderRadius.circular(999.r),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8.h, horizontal: 50.w),
+                                  decoration: BoxDecoration(
+                                    color: theme.scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(999.r),
+                                    border: Border.all(
+                                      color: selected
+                                          ? DefaultColors.greenDark
+                                          : theme.primaryColor.withOpacity(.35),
+                                      width: selected ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$year',
+                                      style: TextStyle(
+                                        color: theme.primaryColor,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+
                         // Nova seção: Análise Mensal
 
                         FinancialSummaryCards(),

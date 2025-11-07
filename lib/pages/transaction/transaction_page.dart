@@ -182,7 +182,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       _buildTypeButton("Despesa", TransactionType.despesa),
                     ],
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 10.h),
                   TextField(
                     controller: valuecontroller,
                     decoration: InputDecoration(
@@ -190,7 +190,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       hintStyle: TextStyle(
                         color: DefaultColors.white,
                         fontWeight: FontWeight.w500,
-                        fontSize: 44.sp,
+                        fontSize: 46.sp,
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide.none,
@@ -201,19 +201,17 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                     style: TextStyle(
                       color: DefaultColors.white,
-                      fontSize: 44.sp,
+                      fontSize: 46.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [CurrencyInputFormatter()],
                   ),
-                  SizedBox(height: 10.h),
                 ],
               ),
             ),
             SizedBox(height: 8.h),
             AdsBanner(),
-            SizedBox(height: 8.h),
 
             Padding(
               padding: EdgeInsets.symmetric(
@@ -469,18 +467,13 @@ class _TransactionPageState extends State<TransactionPage> {
               color: DefaultColors.grey,
             ),
 
-            AdsBanner(),
-            SizedBox(
-              height: 20.h,
-            ),
-
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 2.h),
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(child: ButtonBackTransaction()),
-                  SizedBox(width: 10.w),
+                  SizedBox(width: 6.w),
                   Expanded(
                     child: InkWell(
                       onTap: () async {
@@ -545,7 +538,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       child: _isSaving
                           ? SizedBox(
                               width: 20.w,
-                              height: 20.h,
+                              height: 48.h,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     theme.cardColor),
@@ -553,6 +546,7 @@ class _TransactionPageState extends State<TransactionPage> {
                               ),
                             )
                           : Container(
+                              height: 48.h,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20.w, vertical: 10.h),
                               decoration: BoxDecoration(
@@ -574,6 +568,14 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+
+            AdsBanner(),
+            SizedBox(
+              height: 10.h,
             ),
           ],
         ),

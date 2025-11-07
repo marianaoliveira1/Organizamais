@@ -141,9 +141,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           textTheme: GoogleFonts.interTextTheme(),
           brightness: Brightness.light,
-          scaffoldBackgroundColor: DefaultColors.backgroundLight,
+          scaffoldBackgroundColor: DefaultColors.white,
           primaryColor: DefaultColors.black,
-          cardColor: DefaultColors.white,
+          cardColor: DefaultColors.backgroundLight,
 
           // Cursor piscando e seleção
           textSelectionTheme: TextSelectionThemeData(

@@ -100,6 +100,16 @@ class _AddGoalPageState extends State<AddGoalPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: theme.primaryColor),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Get.offAllNamed(Routes.INITIAL);
+            }
+          },
+        ),
         title: Text(
           widget.isEditing ? 'Editar Meta' : 'Adicionar Meta',
           style: TextStyle(color: theme.primaryColor),

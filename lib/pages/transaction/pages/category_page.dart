@@ -1154,29 +1154,28 @@ class _CategoryPageState extends State<CategoryPage> {
                             transactionController.transactionRx;
 
                             final DateTime now = DateTime.now();
-                            final DateTime todayOnly =
-                                DateTime(now.year, now.month, now.day);
+                            final int cm = now.month;
+                            final int cy = now.year;
 
-                            // Usa a lista combinada (inclui contas fixas geradas)
-                            final int count =
-                                transactionController.transaction.where((t) {
-                              if (t.category != categoryId ||
-                                  t.type != currentType) {
-                                return false;
-                              }
-                              if (t.paymentDay == null) return true;
+                            final items = transactionController.transaction
+                                .where((t) =>
+                                    t.category == categoryId &&
+                                    t.type == currentType)
+                                .toList();
+
+                            final int totalCount = items.length;
+                            final int monthCount = items.where((t) {
+                              if (t.paymentDay == null) return false;
                               try {
                                 final d = DateTime.parse(t.paymentDay!);
-                                final dOnly = DateTime(d.year, d.month, d.day);
-                                return dOnly.isBefore(todayOnly) ||
-                                    dOnly.isAtSameMomentAs(todayOnly);
+                                return d.month == cm && d.year == cy;
                               } catch (_) {
                                 return false;
                               }
                             }).length;
 
                             return Text(
-                              '$count transação${count == 1 ? '' : 's'}',
+                              '$monthCount transações nesse mês / $totalCount transações no total',
                               style: TextStyle(
                                 fontSize: 10.sp,
                                 color: theme.hintColor,

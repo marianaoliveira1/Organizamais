@@ -246,7 +246,7 @@ class ParcelamentosCard extends StatelessWidget {
               _formatCurrency(totalParcelasValue),
               style: TextStyle(
                 color: theme.primaryColor,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
                 fontSize: 12.sp,
               ),
             ),

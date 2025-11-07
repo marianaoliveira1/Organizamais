@@ -25,21 +25,17 @@ class PaymentOption extends StatelessWidget {
         ),
         color: theme.cardColor,
       ),
-      padding: EdgeInsets.symmetric(
-        vertical: 2.h,
-        horizontal: 6.w,
-      ),
       margin: EdgeInsets.only(bottom: 14.h),
       child: ListTile(
         leading: Image.asset(
           assetPath,
-          width: 22.w,
-          height: 22.h,
+          width: 28.w,
+          height: 28.h,
         ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 16.sp,
             color: theme.primaryColor,
             fontWeight: FontWeight.w500,
           ),

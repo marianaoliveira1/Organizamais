@@ -276,7 +276,7 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                 ),
               ),
               Text(
-                "para que os gráficos sejam exibidos de maneira mais equilibrada",
+                "Para que os gráficos sejam exibidos de maneira mais equilibrada",
                 style: TextStyle(
                   color: DefaultColors.grey20,
                   fontSize: 9.sp,
@@ -365,36 +365,54 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
               // Resumo da periodicidade selecionada
               if (selectedFrequency.isNotEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: 8.h),
+                  padding: EdgeInsets.only(top: 1.h),
                   child: Text(
                     _frequencySummary(),
                     style: TextStyle(
                       color: DefaultColors.grey20,
                       fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),
               DefaultTitleTransaction(
                 title: "Categoria",
               ),
-              DefaultButtonSelectCategory(
-                selectedCategory: categoryId,
-                transactionType: TransactionType.despesa,
-                onTap: (category) {
-                  setState(() {
-                    categoryId = category;
-                  });
-                },
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: theme.primaryColor.withOpacity(.5),
+                  ),
+                ),
+                child: DefaultButtonSelectCategory(
+                  selectedCategory: categoryId,
+                  transactionType: TransactionType.despesa,
+                  onTap: (category) {
+                    setState(() {
+                      categoryId = category;
+                    });
+                  },
+                ),
               ),
 
               DefaultTitleTransaction(
                 title: "Tipo de pagamento",
               ),
-              PaymentTypeField(
-                controller: paymentTypeController,
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: theme.primaryColor.withOpacity(.5),
+                  ),
+                ),
+                child: PaymentTypeField(
+                  controller: paymentTypeController,
+                ),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 10.h),
               Row(
                 children: [
                   Expanded(
@@ -520,36 +538,49 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
                               }
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primaryColor,
-                        padding: EdgeInsets.all(15.h),
+                        padding: EdgeInsets.zero,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
-                      child: isSaving
-                          ? SizedBox(
-                              width: 20.h,
-                              height: 20.h,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.cardColor,
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Container(
+                          height: 48.h,
+                          alignment: Alignment.center,
+                          child: isSaving
+                              ? SizedBox(
+                                  width: 20.h,
+                                  height: 20.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      theme.cardColor,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  widget.fromOnboarding
+                                      ? "Criar conta fixa"
+                                      : "Salvar",
+                                  style: TextStyle(
+                                    color: theme.cardColor,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                            )
-                          : Text(
-                              widget.fromOnboarding
-                                  ? "Criar conta fixa"
-                                  : "Salvar",
-                              style: TextStyle(
-                                color: theme.cardColor,
-                                fontSize: 14.sp,
-                              ),
-                            ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
+              SizedBox(height: 20.h),
             ],
           ),
         ),

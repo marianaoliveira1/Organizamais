@@ -1175,7 +1175,7 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
             ),
           ),
           Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Container(
                 width: 16.w,
@@ -1197,12 +1197,16 @@ class _SpendingShiftBalancePageState extends State<SpendingShiftBalancePage> {
               ),
               if (deltaCurrencyText != null) ...[
                 SizedBox(width: 6.w),
-                Text(
-                  deltaCurrencyText,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    color: color,
-                    fontWeight: FontWeight.w700,
+                Flexible(
+                  child: Text(
+                    deltaCurrencyText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: color,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ]

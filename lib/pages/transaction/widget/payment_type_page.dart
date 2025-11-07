@@ -89,13 +89,13 @@ class PaymentTypePage extends StatelessWidget {
                                 child: ListTile(
                                   leading: Image.asset(
                                     card.iconPath!,
-                                    width: 30.w,
-                                    height: 30.h,
+                                    width: 28.w,
+                                    height: 28.h,
                                   ),
                                   title: Text(
                                     card.name,
                                     style: TextStyle(
-                                      fontSize: 18.sp,
+                                      fontSize: 16.sp,
                                       color: theme.primaryColor,
                                       fontWeight: FontWeight.w500,
                                     ),
