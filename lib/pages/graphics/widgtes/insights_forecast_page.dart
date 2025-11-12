@@ -173,8 +173,7 @@ class InsightsForecastPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.h),
-            AdsBanner(),
-            SizedBox(height: 16.h),
+
             Row(
               children: [
                 Expanded(
@@ -201,9 +200,7 @@ class InsightsForecastPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.h),
-            SizedBox(height: 12.h),
-            AdsBanner(),
-            SizedBox(height: 16.h),
+
             _metricCard(
               theme: theme,
               label: 'Total até agora',
@@ -271,8 +268,7 @@ class InsightsForecastPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12.h),
-            AdsBanner(),
-            SizedBox(height: 16.h),
+
             _infoBox(
               theme: theme,
               color: const Color(0xFF7C3AED),

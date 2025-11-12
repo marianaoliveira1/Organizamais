@@ -36,7 +36,11 @@ class GoalDetailsPage extends StatelessWidget {
             Icons.arrow_back,
             color: theme.primaryColor,
           ),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          },
         ),
         title: ValueListenableBuilder<GoalModel>(
           valueListenable: goalNotifier,
@@ -123,9 +127,7 @@ class GoalDetailsPage extends StatelessWidget {
               );
               if (confirmed == true) {
                 await goalController.deleteGoal(initialGoal.id!);
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
+                // Volta apenas uma vez para a página anterior
                 if (Navigator.of(context).canPop()) {
                   Navigator.of(context).pop();
                 }

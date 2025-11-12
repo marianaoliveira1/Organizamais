@@ -107,6 +107,8 @@ class _GraphicsPageState extends State<GraphicsPage>
   Set<int> _selectedCategoryIds = {};
   String?
       _expandedPaymentType; // expande detalhes do tipo de pagamento no gráfico
+  String?
+      _expandedMacrocategoria; // expande detalhes da macrocategoria no gráfico
   // final Set<int> _essentialCategoryIds = const {}; // deprecado
   // Mapa para armazenar seleção de essenciais por mês (chave YYYY-MM)
   // final Map<String, Set<int>> _monthEssentialCategoryIds = {};
@@ -171,9 +173,7 @@ class _GraphicsPageState extends State<GraphicsPage>
     // Precarrega overrides ao abrir a página (se usuário logado)
     _reloadClassificationOverrides();
     // Preload an interstitial ad early to improve show rate
-    try {
-      AdsInterstitial.preload();
-    } catch (_) {}
+    try {} catch (_) {}
     // Limpa caches quando as transações mudarem
     _cacheWorker = ever<List<TransactionModel>>(
       _transactionController.transactionRx,
@@ -361,6 +361,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                               onTap: () {
                                 setState(() {
                                   selectedMonth = month;
+                                  _expandedMacrocategoria = null;
                                 });
                                 selectedCategoryId.value = null;
                               },
@@ -697,17 +698,26 @@ class _GraphicsPageState extends State<GraphicsPage>
         ),
         SizedBox(height: 20.h),
 
+        // Gráfico de Categorias Agrupadas por Macrocategoria (InfoCard)
+        InfoCard(
+          title: 'Categorias Agrupadas',
+          icon: Iconsax.category,
+          onTap: null,
+          backgroundColor: theme.cardColor,
+          content: _entranceWrap(
+            _buildMacrocategoriaGroupedChart(
+              theme,
+              transactionController,
+              currencyFormatter,
+            ),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
         // Balanço de troca de gastos (InfoCard)
         InfoCard(
           title: 'Balanço de Gastos por Categoria',
           onTap: () async {
-            try {
-              await AdsInterstitial.preload();
-              final shown = await AdsInterstitial.showIfReady();
-              if (!shown) {
-                await AdsInterstitial.show();
-              }
-            } catch (_) {}
             if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -752,13 +762,6 @@ class _GraphicsPageState extends State<GraphicsPage>
         InfoCard(
           title: 'Relatório Mensal',
           onTap: () async {
-            try {
-              await AdsInterstitial.preload();
-              final shown = await AdsInterstitial.showIfReady();
-              if (!shown) {
-                await AdsInterstitial.show();
-              }
-            } catch (_) {}
             if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -802,13 +805,6 @@ class _GraphicsPageState extends State<GraphicsPage>
         InfoCard(
           title: 'Relatório Semanal',
           onTap: () async {
-            try {
-              await AdsInterstitial.preload();
-              final shown = await AdsInterstitial.showIfReady();
-              if (!shown) {
-                await AdsInterstitial.show();
-              }
-            } catch (_) {}
             if (!mounted) return;
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -1045,8 +1041,7 @@ class _GraphicsPageState extends State<GraphicsPage>
     // 'overrides' fornecido via StreamBuilder acima quando logado
 
     for (var t in filteredTransactions) {
-      final double value =
-          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      final double value = _parseValue(t.value);
       final int? categoryId = t.category;
       final Map<String, dynamic>? category =
           categoryId != null ? findCategoryById(categoryId) : null;
@@ -1255,12 +1250,41 @@ class _GraphicsPageState extends State<GraphicsPage>
 
     // Usa o novo helper para incluir contas fixas do mês selecionado
     final despesas = transactionController.getTransactionsForMonth(
-        year, monthIndex, type: TransactionType.despesa)
-      ..sort((a, b) => DateTime.parse(a.paymentDay!)
-          .compareTo(DateTime.parse(b.paymentDay!)));
+        year, monthIndex,
+        type: TransactionType.despesa);
+
+    // Cache de datas parseadas para ordenação mais eficiente
+    final dateCache = <TransactionModel, DateTime>{};
+    for (final t in despesas) {
+      if (t.paymentDay != null) {
+        try {
+          dateCache[t] = DateTime.parse(t.paymentDay!);
+        } catch (_) {}
+      }
+    }
+
+    despesas.sort((a, b) {
+      final dateA = dateCache[a];
+      final dateB = dateCache[b];
+      if (dateA == null || dateB == null) return 0;
+      return dateA.compareTo(dateB);
+    });
 
     _cacheFilteredDespesasByMonth[cacheKey] = despesas;
     return despesas;
+  }
+
+  // Helper otimizado para parsing de valores
+  static double _parseValue(String value) {
+    try {
+      final cleaned = value.replaceAll('R\$', '').trim();
+      if (cleaned.contains(',')) {
+        return double.parse(cleaned.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      return double.parse(cleaned.replaceAll(' ', ''));
+    } catch (_) {
+      return 0.0;
+    }
   }
 
   Map<String, dynamic> getSparklineData(
@@ -1288,13 +1312,16 @@ class _GraphicsPageState extends State<GraphicsPage>
 
     for (var transaction in filteredTransactions) {
       if (transaction.paymentDay != null) {
-        DateTime date = DateTime.parse(transaction.paymentDay!);
-        String dayKey = dayFormatter.format(date);
-        double value = double.parse(
-            transaction.value.replaceAll('.', '').replaceAll(',', '.'));
+        try {
+          DateTime date = DateTime.parse(transaction.paymentDay!);
+          String dayKey = dayFormatter.format(date);
+          double value = _parseValue(transaction.value);
 
-        if (dailyTotals.containsKey(dayKey)) {
-          dailyTotals[dayKey] = dailyTotals[dayKey]! + value;
+          if (dailyTotals.containsKey(dayKey)) {
+            dailyTotals[dayKey] = dailyTotals[dayKey]! + value;
+          }
+        } catch (_) {
+          continue;
         }
       }
     }
@@ -1423,6 +1450,7 @@ class _GraphicsPageState extends State<GraphicsPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RepaintBoundary(
+                  key: ValueKey('line_chart_$selectedMonth'),
                   child: SizedBox(
                     height: 120.h,
                     child: SfCartesianChart(
@@ -1754,20 +1782,19 @@ class _GraphicsPageState extends State<GraphicsPage>
         .toList()
         .cast<int>();
 
+    // Otimizar cálculo de valores por categoria
+    final Map<int, double> categoryTotals = {};
+    for (final t in filteredTransactions) {
+      if (t.category != null) {
+        categoryTotals[t.category!] =
+            (categoryTotals[t.category!] ?? 0.0) + _parseValue(t.value);
+      }
+    }
+
     var data = categories
         .map((e) => {
               "category": e,
-              "value": filteredTransactions
-                  .where((element) => element.category == e)
-                  .fold<double>(
-                0.0,
-                (previousValue, element) {
-                  return previousValue +
-                      double.parse(element.value
-                          .replaceAll('.', '')
-                          .replaceAll(',', '.'));
-                },
-              ),
+              "value": categoryTotals[e] ?? 0.0,
               "name": findCategoryById(e)?['name'],
               "color": findCategoryById(e)?['color'],
               "icon": findCategoryById(e)?['icon'],
@@ -1821,6 +1848,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                   }
                 },
                 child: RepaintBoundary(
+                  key: ValueKey('category_chart_$selectedMonth'),
                   child: SizedBox(
                     height: 180.h,
                     child: SfCircularChart(
@@ -1874,6 +1902,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 }
               },
               child: RepaintBoundary(
+                key: ValueKey('bar_chart_$selectedMonth'),
                 child: SizedBox(
                   height: 220.h,
                   child: BarChart(
@@ -2164,8 +2193,7 @@ class _GraphicsPageState extends State<GraphicsPage>
     final Map<String, double> byType = {};
     for (final t in txs) {
       final key = (t.paymentType ?? 'Outros').trim();
-      byType[key] = (byType[key] ?? 0) +
-          double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      byType[key] = (byType[key] ?? 0) + _parseValue(t.value);
     }
     // Garante distinção de cores por rótulo atual
     final labels = byType.keys.toList();
@@ -2257,6 +2285,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       children: [
         Center(
           child: RepaintBoundary(
+            key: ValueKey('payment_type_chart_$selectedMonth'),
             child: SizedBox(
               height: 180.h,
               child: SfCircularChart(
@@ -2335,9 +2364,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                                 continue;
                               }
                               final d = DateTime.parse(t.paymentDay!);
-                              final v = double.parse(t.value
-                                  .replaceAll('.', '')
-                                  .replaceAll(',', '.'));
+                              final v = _parseValue(t.value);
                               if (d.isAfter(curStart
                                       .subtract(const Duration(seconds: 1))) &&
                                   d.isBefore(
@@ -2502,7 +2529,7 @@ class _GraphicsPageState extends State<GraphicsPage>
     });
     for (final t in filtered) {
       final d = DateTime.parse(t.paymentDay!);
-      final v = double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
+      final v = _parseValue(t.value);
       if (d.isAfter(curStart.subtract(const Duration(seconds: 1))) &&
           d.isBefore(curEnd.add(const Duration(seconds: 1)))) {
         currentValue += v;
@@ -2604,11 +2631,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       final d = DateTime.parse(t.paymentDay!);
       return d.isAfter(monthStart.subtract(const Duration(seconds: 1))) &&
           d.isBefore(monthEnd.add(const Duration(seconds: 1)));
-    }).fold(
-            0.0,
-            (prev, t) =>
-                prev +
-                double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    }).fold(0.0, (prev, t) => prev + _parseValue(t.value));
     final double percReceita =
         totalReceitasMes > 0 ? (currentValue / totalReceitasMes * 100) : 0.0;
     // removed unused monthLabelTitle
@@ -2705,8 +2728,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 Divider(height: 1, color: DefaultColors.grey20.withOpacity(.5)),
             itemBuilder: (_, i) {
               final t = monthTxs[i];
-              final v = double.parse(
-                  t.value.replaceAll('.', '').replaceAll(',', '.'));
+              final v = _parseValue(t.value);
               final date = t.paymentDay != null
                   ? dateFormatter.format(DateTime.parse(t.paymentDay!))
                   : '';
@@ -2745,6 +2767,621 @@ class _GraphicsPageState extends State<GraphicsPage>
             },
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildMacrocategoriaGroupedChart(
+    ThemeData theme,
+    TransactionController transactionController,
+    NumberFormat currencyFormatter,
+  ) {
+    final filteredTransactions = getFilteredTransactions(transactionController);
+
+    // Calcula datas para comparação (mês atual vs mês anterior - mesmo período de dias)
+    final DateTime now = DateTime.now();
+    int selMonth, selYear;
+    final partsMY = selectedMonth.split('/');
+    if (partsMY.length == 2) {
+      selYear = int.tryParse(partsMY[1]) ?? now.year;
+      selMonth = getAllMonths().indexOf(partsMY[0]) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    } else {
+      selYear = now.year;
+      selMonth = getAllMonths().indexOf(selectedMonth) + 1;
+      if (selMonth <= 0) selMonth = now.month;
+    }
+    final bool isMonthClosed =
+        (selYear < now.year) || (selYear == now.year && selMonth < now.month);
+    // curStart e curEnd são necessários para calcular o período equivalente no mês anterior
+    // ignore: unused_local_variable
+    final DateTime curStart = DateTime(selYear, selMonth, 1);
+    final int daysInSel = DateTime(selYear, selMonth + 1, 0).day;
+    final int curEndDay =
+        isMonthClosed ? daysInSel : now.day.clamp(1, daysInSel);
+    // ignore: unused_local_variable
+    final DateTime curEnd = DateTime(selYear, selMonth, curEndDay, 23, 59, 59);
+    final int prevMonth = selMonth == 1 ? 12 : selMonth - 1;
+    final int prevYear = selMonth == 1 ? selYear - 1 : selYear;
+    final DateTime prevStart = DateTime(prevYear, prevMonth, 1);
+    final int daysInPrev = DateTime(prevYear, prevMonth + 1, 0).day;
+    final int prevEndDay =
+        isMonthClosed ? daysInPrev : now.day.clamp(1, daysInPrev);
+    final DateTime prevEnd =
+        DateTime(prevYear, prevMonth, prevEndDay, 23, 59, 59);
+
+    // Agrupa transações por macrocategoria (mês atual)
+    final Map<String, double> macrocategoriaTotals = {};
+    final Map<String, double> macrocategoriaTotalsPrevious = {};
+    final Map<String, Set<String>> macrocategoriaCategories = {};
+    final Map<String, Color> macrocategoriaColors = {};
+
+    // Cores para cada macrocategoria (usando cores das primeiras categorias)
+    final List<Color> macroColors = [
+      DefaultColors.blue, // Moradia e Casa
+      DefaultColors.emeraldBright, // Alimentação
+      DefaultColors.indigo, // Transporte
+      DefaultColors.vibrantTeal, // Saúde e Bem-estar
+      DefaultColors.deepPurpleDark, // Educação
+      DefaultColors.tangerine, // Lazer e Entretenimento
+      DefaultColors.hotPink, // Compras
+      DefaultColors.emerald, // Pets
+      DefaultColors.grey, // Finanças
+      DefaultColors.pastelGreen, // Família
+      DefaultColors.indigoDark, // Trabalho
+      DefaultColors.brightRed, // Imprevistos
+      DefaultColors.darkGrey, // Outros
+    ];
+
+    int colorIndex = 0;
+
+    for (var transaction in filteredTransactions) {
+      final int? categoryId = transaction.category;
+      if (categoryId == null) continue;
+
+      final categoryInfo = findCategoryById(categoryId);
+      if (categoryInfo == null) continue;
+
+      final String macrocategoria =
+          (categoryInfo['macrocategoria'] as String?) ?? 'Outros';
+      final String categoryName = (categoryInfo['name'] as String?) ?? '';
+
+      // Adiciona categoria à lista de categorias da macrocategoria
+      macrocategoriaCategories
+          .putIfAbsent(macrocategoria, () => {})
+          .add(categoryName);
+
+      // Define cor da macrocategoria (usa a cor da primeira categoria encontrada)
+      if (!macrocategoriaColors.containsKey(macrocategoria)) {
+        final Color? categoryColor = categoryInfo['color'] as Color?;
+        macrocategoriaColors[macrocategoria] =
+            categoryColor ?? macroColors[colorIndex % macroColors.length];
+        colorIndex++;
+      }
+
+      // Soma o valor
+      final double value = _parseValue(transaction.value);
+      macrocategoriaTotals[macrocategoria] =
+          (macrocategoriaTotals[macrocategoria] ?? 0.0) + value;
+    }
+
+    // Processa transações do mês anterior para comparação
+    for (var transaction in transactionController.transaction) {
+      if (transaction.paymentDay == null ||
+          transaction.type != TransactionType.despesa) {
+        continue;
+      }
+
+      final int? categoryId = transaction.category;
+      if (categoryId == null) continue;
+
+      final categoryInfo = findCategoryById(categoryId);
+      if (categoryInfo == null) continue;
+
+      final String macrocategoria =
+          (categoryInfo['macrocategoria'] as String?) ?? 'Outros';
+
+      final DateTime d = DateTime.parse(transaction.paymentDay!);
+      final double value = _parseValue(transaction.value);
+
+      // Verifica se está no período do mês anterior
+      if (d.isAfter(prevStart.subtract(const Duration(seconds: 1))) &&
+          d.isBefore(prevEnd.add(const Duration(seconds: 1)))) {
+        macrocategoriaTotalsPrevious[macrocategoria] =
+            (macrocategoriaTotalsPrevious[macrocategoria] ?? 0.0) + value;
+      }
+    }
+
+    if (macrocategoriaTotals.isEmpty) {
+      return Center(
+        child: Text(
+          "Nenhuma despesa registrada para exibir o gráfico.",
+          style: TextStyle(
+            color: DefaultColors.grey,
+            fontSize: 12.sp,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    // Converte para lista e ordena por valor
+    final data = macrocategoriaTotals.entries
+        .map((e) => {
+              'macrocategoria': e.key,
+              'value': e.value,
+              'previousValue': macrocategoriaTotalsPrevious[e.key] ?? 0.0,
+              'color': macrocategoriaColors[e.key] ?? DefaultColors.grey,
+              'categories': macrocategoriaCategories[e.key]?.toList() ?? [],
+            })
+        .toList()
+      ..sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
+
+    final double totalValue = data.fold(
+      0.0,
+      (previousValue, element) => previousValue + (element['value'] as double),
+    );
+
+    // Encontra o índice da maior fatia para explodir
+    final double maxVal =
+        data.map((e) => e['value'] as double).reduce((a, b) => a > b ? a : b);
+    final int explodeIndex =
+        data.indexWhere((e) => (e['value'] as double) == maxVal);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 16.h),
+          // Gráfico de Pizza
+          RepaintBoundary(
+            key: ValueKey('macrocategoria_chart_$selectedMonth'),
+            child: SizedBox(
+              height: 180.h,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SfCircularChart(
+                    margin: EdgeInsets.zero,
+                    legend: Legend(isVisible: false),
+                    series: <CircularSeries<Map<String, dynamic>, String>>[
+                      PieSeries<Map<String, dynamic>, String>(
+                        dataSource: data,
+                        xValueMapper: (Map<String, dynamic> e, _) =>
+                            (e['macrocategoria'] as String),
+                        yValueMapper: (Map<String, dynamic> e, _) =>
+                            (e['value'] as double),
+                        pointColorMapper: (Map<String, dynamic> e, _) =>
+                            (e['color'] as Color),
+                        dataLabelMapper: (Map<String, dynamic> e, _) => '',
+                        dataLabelSettings:
+                            const DataLabelSettings(isVisible: false),
+                        explode: true,
+                        explodeIndex: explodeIndex < 0 ? 0 : explodeIndex,
+                        explodeOffset: '8%',
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+          // Legenda com detalhes
+          ...data.map((e) {
+            final String macro = e['macrocategoria'] as String;
+            final double value = e['value'] as double;
+            final double previousValue = e['previousValue'] as double;
+            final Color color = e['color'] as Color;
+            final List<String> categories = e['categories'] as List<String>;
+            final double pct = totalValue > 0 ? (value / totalValue) * 100 : 0;
+
+            // Calcula comparação com mês anterior
+            double changePct;
+            IconData changeIcon;
+            Color changeColor;
+            if (previousValue == 0 && value > 0) {
+              changePct = 100.0;
+              changeIcon = Iconsax.arrow_circle_up;
+              changeColor = DefaultColors.redDark;
+            } else if (previousValue > 0 && value == 0) {
+              changePct = -100.0;
+              changeIcon = Iconsax.arrow_circle_down;
+              changeColor = DefaultColors.greenDark;
+            } else if (previousValue == 0 && value == 0) {
+              changePct = 0.0;
+              changeIcon = Iconsax.more_circle;
+              changeColor = DefaultColors.grey;
+            } else {
+              final c = ((value - previousValue) / previousValue) * 100;
+              changePct = c;
+              if (c > 0) {
+                changeIcon = Iconsax.arrow_circle_up;
+                changeColor = DefaultColors.redDark;
+              } else if (c < 0) {
+                changeIcon = Iconsax.arrow_circle_down;
+                changeColor = DefaultColors.greenDark;
+              } else {
+                changeIcon = Iconsax.more_circle;
+                changeColor = DefaultColors.grey;
+              }
+            }
+
+            final String changeLabel = changePct > 0
+                ? '+${changePct.abs().toStringAsFixed(1)}%'
+                : changePct < 0
+                    ? '-${changePct.abs().toStringAsFixed(1)}%'
+                    : '0.0%';
+
+            // Ordena as categorias alfabeticamente
+            final sortedCategories = List<String>.from(categories)..sort();
+
+            final bool isExpanded = _expandedMacrocategoria == macro;
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _expandedMacrocategoria = isExpanded ? null : macro;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 16.w,
+                            height: 16.w,
+                            margin: EdgeInsets.only(top: 2.h),
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  macro,
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  '(${sortedCategories.join(', ')})',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 4.h),
+                                Row(
+                                  children: [
+                                    Icon(changeIcon,
+                                        size: 12.sp, color: changeColor),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      changeLabel,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: changeColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                currencyFormatter.format(value),
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.primaryColor,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                '${pct.toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: DefaultColors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 4.h),
+                              SizedBox(height: 4.h),
+                              Icon(
+                                isExpanded
+                                    ? Iconsax.arrow_up_24
+                                    : Iconsax.arrow_down_1,
+                                size: 14.sp,
+                                color: DefaultColors.grey,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Detalhes expandidos
+                  if (isExpanded)
+                    Padding(
+                      padding: EdgeInsets.only(top: 12.h),
+                      child: _buildMacrocategoriaExpandedDetails(
+                        theme,
+                        macro,
+                        value,
+                        previousValue,
+                        changePct,
+                        changeColor,
+                        changeIcon,
+                        currencyFormatter,
+                        isMonthClosed,
+                        selMonth,
+                        prevEnd,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMacrocategoriaExpandedDetails(
+    ThemeData theme,
+    String macrocategoria,
+    double currentValue,
+    double previousValue,
+    double changePct,
+    Color changeColor,
+    IconData changeIcon,
+    NumberFormat currencyFormatter,
+    bool isMonthClosed,
+    int selMonth,
+    DateTime prevEnd,
+  ) {
+    // Texto de comparação
+    String monthNamePt(int m) {
+      const ms = [
+        'janeiro',
+        'fevereiro',
+        'março',
+        'abril',
+        'maio',
+        'junho',
+        'julho',
+        'agosto',
+        'setembro',
+        'outubro',
+        'novembro',
+        'dezembro'
+      ];
+      return ms[(m - 1).clamp(0, 11)];
+    }
+
+    String text;
+    if (currentValue == 0 && previousValue == 0) {
+      text =
+          'Mesmo valor: ${currencyFormatter.format(currentValue)} (igual ao mês passado, ${currencyFormatter.format(previousValue)})';
+    } else if (isMonthClosed) {
+      final diff = (currentValue - previousValue).abs();
+      final pct = previousValue == 0
+          ? 100.0
+          : ((currentValue - previousValue) / previousValue) * 100;
+      final ml = monthNamePt(selMonth);
+      if (currentValue > previousValue) {
+        text =
+            'No mês passado você gastou ${currencyFormatter.format(previousValue)} e agora em $ml ${currencyFormatter.format(currentValue)}; gasto maior de ${currencyFormatter.format(diff)} (+${pct.abs().toStringAsFixed(1)}%).';
+      } else if (currentValue < previousValue) {
+        text =
+            'No mês passado você gastou ${currencyFormatter.format(previousValue)} e agora em $ml ${currencyFormatter.format(currentValue)}; gasto menor de ${currencyFormatter.format(diff)} (-${pct.abs().toStringAsFixed(1)}%).';
+      } else {
+        text =
+            'Você gastou o mesmo valor em $ml que no mês anterior: ${currencyFormatter.format(currentValue)}';
+      }
+    } else {
+      final diff = (currentValue - previousValue).abs();
+      final pct = previousValue == 0
+          ? 100.0
+          : ((currentValue - previousValue) / previousValue) * 100;
+      final sameDayLabel = '${prevEnd.day} de ${monthNamePt(prevEnd.month)}';
+      if (currentValue > previousValue) {
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou ${currencyFormatter.format(currentValue)}, o que aumentou ${pct.abs().toStringAsFixed(1)}% (${currencyFormatter.format(diff)}).';
+      } else if (currentValue < previousValue) {
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou ${currencyFormatter.format(currentValue)}, o que diminuiu ${pct.abs().toStringAsFixed(1)}% (${currencyFormatter.format(diff)}).';
+      } else {
+        text =
+            'No mesmo dia do mês passado ($sameDayLabel) você gastou ${currencyFormatter.format(previousValue)}, e agora gastou o mesmo valor: ${currencyFormatter.format(currentValue)}.';
+      }
+    }
+
+    // Escolhe cores do gradiente baseado na mudança
+    final List<Color> gradColors = changeColor == DefaultColors.redDark
+        ? [DefaultColors.redDark, DefaultColors.red]
+        : (changeColor == DefaultColors.greenDark
+            ? [DefaultColors.greenDark, DefaultColors.green]
+            : [DefaultColors.grey, DefaultColors.darkGrey]);
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.w,
+          vertical: 12.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 6.h),
+            // Card com gradiente mostrando a comparação
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: gradColors,
+                ),
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(changeIcon, color: Colors.white, size: 20.sp),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12.h),
+            // Card com valores comparativos
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(14.w),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: DefaultColors.grey20.withOpacity(.2)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mês atual',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: DefaultColors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            currencyFormatter.format(currentValue),
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Mês anterior',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: DefaultColors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            currencyFormatter.format(previousValue),
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+                  Divider(
+                    color: DefaultColors.grey20.withOpacity(.3),
+                    height: 1,
+                  ),
+                  SizedBox(height: 12.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Variação',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: DefaultColors.grey,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(changeIcon, size: 16.sp, color: changeColor),
+                          SizedBox(width: 6.w),
+                          Text(
+                            changePct > 0
+                                ? '+${changePct.abs().toStringAsFixed(1)}%'
+                                : changePct < 0
+                                    ? '-${changePct.abs().toStringAsFixed(1)}%'
+                                    : '0.0%',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: changeColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

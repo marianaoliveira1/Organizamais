@@ -491,19 +491,21 @@ class PercentageCalculationService {
       final previousExpenses = getCategoryExpensesForPeriod(
           transactions, categoryId, previousMonthStart, previousMonthEnd);
 
-      // Valor do mês anterior completo
+      // Valor do mês anterior completo (para verificar se há transações)
       final previousFullMonthEnd =
           DateTime(previousYear, previousMonth + 1, 0, 23, 59, 59);
-      final previousFullMonthExpenses = getCategoryExpensesForPeriod(
-          transactions, categoryId, previousMonthStart, previousFullMonthEnd);
 
       // Check if we have data for current month
       final hasCurrentData = _hasCategoryTransactionsInPeriod(
           transactions, categoryId, currentMonthStart, currentMonthEnd);
 
-      // Check if we have data for previous month
+      // Check if we have data for previous month (até o dia atual)
       final hasPreviousData = _hasCategoryTransactionsInPeriod(
           transactions, categoryId, previousMonthStart, previousMonthEnd);
+
+      // Check if we have transactions in the full previous month
+      final hasPreviousFullMonthData = _hasCategoryTransactionsInPeriod(
+          transactions, categoryId, previousMonthStart, previousFullMonthEnd);
 
       // // Debug: imprimir informações para entender o que está acontecendo
       // print(
@@ -553,11 +555,13 @@ class PercentageCalculationService {
       // noop: debug variable removed
 
       // Lógica: considerar somente o mês anterior para definir "Novo" e cobrir cenários incompletos
-      if (hasCurrentData || hasPreviousData) {
-        // Caso 1: Novo (tem no mês atual e mês anterior completo foi zero)
+      // Se há transações no mês anterior completo, sempre faz comparação (nunca marca como nova)
+      if (hasCurrentData || hasPreviousData || hasPreviousFullMonthData) {
+        // Caso 1: Novo (tem no mês atual e mês anterior completo não teve transações)
+        // Só marca como nova se não houver transações no mês anterior completo
         if (hasCurrentData &&
             currentExpenses > 0 &&
-            previousFullMonthExpenses == 0) {
+            !hasPreviousFullMonthData) {
           return PercentageResult(
             percentage: 0.0,
             hasData: true,
@@ -566,7 +570,17 @@ class PercentageCalculationService {
           );
         }
 
-        // Caso 2: Há dados no mês anterior dentro da janela comparável
+        // Caso 1b: Tem dados atuais mas currentExpenses == 0 e não há dados anteriores
+        if (hasCurrentData &&
+            currentExpenses == 0 &&
+            !hasPreviousFullMonthData &&
+            !hasPreviousData) {
+          // Se não há dados anteriores, não há comparação possível
+          return PercentageResult.noData();
+        }
+
+        // Caso 2: Há dados no mês anterior dentro da janela comparável (até o mesmo dia)
+        // Sempre usa previousExpenses que é calculado até o mesmo dia do mês passado
         if (hasPreviousData) {
           if (previousExpenses == 0.0) {
             // Sem gasto até o mesmo dia do mês anterior – tratar variação como 100% se houver gasto atual
@@ -607,25 +621,201 @@ class PercentageCalculationService {
           );
         }
 
-        // Caso 3: Tem dados no mês atual, mas não no período comparável do mês anterior
-        // Se mesmo assim o mês anterior completo teve gasto (>0), consideramos aumento de 100%
-        if (hasCurrentData && previousFullMonthExpenses > 0) {
+        // Caso 3: Tem dados no mês atual e há transações no mês anterior completo,
+        // mas não há dados até o mesmo dia do mês passado
+        // Compara usando previousExpenses (até o mesmo dia, que será 0) vs currentExpenses
+        if (hasCurrentData && hasPreviousFullMonthData && !hasPreviousData) {
+          if (previousExpenses == 0.0) {
+            if (currentExpenses > 0) {
+              // Não havia gasto até o mesmo dia do mês passado, mas há no mês completo
+              // Trata como aumento de 100% (comparando até o mesmo dia)
+              return PercentageResult(
+                percentage: 100.0,
+                hasData: true,
+                type: PercentageType.negative,
+                displayText: _formatPercentage(100.0, PercentageType.negative),
+              );
+            } else {
+              // Ambos são zero até o mesmo dia
+              return PercentageResult(
+                percentage: 0.0,
+                hasData: true,
+                type: PercentageType.neutral,
+                displayText: '0.0%',
+              );
+            }
+          }
+          // Se previousExpenses > 0 mas não há hasPreviousData, isso não deveria acontecer,
+          // mas vamos tratar como comparação normal
+          if (previousExpenses > 0) {
+            final percentageChange =
+                ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+            PercentageType type;
+            if (percentageChange < 0) {
+              type = PercentageType.positive;
+            } else if (percentageChange > 0) {
+              type = PercentageType.negative;
+            } else {
+              type = PercentageType.neutral;
+            }
+            return PercentageResult(
+              percentage: percentageChange.abs(),
+              hasData: true,
+              type: type,
+              displayText: _formatPercentage(percentageChange.abs(), type),
+            );
+          }
+        }
+
+        // Caso 4: Tem dados no mês anterior (na janela), mas não no atual até a data
+        if (hasPreviousData && !hasCurrentData) {
+          if (previousExpenses > 0) {
+            // Queda de 100%
+            return PercentageResult(
+              percentage: 100.0,
+              hasData: true,
+              type: PercentageType.positive, // diminuição de despesa = bom
+              displayText: _formatPercentage(100.0, PercentageType.positive),
+            );
+          } else {
+            // Ambos são zero
+            return PercentageResult(
+              percentage: 0.0,
+              hasData: true,
+              type: PercentageType.neutral,
+              displayText: '0.0%',
+            );
+          }
+        }
+
+        // Caso 5: Fallback final - se tem dados atuais e anteriores completos mas não entrou em nenhum caso
+        // Isso não deveria acontecer, mas garante que sempre retorna comparação quando há dados
+        if (hasCurrentData && hasPreviousFullMonthData) {
+          // Faz comparação usando previousExpenses (até o mesmo dia)
+          if (previousExpenses == 0.0) {
+            if (currentExpenses > 0) {
+              return PercentageResult(
+                percentage: 100.0,
+                hasData: true,
+                type: PercentageType.negative,
+                displayText: _formatPercentage(100.0, PercentageType.negative),
+              );
+            } else {
+              // Ambos são zero até o mesmo dia
+              return PercentageResult(
+                percentage: 0.0,
+                hasData: true,
+                type: PercentageType.neutral,
+                displayText: '0.0%',
+              );
+            }
+          } else {
+            final percentageChange =
+                ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+            PercentageType type;
+            if (percentageChange < 0) {
+              type = PercentageType.positive;
+            } else if (percentageChange > 0) {
+              type = PercentageType.negative;
+            } else {
+              type = PercentageType.neutral;
+            }
+            return PercentageResult(
+              percentage: percentageChange.abs(),
+              hasData: true,
+              type: type,
+              displayText: _formatPercentage(percentageChange.abs(), type),
+            );
+          }
+        }
+
+        // Caso 6: Tem apenas dados atuais (sem dados anteriores)
+        // Se chegou aqui e tem hasCurrentData mas não tem hasPreviousFullMonthData nem hasPreviousData,
+        // e não entrou no Caso 1, então currentExpenses deve ser 0
+        if (hasCurrentData && !hasPreviousFullMonthData && !hasPreviousData) {
+          // Já foi tratado no Caso 1b, mas se chegou aqui é porque currentExpenses > 0
+          // mas não entrou no Caso 1 - isso não deveria acontecer, mas vamos tratar
           return PercentageResult(
-            percentage: 100.0,
+            percentage: 0.0,
             hasData: true,
-            type: PercentageType.negative,
-            displayText: _formatPercentage(100.0, PercentageType.negative),
+            type: PercentageType.newData,
+            displayText: 'Novo',
           );
         }
 
-        // Caso 4: Tem dados no mês anterior (na janela), mas não no atual até a data – queda de 100%
-        if (hasPreviousData && !hasCurrentData && previousExpenses > 0) {
+        // Caso 7: Tem apenas dados anteriores completos (sem dados atuais até o dia)
+        if (hasPreviousFullMonthData && !hasCurrentData && !hasPreviousData) {
+          // Não há dados atuais até o dia, mas há no mês anterior completo
+          // Compara 0 atual vs previousExpenses (que será 0 até o mesmo dia)
           return PercentageResult(
-            percentage: 100.0,
+            percentage: 0.0,
             hasData: true,
-            type: PercentageType.positive, // diminuição de despesa = bom
-            displayText: _formatPercentage(100.0, PercentageType.positive),
+            type: PercentageType.neutral,
+            displayText: '0.0%',
           );
+        }
+
+        // Fallback final: Se chegou aqui e tem qualquer dado, faz comparação básica
+        // Isso garante que sempre retorna algo quando há dados para comparar
+        if (hasCurrentData || hasPreviousData || hasPreviousFullMonthData) {
+          // Se tem dados atuais e anteriores, compara
+          if (hasCurrentData && (hasPreviousData || hasPreviousFullMonthData)) {
+            if (previousExpenses == 0.0) {
+              if (currentExpenses > 0) {
+                return PercentageResult(
+                  percentage: 100.0,
+                  hasData: true,
+                  type: PercentageType.negative,
+                  displayText:
+                      _formatPercentage(100.0, PercentageType.negative),
+                );
+              } else {
+                return PercentageResult(
+                  percentage: 0.0,
+                  hasData: true,
+                  type: PercentageType.neutral,
+                  displayText: '0.0%',
+                );
+              }
+            } else {
+              final percentageChange =
+                  ((currentExpenses - previousExpenses) / previousExpenses) *
+                      100;
+              PercentageType type;
+              if (percentageChange < 0) {
+                type = PercentageType.positive;
+              } else if (percentageChange > 0) {
+                type = PercentageType.negative;
+              } else {
+                type = PercentageType.neutral;
+              }
+              return PercentageResult(
+                percentage: percentageChange.abs(),
+                hasData: true,
+                type: type,
+                displayText: _formatPercentage(percentageChange.abs(), type),
+              );
+            }
+          }
+          // Se tem apenas dados atuais sem anteriores
+          else if (hasCurrentData && currentExpenses > 0) {
+            return PercentageResult(
+              percentage: 0.0,
+              hasData: true,
+              type: PercentageType.newData,
+              displayText: 'Novo',
+            );
+          }
+          // Se tem apenas dados anteriores sem atuais
+          else if ((hasPreviousData || hasPreviousFullMonthData) &&
+              previousExpenses > 0) {
+            return PercentageResult(
+              percentage: 100.0,
+              hasData: true,
+              type: PercentageType.positive,
+              displayText: _formatPercentage(100.0, PercentageType.positive),
+            );
+          }
         }
 
         // Sem dados relevantes para comparar

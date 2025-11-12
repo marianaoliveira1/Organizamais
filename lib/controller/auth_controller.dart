@@ -254,34 +254,50 @@ class AuthController extends GetxController {
   }
 
   Future<void> loginWithGoogle() async {
+    Trace? perfTrace;
     try {
-      final Trace perfTrace =
-          FirebasePerformance.instance.newTrace('auth_google_login');
+      perfTrace = FirebasePerformance.instance.newTrace('auth_google_login');
       await perfTrace.start();
       FirebaseCrashlytics.instance.log('Auth.loginWithGoogle start');
       FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'google_login');
+      isLoading(true);
       _showLoadingDialog();
+
+      // Sign out from Google Sign In first to ensure a fresh sign in
+      try {
+        await GoogleSignIn().signOut();
+      } catch (_) {
+        // Ignore if there's no previous session
+      }
 
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        final cancellation = Exception("Login cancelado pelo usuário");
-        FirebaseCrashlytics.instance.recordError(
-          cancellation,
-          StackTrace.current,
-          reason: 'google sign-in cancelled',
-          information: ['stage=google_sign_in'],
-        );
-        throw cancellation;
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        return; // User cancelled, just return without error
       }
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        Get.snackbar(
+          "Erro ao entrar com Google",
+          "Não foi possível obter as credenciais de autenticação",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
       FirebaseCrashlytics.instance
           .setCustomKey('google_email', googleUser.email);
       FirebaseCrashlytics.instance.setCustomKey('google_has_access_token',
           (googleAuth.accessToken != null).toString());
       FirebaseCrashlytics.instance.setCustomKey(
           'google_has_id_token', (googleAuth.idToken != null).toString());
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -291,6 +307,7 @@ class AuthController extends GetxController {
           await _auth.signInWithCredential(credential);
       await FirebaseCrashlytics.instance
           .setUserIdentifier(userCredential.user?.uid ?? '');
+
       DocumentSnapshot userDoc = await _firestore
           .collection("users")
           .doc(userCredential.user!.uid)
@@ -303,11 +320,18 @@ class AuthController extends GetxController {
           "uid": userCredential.user!.uid,
         });
 
+        // Ensure Firebase Auth displayName is set
+        await userCredential.user
+            ?.updateProfile(displayName: googleUser.displayName ?? "Usuário");
+        await userCredential.user?.reload();
+        firebaseUser.value = _auth.currentUser;
+
         // Log analytics event for new user
         await _analyticsService.logSignUp('google');
 
-        isOnboarding = true;
         _hideLoadingDialog();
+        await perfTrace.stop();
+        isOnboarding = true;
         Get.offAllNamed(Routes.ONBOARD_WELCOME);
         return;
       }
@@ -320,10 +344,10 @@ class AuthController extends GetxController {
         firebaseUser.value = _auth.currentUser;
       } catch (_) {}
       _hideLoadingDialog();
+      await perfTrace.stop();
       if (Get.currentRoute != Routes.HOME) {
         Get.offAllNamed(Routes.HOME);
       }
-      await perfTrace.stop();
     } on FirebaseAuthException catch (e, st) {
       try {
         final Trace t =
@@ -337,8 +361,12 @@ class AuthController extends GetxController {
         reason: 'google login FirebaseAuthException',
         information: ['stage=signInWithCredential'],
       );
-      print(e);
       _hideLoadingDialog();
+      if (perfTrace != null) {
+        try {
+          await perfTrace.stop();
+        } catch (_) {}
+      }
       Get.snackbar(
         "Erro ao entrar com Google",
         _getAuthErrorMessage(e),
@@ -358,12 +386,21 @@ class AuthController extends GetxController {
         information: ['stage=unknown'],
       );
       _hideLoadingDialog();
+      if (perfTrace != null) {
+        try {
+          await perfTrace.stop();
+        } catch (_) {}
+      }
+      // Don't show error message if user cancelled
+      if (e.toString().contains('cancelado') ||
+          e.toString().contains('cancelled')) {
+        return;
+      }
       Get.snackbar(
         "Erro ao entrar com Google",
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
-      print(e);
     } finally {
       isLoading(false);
     }

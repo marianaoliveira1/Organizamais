@@ -225,7 +225,6 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
           : '',
     );
     // Preload interstitial before showing the sheet
-    AdsInterstitial.preload();
 
     showModalBottomSheet(
       context: context,
@@ -286,12 +285,7 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                         .set({'categoryId': categoryId, 'amount': amount},
                             SetOptions(merge: true));
                     // Try show preloaded interstitial; fallback to immediate load
-                    try {
-                      final shown = await AdsInterstitial.showIfReady();
-                      if (!shown) {
-                        await AdsInterstitial.show();
-                      }
-                    } catch (_) {}
+
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(

@@ -68,7 +68,7 @@ class _AddCardPageState extends State<AddCardPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: DefaultColors.green,
+        backgroundColor: DefaultColors.grey,
         iconTheme: IconThemeData(
           color: DefaultColors.white,
         ),
@@ -324,13 +324,13 @@ class _AddCardPageState extends State<AddCardPage> {
                   color: theme.scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: DefaultColors.green,
+                    color: theme.primaryColor,
                   ),
                 ),
                 child: Text(
                   widget.isEditing ? 'Atualizar Cartão' : 'Adicionar Cartão',
                   style: TextStyle(
-                    color: DefaultColors.green,
+                    color: theme.primaryColor,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),

@@ -112,8 +112,8 @@ class TransactionItem extends StatelessWidget {
                     Center(
                       child: Image.asset(
                         category?['icon'] ?? 'assets/icon-category/default.png',
-                        width: 24.w,
-                        height: 24.h,
+                        width: 30.w,
+                        height: 30.h,
                       ),
                     ),
 
@@ -127,7 +127,7 @@ class TransactionItem extends StatelessWidget {
                           // título
                           Text(
                             _titleWithInstallment(
-                                transaction.title, controller.transaction),
+                                transaction, controller.transaction),
                             style: TextStyle(
                               color: isFuture
                                   ? DefaultColors.grey
@@ -293,33 +293,57 @@ class TransactionItem extends StatelessWidget {
     return formatter.format(0);
   }
 
-  // Gera o rótulo "Parcela X de Y" quando aplicável, baseado no padrão do título
-  String? _computeInstallmentLabel(
-      List<dynamic> allTransactions, String? title) {
+  // Gera o rótulo "Parcela X de Y" limitado à SÉRIE correta: mesmo baseTitle,
+  // paymentType normalizado e valor por parcela igual (tolerância de 1 centavo)
+  String? _computeInstallmentLabelForTx(
+      List<dynamic> allTransactions, dynamic tx) {
+    final String? title = (tx as dynamic).title as String?;
     if (title == null) return null;
     final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
     final match = regex.firstMatch(title);
     if (match == null) return null;
-    final current = int.tryParse(match.group(1) ?? '') ?? 0;
-    final baseTitle = match.group(2) ?? '';
+    final int current = int.tryParse(match.group(1) ?? '') ?? 0;
+    final String baseTitle = match.group(2) ?? '';
 
-    // Total de parcelas: conta quantas transações existem para o mesmo produto/baseTitle
-    final total = allTransactions.where((t) {
+    String _normPay(String? s) => (s ?? '').trim().toLowerCase();
+    double _parseVal(dynamic v) {
+      if (v is num) return v.toDouble();
+      if (v is String) {
+        final cleaned = v
+            .replaceAll('R\$', '')
+            .trim()
+            .replaceAll('.', '')
+            .replaceAll(',', '.');
+        return double.tryParse(cleaned) ?? 0.0;
+      }
+      return 0.0;
+    }
+
+    final String payNorm = _normPay((tx as dynamic).paymentType as String?);
+    final double val = _parseVal((tx as dynamic).value);
+
+    final int total = allTransactions.where((t) {
       final String? tTitle = (t as dynamic).title as String?;
       if (tTitle == null) return false;
       final m = regex.firstMatch(tTitle);
       if (m == null) return false;
-      final tBase = m.group(2) ?? '';
-      return tBase == baseTitle;
+      final String tBase = m.group(2) ?? '';
+      if (tBase != baseTitle) return false;
+      if (_normPay((t as dynamic).paymentType as String?) != payNorm) {
+        return false;
+      }
+      final double tv = _parseVal((t as dynamic).value);
+      return (tv - val).abs() <= 0.01;
     }).length;
+
     if (total <= 0) return null;
     return 'Parcela $current de $total';
   }
 
-  String _titleWithInstallment(String? title, List<dynamic> all) {
-    final label = _computeInstallmentLabel(all, title);
+  String _titleWithInstallment(dynamic tx, List<dynamic> all) {
+    final String? title = (tx as dynamic).title as String?;
+    final label = _computeInstallmentLabelForTx(all, tx);
     if (label == null) return title ?? '';
-    // Se o título já é "Parcela N: Nome", substitui por "Parcela N de Y — Nome"
     final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
     final match = title != null ? regex.firstMatch(title) : null;
     if (match == null) return title ?? '';

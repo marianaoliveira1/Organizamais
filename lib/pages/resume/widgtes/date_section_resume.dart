@@ -44,11 +44,11 @@ class DateSectionResume extends StatelessWidget {
           date,
           style: TextStyle(
             color: DefaultColors.grey,
-            fontSize: 10.sp,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: 2.h),
+        SizedBox(height: 4.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -56,8 +56,8 @@ class DateSectionResume extends StatelessWidget {
               'Despesas: ${formatter.format(totalDespesa)}',
               style: TextStyle(
                 color: DefaultColors.redDark,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w600,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
             if (totalReceita > 0) SizedBox(width: 8.w),
@@ -66,8 +66,8 @@ class DateSectionResume extends StatelessWidget {
                 'Receitas: ${formatter.format(totalReceita)}',
                 style: TextStyle(
                   color: DefaultColors.greenDark,
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
           ],

@@ -611,41 +611,50 @@ class TransactionController extends GetxController {
     );
   }
 
+  // Helper otimizado para parsing de valores
+  static double _parseTransactionValue(String value) {
+    try {
+      final cleaned = value.replaceAll('R\$', '').trim();
+      if (cleaned.contains(',')) {
+        return double.parse(cleaned.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      return double.parse(cleaned.replaceAll(' ', ''));
+    } catch (_) {
+      return 0.0;
+    }
+  }
+
   double getBalanceForDateRange(DateTime startDate, DateTime endDate) {
-    return transaction.where((t) {
-      if (t.paymentDay == null) return false;
+    // Normalizar datas para comparação mais eficiente
+    final startDateOnly =
+        DateTime(startDate.year, startDate.month, startDate.day);
+    final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+    double balance = 0.0;
+    for (final t in transaction) {
+      if (t.paymentDay == null) continue;
 
       try {
         final paymentDate = DateTime.parse(t.paymentDay!);
-
-        // Simplificando a lógica de comparação
         final paymentDateOnly =
             DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final startDateOnly =
-            DateTime(startDate.year, startDate.month, startDate.day);
-        final endDateOnly = DateTime(endDate.year, endDate.month, endDate.day);
 
-        return paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
+        if (paymentDateOnly.isAtSameMomentAs(startDateOnly) ||
             paymentDateOnly.isAtSameMomentAs(endDateOnly) ||
             (paymentDateOnly.isAfter(startDateOnly) &&
-                paymentDateOnly.isBefore(endDateOnly));
-      } catch (e) {
-        return false;
-      }
-    }).fold<double>(0.0, (balance, t) {
-      try {
-        final value =
-            double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
-        if (t.type == TransactionType.receita) {
-          return balance + value;
-        } else if (t.type == TransactionType.despesa) {
-          return balance - value;
+                paymentDateOnly.isBefore(endDateOnly))) {
+          final value = _parseTransactionValue(t.value);
+          if (t.type == TransactionType.receita) {
+            balance += value;
+          } else if (t.type == TransactionType.despesa) {
+            balance -= value;
+          }
         }
-        return balance;
-      } catch (e) {
-        return balance;
+      } catch (_) {
+        continue;
       }
-    });
+    }
+    return balance;
   }
 
   List<TransactionModel> getTransactionsForDateRange(

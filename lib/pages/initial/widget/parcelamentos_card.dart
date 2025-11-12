@@ -136,14 +136,48 @@ class ParcelamentosCard extends StatelessWidget {
           final parcelaAtual = match?.group(1) ?? '1';
           final tituloOriginal = match?.group(2) ?? parcela.title;
 
-          // Busca quantas parcelas totais existem para este item
-          final totalParcelas = _transactionController.transaction
-              .where((t) => t.title.contains(': $tituloOriginal'))
-              .length;
+          // Normalizações para agrupar por série única
+          String _normPay(String? s) => (s ?? '').trim().toLowerCase();
+          final normalizedPay = _normPay(parcela.paymentType);
+          final valuePerInstallment = _parseCurrencyValue(parcela.value);
+
+          // Todas as transações que pertencem a esta mesma série (mesmo título, paymentType e valor por parcela)
+          final sameSeries = _transactionController.transaction.where((t) {
+            final m2 = regex.firstMatch(t.title);
+            final base2 = m2?.group(2) ?? t.title;
+            if (base2 != tituloOriginal) return false;
+            if (_normPay(t.paymentType) != normalizedPay) return false;
+            final v2 = _parseCurrencyValue(t.value);
+            return (v2 - valuePerInstallment).abs() <= 0.005;
+          }).toList();
+
+          // Total de parcelas corretas desta série
+          final totalParcelas = sameSeries.length;
+
+          // Determina a chave do início da série (yyyy-MM)
+          DateTime? firstDate;
+          for (final x in sameSeries) {
+            if (x.paymentDay == null) continue;
+            final d = DateTime.tryParse(x.paymentDay!);
+            if (d == null) continue;
+            if (firstDate == null || d.isBefore(firstDate)) firstDate = d;
+          }
+          String seriesStartKey;
+          if (firstDate == null) {
+            seriesStartKey = '';
+          } else {
+            seriesStartKey =
+                '${firstDate.year}-${firstDate.month.toString().padLeft(2, '0')}';
+          }
 
           return InkWell(
             onTap: () {
-              Get.to(() => ParcelasDetailsPage(productName: tituloOriginal));
+              Get.to(() => ParcelasDetailsPage(
+                    productName: tituloOriginal,
+                    filterPaymentType: parcela.paymentType,
+                    installmentValue: valuePerInstallment,
+                    seriesStartKey: seriesStartKey,
+                  ));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

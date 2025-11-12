@@ -46,7 +46,7 @@ class _TransactionPageState extends State<TransactionPage> {
   bool _isInstallment = false;
   int _installments = 1;
 
-  final bool _isSaving = false;
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -190,7 +190,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       hintStyle: TextStyle(
                         color: DefaultColors.white,
                         fontWeight: FontWeight.w500,
-                        fontSize: 46.sp,
+                        fontSize: 48.sp,
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide.none,
@@ -201,7 +201,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                     style: TextStyle(
                       color: DefaultColors.white,
-                      fontSize: 46.sp,
+                      fontSize: 48.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
@@ -212,6 +212,7 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
             SizedBox(height: 8.h),
             AdsBanner(),
+            SizedBox(height: 8.h),
 
             Padding(
               padding: EdgeInsets.symmetric(
@@ -477,6 +478,8 @@ class _TransactionPageState extends State<TransactionPage> {
                   Expanded(
                     child: InkWell(
                       onTap: () async {
+                        if (_isSaving) return;
+
                         final TransactionController transactionController =
                             Get.find<TransactionController>();
 
@@ -496,6 +499,10 @@ class _TransactionPageState extends State<TransactionPage> {
                           );
                           return;
                         }
+
+                        setState(() {
+                          _isSaving = true;
+                        });
 
                         final TransactionModel transaction = TransactionModel(
                           title: titleController.text,
@@ -525,6 +532,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           // Navegar para ResumePage após salvar
                           Navigator.pop(
                               context, 3); // Retorna índice 3 (ResumePage)
+                          return;
                         } catch (e) {
                           Get.snackbar(
                             'Erro',
@@ -533,6 +541,12 @@ class _TransactionPageState extends State<TransactionPage> {
                             colorText: Colors.white,
                             snackPosition: SnackPosition.BOTTOM,
                           );
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isSaving = false;
+                            });
+                          }
                         }
                       },
                       child: _isSaving
@@ -575,7 +589,7 @@ class _TransactionPageState extends State<TransactionPage> {
 
             AdsBanner(),
             SizedBox(
-              height: 10.h,
+              height: 20.h,
             ),
           ],
         ),

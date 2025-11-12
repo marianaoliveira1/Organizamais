@@ -103,27 +103,63 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
   }
 
   List<TransactionModel> _filterMonth(List<TransactionModel> all) {
+    // Cache de datas parseadas para evitar parsing repetido
+    final dateCache = <TransactionModel, DateTime>{};
+    for (final t in all) {
+      if (t.paymentDay != null) {
+        try {
+          dateCache[t] = DateTime.parse(t.paymentDay!);
+        } catch (_) {}
+      }
+    }
+
     return all.where((t) {
-      if (t.paymentDay == null) return false;
-      final d = DateTime.parse(t.paymentDay!);
+      final d = dateCache[t];
+      if (d == null) return false;
       return d.month == _selectedMonth && d.year == _selectedYear;
     }).toList();
   }
 
   List<TransactionModel> _filterYear(List<TransactionModel> all, int year) {
     final now = DateTime.now();
+    // Cache de datas parseadas para evitar parsing repetido
+    final dateCache = <TransactionModel, DateTime>{};
+    for (final t in all) {
+      if (t.paymentDay != null) {
+        try {
+          dateCache[t] = DateTime.parse(t.paymentDay!);
+        } catch (_) {}
+      }
+    }
+
     return all.where((t) {
-      if (t.paymentDay == null) return false;
-      final d = DateTime.parse(t.paymentDay!);
+      final d = dateCache[t];
+      if (d == null) return false;
       return d.year == year && d.isBefore(now);
     }).toList();
   }
 
+  // Helper otimizado para parsing de valores
+  static double _parseValue(String value) {
+    try {
+      final cleaned = value.replaceAll('R\$', '').trim();
+      if (cleaned.contains(',')) {
+        return double.parse(cleaned.replaceAll('.', '').replaceAll(',', '.'));
+      }
+      return double.parse(cleaned.replaceAll(' ', ''));
+    } catch (_) {
+      return 0.0;
+    }
+  }
+
   double _sumByType(List<TransactionModel> txs, TransactionType type) {
-    return txs.where((t) => t.type == type).fold(
-        0.0,
-        (s, t) =>
-            s + double.parse(t.value.replaceAll('.', '').replaceAll(',', '.')));
+    double total = 0.0;
+    for (final t in txs) {
+      if (t.type == type) {
+        total += _parseValue(t.value);
+      }
+    }
+    return total;
   }
 
   Future<double> _fetchGoalDepositsForMonth() async {
@@ -316,9 +352,7 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                           title: 'Resumo Mensal',
                           onTap: () async {
                             // Exibe anúncio de tela cheia e depois navega
-                            try {
-                              await AdsInterstitial.show();
-                            } catch (_) {}
+
                             Get.to(() => MonthlySummaryPage(
                                   initialMonth: _selectedMonth,
                                   initialYear: _selectedYear,
@@ -369,20 +403,21 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                               .toList()
                               .cast<int>();
 
+                          // Otimizar cálculo de valores por categoria
+                          final Map<int, double> categoryTotals = {};
+                          for (final t in filteredTransactions) {
+                            if (t.category != null) {
+                              categoryTotals[t.category!] =
+                                  (categoryTotals[t.category!] ?? 0.0) +
+                                      _parseValue(t.value);
+                            }
+                          }
+
                           var data = categories
                               .map(
                                 (e) => {
                                   'category': e,
-                                  'value': filteredTransactions
-                                      .where((t) => t.category == e)
-                                      .fold<double>(
-                                        0.0,
-                                        (prev, t) =>
-                                            prev +
-                                            double.parse(t.value
-                                                .replaceAll('.', '')
-                                                .replaceAll(',', '.')),
-                                      ),
+                                  'value': categoryTotals[e] ?? 0.0,
                                   'name': findCategoryById(e)?['name'],
                                   'color': findCategoryById(e)?['color'],
                                   'icon': findCategoryById(e)?['icon'],
@@ -420,44 +455,48 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Center(
-                                      child: SizedBox(
-                                        height: 180.h,
-                                        child: SfCircularChart(
-                                          margin: EdgeInsets.zero,
-                                          legend: Legend(isVisible: false),
-                                          series: <CircularSeries<
-                                              Map<String, dynamic>, String>>[
-                                            PieSeries<Map<String, dynamic>,
-                                                String>(
-                                              dataSource: data,
-                                              xValueMapper: (e, _) =>
-                                                  (e['name'] ?? '').toString(),
-                                              yValueMapper: (e, _) =>
-                                                  (e['value'] as double),
-                                              pointColorMapper: (e, _) =>
-                                                  (e['color'] as Color?) ??
-                                                  Colors.grey.withOpacity(0.5),
-                                              dataLabelMapper: (e, _) {
-                                                final v =
-                                                    (e['value'] as double);
-                                                final pct = totalValue > 0
-                                                    ? (v / totalValue) * 100
-                                                    : 0;
-                                                return '${(e['name'] ?? '').toString()}\n${pct.toStringAsFixed(0)}%';
-                                              },
-                                              dataLabelSettings:
-                                                  const DataLabelSettings(
-                                                      isVisible: false),
-                                              explode: true,
-                                              explodeIndex:
-                                                  data.isEmpty ? null : 0,
-                                              explodeOffset: '8%',
-                                              sortingOrder:
-                                                  SortingOrder.descending,
-                                              sortFieldValueMapper: (e, _) =>
-                                                  (e['value'] as double),
-                                            )
-                                          ],
+                                      child: RepaintBoundary(
+                                        child: SizedBox(
+                                          height: 180.h,
+                                          child: SfCircularChart(
+                                            margin: EdgeInsets.zero,
+                                            legend: Legend(isVisible: false),
+                                            series: <CircularSeries<
+                                                Map<String, dynamic>, String>>[
+                                              PieSeries<Map<String, dynamic>,
+                                                  String>(
+                                                dataSource: data,
+                                                xValueMapper: (e, _) =>
+                                                    (e['name'] ?? '')
+                                                        .toString(),
+                                                yValueMapper: (e, _) =>
+                                                    (e['value'] as double),
+                                                pointColorMapper: (e, _) =>
+                                                    (e['color'] as Color?) ??
+                                                    Colors.grey
+                                                        .withOpacity(0.5),
+                                                dataLabelMapper: (e, _) {
+                                                  final v =
+                                                      (e['value'] as double);
+                                                  final pct = totalValue > 0
+                                                      ? (v / totalValue) * 100
+                                                      : 0;
+                                                  return '${(e['name'] ?? '').toString()}\n${pct.toStringAsFixed(0)}%';
+                                                },
+                                                dataLabelSettings:
+                                                    const DataLabelSettings(
+                                                        isVisible: false),
+                                                explode: true,
+                                                explodeIndex:
+                                                    data.isEmpty ? null : 0,
+                                                explodeOffset: '8%',
+                                                sortingOrder:
+                                                    SortingOrder.descending,
+                                                sortFieldValueMapper: (e, _) =>
+                                                    (e['value'] as double),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -486,26 +525,25 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                                     .toList()
                                     .cast<String>();
 
+                                // Otimizar cálculo de valores por tipo de pagamento
+                                final Map<String, double> paymentTypeTotals =
+                                    {};
+                                for (final t in filteredTransactions) {
+                                  if (t.paymentType != null) {
+                                    final key =
+                                        t.paymentType!.trim().toLowerCase();
+                                    paymentTypeTotals[key] =
+                                        (paymentTypeTotals[key] ?? 0.0) +
+                                            _parseValue(t.value);
+                                  }
+                                }
+
                                 final payData = payTypes
                                     .map((pt) => {
                                           'paymentType': pt,
-                                          'value': filteredTransactions
-                                              .where((t) =>
-                                                  t.paymentType != null &&
-                                                  t.paymentType!
-                                                          .trim()
-                                                          .toLowerCase() ==
-                                                      pt.trim().toLowerCase())
-                                              .fold<double>(
-                                                0.0,
-                                                (prev, t) =>
-                                                    prev +
-                                                    double.parse(
-                                                      t.value
-                                                          .replaceAll('.', '')
-                                                          .replaceAll(',', '.'),
-                                                    ),
-                                              ),
+                                          'value': paymentTypeTotals[
+                                                  pt.trim().toLowerCase()] ??
+                                              0.0,
                                           'color': _getPaymentTypeColor(pt),
                                         })
                                     .toList();
@@ -530,44 +568,49 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Center(
-                                        child: SizedBox(
-                                          height: 180.h,
-                                          child: SfCircularChart(
-                                            margin: EdgeInsets.zero,
-                                            legend: Legend(isVisible: false),
-                                            series: <CircularSeries<
-                                                Map<String, dynamic>, String>>[
-                                              PieSeries<Map<String, dynamic>,
-                                                  String>(
-                                                dataSource: payData,
-                                                xValueMapper: (e, _) =>
-                                                    (e['paymentType']
-                                                        as String),
-                                                yValueMapper: (e, _) =>
-                                                    (e['value'] as double),
-                                                pointColorMapper: (e, _) =>
-                                                    (e['color'] as Color),
-                                                dataLabelMapper: (e, _) {
-                                                  final v =
-                                                      (e['value'] as double);
-                                                  final pct = payTotal > 0
-                                                      ? (v / payTotal) * 100
-                                                      : 0;
-                                                  return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
-                                                },
-                                                dataLabelSettings:
-                                                    const DataLabelSettings(
-                                                        isVisible: false),
-                                                explode: true,
-                                                explodeIndex:
-                                                    payData.isEmpty ? null : 0,
-                                                explodeOffset: '8%',
-                                                sortingOrder:
-                                                    SortingOrder.descending,
-                                                sortFieldValueMapper: (e, _) =>
-                                                    (e['value'] as double),
-                                              )
-                                            ],
+                                        child: RepaintBoundary(
+                                          child: SizedBox(
+                                            height: 180.h,
+                                            child: SfCircularChart(
+                                              margin: EdgeInsets.zero,
+                                              legend: Legend(isVisible: false),
+                                              series: <CircularSeries<
+                                                  Map<String, dynamic>,
+                                                  String>>[
+                                                PieSeries<Map<String, dynamic>,
+                                                    String>(
+                                                  dataSource: payData,
+                                                  xValueMapper: (e, _) =>
+                                                      (e['paymentType']
+                                                          as String),
+                                                  yValueMapper: (e, _) =>
+                                                      (e['value'] as double),
+                                                  pointColorMapper: (e, _) =>
+                                                      (e['color'] as Color),
+                                                  dataLabelMapper: (e, _) {
+                                                    final v =
+                                                        (e['value'] as double);
+                                                    final pct = payTotal > 0
+                                                        ? (v / payTotal) * 100
+                                                        : 0;
+                                                    return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
+                                                  },
+                                                  dataLabelSettings:
+                                                      const DataLabelSettings(
+                                                          isVisible: false),
+                                                  explode: true,
+                                                  explodeIndex: payData.isEmpty
+                                                      ? null
+                                                      : 0,
+                                                  explodeOffset: '8%',
+                                                  sortingOrder:
+                                                      SortingOrder.descending,
+                                                  sortFieldValueMapper: (e,
+                                                          _) =>
+                                                      (e['value'] as double),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),

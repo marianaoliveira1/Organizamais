@@ -513,11 +513,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             foregroundColor: theme.primaryColor,
                           ),
                           onPressed: () async {
-                            try {
-                              await AdsInterstitial.preload();
-                              final shown = await AdsInterstitial.showIfReady();
-                              if (!shown) await AdsInterstitial.show();
-                            } catch (_) {}
                             Get.to(() => InsightsForecastPage(
                                   categoryId: categoryId,
                                   monthName: monthName,
@@ -550,14 +545,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           SizedBox(width: 12.w),
                           GestureDetector(
                             onTap: () async {
-                              try {
-                                await AdsInterstitial.preload();
-                                final shown =
-                                    await AdsInterstitial.showIfReady();
-                                if (!shown) {
-                                  await AdsInterstitial.show();
-                                }
-                              } catch (_) {}
                               Get.to(() => TwoMonthsComparisonPage(
                                     categoryId: categoryId,
                                     title: (item['name'] as String? ?? ''),
@@ -777,13 +764,32 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
     final match = regex.firstMatch(t.title);
     if (match == null) return t.title;
-    final current = int.tryParse(match.group(1) ?? '') ?? 0;
-    final baseTitle = match.group(2) ?? '';
-    final total = all.where((x) {
+    final int current = int.tryParse(match.group(1) ?? '') ?? 0;
+    final String baseTitle = match.group(2) ?? '';
+
+    String _normPay(String? s) => (s ?? '').trim().toLowerCase();
+    double _parseVal(String v) {
+      return double.tryParse(v
+              .replaceAll('R\$', '')
+              .trim()
+              .replaceAll('.', '')
+              .replaceAll(',', '.')) ??
+          0.0;
+    }
+
+    final String payNorm = _normPay(t.paymentType);
+    final double val = _parseVal(t.value);
+
+    final int total = all.where((x) {
       final m = regex.firstMatch(x.title);
       if (m == null) return false;
-      return (m.group(2) ?? '') == baseTitle;
+      final String tBase = m.group(2) ?? '';
+      if (tBase != baseTitle) return false;
+      if (_normPay(x.paymentType) != payNorm) return false;
+      final double xv = _parseVal(x.value);
+      return (xv - val).abs() <= 0.01;
     }).length;
+
     if (total <= 0) return t.title;
     return 'Parcela $current de $total — $baseTitle';
   }
@@ -850,7 +856,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: theme.cardColor,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: DefaultColors.grey20.withOpacity(.2)),
       ),
@@ -1054,8 +1059,6 @@ class WidgetListCategoryGraphics extends StatelessWidget {
       return ms[(m - 1).clamp(0, 11)];
     }
 
-    final DateTime now2 = DateTime.now();
-
     // Gradient header like the reference card
     final sameDayText =
         '${previousMonthEnd.day} de ${monthNamePt(previousMonthEnd.month)}';
@@ -1067,8 +1070,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
     final diffAbs = delta.abs();
 
     // Status helpers
-    final bool isNewCategory = comparison.type == PercentageType.newData ||
-        (previousValue == 0 && currentValue > 0);
+    final bool isNewCategory = comparison.type == PercentageType.newData;
 
     // Gradient colors per state
     final List<Color> gradColors = isNewCategory
@@ -1083,15 +1085,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   ];
 
     // Header text per state
-// Header text per state
-// Header text per state
     final String headerText = isNewCategory
         ? 'É uma categoria nova e, por isso, ainda não temos dados para comparação com o mês anterior.'
         : (isNeutral
-            ? 'Sem variação: Seus valores permaneceram estáveis, registrando 0% de mudança em relação ao mês passado.'
+            ? 'Sem variação: Seus valores permaneceram estáveis, registrando 0% de mudança em relação ao mês passado. '
+                'No dia ${sameDayText} o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.'
             : 'Seus gastos ${increased ? 'aumentaram' : 'diminuíram'} em ${pctDisp.abs().toStringAsFixed(1)}% '
                 '(${increased ? 'R\$ ${_formatCurrency(diffAbs)} a mais' : 'R\$ ${_formatCurrency(diffAbs)} a menos'}). '
-                'No mês passado o valor era R\$ ${_formatCurrency(previousValue)}, e agora está em R\$ ${_formatCurrency(currentValue)}.');
+                'No dia ${sameDayText} o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.');
 
     return Container(
       decoration: BoxDecoration(
@@ -1142,21 +1143,16 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                         Future<void> handleWatch() async {
                           if (isLoading) return;
                           setState(() => isLoading = true);
-                          final ok = await AdsRewardedPremium.show();
+                          await AdsInterstitial.show();
                           setState(() => isLoading = false);
-                          if (ok) {
-                            Navigator.of(ctx).pop();
-                            Get.to(
-                                () => Get.to(() => AnaliseMensalParcialWidget(
-                                      categoryId: categoryId,
-                                      categoryName: (categoryName ?? ''),
-                                      categoryIcon: categoryIcon,
-                                      categoryColor: categoryColor,
-                                      selectedMonthName: monthName,
-                                    )));
-                          }
-
-                          // }
+                          Navigator.of(ctx).pop();
+                          Get.to(() => Get.to(() => AnaliseMensalParcialWidget(
+                                categoryId: categoryId,
+                                categoryName: (categoryName ?? ''),
+                                categoryIcon: categoryIcon,
+                                categoryColor: categoryColor,
+                                selectedMonthName: monthName,
+                              )));
                         }
 
                         return Container(
@@ -1275,7 +1271,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                         isLoading
                                             // ignore: dead_code
                                             ? 'Carregando...'
-                                            : 'Assistir vídeo (30s)',
+                                            : 'Assistir vídeo (5s)',
                                         style: TextStyle(
                                           color: theme.cardColor,
                                           fontWeight: FontWeight.bold,
@@ -1392,7 +1388,7 @@ class _BenefitItem extends StatelessWidget {
                   text: description,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Colors.white60,
+                    color: theme.primaryColor.withOpacity(.7),
                   ),
                 ),
               ],

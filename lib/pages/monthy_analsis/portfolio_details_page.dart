@@ -698,13 +698,32 @@ String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
   final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
   final match = regex.firstMatch(t.title);
   if (match == null) return t.title;
-  final current = int.tryParse(match.group(1) ?? '') ?? 0;
-  final baseTitle = match.group(2) ?? '';
-  final total = all.where((x) {
+  final int current = int.tryParse(match.group(1) ?? '') ?? 0;
+  final String baseTitle = match.group(2) ?? '';
+
+  String _normPay(String? s) => (s ?? '').trim().toLowerCase();
+  double _parseVal(String v) {
+    return double.tryParse(v
+            .replaceAll('R\$', '')
+            .trim()
+            .replaceAll('.', '')
+            .replaceAll(',', '.')) ??
+        0.0;
+  }
+
+  final String payNorm = _normPay(t.paymentType);
+  final double val = _parseVal(t.value);
+
+  final int total = all.where((x) {
     final m = regex.firstMatch(x.title);
     if (m == null) return false;
-    return (m.group(2) ?? '') == baseTitle;
+    final String tBase = m.group(2) ?? '';
+    if (tBase != baseTitle) return false;
+    if (_normPay(x.paymentType) != payNorm) return false;
+    final double xv = _parseVal(x.value);
+    return (xv - val).abs() <= 0.01;
   }).length;
+
   if (total <= 0) return t.title;
   return 'Parcela $current de $total — $baseTitle';
 }

@@ -43,12 +43,28 @@ class TransactionsList extends StatelessWidget {
       final List<String> months = ResumeContent.getAllMonths();
       final int month = months.indexOf(monthName) + 1;
 
-      final monthTransactions = transactionController.getTransactionsForMonth(
-          year, month)
-        ..sort((a, b) => DateTime.parse(b.paymentDay!)
-            .compareTo(DateTime.parse(a.paymentDay!)));
+      final monthTransactions =
+          transactionController.getTransactionsForMonth(year, month);
 
-      final groupedTransactions = _groupTransactionsByDate(monthTransactions);
+      // Cache de datas parseadas para ordenação mais eficiente
+      final dateCache = <dynamic, DateTime>{};
+      for (final t in monthTransactions) {
+        if (t.paymentDay != null) {
+          try {
+            dateCache[t] = DateTime.parse(t.paymentDay!);
+          } catch (_) {}
+        }
+      }
+
+      monthTransactions.sort((a, b) {
+        final dateA = dateCache[a];
+        final dateB = dateCache[b];
+        if (dateA == null || dateB == null) return 0;
+        return dateB.compareTo(dateA);
+      });
+
+      final groupedTransactions =
+          _groupTransactionsByDate(monthTransactions, dateCache);
 
       return ListView.builder(
         shrinkWrap: true,
@@ -68,7 +84,8 @@ class TransactionsList extends StatelessWidget {
     });
   }
 
-  Map<String, List<dynamic>> _groupTransactionsByDate(List transactions) {
+  Map<String, List<dynamic>> _groupTransactionsByDate(
+      List transactions, Map<dynamic, DateTime> dateCache) {
     Map<String, List<dynamic>> grouped = {};
     final int currentYear = DateTime.now().year;
     final today = DateTime.now();
@@ -88,7 +105,8 @@ class TransactionsList extends StatelessWidget {
     }
 
     for (var transaction in transactions) {
-      DateTime transactionDate = DateTime.parse(transaction.paymentDay!);
+      final transactionDate = dateCache[transaction];
+      if (transactionDate == null) continue;
 
       // Filtra por ano selecionado (ou ano atual como fallback)
       final int yearFilter = selectedYear ?? currentYear;
@@ -100,7 +118,7 @@ class TransactionsList extends StatelessWidget {
         if (monthName != selectedMonthName) continue;
       }
 
-      String relativeDate = _getRelativeDate(transaction.paymentDay!);
+      String relativeDate = _getRelativeDate(transactionDate);
       grouped.putIfAbsent(relativeDate, () => []).add(transaction);
     }
 
@@ -167,16 +185,60 @@ class TransactionsList extends StatelessWidget {
       }
     }
 
-    // Se não é nenhuma das opções acima, tenta fazer parse da data
+    // Tenta fazer parse do formato brasileiro "2 de novembro de 2025"
     try {
+      final months = {
+        'janeiro': 1,
+        'fevereiro': 2,
+        'março': 3,
+        'abril': 4,
+        'maio': 5,
+        'junho': 6,
+        'julho': 7,
+        'agosto': 8,
+        'setembro': 9,
+        'outubro': 10,
+        'novembro': 11,
+        'dezembro': 12,
+      };
+
+      final match = RegExp(r'(\d+) de (\w+) de (\d+)').firstMatch(relativeDate);
+      if (match != null) {
+        final day = int.parse(match.group(1)!);
+        final monthName = match.group(2)!;
+        final year = int.parse(match.group(3)!);
+        final month = months[monthName.toLowerCase()];
+        if (month != null) {
+          return DateTime(year, month, day);
+        }
+      }
+
+      // Fallback: tenta fazer parse do formato antigo dd/MM/yyyy
       return DateFormat('dd/MM/yyyy').parse(relativeDate);
     } catch (e) {
       return now; // Fallback para hoje se não conseguir fazer parse
     }
   }
 
-  String _getRelativeDate(String dateStr) {
-    DateTime date = DateTime.parse(dateStr);
+  String _formatDateBrazilian(DateTime date) {
+    const months = [
+      'janeiro',
+      'fevereiro',
+      'março',
+      'abril',
+      'maio',
+      'junho',
+      'julho',
+      'agosto',
+      'setembro',
+      'outubro',
+      'novembro',
+      'dezembro'
+    ];
+    return '${date.day} de ${months[date.month - 1]} de ${date.year}';
+  }
+
+  String _getRelativeDate(DateTime date) {
     DateTime now = DateTime.now();
 
     // Calcular diferença em dias
@@ -198,6 +260,6 @@ class TransactionsList extends StatelessWidget {
       return 'Daqui $differenceInDays dias';
     }
 
-    return DateFormat('dd/MM/yyyy').format(date);
+    return _formatDateBrazilian(date);
   }
 }
