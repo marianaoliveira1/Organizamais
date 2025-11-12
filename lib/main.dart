@@ -30,71 +30,71 @@ import 'services/remote_config_service.dart';
 import 'services/performance_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-  } catch (e) {
-    print('Error initializing Firebase: $e');
-  }
-
-  // Configure Crashlytics collection and global error handlers
-  try {
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
-
-    // Forward Flutter framework errors to Crashlytics
-    FlutterError.onError = (FlutterErrorDetails details) {
-      FlutterError.presentError(details);
-      FirebaseCrashlytics.instance.recordFlutterError(details);
-    };
-
-    // Catch unhandled async errors
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
-  } catch (e) {
-    debugPrint('Crashlytics setup failed: $e');
-  }
-
-  if (kReleaseMode) {
-    try {
-      await MobileAds.instance.initialize();
-    } catch (e) {
-      print('Error initializing MobileAds: $e');
-    }
-  } else {
-    debugPrint('MobileAds disabled in debug mode');
-  }
-
-  try {
-    initializeDateFormatting('pt_BR', null);
-  } catch (e) {
-    print('Error initializing date formatting: $e');
-  }
-
-  try {
-    await NotificationService().init();
-  } catch (e) {
-    print('Error initializing notifications: $e');
-  }
-
-  // Initialize Firebase services
-  AnalyticsService();
-  await RemoteConfigService().init();
-  await PerformanceService().init();
-  await MessagingService().init();
-  // Debug: print FCM token
-  if (kDebugMode) {
-    try {
-      final token = await MessagingService().getToken();
-      debugPrint('FCM token: $token');
-    } catch (_) {}
-  }
-
   await runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    try {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+    } catch (e) {
+      print('Error initializing Firebase: $e');
+    }
+
+    // Configure Crashlytics collection and global error handlers
+    try {
+      await FirebaseCrashlytics.instance
+          .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+      // Forward Flutter framework errors to Crashlytics
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FlutterError.presentError(details);
+        FirebaseCrashlytics.instance.recordFlutterError(details);
+      };
+
+      // Catch unhandled async errors
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
+    } catch (e) {
+      debugPrint('Crashlytics setup failed: $e');
+    }
+
+    if (kReleaseMode) {
+      try {
+        await MobileAds.instance.initialize();
+      } catch (e) {
+        print('Error initializing MobileAds: $e');
+      }
+    } else {
+      debugPrint('MobileAds disabled in debug mode');
+    }
+
+    try {
+      initializeDateFormatting('pt_BR', null);
+    } catch (e) {
+      print('Error initializing date formatting: $e');
+    }
+
+    try {
+      await NotificationService().init();
+    } catch (e) {
+      print('Error initializing notifications: $e');
+    }
+
+    // Initialize Firebase services
+    AnalyticsService();
+    await RemoteConfigService().init();
+    await PerformanceService().init();
+    await MessagingService().init();
+    // Debug: print FCM token
+    if (kDebugMode) {
+      try {
+        final token = await MessagingService().getToken();
+        debugPrint('FCM token: $token');
+      } catch (_) {}
+    }
+
     runApp(const MyApp());
   }, (Object error, StackTrace stack) async {
     try {
