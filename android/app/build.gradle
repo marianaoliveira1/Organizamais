@@ -19,7 +19,7 @@ android {
         applicationId "com.organiza.organizamais"
         minSdkVersion flutter.minSdkVersion
         targetSdk 36
-        versionCode 163
+        versionCode 165
         versionName "1.0.0"
     }
 

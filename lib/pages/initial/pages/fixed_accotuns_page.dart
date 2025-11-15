@@ -44,20 +44,56 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
   int? selectedWeeklyWeekday; // 1=Monday .. 7=Sunday
   bool isSaving = false;
 
-  String _frequencyLabel(String value) {
-    switch (value) {
+  String _getFrequencyDisplayText() {
+    // Verificar se a periodicidade está completa
+    bool isComplete = false;
+
+    switch (selectedFrequency) {
       case 'mensal':
-        return 'Periodicidade: Mensal';
-      case 'quinzenal':
-        return 'Periodicidade: Quinzenal';
-      case 'semanal':
-        return 'Periodicidade: Semanal';
       case 'bimestral':
-        return 'Periodicidade: Bimestral';
       case 'trimestral':
-        return 'Periodicidade: Trimestral';
+        isComplete = dayOfTheMonthController.text.isNotEmpty;
+        break;
+      case 'quinzenal':
+        isComplete = biweeklyDay1Controller.text.isNotEmpty &&
+            biweeklyDay2Controller.text.isNotEmpty;
+        break;
+      case 'semanal':
+        isComplete = selectedWeeklyWeekday != null;
+        break;
       default:
-        return 'Periodicidade';
+        isComplete = false;
+    }
+
+    // Se não está completa, mostrar placeholder
+    if (!isComplete) {
+      return 'Selecione a periodicidade';
+    }
+
+    // Se está completa, mostrar texto formatado
+    switch (selectedFrequency) {
+      case 'mensal':
+        return 'Mensal dia ${dayOfTheMonthController.text}';
+      case 'bimestral':
+        return 'Bimestral dia ${dayOfTheMonthController.text}';
+      case 'trimestral':
+        return 'Trimestral dia ${dayOfTheMonthController.text}';
+      case 'quinzenal':
+        return 'Quinzenal dias ${biweeklyDay1Controller.text} e ${biweeklyDay2Controller.text}';
+      case 'semanal':
+        const weekdays = [
+          '',
+          'segundas',
+          'terças',
+          'quartas',
+          'quintas',
+          'sextas',
+          'sábados',
+          'domingos'
+        ];
+        return 'Semanal todas as ${weekdays[selectedWeeklyWeekday!]}';
+      default:
+        return 'Selecione a periodicidade';
     }
   }
 
@@ -128,9 +164,12 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final FixedAccountsController fixedAccountsController = Get.put(
-      FixedAccountsController(),
-    );
+    // Usar a instância existente do controller ao invés de criar uma nova
+    if (!Get.isRegistered<FixedAccountsController>()) {
+      Get.put(FixedAccountsController());
+    }
+    final FixedAccountsController fixedAccountsController =
+        Get.find<FixedAccountsController>();
 
     final theme = Theme.of(context);
 
@@ -146,444 +185,503 @@ class _AddFixedAccountsFormPageState extends State<AddFixedAccountsFormPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 20.w,
-            horizontal: 20.h,
-          ),
-          child: Column(
-            spacing: 10.h,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AdsBanner(),
-              DefaultTitleTransaction(
-                title: "Titulo",
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                vertical: 20.w,
+                horizontal: 20.h,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: DefaultTextFieldTransaction(
-                  hintText: 'ex: Aluguel',
-                  controller: titleController,
-                  keyboardType: TextInputType.text,
-                ),
-              ),
-              DefaultTitleTransaction(
-                title: "Valor",
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: TextFieldValueFixedAccotuns(
-                  valueController: valueController,
-                  theme: theme,
-                ),
-              ),
-              DefaultTitleTransaction(
-                title: "Mês e ano de início",
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: theme.primaryColor.withOpacity(.5),
+              child: Column(
+                spacing: 10.h,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AdsBanner(),
+                  DefaultTitleTransaction(
+                    title: "Titulo",
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: DropdownButton<int>(
-                          value: selectedMonth,
-                          isExpanded: true,
-                          underline: SizedBox(),
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: theme.primaryColor,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: DefaultTextFieldTransaction(
+                      hintText: 'ex: Aluguel',
+                      controller: titleController,
+                      keyboardType: TextInputType.text,
+                    ),
+                  ),
+                  DefaultTitleTransaction(
+                    title: "Valor",
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: TextFieldValueFixedAccotuns(
+                      valueController: valueController,
+                      theme: theme,
+                    ),
+                  ),
+                  DefaultTitleTransaction(
+                    title: "Mês e ano de início",
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: theme.primaryColor.withOpacity(.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            child: DropdownButton<int>(
+                              value: selectedMonth,
+                              isExpanded: true,
+                              underline: SizedBox(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: theme.primaryColor,
+                              ),
+                              dropdownColor: theme.scaffoldBackgroundColor,
+                              items: List.generate(12, (index) {
+                                int month = index + 1;
+                                List<String> monthNames = [
+                                  'Janeiro',
+                                  'Fevereiro',
+                                  'Março',
+                                  'Abril',
+                                  'Maio',
+                                  'Junho',
+                                  'Julho',
+                                  'Agosto',
+                                  'Setembro',
+                                  'Outubro',
+                                  'Novembro',
+                                  'Dezembro'
+                                ];
+                                return DropdownMenuItem<int>(
+                                  value: month,
+                                  child: Text(monthNames[index]),
+                                );
+                              }),
+                              onChanged: (int? newValue) {
+                                setState(() {
+                                  selectedMonth = newValue!;
+                                });
+                              },
+                            ),
                           ),
-                          dropdownColor: theme.scaffoldBackgroundColor,
-                          items: List.generate(12, (index) {
-                            int month = index + 1;
-                            List<String> monthNames = [
-                              'Janeiro',
-                              'Fevereiro',
-                              'Março',
-                              'Abril',
-                              'Maio',
-                              'Junho',
-                              'Julho',
-                              'Agosto',
-                              'Setembro',
-                              'Outubro',
-                              'Novembro',
-                              'Dezembro'
-                            ];
-                            return DropdownMenuItem<int>(
-                              value: month,
-                              child: Text(monthNames[index]),
-                            );
-                          }),
-                          onChanged: (int? newValue) {
-                            setState(() {
-                              selectedMonth = newValue!;
-                            });
-                          },
                         ),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 50.h,
-                      color: theme.primaryColor.withOpacity(.3),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: DropdownButton<int>(
-                          value: selectedYear,
-                          isExpanded: true,
-                          underline: SizedBox(),
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: theme.primaryColor,
+                        Container(
+                          width: 1,
+                          height: 50.h,
+                          color: theme.primaryColor.withOpacity(.3),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            child: DropdownButton<int>(
+                              value: selectedYear,
+                              isExpanded: true,
+                              underline: SizedBox(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: theme.primaryColor,
+                              ),
+                              dropdownColor: theme.scaffoldBackgroundColor,
+                              items: List.generate(40, (index) {
+                                int year = DateTime.now().year - 10 + index;
+                                return DropdownMenuItem<int>(
+                                  value: year,
+                                  child: Text(year.toString()),
+                                );
+                              }),
+                              onChanged: (int? newValue) {
+                                setState(() {
+                                  selectedYear = newValue!;
+                                });
+                              },
+                            ),
                           ),
-                          dropdownColor: theme.scaffoldBackgroundColor,
-                          items: List.generate(40, (index) {
-                            int year = DateTime.now().year - 10 + index;
-                            return DropdownMenuItem<int>(
-                              value: year,
-                              child: Text(year.toString()),
-                            );
-                          }),
-                          onChanged: (int? newValue) {
-                            setState(() {
-                              selectedYear = newValue!;
-                            });
-                          },
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Text(
-                "Para que os gráficos sejam exibidos de maneira mais equilibrada",
-                style: TextStyle(
-                  color: DefaultColors.grey20,
-                  fontSize: 9.sp,
-                ),
-              ),
-              DefaultTitleTransaction(
-                title: "Periodicidade",
-              ),
-              GestureDetector(
-                onTap: () async {
-                  final result = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => PeriodicitySelectionPage(
-                        initialFrequency: selectedFrequency,
-                        initialMonthlyDay:
-                            dayOfTheMonthController.text.isNotEmpty
-                                ? dayOfTheMonthController.text
-                                : null,
-                        initialBiweeklyDays:
-                            (biweeklyDay1Controller.text.isNotEmpty &&
-                                    biweeklyDay2Controller.text.isNotEmpty)
-                                ? [
-                                    int.parse(biweeklyDay1Controller.text),
-                                    int.parse(biweeklyDay2Controller.text)
-                                  ]
-                                : null,
-                        initialWeeklyWeekday: selectedWeeklyWeekday,
-                      ),
-                    ),
-                  );
-                  if (result is Map) {
-                    setState(() {
-                      selectedFrequency =
-                          result['frequency'] as String? ?? selectedFrequency;
-                      if (selectedFrequency == 'mensal' ||
-                          selectedFrequency == 'bimestral' ||
-                          selectedFrequency == 'trimestral') {
-                        dayOfTheMonthController.text =
-                            (result['monthlyDay'] as String?) ?? '';
-                        biweeklyDay1Controller.clear();
-                        biweeklyDay2Controller.clear();
-                        selectedWeeklyWeekday = null;
-                      } else if (selectedFrequency == 'quinzenal') {
-                        final days =
-                            (result['biweeklyDays'] as List?)?.cast<int>();
-                        if (days != null && days.length >= 2) {
-                          biweeklyDay1Controller.text = days[0].toString();
-                          biweeklyDay2Controller.text = days[1].toString();
-                        }
-                        dayOfTheMonthController.clear();
-                        selectedWeeklyWeekday = null;
-                      } else if (selectedFrequency == 'semanal') {
-                        selectedWeeklyWeekday = result['weeklyWeekday'] as int?;
-                        dayOfTheMonthController.clear();
-                        biweeklyDay1Controller.clear();
-                        biweeklyDay2Controller.clear();
-                      }
-                    });
-                  }
-                },
-                child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(12.r),
-                    border:
-                        Border.all(color: theme.primaryColor.withOpacity(.5)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _frequencyLabel(selectedFrequency),
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: theme.primaryColor,
-                        ),
-                      ),
-                      Icon(Icons.chevron_right, color: theme.primaryColor),
-                    ],
-                  ),
-                ),
-              ),
-              // Resumo da periodicidade selecionada
-              if (selectedFrequency.isNotEmpty)
-                Padding(
-                  padding: EdgeInsets.only(top: 1.h),
-                  child: Text(
-                    _frequencySummary(),
+                  Text(
+                    "Para que os gráficos sejam exibidos de maneira mais equilibrada",
                     style: TextStyle(
                       color: DefaultColors.grey20,
-                      fontSize: 11.sp,
-                      fontStyle: FontStyle.italic,
+                      fontSize: 9.sp,
                     ),
                   ),
-                ),
-              DefaultTitleTransaction(
-                title: "Categoria",
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: theme.primaryColor.withOpacity(.5),
+                  DefaultTitleTransaction(
+                    title: "Periodicidade",
                   ),
-                ),
-                child: DefaultButtonSelectCategory(
-                  selectedCategory: categoryId,
-                  transactionType: TransactionType.despesa,
-                  onTap: (category) {
-                    setState(() {
-                      categoryId = category;
-                    });
-                  },
-                ),
-              ),
-
-              DefaultTitleTransaction(
-                title: "Tipo de pagamento",
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: theme.primaryColor.withOpacity(.5),
-                  ),
-                ),
-                child: PaymentTypeField(
-                  controller: paymentTypeController,
-                ),
-              ),
-              SizedBox(height: 10.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: isSaving
-                          ? null
-                          : () async {
-                              setState(() {
-                                isSaving = true;
-                              });
-                              // Verificação se todos os campos estão preenchidos
-                              bool invalid = false;
-                              if (titleController.text.isEmpty ||
-                                  valueController.text.isEmpty ||
-                                  paymentTypeController.text.isEmpty ||
-                                  categoryId == null) {
-                                invalid = true;
-                              }
-                              if (!invalid) {
-                                if ((selectedFrequency == 'mensal' ||
-                                        selectedFrequency == 'bimestral' ||
-                                        selectedFrequency == 'trimestral') &&
-                                    dayOfTheMonthController.text.isEmpty) {
-                                  invalid = true;
-                                } else if (selectedFrequency == 'quinzenal' &&
-                                    (biweeklyDay1Controller.text.isEmpty ||
-                                        biweeklyDay2Controller.text.isEmpty)) {
-                                  invalid = true;
-                                } else if (selectedFrequency == 'semanal' &&
-                                    selectedWeeklyWeekday == null) {
-                                  invalid = true;
-                                }
-                              }
-                              if (invalid) {
-                                // Mostrar mensagem de erro se algum campo estiver vazio
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        "Por favor, preencha todos os campos"),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                setState(() {
-                                  isSaving = false;
-                                });
-                                return;
-                              }
-
-                              // Se todos os campos estiverem preenchidos, continua com o salvamento
-                              if (widget.onSave != null) {
-                                widget.onSave!(FixedAccountModel(
-                                  id: widget.fixedAccount?.id,
-                                  title: titleController.text,
-                                  value: valueController.text,
-                                  category: categoryId ?? 0,
-                                  paymentDay: (selectedFrequency == 'mensal' ||
-                                          selectedFrequency == 'bimestral' ||
-                                          selectedFrequency == 'trimestral')
-                                      ? dayOfTheMonthController.text
-                                      : (selectedFrequency == 'quinzenal'
-                                          ? biweeklyDay1Controller.text
-                                          : '1'),
-                                  paymentType: paymentTypeController.text,
-                                  startMonth: selectedMonth,
-                                  startYear: selectedYear,
-                                  frequency: selectedFrequency,
-                                  biweeklyDays: selectedFrequency == 'quinzenal'
-                                      ? [
-                                          int.parse(
-                                              biweeklyDay1Controller.text),
-                                          int.parse(biweeklyDay2Controller.text)
-                                        ]
-                                      : null,
-                                  weeklyWeekday: selectedFrequency == 'semanal'
-                                      ? selectedWeeklyWeekday
-                                      : null,
-                                ));
-                                if (widget.fromOnboarding) {
-                                  Get.offAllNamed(
-                                      app_routes.Routes.FIXED_SUCCESS);
-                                } else {
-                                  Get.offAllNamed(Routes.HOME);
-                                }
-                                setState(() {
-                                  isSaving = false;
-                                });
-                                return;
-                              }
-                              await fixedAccountsController
-                                  .addFixedAccount(FixedAccountModel(
-                                title: titleController.text,
-                                value: valueController.text,
-                                category: categoryId ?? 0,
-                                paymentDay: (selectedFrequency == 'mensal' ||
-                                        selectedFrequency == 'bimestral' ||
-                                        selectedFrequency == 'trimestral')
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PeriodicitySelectionPage(
+                            initialFrequency: selectedFrequency,
+                            initialMonthlyDay:
+                                dayOfTheMonthController.text.isNotEmpty
                                     ? dayOfTheMonthController.text
-                                    : (selectedFrequency == 'quinzenal'
-                                        ? biweeklyDay1Controller.text
-                                        : '1'),
-                                paymentType: paymentTypeController.text,
-                                startMonth: selectedMonth,
-                                startYear: selectedYear,
-                                frequency: selectedFrequency,
-                                biweeklyDays: selectedFrequency == 'quinzenal'
+                                    : null,
+                            initialBiweeklyDays:
+                                (biweeklyDay1Controller.text.isNotEmpty &&
+                                        biweeklyDay2Controller.text.isNotEmpty)
                                     ? [
                                         int.parse(biweeklyDay1Controller.text),
                                         int.parse(biweeklyDay2Controller.text)
                                       ]
                                     : null,
-                                weeklyWeekday: selectedFrequency == 'semanal'
-                                    ? selectedWeeklyWeekday
-                                    : null,
-                              ));
-                              setState(() {
-                                isSaving = false;
-                              });
-                              if (widget.fromOnboarding) {
-                                Get.offAllNamed(
-                                    app_routes.Routes.FIXED_SUCCESS);
-                              } else {
-                                Get.offAllNamed(Routes.HOME);
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                            initialWeeklyWeekday: selectedWeeklyWeekday,
+                          ),
                         ),
+                      );
+                      if (result is Map) {
+                        setState(() {
+                          selectedFrequency = result['frequency'] as String? ??
+                              selectedFrequency;
+                          if (selectedFrequency == 'mensal' ||
+                              selectedFrequency == 'bimestral' ||
+                              selectedFrequency == 'trimestral') {
+                            dayOfTheMonthController.text =
+                                (result['monthlyDay'] as String?) ?? '';
+                            biweeklyDay1Controller.clear();
+                            biweeklyDay2Controller.clear();
+                            selectedWeeklyWeekday = null;
+                          } else if (selectedFrequency == 'quinzenal') {
+                            final days =
+                                (result['biweeklyDays'] as List?)?.cast<int>();
+                            if (days != null && days.length >= 2) {
+                              biweeklyDay1Controller.text = days[0].toString();
+                              biweeklyDay2Controller.text = days[1].toString();
+                            }
+                            dayOfTheMonthController.clear();
+                            selectedWeeklyWeekday = null;
+                          } else if (selectedFrequency == 'semanal') {
+                            selectedWeeklyWeekday =
+                                result['weeklyWeekday'] as int?;
+                            dayOfTheMonthController.clear();
+                            biweeklyDay1Controller.clear();
+                            biweeklyDay2Controller.clear();
+                          }
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 14.h),
+                      decoration: BoxDecoration(
+                        color: theme.scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.5)),
                       ),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Container(
-                          height: 48.h,
-                          alignment: Alignment.center,
-                          child: isSaving
-                              ? SizedBox(
-                                  width: 20.h,
-                                  height: 20.h,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      theme.cardColor,
-                                    ),
-                                  ),
-                                )
-                              : Text(
-                                  widget.fromOnboarding
-                                      ? "Criar conta fixa"
-                                      : "Salvar",
-                                  style: TextStyle(
-                                    color: theme.cardColor,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _getFrequencyDisplayText(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: _getFrequencyDisplayText() ==
+                                        'Selecione a periodicidade'
+                                    ? DefaultColors.grey20
+                                    : theme.primaryColor,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Icon(Icons.chevron_right, color: theme.primaryColor),
+                        ],
                       ),
                     ),
                   ),
+                  DefaultTitleTransaction(
+                    title: "Categoria",
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: theme.primaryColor.withOpacity(.5),
+                      ),
+                    ),
+                    child: DefaultButtonSelectCategory(
+                      selectedCategory: categoryId,
+                      transactionType: TransactionType.despesa,
+                      onTap: (category) {
+                        setState(() {
+                          categoryId = category;
+                        });
+                      },
+                    ),
+                  ),
+                  DefaultTitleTransaction(
+                    title: "Tipo de pagamento",
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: theme.primaryColor.withOpacity(.5),
+                      ),
+                    ),
+                    child: PaymentTypeField(
+                      controller: paymentTypeController,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isSaving
+                              ? null
+                              : () async {
+                                  // Verificação se todos os campos estão preenchidos ANTES de setar isSaving
+                                  bool invalid = false;
+                                  if (titleController.text.isEmpty ||
+                                      valueController.text.isEmpty ||
+                                      paymentTypeController.text.isEmpty ||
+                                      categoryId == null) {
+                                    invalid = true;
+                                  }
+                                  if (!invalid) {
+                                    if ((selectedFrequency == 'mensal' ||
+                                            selectedFrequency == 'bimestral' ||
+                                            selectedFrequency ==
+                                                'trimestral') &&
+                                        dayOfTheMonthController.text.isEmpty) {
+                                      invalid = true;
+                                    } else if (selectedFrequency ==
+                                            'quinzenal' &&
+                                        (biweeklyDay1Controller.text.isEmpty ||
+                                            biweeklyDay2Controller
+                                                .text.isEmpty)) {
+                                      invalid = true;
+                                    } else if (selectedFrequency == 'semanal' &&
+                                        selectedWeeklyWeekday == null) {
+                                      invalid = true;
+                                    }
+                                  }
+                                  if (invalid) {
+                                    // Mostrar mensagem de erro se algum campo estiver vazio
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "Por favor, preencha todos os campos"),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  // Agora sim, setar isSaving e mostrar loading
+                                  setState(() {
+                                    isSaving = true;
+                                  });
+
+                                  try {
+                                    // Se todos os campos estiverem preenchidos, continua com o salvamento
+                                    if (widget.onSave != null) {
+                                      widget.onSave!(FixedAccountModel(
+                                        id: widget.fixedAccount?.id,
+                                        title: titleController.text,
+                                        value: valueController.text,
+                                        category: categoryId ?? 0,
+                                        paymentDay: (selectedFrequency ==
+                                                    'mensal' ||
+                                                selectedFrequency ==
+                                                    'bimestral' ||
+                                                selectedFrequency ==
+                                                    'trimestral')
+                                            ? dayOfTheMonthController.text
+                                            : (selectedFrequency == 'quinzenal'
+                                                ? biweeklyDay1Controller.text
+                                                : '1'),
+                                        paymentType: paymentTypeController.text,
+                                        startMonth: selectedMonth,
+                                        startYear: selectedYear,
+                                        frequency: selectedFrequency,
+                                        biweeklyDays: selectedFrequency ==
+                                                'quinzenal'
+                                            ? [
+                                                int.parse(biweeklyDay1Controller
+                                                    .text),
+                                                int.parse(
+                                                    biweeklyDay2Controller.text)
+                                              ]
+                                            : null,
+                                        weeklyWeekday:
+                                            selectedFrequency == 'semanal'
+                                                ? selectedWeeklyWeekday
+                                                : null,
+                                      ));
+                                      if (widget.fromOnboarding) {
+                                        Get.offAllNamed(
+                                            app_routes.Routes.FIXED_SUCCESS);
+                                      } else {
+                                        Get.offAllNamed(Routes.HOME);
+                                      }
+                                      return;
+                                    }
+
+                                    await fixedAccountsController
+                                        .addFixedAccount(FixedAccountModel(
+                                      title: titleController.text,
+                                      value: valueController.text,
+                                      category: categoryId ?? 0,
+                                      paymentDay: (selectedFrequency ==
+                                                  'mensal' ||
+                                              selectedFrequency ==
+                                                  'bimestral' ||
+                                              selectedFrequency == 'trimestral')
+                                          ? dayOfTheMonthController.text
+                                          : (selectedFrequency == 'quinzenal'
+                                              ? biweeklyDay1Controller.text
+                                              : '1'),
+                                      paymentType: paymentTypeController.text,
+                                      startMonth: selectedMonth,
+                                      startYear: selectedYear,
+                                      frequency: selectedFrequency,
+                                      biweeklyDays: selectedFrequency ==
+                                              'quinzenal'
+                                          ? [
+                                              int.parse(
+                                                  biweeklyDay1Controller.text),
+                                              int.parse(
+                                                  biweeklyDay2Controller.text)
+                                            ]
+                                          : null,
+                                      weeklyWeekday:
+                                          selectedFrequency == 'semanal'
+                                              ? selectedWeeklyWeekday
+                                              : null,
+                                    ));
+
+                                    if (widget.fromOnboarding) {
+                                      Get.offAllNamed(
+                                          app_routes.Routes.FIXED_SUCCESS);
+                                    } else {
+                                      Get.offAllNamed(Routes.HOME);
+                                    }
+                                  } catch (e) {
+                                    // Em caso de erro, resetar o estado e mostrar mensagem
+                                    setState(() {
+                                      isSaving = false;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "Erro ao salvar conta fixa. Tente novamente."),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Container(
+                              height: 48.h,
+                              alignment: Alignment.center,
+                              child: isSaving
+                                  ? SizedBox(
+                                      width: 20.h,
+                                      height: 20.h,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          theme.cardColor,
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                      widget.fromOnboarding
+                                          ? "Criar conta fixa"
+                                          : "Salvar",
+                                      style: TextStyle(
+                                        color: theme.cardColor,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.h),
                 ],
               ),
-              SizedBox(height: 20.h),
-            ],
+            ),
           ),
-        ),
+          // Overlay de loading quando está salvando
+          Visibility(
+            visible: isSaving,
+            child: Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: Center(
+                  child: Container(
+                    padding: EdgeInsets.all(24.w),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.primaryColor,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          "Salvando conta fixa...",
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

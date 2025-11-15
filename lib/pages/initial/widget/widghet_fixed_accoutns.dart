@@ -14,12 +14,23 @@ class DefaultWidgetFixedAccounts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(FixedAccountsController());
+    // Usar a instância existente do controller ao invés de criar uma nova
+    // Isso evita substituir a instância que já tem o stream iniciado
+    if (!Get.isRegistered<FixedAccountsController>()) {
+      Get.put(FixedAccountsController());
+    }
+
+    final controller = Get.find<FixedAccountsController>();
+
+    // Garantir que o stream está iniciado
+    if (controller.fixedAccountsStream == null) {
+      controller.startFixedAccountsStream();
+    }
 
     // final theme = Theme.of(context);
 
     return Obx(() {
-      final count = Get.find<FixedAccountsController>().fixedAccounts.length;
+      final count = controller.fixedAccounts.length;
       return InfoCard(
         title: "Contas fixas ($count)",
         onTap: () {

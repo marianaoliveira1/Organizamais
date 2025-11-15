@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/fixed_accounts_controller.dart';
-import '../../controller/transaction_controller.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/goal_controller.dart';
 
@@ -23,7 +22,11 @@ class InitialPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(FixedAccountsController());
+    // Usar instância existente se já estiver registrada, senão criar nova
+    if (!Get.isRegistered<FixedAccountsController>()) {
+      Get.put(FixedAccountsController());
+    }
+
     final GoalController goalController = Get.put(GoalController());
     if (goalController.goalStream == null) {
       goalController.startGoalStream();
@@ -39,28 +42,42 @@ class InitialPage extends StatelessWidget {
           final auth = Get.find<AuthController>();
           final user = auth.firebaseUser.value;
           if (user == null) return const SizedBox.shrink();
-          final effectiveName = user.displayName ?? 'Usuário';
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Oi,',
-                style: TextStyle(
-                  color: theme.primaryColor.withOpacity(0.7),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                "$effectiveName 👋",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+
+          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .snapshots(),
+            builder: (context, snapshot) {
+              final firestoreName = snapshot.data?.data()?['name'] as String?;
+              final effectiveName =
+                  (firestoreName != null && firestoreName.trim().isNotEmpty)
+                      ? firestoreName
+                      : (user.displayName ?? 'Usuário');
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Oi,',
+                    style: TextStyle(
+                      color: theme.primaryColor.withOpacity(0.7),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    "$effectiveName 👋",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              );
+            },
           );
         }),
       ),
