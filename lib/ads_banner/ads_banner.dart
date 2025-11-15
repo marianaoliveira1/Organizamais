@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:organizamais/services/remote_config_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:async';
+import 'dart:io';
 
 class AdsBanner extends StatefulWidget {
   const AdsBanner({super.key});
@@ -26,8 +27,15 @@ class _AdsBannerState extends State<AdsBanner> {
   }
 
   void _loadBannerAd() {
+    // Seleciona o ID do anúncio baseado na plataforma
+    final String adUnitId = Platform.isAndroid
+        ? 'ca-app-pub-8308246738505070/6410645428' // Android
+        : Platform.isIOS
+            ? 'ca-app-pub-8308246738505070/9270077861' // iOS
+            : 'ca-app-pub-8308246738505070/6410645428'; // Fallback para Android
+
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-8308246738505070/6410645428', // Seu ID do banner
+      adUnitId: adUnitId,
       size: AdSize.banner, // Banner com altura menor (320x50)
       request: const AdRequest(),
       listener: BannerAdListener(

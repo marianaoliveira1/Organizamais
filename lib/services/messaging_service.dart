@@ -28,25 +28,41 @@ class MessagingService {
   Future<void> init() async {
     if (_initialized) return;
 
-    // Local notifications init (for foreground display)
+    /// ---------------------- iOS SETTINGS ----------------------
+    const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    /// ---------------------- ANDROID SETTINGS ----------------------
     const AndroidInitializationSettings androidInit =
         AndroidInitializationSettings('@mipmap/launcher_icon');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidInit);
+
+    /// ---------------------- GLOBAL SETTINGS ----------------------
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidInit,
+      iOS: iosInit,
+    );
+
     await _local.initialize(initSettings);
 
-    // Create channel (safe to call multiple times)
+    /// ---------------------- ANDROID CHANNEL ----------------------
     final androidImpl = _local.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await androidImpl?.createNotificationChannel(_channel);
 
-    // Request permissions on Android 13+
-    await _messaging.requestPermission();
+    /// ---------------------- REQUEST PERMISSIONS (iOS + Android) ----------------------
+    await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
-    // Background messages
+    /// ---------------------- BACKGROUND HANDLER ----------------------
     FirebaseMessaging.onBackgroundMessage(MessagingService.backgroundHandler);
 
-    // Foreground messages
+    /// ---------------------- FOREGROUND NOTIFICATIONS ----------------------
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (kDebugMode) {
         debugPrint('FCM foreground: ${message.messageId} data=${message.data}');

@@ -5,7 +5,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Organizamais</string>
+		<string>Organiza+</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -47,5 +47,12 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>GADApplicationIdentifier</key>
+		<string>ca-app-pub-8308246738505070~9270077861</string>
+		<key>NSUserTrackingUsageDescription</key>
+		<string>Este identificador será usado para exibir anúncios personalizados.</string>
+
+
+
 	</dict>
 </plist>

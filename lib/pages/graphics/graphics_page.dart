@@ -27,6 +27,7 @@ import 'pages/category_report_page.dart';
 import 'pages/weekly_report_page.dart';
 import 'pages/spending_shift_balance_page.dart';
 import 'pages/category_type_selection_page.dart';
+import 'pages/budget_suggestions_page.dart';
 import '../resume/widgtes/text_not_transaction.dart';
 import '../../widgetes/info_card.dart';
 
@@ -696,6 +697,11 @@ class _GraphicsPageState extends State<GraphicsPage>
             ),
           ),
         ),
+        SizedBox(height: 20.h),
+
+        // Card de sugestões 50/30/20
+        _buildBudgetSuggestionsCard(
+            theme, transactionController, currencyFormatter),
         SizedBox(height: 20.h),
 
         // Gráfico de Categorias Agrupadas por Macrocategoria (InfoCard)
@@ -3453,6 +3459,130 @@ class _GraphicsPageState extends State<GraphicsPage>
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildBudgetSuggestionsCard(
+    ThemeData theme,
+    TransactionController transactionController,
+    NumberFormat currencyFormatter,
+  ) {
+    // Calcular receita total do último mês ou mês atual
+    final now = DateTime.now();
+    final lastMonth = now.month == 1 ? 12 : now.month - 1;
+    final lastMonthYear = now.month == 1 ? now.year - 1 : now.year;
+
+    final lastMonthStart = DateTime(lastMonthYear, lastMonth, 1);
+    final lastMonthEnd = DateTime(lastMonthYear, lastMonth + 1, 0, 23, 59, 59);
+
+    final lastMonthTransactions = transactionController
+        .getTransactionsForDateRange(lastMonthStart, lastMonthEnd);
+
+    double lastMonthIncome = 0.0;
+    for (final t in lastMonthTransactions) {
+      if (t.type == TransactionType.receita) {
+        try {
+          String s = t.value.replaceAll('R\$', '').trim();
+          if (s.contains(',')) {
+            s = s.replaceAll('.', '').replaceAll(',', '.');
+          } else {
+            s = s.replaceAll(' ', '');
+          }
+          lastMonthIncome += double.tryParse(s) ?? 0.0;
+        } catch (_) {}
+      }
+    }
+
+    // Se não houver receita no último mês, usar mês atual
+    String monthName;
+    if (lastMonthIncome == 0) {
+      final currentMonthStart = DateTime(now.year, now.month, 1);
+      final currentMonthEnd = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+      final currentMonthTransactions = transactionController
+          .getTransactionsForDateRange(currentMonthStart, currentMonthEnd);
+
+      for (final t in currentMonthTransactions) {
+        if (t.type == TransactionType.receita) {
+          try {
+            String s = t.value.replaceAll('R\$', '').trim();
+            if (s.contains(',')) {
+              s = s.replaceAll('.', '').replaceAll(',', '.');
+            } else {
+              s = s.replaceAll(' ', '');
+            }
+            lastMonthIncome += double.tryParse(s) ?? 0.0;
+          } catch (_) {}
+        }
+      }
+      final monthNames = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ];
+      monthName = monthNames[now.month - 1];
+    } else {
+      final monthNames = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ];
+      monthName = monthNames[lastMonth - 1];
+    }
+
+    return InfoCard(
+      title: 'Sugestões de Orçamento',
+      onTap: () {
+        Get.to(() => const BudgetSuggestionsPage());
+      },
+      backgroundColor: theme.cardColor,
+      content: Row(
+        children: [
+          Container(
+            width: 36.w,
+            height: 36.h,
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(
+              Iconsax.chart_21,
+              color: theme.primaryColor,
+              size: 18.sp,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              'Veja sua distribuição financeira automática pelo método 50/30/20 de $monthName.',
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: theme.primaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Icon(Icons.chevron_right, color: theme.primaryColor),
+        ],
+      ),
     );
   }
 

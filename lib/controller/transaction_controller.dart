@@ -425,6 +425,9 @@ class TransactionController extends GetxController {
   }
 
   void startTransactionStream() {
+    // Cancelar stream anterior se existir para evitar múltiplas subscrições
+    transactionStream?.cancel();
+
     transactionStream = FirebaseFirestore.instance
         .collection('transactions')
         .where(
@@ -433,15 +436,18 @@ class TransactionController extends GetxController {
         )
         .snapshots()
         .listen((snapshot) {
-      var map = snapshot.docs.map((e) {
+      // Usar List.generate para melhor performance
+      final List<TransactionModel> newTransactions = [];
+      for (final doc in snapshot.docs) {
         try {
-          return TransactionModel.fromMap(e.data()).copyWith(id: e.id);
-        } catch (e) {
-          return null;
+          final transaction =
+              TransactionModel.fromMap(doc.data()).copyWith(id: doc.id);
+          newTransactions.add(transaction);
+        } catch (_) {
+          // Ignorar documentos inválidos
         }
-      }).toList();
-      var filteredMap = map.where((e) => e != null).toList();
-      _transaction.value = filteredMap.cast<TransactionModel>();
+      }
+      _transaction.value = newTransactions;
       _isLoading.value = false;
     });
   }
@@ -506,7 +512,7 @@ class TransactionController extends GetxController {
       isInstallment: isInstallment,
     );
 
-    Get.snackbar('Sucesso', 'Transação adicionada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   Future<void> updateTransaction(TransactionModel transaction) async {
@@ -546,7 +552,7 @@ class TransactionController extends GetxController {
       value: value,
     );
 
-    Get.snackbar('Sucesso', 'Transação atualizada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   Future<void> deleteTransaction(String id) async {
@@ -586,7 +592,7 @@ class TransactionController extends GetxController {
       );
     }
 
-    Get.snackbar('Sucesso', 'Transação removida com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   // Percentage calculation methods

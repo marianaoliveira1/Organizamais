@@ -55,6 +55,9 @@ class FixedAccountsController extends GetxController {
   List<FixedAccountModel> get allFixedAccounts => _allFixedAccounts;
 
   void startFixedAccountsStream() {
+    // Cancelar stream anterior se existir para evitar múltiplas subscrições
+    fixedAccountsStream?.cancel();
+
     fixedAccountsStream = FirebaseFirestore.instance
         .collection('fixedAccounts')
         .where(
@@ -63,15 +66,24 @@ class FixedAccountsController extends GetxController {
         )
         .snapshots()
         .listen((snapshot) {
-      _allFixedAccounts.value = snapshot.docs
-          .map(
-            (e) => FixedAccountModel.fromMap(e.data()).copyWith(id: e.id),
-          )
-          .toList();
+      // Usar List.generate para melhor performance
+      final List<FixedAccountModel> newAccounts = [];
+      for (final doc in snapshot.docs) {
+        try {
+          final account =
+              FixedAccountModel.fromMap(doc.data()).copyWith(id: doc.id);
+          newAccounts.add(account);
+        } catch (_) {
+          // Ignorar documentos inválidos
+        }
+      }
+      _allFixedAccounts.value = newAccounts;
       isLoading.value = false;
 
-      // Reagendar notificações simples (12:00 no dia)
-      NotificationService().rescheduleAll(_allFixedAccounts);
+      // Reagendar notificações de forma assíncrona para não bloquear
+      Future.microtask(() {
+        NotificationService().rescheduleAll(_allFixedAccounts);
+      });
     });
   }
 
@@ -106,7 +118,7 @@ class FixedAccountsController extends GetxController {
       frequency: fixedAccount.frequency ?? 'mensal',
     );
 
-    Get.snackbar('Sucesso', 'Conta fixa adicionada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
     // Reagendar notificação (não bloqueante)
     NotificationService().scheduleDueDay(fixedAccountWithUserId);
   }
@@ -142,7 +154,7 @@ class FixedAccountsController extends GetxController {
     // Log analytics (não bloqueante)
     _analyticsService.logUpdateFixedAccount(fixedAccount.title);
 
-    Get.snackbar('Sucesso', 'Conta fixa atualizada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
     // Reagendar notificação (não bloqueante)
     NotificationService().scheduleDueDay(fixedAccount);
   }
@@ -171,7 +183,7 @@ class FixedAccountsController extends GetxController {
       }
       rethrow;
     }
-    Get.snackbar('Sucesso', 'Conta fixa desabilitada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
     NotificationService().cancelFor(id);
   }
 
@@ -200,7 +212,7 @@ class FixedAccountsController extends GetxController {
       }
       rethrow;
     }
-    Get.snackbar('Sucesso', 'Conta fixa reativada com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
     final account = _allFixedAccounts.firstWhereOrNull((a) => a.id == id);
     if (account != null) {
       NotificationService().scheduleDueDay(account);
@@ -236,7 +248,7 @@ class FixedAccountsController extends GetxController {
       _analyticsService.logDeleteFixedAccount(accountToDelete.title);
     }
 
-    Get.snackbar('Sucesso', 'Conta fixa removida permanentemente');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
     NotificationService().cancelFor(id);
   }
 }

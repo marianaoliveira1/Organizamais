@@ -13,6 +13,9 @@ class CardController extends GetxController {
   final AnalyticsService _analyticsService = AnalyticsService();
 
   void startCardStream() {
+    // Cancelar stream anterior se existir para evitar múltiplas subscrições
+    cardStream?.cancel();
+
     cardStream = FirebaseFirestore.instance
         .collection('cards')
         .where(
@@ -21,11 +24,17 @@ class CardController extends GetxController {
         )
         .snapshots()
         .listen((snapshot) {
-      card.value = snapshot.docs
-          .map(
-            (e) => CardsModel.fromMap(e.data()).copyWith(id: e.id),
-          )
-          .toList();
+      // Usar List.generate para melhor performance
+      final List<CardsModel> newCards = [];
+      for (final doc in snapshot.docs) {
+        try {
+          final card = CardsModel.fromMap(doc.data()).copyWith(id: doc.id);
+          newCards.add(card);
+        } catch (_) {
+          // Ignorar documentos inválidos
+        }
+      }
+      card.value = newCards;
     });
   }
 
@@ -50,7 +59,7 @@ class CardController extends GetxController {
     // Log analytics (não bloqueante)
     _analyticsService.logAddCard(card.name);
 
-    Get.snackbar('Sucesso', 'Cartão adicionado com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   Future<void> updateCard(CardsModel card) async {
@@ -77,7 +86,7 @@ class CardController extends GetxController {
     // Log analytics (não bloqueante)
     _analyticsService.logUpdateCard(card.name);
 
-    Get.snackbar('Sucesso', 'Cartão atualizado com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   Future<void> deleteCard(String id) async {
@@ -105,7 +114,7 @@ class CardController extends GetxController {
       _analyticsService.logDeleteCard(cardToDelete.name);
     }
 
-    Get.snackbar('Sucesso', 'Cartão removido com sucesso');
+    // Snackbar removido para melhorar performance - a UI já atualiza otimisticamente
   }
 
   Future<void> markInvoicePaid(

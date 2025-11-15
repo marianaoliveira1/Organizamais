@@ -25,8 +25,23 @@ class AuthController extends GetxController {
   var isOnboarding = false;
 
   @override
+  void onInit() {
+    super.onInit();
+    // Verificar usuário atual imediatamente
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      firebaseUser.value = currentUser;
+      // Carregar componentes imediatamente se os controllers estiverem prontos
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadOtherComponents(currentUser);
+      });
+    }
+  }
+
+  @override
   void onReady() {
     super.onReady();
+    // Vincular ao stream para mudanças futuras
     firebaseUser.bindStream(_auth.userChanges());
     ever(firebaseUser, _setInitialScreen);
     ever(firebaseUser, _loadOtherComponents);
@@ -39,6 +54,13 @@ class AuthController extends GetxController {
             'user_is_anonymous', (u?.isAnonymous ?? true).toString());
       } catch (_) {}
     });
+
+    // Tentar carregar componentes novamente no onReady caso não tenham sido carregados no onInit
+    if (firebaseUser.value != null && !loadedOtherControllers) {
+      Future.microtask(() {
+        _loadOtherComponents(firebaseUser.value);
+      });
+    }
   }
 
   updateDisplayName(String displayName) async {
@@ -50,22 +72,45 @@ class AuthController extends GetxController {
   _loadOtherComponents(User? user) {
     if (user == null) return;
     if (loadedOtherControllers) return;
-    loadedOtherControllers = true;
-    Get.find<CardController>().startCardStream();
-    Get.find<FixedAccountsController>().startFixedAccountsStream();
-    Get.find<TransactionController>().startTransactionStream();
-    Get.find<GoalController>().startGoalStream();
+
+    // Verificar se todos os controllers estão disponíveis antes de usar
+    final bool allControllersReady = Get.isRegistered<CardController>() &&
+        Get.isRegistered<FixedAccountsController>() &&
+        Get.isRegistered<TransactionController>() &&
+        Get.isRegistered<GoalController>();
+
+    if (!allControllersReady) {
+      // Se não estão todos prontos, tentar novamente depois
+      return;
+    }
+
+    try {
+      Get.find<CardController>().startCardStream();
+      Get.find<FixedAccountsController>().startFixedAccountsStream();
+      Get.find<TransactionController>().startTransactionStream();
+      Get.find<GoalController>().startGoalStream();
+      loadedOtherControllers = true;
+    } catch (e) {
+      // Se algum controller não estiver disponível, não marca como carregado
+      // para tentar novamente depois
+      debugPrint('Erro ao carregar componentes: $e');
+    }
   }
 
   _setInitialScreen(User? user) {
+    // Evitar navegação desnecessária se já estiver na rota correta
     if (user == null) {
-      if (Get.currentRoute != Routes.LOGIN) {
+      if (Get.currentRoute != Routes.LOGIN && !isOnboarding) {
         Get.offAllNamed(Routes.LOGIN);
       }
     } else {
       // Skip auto-redirect while onboarding
       if (isOnboarding) return;
-      if (Get.currentRoute != Routes.HOME) {
+      if (Get.currentRoute != Routes.HOME &&
+          Get.currentRoute != Routes.ONBOARD_WELCOME &&
+          Get.currentRoute != Routes.CARD_INTRO &&
+          Get.currentRoute != Routes.CARD_SUCCESS &&
+          Get.currentRoute != Routes.FIXED_SUCCESS) {
         Get.offAllNamed(Routes.HOME);
       }
     }

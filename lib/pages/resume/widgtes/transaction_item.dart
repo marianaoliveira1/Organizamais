@@ -102,6 +102,7 @@ class TransactionItem extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 Slidable.of(context)?.close();
+                _showActionModal(context, transaction);
               },
               child: Padding(
                 padding: EdgeInsets.all(14.w),
@@ -248,7 +249,7 @@ class TransactionItem extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardColor,
         content: Text(
-            'Tem certeza que deseja excluir o cartão ${transaction.title}?'),
+            'Tem certeza que deseja excluir a transação "${transaction.title}"?'),
         actions: [
           TextButton(
             child: Text(
@@ -349,5 +350,132 @@ class TransactionItem extends StatelessWidget {
     if (match == null) return title ?? '';
     final baseTitle = match.group(2) ?? '';
     return '$label — $baseTitle';
+  }
+
+  void _showActionModal(BuildContext context, dynamic transaction) {
+    final theme = Theme.of(context);
+    final controller = Get.find<TransactionController>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 12.h),
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: DefaultColors.grey20.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                children: [
+                  Text(
+                    transaction.title,
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildActionButton(
+                    context: context,
+                    theme: theme,
+                    icon: Icons.edit,
+                    label: 'Editar',
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      // Pequeno delay para garantir que o modal feche antes de navegar
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        Get.to(
+                          () => TransactionPage(
+                            transaction: transaction,
+                            overrideTransactionSalvar: (updated) {
+                              controller.updateTransaction(updated);
+                            },
+                          ),
+                        );
+                      });
+                    },
+                  ),
+                  SizedBox(height: 12.h),
+                  _buildActionButton(
+                    context: context,
+                    theme: theme,
+                    icon: Icons.delete,
+                    label: 'Deletar',
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showDeleteConfirmationDialog(context, transaction);
+                    },
+                  ),
+                  SizedBox(height: 12.h),
+                  _buildActionButton(
+                    context: context,
+                    theme: theme,
+                    icon: Icons.close,
+                    label: 'Cancelar',
+                    color: DefaultColors.grey20,
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required ThemeData theme,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20.sp),
+            SizedBox(width: 12.w),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

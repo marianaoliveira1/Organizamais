@@ -33,21 +33,22 @@ class FinanceSummaryWidget extends StatelessWidget {
 
     final String mesAtual = DateFormat.MMMM('pt_BR').format(DateTime.now());
 
-    return Obx(() {
-      if (transactionController.isLoading) {
-        return _buildShimmerSkeleton(theme);
-      }
+    return RepaintBoundary(
+      child: Obx(() {
+        if (transactionController.isLoading) {
+          return _buildShimmerSkeleton(theme);
+        }
 
-      // Calcular valores uma única vez para evitar chamadas duplicadas
-      final currentBalance = _getCurrentMonthBalance(transactionController);
-      final previousBalance = _getPreviousMonthBalance(transactionController);
-      final currentIncome = _getCurrentMonthIncome(transactionController);
-      final previousIncome = _getPreviousMonthIncome(transactionController);
-      final currentExpenses = _getCurrentMonthExpenses(transactionController);
-      final previousExpenses = _getPreviousMonthExpenses(transactionController);
+        // Calcular valores uma única vez para evitar chamadas duplicadas
+        final currentBalance = _getCurrentMonthBalance(transactionController);
+        final previousBalance = _getPreviousMonthBalance(transactionController);
+        final currentIncome = _getCurrentMonthIncome(transactionController);
+        final previousIncome = _getPreviousMonthIncome(transactionController);
+        final currentExpenses = _getCurrentMonthExpenses(transactionController);
+        final previousExpenses =
+            _getPreviousMonthExpenses(transactionController);
 
-      return RepaintBoundary(
-        child: Column(
+        return Column(
           children: [
             GestureDetector(
               onTap: () {
@@ -100,9 +101,9 @@ class FinanceSummaryWidget extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      );
-    });
+        );
+      }),
+    );
   }
 
   double _getCurrentMonthBalance(TransactionController controller) {

@@ -30,18 +30,6 @@ class InitialPage extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
-    final TransactionController transactionController =
-        Get.find<TransactionController>();
-    final currentMonth = DateTime.now().month;
-    final currentYear = DateTime.now().year;
-
-    transactionController.transaction
-        .where((t) => t.title.contains('Parcela'))
-        .where((t) {
-      if (t.paymentDay == null) return false;
-      final date = DateTime.parse(t.paymentDay!);
-      return date.month == currentMonth && date.year == currentYear;
-    }).toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -51,40 +39,28 @@ class InitialPage extends StatelessWidget {
           final auth = Get.find<AuthController>();
           final user = auth.firebaseUser.value;
           if (user == null) return const SizedBox.shrink();
-          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-            stream: FirebaseFirestore.instance
-                .collection('users')
-                .doc(user.uid)
-                .snapshots(),
-            builder: (context, snapshot) {
-              final firestoreName = snapshot.data?.data()?['name'] as String?;
-              final effectiveName =
-                  (firestoreName != null && firestoreName.trim().isNotEmpty)
-                      ? firestoreName
-                      : (user.displayName ?? '');
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Oi,',
-                    style: TextStyle(
-                      color: theme.primaryColor.withOpacity(0.7),
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    "$effectiveName 👋",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              );
-            },
+          final effectiveName = user.displayName ?? 'Usuário';
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Oi,',
+                style: TextStyle(
+                  color: theme.primaryColor.withOpacity(0.7),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                "$effectiveName 👋",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           );
         }),
       ),

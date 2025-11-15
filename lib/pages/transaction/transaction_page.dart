@@ -520,7 +520,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                 transaction.copyWith(
                               id: widget.transaction!.id,
                             ));
-                            Navigator.pop(context);
+                            Get.back();
                             return;
                           }
 
@@ -530,8 +530,7 @@ class _TransactionPageState extends State<TransactionPage> {
                               installments: _installments);
 
                           // Navegar para ResumePage após salvar
-                          Navigator.pop(
-                              context, 3); // Retorna índice 3 (ResumePage)
+                          Get.back(result: 3);
                           return;
                         } catch (e) {
                           Get.snackbar(

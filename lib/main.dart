@@ -23,6 +23,7 @@ import 'controller/auth_controller.dart';
 import 'controller/card_controller.dart';
 import 'controller/transaction_controller.dart';
 import 'routes/route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'services/notification_service.dart';
 import 'services/analytics_service.dart';
 import 'services/messaging_service.dart';
@@ -32,6 +33,7 @@ import 'services/performance_service.dart';
 void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    MobileAds.instance.initialize();
 
     try {
       await Firebase.initializeApp(
@@ -117,6 +119,11 @@ class MyApp extends StatelessWidget {
     Get.put(GoalController());
     Get.put(SpendingGoalController());
 
+    // Verificar usuário atual ANTES de definir a rota inicial
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final String initialRoute =
+        currentUser != null ? Routes.HOME : Routes.LOGIN;
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
@@ -134,7 +141,7 @@ class MyApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        initialRoute: AppPages.INITIAL,
+        initialRoute: initialRoute,
         getPages: AppPages.routes,
 
         // 🌞 Tema Claro
