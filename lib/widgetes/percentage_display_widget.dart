@@ -25,72 +25,75 @@ class PercentageDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Derive an effective result using current/previous values when available
-    PercentageResult? derived;
+    // Sempre calcular usando valores locais quando disponíveis
+    PercentageResult effectiveResult;
+
     if (explanationType != null &&
         currentValue != null &&
         previousValue != null) {
       final double prev = previousValue!;
       final double curr = currentValue!;
 
-      if (prev == 0) {
-        // Sem base comparável: mostrar 0.0% em vez de "Novo"
-        derived = PercentageResult(
+      // Se ambos são zero, mostrar 0.0%
+      if (prev.abs() < 0.01 && curr.abs() < 0.01) {
+        effectiveResult = PercentageResult(
           percentage: 0.0,
           hasData: true,
           type: PercentageType.neutral,
           displayText: '0.0%',
         );
       } else {
-        final double computedPercent = ((curr - prev) / prev.abs()) * 100.0;
+        double computedPercent;
 
+        // Se valor anterior é zero mas atual tem valor, calcular como aumento infinito
+        if (prev.abs() < 0.01 && curr.abs() >= 0.01) {
+          // Mostrar uma porcentagem muito grande para indicar aumento infinito
+          computedPercent = 999.9; // Representa aumento infinito
+        } else {
+          // Calcular porcentagem normal: ((atual - anterior) / anterior) * 100
+          computedPercent = ((curr - prev) / prev) * 100.0;
+        }
+
+        // Determinar tipo baseado no sinal e no tipo de transação
         PercentageType type;
         if (explanationType == PercentageExplanationType.expense) {
-          // Expense: decrease is positive (good), increase is negative (bad)
-          if (computedPercent < 0) {
-            type = PercentageType.positive;
-          } else if (computedPercent > 0) {
-            type = PercentageType.negative;
-          } else {
-            type = PercentageType.neutral;
-          }
+          // Para despesas: diminuição é bom (positivo), aumento é ruim (negativo)
+          type = computedPercent < 0
+              ? PercentageType.positive
+              : (computedPercent > 0
+                  ? PercentageType.negative
+                  : PercentageType.neutral);
         } else {
-          // Income/balance: increase is positive, decrease is negative
-          if (computedPercent > 0) {
-            type = PercentageType.positive;
-          } else if (computedPercent < 0) {
-            type = PercentageType.negative;
-          } else {
-            type = PercentageType.neutral;
-          }
+          // Para receita/saldo: aumento é bom (positivo), diminuição é ruim (negativo)
+          type = computedPercent > 0
+              ? PercentageType.positive
+              : (computedPercent < 0
+                  ? PercentageType.negative
+                  : PercentageType.neutral);
         }
 
+        // Formatar texto da porcentagem
         String displayText;
-        switch (type) {
-          case PercentageType.positive:
-            displayText = '+${computedPercent.abs().toStringAsFixed(1)}%';
-            break;
-          case PercentageType.negative:
-            displayText = '-${computedPercent.abs().toStringAsFixed(1)}%';
-            break;
-          case PercentageType.neutral:
-            displayText = '0.0%';
-            break;
-          case PercentageType.newData:
-            displayText = 'Novo';
-            break;
+        if (computedPercent.abs() < 0.01) {
+          displayText = '0.0%';
+        } else {
+          final String sign = computedPercent > 0 ? '+' : '';
+          displayText = '$sign${computedPercent.toStringAsFixed(1)}%';
         }
 
-        derived = PercentageResult(
+        effectiveResult = PercentageResult(
           percentage: computedPercent.abs(),
           hasData: true,
           type: type,
           displayText: displayText,
         );
       }
+    } else {
+      // Usar result quando não temos valores locais
+      effectiveResult = result;
     }
 
-    final PercentageResult effectiveResult = derived ?? result;
+    // Se não tem dados e não temos valores locais, não mostrar nada
     if (!effectiveResult.hasData) {
       return const SizedBox.shrink();
     }
@@ -104,7 +107,9 @@ class PercentageDisplayWidget extends StatelessWidget {
         previousValue != null) {
       final double prev = previousValue!;
       final double curr = currentValue!;
-      final bool isEqual = curr == prev;
+
+      // Usar tolerância para comparação de igualdade (evitar problemas com ponto flutuante)
+      final bool isEqual = (curr - prev).abs() < 0.01;
       if (isEqual) {
         iconData = Iconsax.more_circle;
         circleColor = DefaultColors.grey;
@@ -164,7 +169,7 @@ class PercentageDisplayWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              effectiveResult.formattedPercentage,
+              effectiveResult.displayText,
               style: TextStyle(
                 fontSize: (textFontSizeSp ?? 10.sp),
                 fontWeight: FontWeight.w600,

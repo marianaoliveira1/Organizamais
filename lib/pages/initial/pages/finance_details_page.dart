@@ -208,130 +208,91 @@ class FinanceDetailsPage extends StatelessWidget {
                 color: theme.primaryColor,
               ),
             ),
-            // Exibir a % mesmo quando o serviço não tiver dados, derivando pela janela atual
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (percentageResult.hasData) ...[
-                  Builder(
-                    builder: (context) {
-                      final bool increased = currentValue > previousValue;
-                      final bool equal = currentValue == previousValue;
+            // Sempre calcular usando valores locais quando disponíveis
+            Builder(
+              builder: (context) {
+                final prev = previousValue;
+                final curr = currentValue;
 
-                      // Para despesas, inverter a lógica de cores
-                      final bool isExpense =
-                          type == PercentageExplanationType.expense;
-                      final Color circleColor = equal
-                          ? DefaultColors.grey
-                          : (increased
-                              ? (isExpense
-                                  ? DefaultColors.redDark
-                                  : DefaultColors.greenDark)
-                              : (isExpense
-                                  ? DefaultColors.greenDark
-                                  : DefaultColors.redDark));
+                // Se ambos são zero, mostrar 0.0%
+                if (prev.abs() < 0.01 && curr.abs() < 0.01) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '0.0%',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: DefaultColors.grey,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Iconsax.more_circle,
+                        size: 14.sp,
+                        color: DefaultColors.grey,
+                      ),
+                    ],
+                  );
+                }
 
-                      final IconData dirIcon = equal
-                          ? Iconsax.more_circle
-                          : (increased
-                              ? Iconsax.arrow_circle_up
-                              : Iconsax.arrow_circle_down);
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            percentageResult.formattedPercentage,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: circleColor,
-                            ),
-                          ),
-                          SizedBox(width: 4.w),
-                          Icon(
-                            dirIcon,
-                            size: 14.sp,
-                            color: circleColor,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ] else ...[
-                  Builder(
-                    builder: (context) {
-                      final prev = previousValue;
-                      final curr = currentValue;
-                      if (prev == 0) {
-                        return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '0.0%',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: DefaultColors.grey,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Icon(
-                              Iconsax.more_circle,
-                              size: 14.sp,
-                              color: DefaultColors.grey,
-                            ),
-                          ],
-                        );
-                      }
-                      final computedPercent =
-                          ((curr - prev) / prev.abs()) * 100.0;
-                      final bool increased = curr > prev;
-                      final bool equal = computedPercent == 0;
+                // Calcular porcentagem usando valores locais
+                double computedPercent;
+                if (prev.abs() < 0.01 && curr.abs() >= 0.01) {
+                  // Valor anterior zero mas atual tem valor = aumento infinito
+                  computedPercent = 999.9;
+                } else {
+                  // Calcular porcentagem normal
+                  computedPercent = ((curr - prev) / prev.abs()) * 100.0;
+                }
+                final bool increased = curr > prev;
+                final bool equal = (computedPercent.abs() <
+                    0.01); // Considerar igual se diferença muito pequena
 
-                      // Para despesas, inverter a lógica de cores
-                      final bool isExpense =
-                          type == PercentageExplanationType.expense;
-                      final Color color = equal
-                          ? DefaultColors.grey
-                          : (increased
-                              ? (isExpense
-                                  ? DefaultColors.redDark
-                                  : DefaultColors.greenDark)
-                              : (isExpense
-                                  ? DefaultColors.greenDark
-                                  : DefaultColors.redDark));
+                // Para despesas, inverter a lógica de cores
+                final bool isExpense =
+                    type == PercentageExplanationType.expense;
+                final Color color = equal
+                    ? DefaultColors.grey
+                    : (increased
+                        ? (isExpense
+                            ? DefaultColors.redDark
+                            : DefaultColors.greenDark)
+                        : (isExpense
+                            ? DefaultColors.greenDark
+                            : DefaultColors.redDark));
 
-                      final IconData icon = equal
-                          ? Iconsax.more_circle
-                          : (increased
-                              ? Iconsax.arrow_circle_up
-                              : Iconsax.arrow_circle_down);
-                      final text = equal
-                          ? '0.0%'
-                          : '${increased ? '+' : '-'}${computedPercent.abs().toStringAsFixed(1)}%';
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            text,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: color,
-                            ),
-                          ),
-                          SizedBox(width: 4.w),
-                          Icon(
-                            icon,
-                            size: 14.sp,
-                            color: color,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ],
+                final IconData icon = equal
+                    ? Iconsax.more_circle
+                    : (increased
+                        ? Iconsax.arrow_circle_up
+                        : Iconsax.arrow_circle_down);
+
+                final String text = equal
+                    ? '0.0%'
+                    : '${increased ? '+' : ''}${computedPercent.abs().toStringAsFixed(1)}%';
+
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      text,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Icon(
+                      icon,
+                      size: 14.sp,
+                      color: color,
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

@@ -284,7 +284,9 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                         .doc(categoryId.toString())
                         .set({'categoryId': categoryId, 'amount': amount},
                             SetOptions(merge: true));
-                    // Try show preloaded interstitial; fallback to immediate load
+
+                    // Mostra o anúncio intersticial antes de fechar o modal
+                    await AdsInterstitial.show();
 
                     if (ctx.mounted) Navigator.pop(ctx);
                   },

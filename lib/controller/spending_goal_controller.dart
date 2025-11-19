@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../model/spending_goal_model.dart';
 import '../model/transaction_model.dart';
 import '../services/analytics_service.dart';
+import '../utils/snackbar_helper.dart';
 import 'auth_controller.dart';
 import 'transaction_controller.dart';
 
@@ -47,7 +48,7 @@ class SpendingGoalController extends GetxController {
       limit: spendingGoal.limitValue,
     );
 
-    Get.snackbar('Sucesso', 'Meta de gasto adicionada com sucesso');
+    SnackbarHelper.showSuccess('Meta de gasto adicionada com sucesso');
   }
 
   Future<void> updateSpendingGoal(SpendingGoalModel spendingGoal) async {
@@ -61,7 +62,7 @@ class SpendingGoalController extends GetxController {
     await _analyticsService
         .logUpdateSpendingGoal(spendingGoal.categoryId.toString());
 
-    Get.snackbar('Sucesso', 'Meta de gasto atualizada com sucesso');
+    SnackbarHelper.showSuccess('Meta de gasto atualizada com sucesso');
   }
 
   Future<void> deleteSpendingGoal(String id) async {
@@ -80,7 +81,7 @@ class SpendingGoalController extends GetxController {
           .logDeleteSpendingGoal(goalToDelete.categoryId.toString());
     }
 
-    Get.snackbar('Sucesso', 'Meta de gasto removida com sucesso');
+    SnackbarHelper.showSuccess('Meta de gasto removida com sucesso');
   }
 
   /// Calcula o valor gasto em uma categoria específica no mês/ano

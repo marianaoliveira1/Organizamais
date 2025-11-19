@@ -115,9 +115,8 @@ class ParcelasDetailsPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back,
             color: theme.primaryColor,
-            size: 20.sp,
           ),
           onPressed: () => Get.back(),
         ),
@@ -125,11 +124,10 @@ class ParcelasDetailsPage extends StatelessWidget {
           'Detalhes das Parcelas',
           style: TextStyle(
             color: theme.primaryColor,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
@@ -228,30 +226,25 @@ class ParcelasDetailsPage extends StatelessWidget {
                 }
 
                 if (parcelasUnique.isEmpty) {
-                  return SingleChildScrollView(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.credit_card_off,
-                              size: 64.sp,
-                              color: DefaultColors.grey.withOpacity(0.5),
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              'Nenhuma parcela encontrada',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                color: DefaultColors.grey20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.credit_card_off,
+                          size: 48.sp,
+                          color: DefaultColors.grey20,
                         ),
-                      ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Nenhuma parcela encontrada',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: DefaultColors.grey20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }
@@ -309,67 +302,47 @@ class ParcelasDetailsPage extends StatelessWidget {
                     children: [
                       // Resumo da compra (antes da lista)
                       Container(
-                        margin: EdgeInsets.only(bottom: 12.h),
-                        padding: EdgeInsets.all(12.w),
+                        margin: EdgeInsets.only(bottom: 16.h),
+                        padding: EdgeInsets.all(16.w),
                         decoration: BoxDecoration(
                           color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: DefaultColors.grey.withOpacity(0.2),
-                            width: 1,
-                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              productName,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: theme.primaryColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
                             Row(
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            productName,
-                                            style: TextStyle(
-                                              fontSize: 18.sp,
-                                              color: theme.primaryColor,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            primeiraData != null
-                                                ? 'Comprado em ${DateFormat('dd/MM/yyyy').format(primeiraData)}'
-                                                : 'Comprado em —',
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: DefaultColors.grey20,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          if (bankName.isNotEmpty) ...[
-                                            SizedBox(width: 8.w),
-                                            Text(
-                                              bankName,
-                                              style: TextStyle(
-                                                fontSize: 13.sp,
-                                                color: DefaultColors.grey20,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ],
+                                Text(
+                                  primeiraData != null
+                                      ? 'Comprado em ${DateFormat('dd/MM/yyyy').format(primeiraData)}'
+                                      : 'Comprado em —',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: DefaultColors.grey20,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
+                                if (bankName.isNotEmpty) ...[
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    '• $bankName',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: DefaultColors.grey20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                             SizedBox(height: 16.h),
@@ -382,20 +355,20 @@ class ParcelasDetailsPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '\$ Total parcelado',
+                                        'Total parcelado',
                                         style: TextStyle(
                                           fontSize: 11.sp,
                                           color: DefaultColors.grey20,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 6.h),
+                                      SizedBox(height: 4.h),
                                       Text(
                                         _formatCurrency(valorTotal),
                                         style: TextStyle(
-                                          fontSize: 18.sp,
-                                          color: DefaultColors.redDark,
-                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16.sp,
+                                          color: theme.primaryColor,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
                                     ],
@@ -412,16 +385,16 @@ class ParcelasDetailsPage extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 11.sp,
                                           color: DefaultColors.grey20,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 6.h),
+                                      SizedBox(height: 4.h),
                                       Text(
                                         _formatCurrency(valorPago),
                                         style: TextStyle(
-                                          fontSize: 18.sp,
+                                          fontSize: 16.sp,
                                           color: DefaultColors.greenDark,
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
                                     ],
@@ -438,18 +411,15 @@ class ParcelasDetailsPage extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 11.sp,
                                     color: DefaultColors.grey20,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    '${(progresso * 100).toStringAsFixed(0)}%',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      color: theme.primaryColor,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                Text(
+                                  '${(progresso * 100).toStringAsFixed(0)}%',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
@@ -458,7 +428,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                             Stack(
                               children: [
                                 Container(
-                                  height: 8.h,
+                                  height: 6.h,
                                   decoration: BoxDecoration(
                                     color: DefaultColors.grey.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(999.r),
@@ -468,7 +438,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                                   final double w = c.maxWidth * progresso;
                                   return Container(
                                     width: w,
-                                    height: 8.h,
+                                    height: 6.h,
                                     decoration: BoxDecoration(
                                       color: DefaultColors.greenDark,
                                       borderRadius:
@@ -478,8 +448,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                                 }),
                               ],
                             ),
-                            SizedBox(height: 4.h),
-                            SizedBox(height: 8.h),
+                            SizedBox(height: 12.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -493,23 +462,13 @@ class ParcelasDetailsPage extends StatelessWidget {
                                 ),
                                 if (proximaParcela != null &&
                                     proximaParcela.paymentDay != null)
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_today,
-                                        size: 12.sp,
-                                        color: DefaultColors.grey20,
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        'Próxima: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(proximaParcela.paymentDay!))}',
-                                        style: TextStyle(
-                                          fontSize: 11.sp,
-                                          color: DefaultColors.grey20,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    'Próxima: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(proximaParcela.paymentDay!))}',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: DefaultColors.grey20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                               ],
                             ),
@@ -523,14 +482,12 @@ class ParcelasDetailsPage extends StatelessWidget {
                         child: Text(
                           'Parcelas (${parcelasUnique.length})',
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 14.sp,
                             color: theme.primaryColor,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-
-                      SizedBox(height: 16.h),
 
                       // Lista das parcelas
                       ListView.builder(
@@ -555,191 +512,166 @@ class ParcelasDetailsPage extends StatelessWidget {
 
                           return Container(
                             margin: EdgeInsets.only(bottom: 12.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 16.h,
+                            ),
                             decoration: BoxDecoration(
                               color: theme.cardColor,
                               borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: isPaga
-                                    ? Colors.green
-                                    : (isProxima
-                                        ? Colors.orange
-                                        : DefaultColors.grey.withOpacity(0.2)),
-                                width: isPaga || isProxima ? 1.5 : 1,
-                              ),
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16.w),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Ícone circular de status
-                                  Container(
-                                    width: 36.w,
-                                    height: 36.w,
-                                    decoration: BoxDecoration(
-                                      color: isPaga
-                                          ? Colors.green
-                                          : Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: isPaga
-                                          ? null
-                                          : Border.all(
-                                              color: Colors.white,
-                                              width: 2,
-                                            ),
-                                    ),
-                                    child: isPaga
-                                        ? Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 20.sp,
-                                          )
-                                        : null,
-                                  ),
-
-                                  SizedBox(width: 12.w),
-
-                                  // Informações da parcela
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Parcela $numeroParcela',
-                                              style: TextStyle(
-                                                fontSize: 14.sp,
-                                                color: isPaga
-                                                    ? Colors.green
-                                                    : theme.primaryColor,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 6.h),
-                                        if (parcela.paymentDay != null)
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
                                           Row(
                                             children: [
-                                              Icon(
-                                                Icons.calendar_today,
-                                                size: 12.sp,
-                                                color: DefaultColors.grey20,
-                                              ),
-                                              SizedBox(width: 4.w),
                                               Text(
-                                                DateFormat('dd/MM/yyyy').format(
-                                                  DateTime.parse(
-                                                      parcela.paymentDay!),
-                                                ),
+                                                'Parcela $numeroParcela',
                                                 style: TextStyle(
                                                   fontSize: 12.sp,
-                                                  color: DefaultColors.grey20,
-                                                  fontWeight: FontWeight.w500,
+                                                  color: theme.primaryColor,
+                                                  fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                               SizedBox(width: 8.w),
                                               if (isPaga)
                                                 Container(
                                                   padding: EdgeInsets.symmetric(
-                                                      horizontal: 8.w,
-                                                      vertical: 3.h),
+                                                      horizontal: 6.w,
+                                                      vertical: 2.h),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.green,
+                                                    color:
+                                                        DefaultColors.greenDark,
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            6.r),
+                                                            4.r),
                                                   ),
                                                   child: Text(
                                                     'Pago',
                                                     style: TextStyle(
-                                                      fontSize: 10.sp,
+                                                      fontSize: 9.sp,
                                                       color: Colors.white,
                                                       fontWeight:
-                                                          FontWeight.w700,
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 )
                                               else if (isProxima)
                                                 Container(
                                                   padding: EdgeInsets.symmetric(
-                                                      horizontal: 8.w,
-                                                      vertical: 3.h),
+                                                      horizontal: 6.w,
+                                                      vertical: 2.h),
                                                   decoration: BoxDecoration(
                                                     color: Colors.orange,
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            6.r),
+                                                            4.r),
                                                   ),
                                                   child: Text(
                                                     'Próxima',
                                                     style: TextStyle(
-                                                      fontSize: 10.sp,
+                                                      fontSize: 9.sp,
                                                       color: Colors.white,
                                                       fontWeight:
-                                                          FontWeight.w700,
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 ),
                                             ],
                                           ),
+                                          SizedBox(height: 6.h),
+                                          if (parcela.paymentDay != null)
+                                            Text(
+                                              DateFormat('dd/MM/yyyy').format(
+                                                DateTime.parse(
+                                                    parcela.paymentDay!),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 10.sp,
+                                                color: DefaultColors.grey20,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          _formatCurrency(_parseCurrencyValue(
+                                              parcela.value)),
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            color: isPaga
+                                                ? DefaultColors.greenDark
+                                                : theme.primaryColor,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        if (parcela.paymentType != null &&
+                                            parcela.paymentType!.isNotEmpty)
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 2.h),
+                                            child: Text(
+                                              parcela.paymentType!,
+                                              style: TextStyle(
+                                                fontSize: 10.sp,
+                                                color: DefaultColors.grey20,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
                                       ],
                                     ),
-                                  ),
-
-                                  // Valor, banco e botão excluir
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        _formatCurrency(
-                                            _parseCurrencyValue(parcela.value)),
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: isPaga
-                                              ? Colors.green
-                                              : theme.primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      if (parcela.paymentType != null &&
-                                          parcela.paymentType!.isNotEmpty)
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 2.h),
-                                          child: Text(
-                                            parcela.paymentType!,
+                                  ],
+                                ),
+                                SizedBox(height: 12.h),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        if (parcela.id != null) {
+                                          _showDeleteConfirmation(
+                                            context,
+                                            parcela.id!,
+                                            'Parcela $numeroParcela',
+                                          );
+                                        }
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.red,
+                                            size: 16.sp,
+                                          ),
+                                          SizedBox(width: 4.w),
+                                          Text(
+                                            'Excluir',
                                             style: TextStyle(
                                               fontSize: 11.sp,
-                                              color: DefaultColors.grey20,
+                                              color: Colors.red,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
-                                        ),
-                                      SizedBox(height: 8.h),
-                                      InkWell(
-                                        onTap: () {
-                                          if (parcela.id != null) {
-                                            _showDeleteConfirmation(
-                                              context,
-                                              parcela.id!,
-                                              'Parcela $numeroParcela',
-                                            );
-                                          }
-                                        },
-                                        child: Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red,
-                                          size: 20.sp,
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           );
                         },

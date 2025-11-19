@@ -48,7 +48,7 @@ class DateSectionResume extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 2.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -72,7 +72,7 @@ class DateSectionResume extends StatelessWidget {
               ),
           ],
         ),
-        SizedBox(height: 6.h),
+        SizedBox(height: 8.h),
         ...transactions.map(
           (transaction) => TransactionItem(
             transaction: transaction,

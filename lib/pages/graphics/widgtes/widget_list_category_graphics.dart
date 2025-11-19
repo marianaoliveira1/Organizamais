@@ -1078,21 +1078,21 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         : isNeutral
             ? [DefaultColors.grey, DefaultColors.darkGrey]
             : increased
-                ? [DefaultColors.red.withOpacity(0.5), DefaultColors.redDark]
+                ? [DefaultColors.red.withOpacity(0.8), DefaultColors.redDark]
                 : [
-                    DefaultColors.green.withOpacity(0.5),
+                    DefaultColors.green.withOpacity(0.8),
                     DefaultColors.greenDark
                   ];
 
     // Header text per state
     final String headerText = isNewCategory
-        ? 'É uma categoria nova e, por isso, ainda não temos dados para comparação com o mês anterior.'
+        ? 'Esta é uma categoria nova, então ainda não temos dados para comparar com o mês anterior.'
         : (isNeutral
-            ? 'Sem variação: Seus valores permaneceram estáveis, registrando 0% de mudança em relação ao mês passado. '
-                'No dia ${sameDayText} o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.'
-            : 'Seus gastos ${increased ? 'aumentaram' : 'diminuíram'} em ${pctDisp.abs().toStringAsFixed(1)}% '
-                '(${increased ? 'R\$ ${_formatCurrency(diffAbs)} a mais' : 'R\$ ${_formatCurrency(diffAbs)} a menos'}). '
-                'No dia ${sameDayText} o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.');
+            ? 'Sem mudanças: seus valores ficaram iguais, com 0% de variação em relação ao mês passado. '
+                'No mesmo dia do mês anterior (${sameDayText}), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.'
+            : 'Seus gastos ${increased ? 'aumentaram' : 'diminuíram'} ${pctDisp.abs().toStringAsFixed(1)}%. '
+                'Isso representa ${increased ? 'R\$ ${_formatCurrency(diffAbs)} a mais' : 'R\$ ${_formatCurrency(diffAbs)} a menos'}. '
+                'No mesmo dia do mês anterior (${sameDayText}), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.');
 
     return Container(
       decoration: BoxDecoration(
@@ -1146,13 +1146,13 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                           await AdsInterstitial.show();
                           setState(() => isLoading = false);
                           Navigator.of(ctx).pop();
-                          Get.to(() => Get.to(() => AnaliseMensalParcialWidget(
+                          Get.to(() => AnaliseMensalParcialWidget(
                                 categoryId: categoryId,
                                 categoryName: (categoryName ?? ''),
                                 categoryIcon: categoryIcon,
                                 categoryColor: categoryColor,
                                 selectedMonthName: monthName,
-                              )));
+                              ));
                         }
 
                         return Container(

@@ -13,6 +13,7 @@ import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/services/analytics_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import '../routes/route.dart';
+import '../utils/snackbar_helper.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
@@ -65,7 +66,7 @@ class AuthController extends GetxController {
 
   updateDisplayName(String displayName) async {
     await firebaseUser.value?.updateProfile(displayName: displayName);
-    Get.snackbar("Sucesso", "Nome atualizado com sucesso: $displayName");
+    SnackbarHelper.showSuccess("Nome atualizado com sucesso: $displayName");
     await firebaseUser.value?.reload();
   }
 
@@ -124,8 +125,12 @@ class AuthController extends GetxController {
   }
 
   void _hideLoadingDialog() {
-    if (Get.isDialogOpen!) {
-      Get.back();
+    try {
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+    } catch (_) {
+      // Ignore errors when closing dialog
     }
   }
 
@@ -172,21 +177,15 @@ class AuthController extends GetxController {
           trimmedEmail.isEmpty ||
           trimmedPassword.isEmpty) {
         _hideLoadingDialog();
-        Get.snackbar(
-          "Campos obrigatórios",
-          "Preencha nome, e-mail e senha",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        SnackbarHelper.showError("Preencha nome, e-mail e senha",
+            title: "Campos obrigatórios");
         return;
       }
 
       if (trimmedPassword.length < 6) {
         _hideLoadingDialog();
-        Get.snackbar(
-          "Senha fraca",
-          "A senha deve conter pelo menos 6 caracteres",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        SnackbarHelper.showError("A senha deve conter pelo menos 6 caracteres",
+            title: "Senha fraca");
         return;
       }
 
@@ -230,11 +229,10 @@ class AuthController extends GetxController {
         information: ['email=${email.trim()}'],
       );
       _hideLoadingDialog();
-      Get.snackbar(
-        "Erro ao cadastrar",
-        _getAuthErrorMessage(e),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(_getAuthErrorMessage(e),
+          title: "Erro ao cadastrar");
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -243,11 +241,9 @@ class AuthController extends GetxController {
         information: ['email=${email.trim()}'],
       );
       _hideLoadingDialog();
-      Get.snackbar(
-        "Erro ao cadastrar",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(e.toString(), title: "Erro ao cadastrar");
     } finally {
       isLoading(false);
     }
@@ -275,11 +271,10 @@ class AuthController extends GetxController {
         information: ['email=${email.trim()}'],
       );
       _hideLoadingDialog();
-      Get.snackbar(
-        "Erro ao entrar",
-        _getAuthErrorMessage(e),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(_getAuthErrorMessage(e),
+          title: "Erro ao entrar");
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -288,11 +283,9 @@ class AuthController extends GetxController {
         information: ['email=${email.trim()}'],
       );
       _hideLoadingDialog();
-      Get.snackbar(
-        "Erro ao entrar",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(e.toString(), title: "Erro ao entrar");
     } finally {
       isLoading(false);
     }
@@ -328,11 +321,9 @@ class AuthController extends GetxController {
       if (googleAuth.accessToken == null || googleAuth.idToken == null) {
         _hideLoadingDialog();
         await perfTrace.stop();
-        Get.snackbar(
-          "Erro ao entrar com Google",
-          "Não foi possível obter as credenciais de autenticação",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        SnackbarHelper.showError(
+            "Não foi possível obter as credenciais de autenticação",
+            title: "Erro ao entrar com Google");
         return;
       }
 
@@ -412,11 +403,10 @@ class AuthController extends GetxController {
           await perfTrace.stop();
         } catch (_) {}
       }
-      Get.snackbar(
-        "Erro ao entrar com Google",
-        _getAuthErrorMessage(e),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(_getAuthErrorMessage(e),
+          title: "Erro ao entrar com Google");
     } catch (e, st) {
       try {
         final Trace t = FirebasePerformance.instance
@@ -441,11 +431,10 @@ class AuthController extends GetxController {
           e.toString().contains('cancelled')) {
         return;
       }
-      Get.snackbar(
-        "Erro ao entrar com Google",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(e.toString(),
+          title: "Erro ao entrar com Google");
     } finally {
       isLoading(false);
     }
@@ -459,22 +448,10 @@ class AuthController extends GetxController {
 
       await _auth.signOut();
       loadedOtherControllers = false;
-      Get.snackbar(
-        "Logout",
-        "Você saiu da sua conta",
-        backgroundColor: Colors.blue,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      SnackbarHelper.showInfo("Você saiu da sua conta", title: "Logout");
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(e, st, reason: 'logout error');
-      Get.snackbar(
-        "Erro ao sair",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      SnackbarHelper.showError(e.toString(), title: "Erro ao sair");
     }
   }
 
@@ -490,13 +467,11 @@ class AuthController extends GetxController {
       // Log analytics event
       await _analyticsService.logPasswordReset();
 
-      Get.snackbar(
-        "E-mail enviado",
-        "Verifique sua caixa de entrada para redefinir sua senha",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      _hideLoadingDialog();
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showSuccess(
+          "Verifique sua caixa de entrada para redefinir sua senha");
     } on FirebaseAuthException catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -504,13 +479,11 @@ class AuthController extends GetxController {
         reason: 'resetPassword FirebaseAuthException',
         information: ['email=${email.trim()}'],
       );
-      Get.snackbar(
-        "Erro ao redefinir senha",
-        _getAuthErrorMessage(e),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      _hideLoadingDialog();
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(_getAuthErrorMessage(e),
+          title: "Erro ao redefinir senha");
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -518,16 +491,12 @@ class AuthController extends GetxController {
         reason: 'resetPassword unexpected error',
         information: ['email=${email.trim()}'],
       );
-      Get.snackbar(
-        "Erro inesperado",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      _hideLoadingDialog();
+      // Wait a bit for dialog to close before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(e.toString(), title: "Erro inesperado");
     } finally {
       isLoading(false);
-      _hideLoadingDialog();
     }
   }
 
@@ -551,25 +520,14 @@ class AuthController extends GetxController {
         // Navigate to login or welcome screen
         Get.offAllNamed('/login'); // Or whatever your login route is
 
-        Get.snackbar(
-          'Conta Deletada',
-          'Sua conta foi deletada com sucesso',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        SnackbarHelper.showSuccess('Sua conta foi deletada com sucesso');
       }
     } catch (e, st) {
       print('Error deleting account: $e');
       FirebaseCrashlytics.instance
           .recordError(e, st, reason: 'deleteAccount error');
-      Get.snackbar(
-        'Erro',
-        'Não foi possível deletar sua conta. Tente fazer login novamente e repetir a operação.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      SnackbarHelper.showError(
+          'Não foi possível deletar sua conta. Tente fazer login novamente e repetir a operação.');
     }
   }
 }

@@ -51,10 +51,10 @@ class CategoryValueWithPercentage extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                (((explanationType != null &&
-                            currentValue != null &&
-                            previousValue != null) ||
-                        (percentageResult != null && percentageResult!.hasData))
+                // Sempre mostrar quando temos valores locais ou quando percentageResult tem dados
+                (explanationType != null &&
+                        currentValue != null &&
+                        previousValue != null)
                     ? Row(
                         children: [
                           SizedBox(width: 6.w),
@@ -67,7 +67,19 @@ class CategoryValueWithPercentage extends StatelessWidget {
                           ),
                         ],
                       )
-                    : const SizedBox.shrink()),
+                    : (percentageResult != null && percentageResult!.hasData)
+                        ? Row(
+                            children: [
+                              SizedBox(width: 6.w),
+                              PercentageDisplayWidget(
+                                result: percentageResult!,
+                                explanationType: explanationType,
+                                currentValue: currentValue,
+                                previousValue: previousValue,
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
               ],
             ),
             SizedBox(height: 4.h),

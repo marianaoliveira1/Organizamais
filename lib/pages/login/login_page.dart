@@ -58,14 +58,14 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 80.h,
+                      height: 210.h,
                     ),
                     Text(
                       "ORGANIZA+",
                       style: TextStyle(
                         color: DefaultColors.black,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                       ),
                     ),
                     SizedBox(

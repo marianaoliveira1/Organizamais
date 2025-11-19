@@ -14,6 +14,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/card_controller.dart';
 import '../../../model/cards_model.dart';
+import '../../../utils/snackbar_helper.dart';
 import 'select_icon_page.dart';
 import '../../../routes/route.dart';
 import '../../../widgetes/currency_ipunt_formated.dart';
@@ -42,6 +43,7 @@ class _AddCardPageState extends State<AddCardPage> {
   String? selectedIconPath;
   String? selectedBankName;
   final CardController cardController = Get.find();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -317,92 +319,142 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
             ),
             Spacer(),
-            InkWell(
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(
-                    color: theme.primaryColor,
+            AbsorbPointer(
+              absorbing: _isSaving,
+              child: InkWell(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  decoration: BoxDecoration(
+                    color: _isSaving
+                        ? theme.scaffoldBackgroundColor.withOpacity(0.6)
+                        : theme.scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: theme.primaryColor,
+                    ),
                   ),
+                  child: _isSaving
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20.w,
+                              height: 20.h,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.primaryColor),
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Text(
+                              widget.isEditing
+                                  ? 'Atualizando...'
+                                  : 'Adicionando...',
+                              style: TextStyle(
+                                color: theme.primaryColor,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          widget.isEditing
+                              ? 'Atualizar Cartão'
+                              : 'Adicionar Cartão',
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                 ),
-                child: Text(
-                  widget.isEditing ? 'Atualizar Cartão' : 'Adicionar Cartão',
-                  style: TextStyle(
-                    color: theme.primaryColor,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                onTap: () async {
+                  // Proteção contra múltiplos cliques
+                  if (_isSaving) return;
+
+                  if (nameController.text.isEmpty || selectedIconPath == null) {
+                    SnackbarHelper.showError('Preencha todos os campos');
+                    return;
+                  }
+
+                  // Validação do dia de fechamento
+                  final closingDay = int.tryParse(closingDayController.text);
+                  if (closingDay == null || closingDay < 1 || closingDay > 31) {
+                    SnackbarHelper.showError(
+                        'Informe o dia de fechamento entre 1 e 31');
+                    return;
+                  }
+
+                  // Validação do dia de pagamento
+                  final paymentDay = int.tryParse(paymentDayController.text);
+                  if (paymentDay == null || paymentDay < 1 || paymentDay > 31) {
+                    SnackbarHelper.showError(
+                        'Informe o dia de pagamento entre 1 e 31');
+                    return;
+                  }
+
+                  // Converter o texto formatado em double
+                  String limitText = limitController.text.trim();
+                  String rawLimit = limitText.replaceAll('R\$', '').trim();
+                  double? parsedLimit;
+                  if (rawLimit.contains(',')) {
+                    // Formato BR: 12.345,67
+                    rawLimit =
+                        rawLimit.replaceAll('.', '').replaceAll(',', '.');
+                    parsedLimit = double.tryParse(rawLimit);
+                  } else {
+                    // Formato numérico simples: 12345.67
+                    rawLimit = rawLimit.replaceAll(' ', '');
+                    parsedLimit = double.tryParse(rawLimit);
+                  }
+
+                  final cardData = CardsModel(
+                    id: widget.isEditing ? widget.card!.id : null,
+                    name: nameController.text,
+                    iconPath: selectedIconPath,
+                    bankName: selectedBankName,
+                    userId: widget.isEditing ? widget.card!.userId : null,
+                    limit: parsedLimit,
+                    closingDay: closingDay,
+                    paymentDay: paymentDay,
+                  );
+
+                  // Definir _isSaving imediatamente para prevenir múltiplos cliques
+                  setState(() {
+                    _isSaving = true;
+                  });
+
+                  try {
+                    if (widget.isEditing) {
+                      await cardController.updateCard(cardData);
+                    } else {
+                      await cardController.addCard(cardData);
+                    }
+
+                    if (mounted) {
+                      if (widget.fromOnboarding) {
+                        Get.offAllNamed(Routes.CARD_SUCCESS);
+                      } else {
+                        Get.back();
+                      }
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      SnackbarHelper.showError(
+                          'Erro ao ${widget.isEditing ? 'atualizar' : 'adicionar'} cartão: ${e.toString()}');
+                    }
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isSaving = false;
+                      });
+                    }
+                  }
+                },
               ),
-              onTap: () {
-                if (nameController.text.isEmpty || selectedIconPath == null) {
-                  Get.snackbar('Erro', 'Preencha todos os campos',
-                      snackPosition: SnackPosition.BOTTOM);
-                  return;
-                }
-
-                // Validação do dia de fechamento
-                final closingDay = int.tryParse(closingDayController.text);
-                if (closingDay == null || closingDay < 1 || closingDay > 31) {
-                  Get.snackbar(
-                      'Erro', 'Informe o dia de fechamento entre 1 e 31',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white);
-                  return;
-                }
-
-                // Validação do dia de pagamento
-                final paymentDay = int.tryParse(paymentDayController.text);
-                if (paymentDay == null || paymentDay < 1 || paymentDay > 31) {
-                  Get.snackbar(
-                      'Erro', 'Informe o dia de pagamento entre 1 e 31',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white);
-                  return;
-                }
-
-                // Converter o texto formatado em double
-                String limitText = limitController.text.trim();
-                String rawLimit = limitText.replaceAll('R\$', '').trim();
-                double? parsedLimit;
-                if (rawLimit.contains(',')) {
-                  // Formato BR: 12.345,67
-                  rawLimit = rawLimit.replaceAll('.', '').replaceAll(',', '.');
-                  parsedLimit = double.tryParse(rawLimit);
-                } else {
-                  // Formato numérico simples: 12345.67
-                  rawLimit = rawLimit.replaceAll(' ', '');
-                  parsedLimit = double.tryParse(rawLimit);
-                }
-
-                final cardData = CardsModel(
-                  id: widget.isEditing ? widget.card!.id : null,
-                  name: nameController.text,
-                  iconPath: selectedIconPath,
-                  bankName: selectedBankName,
-                  userId: widget.isEditing ? widget.card!.userId : null,
-                  limit: parsedLimit,
-                  closingDay: closingDay,
-                  paymentDay: paymentDay,
-                );
-
-                if (widget.isEditing) {
-                  cardController.updateCard(cardData);
-                } else {
-                  cardController.addCard(cardData);
-                }
-
-                if (widget.fromOnboarding) {
-                  Get.offAllNamed(Routes.CARD_SUCCESS);
-                } else {
-                  Get.back();
-                }
-              },
             ),
           ],
         ),

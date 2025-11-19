@@ -12,7 +12,6 @@ import '../../../model/transaction_model.dart';
 import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/title_transaction.dart';
-import '../../../routes/route.dart';
 
 class AddGoalPage extends StatefulWidget {
   final bool isEditing;
@@ -103,11 +102,7 @@ class _AddGoalPageState extends State<AddGoalPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.primaryColor),
           onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              Get.offAllNamed(Routes.INITIAL);
-            }
+            Get.back();
           },
         ),
         title: Text(
@@ -300,12 +295,8 @@ class _AddGoalPageState extends State<AddGoalPage> {
                                   categoryId ?? widget.initialGoal!.categoryId,
                             );
                             await goalController.updateGoal(updated);
-                            // Volta para a tela anterior; se não houver stack, cai para a home
-                            if (Navigator.of(context).canPop()) {
-                              Navigator.of(context).pop(updated);
-                            } else {
-                              Get.offAllNamed(Routes.INITIAL);
-                            }
+                            // Volta para a tela anterior (HomePage com bottomNavigationBar)
+                            Get.back(result: updated);
                           } else {
                             final goal = GoalModel(
                               name: nameController.text,
@@ -317,8 +308,8 @@ class _AddGoalPageState extends State<AddGoalPage> {
                               currentValue: 0,
                             );
                             await goalController.addGoal(goal);
-                            // Navega para a página inicial com o card de metas
-                            Get.offAllNamed(Routes.INITIAL);
+                            // Volta para a tela anterior (HomePage com bottomNavigationBar)
+                            Get.back();
                           }
                         } finally {
                           if (mounted) {

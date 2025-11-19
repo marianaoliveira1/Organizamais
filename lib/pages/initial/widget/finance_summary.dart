@@ -108,19 +108,17 @@ class FinanceSummaryWidget extends StatelessWidget {
 
   double _getCurrentMonthBalance(TransactionController controller) {
     final now = DateTime.now();
+    // Comparar período equivalente: do dia 1 até o dia atual
     final startDate = DateTime(now.year, now.month, 1);
-    // Calcula até o último dia do mês para incluir todas as contas fixas e parcelamentos
-    final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDayOfMonth, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     return controller.getBalanceForDateRange(startDate, endDate);
   }
 
   double _getCurrentMonthIncome(TransactionController controller) {
     final now = DateTime.now();
+    // Comparar período equivalente: do dia 1 até o dia atual
     final startDate = DateTime(now.year, now.month, 1);
-    // Calcula até o último dia do mês para incluir todas as receitas futuras
-    final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDayOfMonth, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     final transactions =
         controller.getTransactionsForDateRange(startDate, endDate);
     double total = 0.0;
@@ -147,10 +145,9 @@ class FinanceSummaryWidget extends StatelessWidget {
 
   double _getCurrentMonthExpenses(TransactionController controller) {
     final now = DateTime.now();
+    // Comparar período equivalente: do dia 1 até o dia atual
     final startDate = DateTime(now.year, now.month, 1);
-    // Calcula até o último dia do mês para incluir todas as contas fixas e parcelamentos
-    final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
-    final endDate = DateTime(now.year, now.month, lastDayOfMonth, 23, 59, 59);
+    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     final transactions =
         controller.getTransactionsForDateRange(startDate, endDate);
     double total = 0.0;

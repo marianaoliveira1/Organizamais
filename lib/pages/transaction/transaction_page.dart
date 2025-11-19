@@ -476,107 +476,130 @@ class _TransactionPageState extends State<TransactionPage> {
                   Expanded(child: ButtonBackTransaction()),
                   SizedBox(width: 6.w),
                   Expanded(
-                    child: InkWell(
-                      onTap: () async {
-                        if (_isSaving) return;
+                    child: AbsorbPointer(
+                      absorbing: _isSaving,
+                      child: InkWell(
+                        onTap: () async {
+                          // Proteção contra múltiplos cliques
+                          if (_isSaving) return;
 
-                        final TransactionController transactionController =
-                            Get.find<TransactionController>();
+                          final TransactionController transactionController =
+                              Get.find<TransactionController>();
 
-                        if (titleController.text.isEmpty ||
-                            valuecontroller.text.isEmpty ||
-                            _selectedDate == null ||
-                            (_selectedType != TransactionType.transferencia &&
-                                categoryId == null) ||
-                            (_selectedType != TransactionType.transferencia &&
-                                paymentTypeController.text.isEmpty)) {
-                          Get.snackbar(
-                            'Erro',
-                            'Preencha todos os campos obrigatórios',
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                          return;
-                        }
-
-                        setState(() {
-                          _isSaving = true;
-                        });
-
-                        final TransactionModel transaction = TransactionModel(
-                          title: titleController.text,
-                          value:
-                              valuecontroller.text.replaceAll('R\$', '').trim(),
-                          type: _selectedType,
-                          category: categoryId,
-                          paymentDay: _selectedDate!.toString().split(' ')[0],
-                          paymentType: paymentTypeController.text,
-                        );
-
-                        try {
-                          if (widget.overrideTransactionSalvar != null) {
-                            await widget.overrideTransactionSalvar!(
-                                transaction.copyWith(
-                              id: widget.transaction!.id,
-                            ));
-                            Get.back();
+                          if (titleController.text.isEmpty ||
+                              valuecontroller.text.isEmpty ||
+                              _selectedDate == null ||
+                              (_selectedType != TransactionType.transferencia &&
+                                  categoryId == null) ||
+                              (_selectedType != TransactionType.transferencia &&
+                                  paymentTypeController.text.isEmpty)) {
+                            Get.snackbar(
+                              'Erro',
+                              'Preencha todos os campos obrigatórios',
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
                             return;
                           }
 
-                          await transactionController.addTransaction(
-                              transaction,
-                              isInstallment: _isInstallment,
-                              installments: _installments);
+                          // Definir _isSaving imediatamente para prevenir múltiplos cliques
+                          setState(() {
+                            _isSaving = true;
+                          });
 
-                          // Navegar para ResumePage após salvar
-                          Get.back(result: 3);
-                          return;
-                        } catch (e) {
-                          Get.snackbar(
-                            'Erro',
-                            'Erro ao salvar a transação: ${e.toString()}',
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.BOTTOM,
+                          final TransactionModel transaction = TransactionModel(
+                            title: titleController.text,
+                            value: valuecontroller.text
+                                .replaceAll('R\$', '')
+                                .trim(),
+                            type: _selectedType,
+                            category: categoryId,
+                            paymentDay: _selectedDate!.toString().split(' ')[0],
+                            paymentType: paymentTypeController.text,
                           );
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isSaving = false;
-                            });
+
+                          try {
+                            if (widget.overrideTransactionSalvar != null) {
+                              await widget.overrideTransactionSalvar!(
+                                  transaction.copyWith(
+                                id: widget.transaction!.id,
+                              ));
+                              if (mounted) {
+                                Get.back();
+                              }
+                              return;
+                            }
+
+                            await transactionController.addTransaction(
+                                transaction,
+                                isInstallment: _isInstallment,
+                                installments: _installments);
+
+                            // Navegar para ResumePage após salvar
+                            if (mounted) {
+                              Get.back(result: 3);
+                            }
+                            return;
+                          } catch (e) {
+                            if (mounted) {
+                              Get.snackbar(
+                                'Erro',
+                                'Erro ao salvar a transação: ${e.toString()}',
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                                snackPosition: SnackPosition.BOTTOM,
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isSaving = false;
+                              });
+                            }
                           }
-                        }
-                      },
-                      child: _isSaving
-                          ? SizedBox(
-                              width: 20.w,
-                              height: 48.h,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    theme.cardColor),
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Container(
-                              height: 48.h,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20.w, vertical: 10.h),
-                              decoration: BoxDecoration(
-                                color: theme.primaryColor,
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Salvar",
-                                  style: TextStyle(
-                                    color: theme.cardColor,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
+                        },
+                        child: _isSaving
+                            ? Container(
+                                height: 48.h,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w, vertical: 10.h),
+                                decoration: BoxDecoration(
+                                  color: theme.primaryColor.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 20.w,
+                                    height: 20.h,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          theme.cardColor),
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                height: 48.h,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w, vertical: 10.h),
+                                decoration: BoxDecoration(
+                                  color: theme.primaryColor,
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Salvar",
+                                    style: TextStyle(
+                                      color: theme.cardColor,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                 ],

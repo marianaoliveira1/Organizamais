@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../model/goal_model.dart';
 import '../services/analytics_service.dart';
+import '../utils/snackbar_helper.dart';
 import 'auth_controller.dart';
 
 class GoalController extends GetxController {
@@ -49,7 +50,7 @@ class GoalController extends GetxController {
       targetValue: targetValue,
     );
 
-    Get.snackbar('Sucesso', 'Meta adicionada com sucesso');
+    SnackbarHelper.showSuccess('Meta adicionada com sucesso');
   }
 
   Future<void> updateGoal(GoalModel goal) async {
@@ -61,7 +62,7 @@ class GoalController extends GetxController {
     // Log analytics event
     await _analyticsService.logUpdateGoal(goal.name);
 
-    Get.snackbar('Sucesso', 'Meta atualizada com sucesso');
+    SnackbarHelper.showSuccess('Meta atualizada com sucesso');
   }
 
   Future<void> deleteGoal(String id) async {
@@ -75,6 +76,6 @@ class GoalController extends GetxController {
       await _analyticsService.logDeleteGoal(goalToDelete.name);
     }
 
-    Get.snackbar('Sucesso', 'Meta removida com sucesso');
+    SnackbarHelper.showSuccess('Meta removida com sucesso');
   }
 }

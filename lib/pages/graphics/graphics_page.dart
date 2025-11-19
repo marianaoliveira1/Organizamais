@@ -267,6 +267,24 @@ class _GraphicsPageState extends State<GraphicsPage>
       _monthScrollController.jumpTo(0);
     } catch (_) {}
     for (int i = 0; i <= targetIndex; i++) {
+      // Verificar se o widget ainda está montado
+      if (!mounted) return;
+
+      // Verificar se o controller ainda tem clientes antes de acessar position
+      if (!_monthScrollController.hasClients) {
+        break;
+      }
+
+      // Verificar se position está disponível e tem dimensões
+      try {
+        if (!_monthScrollController.position.hasContentDimensions) {
+          break;
+        }
+      } catch (_) {
+        // Se position não estiver disponível, sair do loop
+        break;
+      }
+
       final key = _monthItemKeys[i];
       if (key != null && key.currentContext != null) {
         await Scrollable.ensureVisible(
@@ -277,14 +295,23 @@ class _GraphicsPageState extends State<GraphicsPage>
         );
         continue;
       }
-      final double offset = i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
-      final double maxScroll = _monthScrollController.position.maxScrollExtent;
-      final double scrollPosition = offset.clamp(0.0, maxScroll);
-      await _monthScrollController.animateTo(
-        scrollPosition,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-      );
+
+      // Acessar position de forma segura
+      try {
+        final double offset =
+            i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+        final double maxScroll =
+            _monthScrollController.position.maxScrollExtent;
+        final double scrollPosition = offset.clamp(0.0, maxScroll);
+        await _monthScrollController.animateTo(
+          scrollPosition,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+        );
+      } catch (_) {
+        // Se houver erro ao acessar position ou animar, sair do loop
+        break;
+      }
     }
   }
 
@@ -700,9 +727,6 @@ class _GraphicsPageState extends State<GraphicsPage>
         SizedBox(height: 20.h),
 
         // Card de sugestões 50/30/20
-        _buildBudgetSuggestionsCard(
-            theme, transactionController, currencyFormatter),
-        SizedBox(height: 20.h),
 
         // Gráfico de Categorias Agrupadas por Macrocategoria (InfoCard)
         InfoCard(
@@ -762,7 +786,11 @@ class _GraphicsPageState extends State<GraphicsPage>
           ),
         ),
 
-        SizedBox(height: 16.h),
+        SizedBox(height: 20.h),
+
+        _buildBudgetSuggestionsCard(
+            theme, transactionController, currencyFormatter),
+        SizedBox(height: 20.h),
 
         // Relatório Mensal (InfoCard)
         InfoCard(

@@ -125,7 +125,7 @@ class MyApp extends StatelessWidget {
         currentUser != null ? Routes.HOME : Routes.LOGIN;
 
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(411, 915),
       minTextAdapt: true,
       splitScreenMode: true,
       child: GetMaterialApp(

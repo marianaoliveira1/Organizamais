@@ -55,12 +55,15 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(
+              height: 120.h,
+            ),
             Text(
               "ORGANIZA+",
               style: TextStyle(
-                color: DefaultColors.black,
-                fontWeight: FontWeight.bold,
-              ),
+                  color: DefaultColors.black,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(
               height: 70.h,

@@ -9,6 +9,7 @@ import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
 import '../../../utils/performance_helpers.dart';
+import '../../../utils/snackbar_helper.dart';
 import '../pages/add_card_page.dart';
 import '../pages/invoice_details_page.dart';
 
@@ -77,12 +78,12 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
         await widget.cardController
             .markInvoicePaid(cardId: cardIdOrNull, invoiceKey: key);
       }
-      Get.snackbar('Sucesso', 'Fatura marcada como paga');
+      SnackbarHelper.showSuccess('Fatura marcada como paga');
     } catch (e) {
       setState(() {
         _paidInvoiceKeys.remove(key);
       });
-      Get.snackbar('Erro', 'Não foi possível salvar. Tente novamente.');
+      SnackbarHelper.showError('Não foi possível salvar. Tente novamente.');
     }
   }
 
@@ -1407,7 +1408,9 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (modalContext) => Container(
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
@@ -1445,10 +1448,13 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                     label: 'Editar',
                     color: Colors.orange,
                     onTap: () {
-                      Navigator.of(context).pop();
-                      // Pequeno delay para garantir que o modal feche antes de navegar
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        Get.to(() => AddCardPage(isEditing: true, card: card));
+                      Navigator.of(modalContext).pop();
+                      // Usar o contexto original, não o do modal
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          Get.to(
+                              () => AddCardPage(isEditing: true, card: card));
+                        }
                       });
                     },
                   ),
@@ -1460,8 +1466,12 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                     label: 'Deletar',
                     color: Colors.red,
                     onTap: () {
-                      Navigator.of(context).pop();
-                      _showDeleteCardDialog(context, theme, card);
+                      Navigator.of(modalContext).pop();
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          _showDeleteCardDialog(context, theme, card);
+                        }
+                      });
                     },
                   ),
                   SizedBox(height: 12.h),
@@ -1471,7 +1481,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                     icon: Icons.close,
                     label: 'Cancelar',
                     color: DefaultColors.grey20,
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => Navigator.of(modalContext).pop(),
                   ),
                 ],
               ),

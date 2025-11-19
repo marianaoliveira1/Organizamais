@@ -359,7 +359,9 @@ class TransactionItem extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (modalContext) => Container(
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
@@ -399,17 +401,19 @@ class TransactionItem extends StatelessWidget {
                     label: 'Editar',
                     color: Colors.orange,
                     onTap: () {
-                      Navigator.of(context).pop();
-                      // Pequeno delay para garantir que o modal feche antes de navegar
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        Get.to(
-                          () => TransactionPage(
-                            transaction: transaction,
-                            overrideTransactionSalvar: (updated) {
-                              controller.updateTransaction(updated);
-                            },
-                          ),
-                        );
+                      Navigator.of(modalContext).pop();
+                      // Usar o contexto original, não o do modal
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          Get.to(
+                            () => TransactionPage(
+                              transaction: transaction,
+                              overrideTransactionSalvar: (updated) {
+                                controller.updateTransaction(updated);
+                              },
+                            ),
+                          );
+                        }
                       });
                     },
                   ),
@@ -421,8 +425,12 @@ class TransactionItem extends StatelessWidget {
                     label: 'Deletar',
                     color: Colors.red,
                     onTap: () {
-                      Navigator.of(context).pop();
-                      _showDeleteConfirmationDialog(context, transaction);
+                      Navigator.of(modalContext).pop();
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          _showDeleteConfirmationDialog(context, transaction);
+                        }
+                      });
                     },
                   ),
                   SizedBox(height: 12.h),
@@ -432,7 +440,7 @@ class TransactionItem extends StatelessWidget {
                     icon: Icons.close,
                     label: 'Cancelar',
                     color: DefaultColors.grey20,
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => Navigator.of(modalContext).pop(),
                   ),
                 ],
               ),

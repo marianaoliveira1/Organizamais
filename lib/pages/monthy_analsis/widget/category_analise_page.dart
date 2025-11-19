@@ -59,17 +59,9 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DefaultTextGraphic(
-                  text: "Evolução Mensal da Categoria",
+                  text: "Evolução Mensal da Categoria (até hoje)",
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  'Ano ${DateTime.now().year} (até hoje)',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: DefaultColors.grey,
-                  ),
-                ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 6.h),
                 Row(
                   children: [
                     Row(
@@ -106,6 +98,28 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                         SizedBox(width: 6.w),
                         Text(
                           'Meta',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: DefaultColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 16.w),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 12.w,
+                          height: 2.h,
+                          child: CustomPaint(
+                            painter: _DashedLinePainter(
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'Média Mensal',
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: DefaultColors.grey,
@@ -182,6 +196,8 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                                       0.0;
                               // ignore: unused_local_variable
                               final bool hasBudget = budget > 0;
+                              final double monthlyAverage =
+                                  _calculateMonthlyAverage(monthlyData);
                               return _chartMode == _ChartMode.bar
                                   ? SfCartesianChart(
                                       margin: EdgeInsets.zero,
@@ -242,8 +258,8 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                                           yValueMapper: (e, _) =>
                                               e.value.toDouble(),
                                           color: widget.categoryColor,
-                                          width: 0.45,
-                                          spacing: 0.1,
+                                          width: 0.8,
+                                          spacing: 0.0,
                                           dataLabelSettings:
                                               const DataLabelSettings(
                                                   isVisible: false),
@@ -261,8 +277,29 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                                             xValueMapper: (e, _) => e.key,
                                             yValueMapper: (e, _) => e.value,
                                             color: DefaultColors.grey,
-                                            width: 0.45,
-                                            spacing: 0.1,
+                                            width: 0.8,
+                                            spacing: 0.2,
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: false),
+                                          ),
+                                        // Linha da média mensal
+                                        if (monthlyAverage > 0)
+                                          FastLineSeries<MapEntry<int, double>,
+                                              num>(
+                                            dataSource: monthlyData.entries
+                                                .map((e) =>
+                                                    MapEntry<int, double>(
+                                                        e.key, monthlyAverage))
+                                                .toList(),
+                                            xValueMapper: (e, _) => e.key,
+                                            yValueMapper: (e, _) => e.value,
+                                            color: theme.primaryColor,
+                                            width: 2,
+                                            dashArray: const <double>[5, 5],
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: false),
                                             dataLabelSettings:
                                                 const DataLabelSettings(
                                                     isVisible: false),
@@ -359,6 +396,27 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
                                             color: DefaultColors.grey,
                                             width: 4,
                                           ),
+                                        // Linha da média mensal
+                                        if (monthlyAverage > 0)
+                                          FastLineSeries<Map<int, double>, num>(
+                                            dataSource: List.generate(12, (i) {
+                                              final month = i + 1;
+                                              return {month: monthlyAverage};
+                                            }),
+                                            xValueMapper: (e, _) =>
+                                                e.keys.first,
+                                            yValueMapper: (e, _) =>
+                                                e.values.first,
+                                            color: theme.primaryColor,
+                                            width: 2,
+                                            dashArray: const <double>[5, 5],
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: false),
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: false),
+                                          ),
                                       ],
                                       tooltipBehavior: TooltipBehavior(
                                         enable: true,
@@ -438,56 +496,141 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
     });
   }
 
+  Widget _buildTextWithHighlightedNumbers(String text, ThemeData theme,
+      {double fontSize = 13}) {
+    // Regex para encontrar números (incluindo R$ e porcentagens)
+    final RegExp numberPattern = RegExp(r'R\$[\s]?[\d.,]+|[\d.,]+%|[\d.,]+');
+
+    final List<TextSpan> spans = [];
+    int lastMatchEnd = 0;
+
+    for (final Match match in numberPattern.allMatches(text)) {
+      // Adicionar texto antes do número
+      if (match.start > lastMatchEnd) {
+        spans.add(TextSpan(
+          text: text.substring(lastMatchEnd, match.start),
+          style: TextStyle(
+            fontSize: fontSize.sp,
+            fontWeight: FontWeight.w500,
+            color: DefaultColors.textGrey,
+            height: 1.4,
+          ),
+        ));
+      }
+
+      // Adicionar número destacado
+      spans.add(TextSpan(
+        text: match.group(0),
+        style: TextStyle(
+          fontSize: fontSize.sp,
+          fontWeight: FontWeight.w600,
+          color: theme.primaryColor,
+          height: 1.4,
+        ),
+      ));
+
+      lastMatchEnd = match.end;
+    }
+
+    // Adicionar texto restante
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastMatchEnd),
+        style: TextStyle(
+          fontSize: fontSize.sp,
+          fontWeight: FontWeight.w500,
+          color: DefaultColors.textGrey,
+          height: 1.4,
+        ),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
   Widget _buildAnalysisItem(Map<String, dynamic> item, ThemeData theme) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(8.w),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: item['cardColor'].withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8.r),
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: item['cardColor'].withOpacity(0.3),
+          color: DefaultColors.grey20.withOpacity(0.3),
+          width: 1,
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            item['icon'],
-            color: item['cardColor'],
-            size: 16.sp,
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: item['cardColor'].withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(
+                  item['icon'],
+                  color: item['cardColor'],
+                  size: 18.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Text(
+                item['month'],
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['month'],
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
-                    color: theme.primaryColor,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  item['analysis'],
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                    color: DefaultColors.grey,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  item['message'],
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
-                    color: item['cardColor'],
-                  ),
-                ),
-              ],
+          SizedBox(height: 12.h),
+          // Linha 1: Variação
+          _buildTextWithHighlightedNumbers(
+            item['line1'],
+            theme,
+            fontSize: 13.sp,
+          ),
+          // Linha 2: Meta mensal
+          if (item['line2'] != null && item['line2'].toString().isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            _buildTextWithHighlightedNumbers(
+              item['line2'],
+              theme,
+              fontSize: 13.sp,
+            ),
+          ],
+          // Linha 3: Status da meta
+          if (item['line3'] != null && item['line3'].toString().isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            _buildTextWithHighlightedNumbers(
+              item['line3'],
+              theme,
+              fontSize: 13.sp,
+            ),
+          ],
+          // Linha 4: Mensagem explicativa
+          SizedBox(height: 12.h),
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: item['cardColor'].withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Text(
+              item['line4'],
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: item['cardColor'],
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -517,58 +660,89 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
 
         Color cardColor;
         IconData icon;
-        String message;
+        String line1; // Variação
+        String line2; // Meta mensal
+        String line3; // Status da meta
+        String line4; // Mensagem explicativa
 
+        // Construir linha 1 (variação)
+        if (percentChange >= -5 && percentChange <= 5) {
+          // Estável
+          if (difference > 0) {
+            line1 =
+                'Variação mínima: aumentou R\$ ${_formatCurrency(absoluteDifference)} (${percentChange.toStringAsFixed(1)}%).';
+          } else if (difference < 0) {
+            line1 =
+                'Variação mínima: diminuiu R\$ ${_formatCurrency(absoluteDifference)} (${percentChange.abs().toStringAsFixed(1)}%).';
+          } else {
+            line1 = 'Variação mínima: manteve o mesmo valor (0%).';
+          }
+        } else if (difference > 0) {
+          line1 =
+              'Aumentou em R\$ ${_formatCurrency(absoluteDifference)} (${percentChange.toStringAsFixed(1)}%).';
+        } else {
+          line1 =
+              'Diminuiu em R\$ ${_formatCurrency(absoluteDifference)} (${percentChange.abs().toStringAsFixed(1)}%).';
+        }
+
+        // Construir linha 2 (meta mensal)
+        if (budget > 0) {
+          line2 = 'Meta mensal: R\$ ${_formatCurrency(budget)}.';
+        } else {
+          line2 = '';
+        }
+
+        // Construir linha 3 (status da meta)
+        if (budget > 0) {
+          final double remaining = budget - currentValue;
+          if (remaining >= 0) {
+            line3 =
+                'Faltam R\$ ${_formatCurrency(remaining)} para atingir sua meta.';
+          } else {
+            line3 =
+                'Você ultrapassou sua meta em R\$ ${_formatCurrency(remaining.abs())}.';
+          }
+        } else {
+          line3 = '';
+        }
+
+        // Construir linha 4 (mensagem explicativa) e definir cores
         if (percentChange > 15) {
           cardColor = Colors.red;
           icon = Iconsax.arrow_circle_up;
-          message = "Alerta: aumento expressivo!";
+          line4 =
+              'Atenção! Seu gasto subiu muito acima do esperado. Vale revisar onde esse aumento aconteceu.';
         } else if (percentChange >= 5 && percentChange <= 15) {
           cardColor = Colors.orange;
           icon = Iconsax.arrow_circle_up;
-          message = "Aumento moderado";
+          line4 =
+              'Aumento moderado. Acompanhe de perto para manter o controle.';
         } else if (percentChange >= -5 && percentChange <= 5) {
           cardColor = Colors.grey;
           icon = Iconsax.arrow_right_2;
-          message = "Estável";
+          line4 = 'Você manteve o mesmo padrão de gastos do mês anterior.';
         } else if (percentChange >= -15 && percentChange <= -5) {
           cardColor = Colors.green;
           icon = Iconsax.arrow_down_2;
-          message = "Boa redução!";
+          line4 = 'Ótima redução! Continue nesse ritmo.';
         } else {
           cardColor = Colors.green;
           icon = Iconsax.arrow_down_2;
-          message = "Economia significativa!";
-        }
-
-        String valueText = difference >= 0
-            ? 'Aumentou em ${_formatCurrency(absoluteDifference)}'
-            : 'Diminuiu em ${_formatCurrency(absoluteDifference)}';
-
-        String budgetLine = '';
-        if (budget > 0) {
-          final double remaining = budget - currentValue;
-
-          if (remaining >= 0) {
-            budgetLine =
-                '. Sua meta mensal era de R\$ ${_formatCurrency(budget)}. Ainda faltam R\$ ${_formatCurrency(remaining)} para atingir.';
-          } else {
-            budgetLine =
-                '. Sua meta mensal era de R\$ ${_formatCurrency(budget)}. Você ultrapassou em R\$ ${_formatCurrency(remaining.abs())}.';
-          }
+          line4 = 'Excelente! Você teve uma economia significativa neste mês.';
         }
 
         analysis.add({
           'month': _getMonthName(month),
-          'analysis':
-              '$valueText (${percentChange.toStringAsFixed(1)}%)$budgetLine',
+          'line1': line1,
+          'line2': line2,
+          'line3': line3,
+          'line4': line4,
           'percentChange': percentChange,
           'isPositive': difference > 0,
           'currentValue': currentValue,
           'previousValue': previousValue,
           'cardColor': cardColor,
           'icon': icon,
-          'message': message,
         });
       }
     }
@@ -692,6 +866,13 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
     return optimalMaxY;
   }
 
+  double _calculateMonthlyAverage(Map<int, double> monthlyData) {
+    final activeMonths =
+        monthlyData.values.where((value) => value > 0).toList();
+    if (activeMonths.isEmpty) return 0.0;
+    return activeMonths.reduce((a, b) => a + b) / activeMonths.length;
+  }
+
   String _getMonthName(int month) {
     const months = [
       'Janeiro',
@@ -756,6 +937,36 @@ class _CategoryMonthlyChartState extends State<CategoryMonthlyChart> {
       return 'R\$ ${value.toStringAsFixed(0)}';
     }
   }
+}
+
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+
+  _DashedLinePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 5.0;
+    const dashSpace = 5.0;
+    double startX = 0;
+
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, size.height / 2),
+        Offset(startX + dashWidth, size.height / 2),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _ChartModeButton extends StatelessWidget {

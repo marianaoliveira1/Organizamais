@@ -138,12 +138,17 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
         return;
       }
       if (_scrollController.hasClients && _items.length > 1) {
-        final double fraction = itemIndex / (_items.length - 1);
-        final double maxScroll = _scrollController.position.maxScrollExtent;
-        final double target = (maxScroll * fraction).clamp(0.0, maxScroll);
         try {
+          if (!_scrollController.position.hasContentDimensions) {
+            continue;
+          }
+          final double fraction = itemIndex / (_items.length - 1);
+          final double maxScroll = _scrollController.position.maxScrollExtent;
+          final double target = (maxScroll * fraction).clamp(0.0, maxScroll);
           _scrollController.jumpTo(target);
-        } catch (_) {}
+        } catch (_) {
+          // Se houver erro ao acessar position, continuar tentando
+        }
       }
       tries += 1;
       await Future.delayed(const Duration(milliseconds: 60));
@@ -159,9 +164,7 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         itemIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
-    if (!_scrollController.hasClients ||
-        (_scrollController.position.hasContentDimensions == false) ||
-        _scrollController.position.maxScrollExtent == 0) {
+    if (!_scrollController.hasClients) {
       if (_scrollRetries < 4) {
         _scrollRetries += 1;
         WidgetsBinding.instance
@@ -169,13 +172,33 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
       }
       return;
     }
-    final double maxScroll = _scrollController.position.maxScrollExtent;
-    final double scrollPosition = offset.clamp(0.0, maxScroll);
-    _scrollController.animateTo(
-      scrollPosition,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+
+    // Verificar se position está disponível de forma segura
+    try {
+      if (!_scrollController.position.hasContentDimensions ||
+          _scrollController.position.maxScrollExtent == 0) {
+        if (_scrollRetries < 4) {
+          _scrollRetries += 1;
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _scrollToIndex(itemIndex));
+        }
+        return;
+      }
+      final double maxScroll = _scrollController.position.maxScrollExtent;
+      final double scrollPosition = offset.clamp(0.0, maxScroll);
+      _scrollController.animateTo(
+        scrollPosition,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } catch (_) {
+      // Se houver erro ao acessar position, tentar novamente se ainda houver tentativas
+      if (_scrollRetries < 4) {
+        _scrollRetries += 1;
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _scrollToIndex(itemIndex));
+      }
+    }
   }
 
   Future<void> _introScrollToIndex(int itemIndex) async {
@@ -199,14 +222,39 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
       _scrollController.jumpTo(0);
     } catch (_) {}
     for (int i = 0; i <= itemIndex; i++) {
-      final double offset = i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
-      final double maxScroll = _scrollController.position.maxScrollExtent;
-      final double scrollPosition = offset.clamp(0.0, maxScroll);
-      await _scrollController.animateTo(
-        scrollPosition,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-      );
+      // Verificar se o widget ainda está montado
+      if (!mounted) return;
+
+      // Verificar se o controller ainda tem clientes antes de acessar position
+      if (!_scrollController.hasClients) {
+        break;
+      }
+
+      // Verificar se position está disponível e tem dimensões
+      try {
+        if (!_scrollController.position.hasContentDimensions) {
+          break;
+        }
+      } catch (_) {
+        // Se position não estiver disponível, sair do loop
+        break;
+      }
+
+      // Acessar position de forma segura
+      try {
+        final double offset =
+            i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+        final double maxScroll = _scrollController.position.maxScrollExtent;
+        final double scrollPosition = offset.clamp(0.0, maxScroll);
+        await _scrollController.animateTo(
+          scrollPosition,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+        );
+      } catch (_) {
+        // Se houver erro ao acessar position ou animar, sair do loop
+        break;
+      }
     }
   }
 

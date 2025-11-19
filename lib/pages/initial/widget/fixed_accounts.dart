@@ -528,7 +528,9 @@ class FixedAccounts extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (modalContext) => Container(
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
@@ -567,15 +569,18 @@ class FixedAccounts extends StatelessWidget {
                       label: 'Editar',
                       color: Colors.orange,
                       onTap: () {
-                        Navigator.of(context).pop();
-                        // Pequeno delay para garantir que o modal feche antes de navegar
-                        Future.delayed(const Duration(milliseconds: 100), () {
-                          Get.to(
-                            () => AddFixedAccountsFormPage(
-                              fixedAccount: fixedAccount,
-                              onSave: (fa) => controller.updateFixedAccount(fa),
-                            ),
-                          );
+                        Navigator.of(modalContext).pop();
+                        // Usar o contexto original, não o do modal
+                        Future.delayed(const Duration(milliseconds: 150), () {
+                          if (context.mounted) {
+                            Get.to(
+                              () => AddFixedAccountsFormPage(
+                                fixedAccount: fixedAccount,
+                                onSave: (fa) =>
+                                    controller.updateFixedAccount(fa),
+                              ),
+                            );
+                          }
                         });
                       },
                     ),
@@ -587,14 +592,18 @@ class FixedAccounts extends StatelessWidget {
                     label: 'Deletar',
                     color: Colors.red,
                     onTap: () {
-                      Navigator.of(context).pop();
-                      _showDeleteDialog(
-                        context: context,
-                        theme: theme,
-                        controller: controller,
-                        fixedAccount: fixedAccount,
-                        isDeactivated: isDeactivated,
-                      );
+                      Navigator.of(modalContext).pop();
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          _showDeleteDialog(
+                            context: context,
+                            theme: theme,
+                            controller: controller,
+                            fixedAccount: fixedAccount,
+                            isDeactivated: isDeactivated,
+                          );
+                        }
+                      });
                     },
                   ),
                   SizedBox(height: 12.h),
@@ -604,7 +613,7 @@ class FixedAccounts extends StatelessWidget {
                     icon: Icons.close,
                     label: 'Cancelar',
                     color: DefaultColors.grey20,
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => Navigator.of(modalContext).pop(),
                   ),
                 ],
               ),
