@@ -10,15 +10,16 @@ import '../../../utils/color.dart';
 import 'package:organizamais/widgetes/info_card.dart';
 
 class AnnualBalanceSplineChart extends StatelessWidget {
-  const AnnualBalanceSplineChart({super.key});
+  final int selectedYear;
+
+  const AnnualBalanceSplineChart({super.key, required this.selectedYear});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final TransactionController controller = Get.find<TransactionController>();
 
-    final int year = DateTime.now().year;
-    final List<_Point> points = _buildAnnualBalance(controller, year);
+    final List<_Point> points = _buildAnnualBalance(controller, selectedYear);
 
     return InfoCard(
       title: 'Saldo acumulado ao longo do ano',
@@ -83,6 +84,7 @@ class AnnualBalanceSplineChart extends StatelessWidget {
     final List<_Point> out = [];
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
+    final bool isCurrentYear = year == now.year;
     final months = const [
       'Jan',
       'Fev',
@@ -106,7 +108,8 @@ class AnnualBalanceSplineChart extends StatelessWidget {
         final d = DateTime.parse(t.paymentDay!);
         final DateTime dOnly = DateTime(d.year, d.month, d.day);
         if (d.year != year || d.month != m) continue;
-        if (dOnly.isAfter(today)) continue; // only up to today
+        // Se for o ano atual, filtrar apenas até hoje; se for ano passado, mostrar todos os meses
+        if (isCurrentYear && dOnly.isAfter(today)) continue;
         final v =
             double.parse(t.value.replaceAll('.', '').replaceAll(',', '.'));
         if (t.type == TransactionType.receita) {

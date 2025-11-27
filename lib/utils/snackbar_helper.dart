@@ -21,10 +21,9 @@ class SnackbarHelper {
         return;
       }
 
-      // Check if Overlay is available
-      try {
-        Overlay.of(context);
-      } catch (_) {
+      // Check if Overlay is available using maybeOf (doesn't throw)
+      final overlay = Overlay.maybeOf(context);
+      if (overlay == null) {
         // Overlay not available, schedule snackbar for next frame
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _showSnackbarInternal(
@@ -71,11 +70,28 @@ class SnackbarHelper {
         return;
       }
 
-      // Verify overlay is still available
-      try {
-        Overlay.of(context);
-      } catch (_) {
+      // Verify overlay is still available using maybeOf (doesn't throw)
+      final overlay = Overlay.maybeOf(context);
+      if (overlay == null) {
         debugPrint('Snackbar: $title - $message (Overlay not available)');
+        return;
+      }
+
+      // Also try ScaffoldMessenger as a safer alternative
+      final scaffoldMessenger = ScaffoldMessenger.maybeOf(context);
+      if (scaffoldMessenger != null) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: backgroundColor ?? Colors.grey,
+            behavior: SnackBarBehavior.floating,
+            duration: duration ?? const Duration(seconds: 3),
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
         return;
       }
 

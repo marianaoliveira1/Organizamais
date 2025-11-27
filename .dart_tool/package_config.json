@@ -381,9 +381,9 @@
     },
     {
       "name": "google_fonts",
-      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/google_fonts-6.2.1",
+      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/google_fonts-6.3.2",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.7"
     },
     {
       "name": "google_identity_services_web",
@@ -663,13 +663,13 @@
     },
     {
       "name": "syncfusion_flutter_charts",
-      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/syncfusion_flutter_charts-31.1.19",
+      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/syncfusion_flutter_charts-29.1.37+1",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.4"
     },
     {
       "name": "syncfusion_flutter_core",
-      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/syncfusion_flutter_core-31.1.19",
+      "rootUri": "file:///Users/marianaoliveirafernandes/.pub-cache/hosted/pub.dev/syncfusion_flutter_core-29.2.11",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },

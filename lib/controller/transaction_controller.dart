@@ -14,12 +14,26 @@ class TransactionController extends GetxController {
   final _isLoading = true.obs;
   final AnalyticsService _analyticsService = AnalyticsService();
 
+  // Cache para transações fake de contas fixas (otimização de performance)
+  List<TransactionModel>? _cachedFakeTransactions;
+  DateTime? _cacheDate;
+  static const Duration _cacheValidity = Duration(minutes: 5);
+
   FixedAccountsController get fixedAccountsController =>
       Get.find<FixedAccountsController>();
 
   bool get isLoading => _isLoading.value;
 
   List<TransactionModel> get transaction {
+    // Usar cache se ainda válido (evita recalcular toda vez)
+    final now = DateTime.now();
+    if (_cachedFakeTransactions != null &&
+        _cacheDate != null &&
+        now.difference(_cacheDate!) < _cacheValidity) {
+      return [..._transaction, ..._cachedFakeTransactions!];
+    }
+
+    // Recalcular apenas se cache expirou ou não existe
     var fakeTransactionsFromFixed = <TransactionModel>[];
     final today = DateTime.now();
 
@@ -141,7 +155,17 @@ class TransactionController extends GetxController {
       }
     }
 
+    // Atualizar cache
+    _cachedFakeTransactions = fakeTransactionsFromFixed;
+    _cacheDate = now;
+
     return [..._transaction, ...fakeTransactionsFromFixed];
+  }
+
+  // Invalidar cache quando contas fixas mudarem
+  void invalidateFixedAccountsCache() {
+    _cachedFakeTransactions = null;
+    _cacheDate = null;
   }
 
   // Exposição reativa para rebuilds em UI que precisam reagir a alterações de transações
@@ -533,13 +557,28 @@ class TransactionController extends GetxController {
     }
 
     try {
-      await FirebaseFirestore.instance
+      final docRef = FirebaseFirestore.instance
           .collection('transactions')
-          .doc(transaction.id!)
-          .update(
-            transaction.toMap(),
-          );
+          .doc(transaction.id!);
+
+      // Try to update first (more efficient if document exists)
+      try {
+        await docRef.update(transaction.toMap());
+      } catch (e) {
+        // If update fails with not-found error, create the document instead
+        if (e.toString().contains('not-found') ||
+            e.toString().contains('NOT_FOUND') ||
+            e.toString().contains('not found')) {
+          // Document doesn't exist, create it using set with merge
+          // This ensures we don't overwrite any existing fields if document appears
+          await docRef.set(transaction.toMap(), SetOptions(merge: true));
+        } else {
+          // For other errors, rethrow
+          rethrow;
+        }
+      }
     } catch (e) {
+      // Rollback optimistic update on error
       if (idx != -1 && previous != null) {
         _transaction[idx] = previous;
       }

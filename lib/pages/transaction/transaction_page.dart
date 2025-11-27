@@ -10,6 +10,7 @@ import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:organizamais/model/transaction_model.dart';
 import 'package:organizamais/services/analytics_service.dart';
 import 'package:organizamais/utils/color.dart';
+import 'package:organizamais/utils/snackbar_helper.dart';
 
 import '../../ads_banner/ads_banner.dart';
 import '../../controller/transaction_controller.dart';
@@ -34,6 +35,23 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   TransactionType _selectedType = TransactionType.despesa;
+
+  /// Helper function to safely show snackbar
+  /// Uses SnackbarHelper for consistent error handling
+  void _showSafeSnackbar(String title, String message,
+      {Color? backgroundColor, Color? colorText}) {
+    if (!mounted) return;
+
+    // Use the centralized SnackbarHelper for consistent behavior
+    SnackbarHelper.showSnackbar(
+      title,
+      message,
+      backgroundColor: backgroundColor ?? Colors.red,
+      colorText: colorText ?? Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
   int? categoryId;
   DateTime? _selectedDate;
   final TextEditingController titleController = TextEditingController();
@@ -493,12 +511,11 @@ class _TransactionPageState extends State<TransactionPage> {
                                   categoryId == null) ||
                               (_selectedType != TransactionType.transferencia &&
                                   paymentTypeController.text.isEmpty)) {
-                            Get.snackbar(
+                            _showSafeSnackbar(
                               'Erro',
                               'Preencha todos os campos obrigatórios',
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
-                              snackPosition: SnackPosition.BOTTOM,
                             );
                             return;
                           }
@@ -526,7 +543,24 @@ class _TransactionPageState extends State<TransactionPage> {
                                 id: widget.transaction!.id,
                               ));
                               if (mounted) {
-                                Get.back();
+                                // Fechar qualquer snackbar aberto antes de navegar
+                                try {
+                                  if (Get.isSnackbarOpen == true) {
+                                    Get.closeCurrentSnackbar();
+                                    Future.delayed(
+                                        const Duration(milliseconds: 200), () {
+                                      if (mounted) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    });
+                                  } else {
+                                    Navigator.of(context).pop();
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    Navigator.of(context).pop();
+                                  }
+                                }
                               }
                               return;
                             }
@@ -538,17 +572,33 @@ class _TransactionPageState extends State<TransactionPage> {
 
                             // Navegar para ResumePage após salvar
                             if (mounted) {
-                              Get.back(result: 3);
+                              // Fechar qualquer snackbar aberto antes de navegar
+                              try {
+                                if (Get.isSnackbarOpen == true) {
+                                  Get.closeCurrentSnackbar();
+                                  Future.delayed(
+                                      const Duration(milliseconds: 200), () {
+                                    if (mounted) {
+                                      Navigator.of(context).pop(3);
+                                    }
+                                  });
+                                } else {
+                                  Navigator.of(context).pop(3);
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  Navigator.of(context).pop(3);
+                                }
+                              }
                             }
                             return;
                           } catch (e) {
                             if (mounted) {
-                              Get.snackbar(
+                              _showSafeSnackbar(
                                 'Erro',
                                 'Erro ao salvar a transação: ${e.toString()}',
                                 backgroundColor: Colors.red,
                                 colorText: Colors.white,
-                                snackPosition: SnackPosition.BOTTOM,
                               );
                             }
                           } finally {

@@ -27,7 +27,25 @@ class LogoutConfirmationDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Get.back(),
+          onPressed: () {
+            // Fechar qualquer snackbar aberto antes de navegar
+            try {
+              if (Get.isSnackbarOpen == true) {
+                Get.closeCurrentSnackbar();
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                });
+              } else {
+                Navigator.of(context).pop();
+              }
+            } catch (e) {
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
+          },
           child: Text(
             'Não',
             style: TextStyle(
@@ -40,7 +58,23 @@ class LogoutConfirmationDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             authController.logout();
-            Get.back();
+            // Fechar qualquer snackbar aberto antes de navegar
+            try {
+              if (Get.isSnackbarOpen == true) {
+                Get.closeCurrentSnackbar();
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                });
+              } else {
+                Navigator.of(context).pop();
+              }
+            } catch (e) {
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
           },
           child: Text(
             'Sim',

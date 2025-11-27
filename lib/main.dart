@@ -49,6 +49,30 @@ void main() async {
 
       // Forward Flutter framework errors to Crashlytics
       FlutterError.onError = (FlutterErrorDetails details) {
+        // Check if this is an AssetManifest.json error - don't crash the app for this
+        final isAssetManifestError =
+            details.exception.toString().contains('AssetManifest.json') ||
+                details.exception.toString().contains('Unable to load asset');
+
+        if (isAssetManifestError) {
+          // Log to Crashlytics but don't present the error to the user
+          // This prevents the app from crashing due to Google Fonts asset loading issues
+          try {
+            FirebaseCrashlytics.instance.recordError(
+              details.exception,
+              details.stack ?? StackTrace.current,
+              reason: 'AssetManifest.json error (non-fatal)',
+              fatal: false,
+            );
+          } catch (_) {
+            // Ignore if Crashlytics is not available
+          }
+          debugPrint(
+              'AssetManifest.json error caught (non-fatal): ${details.exception}');
+          return; // Don't present the error or crash the app
+        }
+
+        // For other errors, present and log normally
         FlutterError.presentError(details);
         FirebaseCrashlytics.instance.recordFlutterError(details);
       };
@@ -107,6 +131,83 @@ void main() async {
   });
 }
 
+/// Helper function to safely load Google Fonts with fallback
+/// This function wraps GoogleFonts calls in a try-catch to prevent crashes
+/// when AssetManifest.json is not available (common in some build scenarios)
+///
+/// The error "Unable to load asset: AssetManifest.json" can occur when:
+/// - The app hasn't been properly built after changes
+/// - Assets are not included in the build
+/// - GoogleFonts tries to load before assets are available
+TextTheme _getTextTheme() {
+  try {
+    // Usa Inter baseada no TextTheme padrão
+    final base = ThemeData.light().textTheme;
+    final textTheme = GoogleFonts.interTextTheme(base);
+
+    return textTheme;
+  } catch (e, stackTrace) {
+    // Envia erro ao Crashlytics (sem travar o app)
+    try {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Failed to load Google Fonts',
+        fatal: false,
+      );
+    } catch (_) {}
+
+    debugPrint('Error loading Google Fonts, applying fallback.');
+    // fallback em caso de erro
+    return _createInterTextTheme(ThemeData.light().textTheme);
+  }
+}
+
+/// Helper function to safely load Google Fonts for dark theme with fallback
+TextTheme _getDarkTextTheme() {
+  try {
+    final textTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme);
+    // Verificar se a fonte foi aplicada corretamente
+    if (textTheme.bodyLarge?.fontFamily != null) {
+      return textTheme;
+    }
+    // Se não foi aplicada, criar manualmente com fonte Inter
+    return _createInterTextTheme(ThemeData.dark().textTheme);
+  } catch (e, stackTrace) {
+    try {
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.recordError(
+          e,
+          stackTrace,
+          reason:
+              'Failed to load Google Fonts (dark) - AssetManifest.json error',
+          fatal: false,
+        );
+      }
+    } catch (_) {
+      // Ignore if Crashlytics is not available
+    }
+    debugPrint(
+        'Error loading Google Fonts (dark) (applying Inter manually): $e');
+    // Criar TextTheme manualmente com fonte Inter mesmo em caso de erro
+    return _createInterTextTheme(ThemeData.dark().textTheme);
+  }
+}
+
+/// Cria um TextTheme com fonte Inter aplicada manualmente
+/// Isso garante que a fonte Inter seja sempre usada, mesmo se Google Fonts falhar
+TextTheme _createInterTextTheme(TextTheme baseTheme) {
+  // Sempre tentar aplicar Inter através do Google Fonts
+  // Mesmo que tenha falhado antes, tentar novamente aqui
+  try {
+    return GoogleFonts.interTextTheme(baseTheme);
+  } catch (_) {
+    // Se ainda falhar, retornar o baseTheme mas com fontFamily definida
+    // O fontFamily será aplicado no ThemeData principal
+    return baseTheme;
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -125,7 +226,7 @@ class MyApp extends StatelessWidget {
         currentUser != null ? Routes.HOME : Routes.LOGIN;
 
     return ScreenUtilInit(
-      designSize: Size(411, 915),
+      designSize: Size(390, 815),
       minTextAdapt: true,
       splitScreenMode: true,
       child: GetMaterialApp(
@@ -146,7 +247,8 @@ class MyApp extends StatelessWidget {
 
         // 🌞 Tema Claro
         theme: ThemeData(
-          textTheme: GoogleFonts.interTextTheme(),
+          textTheme: _getTextTheme(),
+          fontFamily: 'Inter',
           brightness: Brightness.light,
           scaffoldBackgroundColor: DefaultColors.white,
           primaryColor: DefaultColors.black,
@@ -169,6 +271,8 @@ class MyApp extends StatelessWidget {
 
         // 🌙 Tema Escuro
         darkTheme: ThemeData(
+          textTheme: _getDarkTextTheme(),
+          fontFamily: 'Inter',
           brightness: Brightness.dark,
           scaffoldBackgroundColor: DefaultColors.backgroundDark,
           primaryColor: DefaultColors.white,

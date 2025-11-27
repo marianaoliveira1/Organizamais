@@ -1183,9 +1183,28 @@ class _CategoryPageState extends State<CategoryPage> {
                             );
                           }),
                           onTap: () {
-                            Get.back(
-                              result: category['id'],
-                            );
+                            // Fechar qualquer snackbar aberto antes de navegar
+                            // para evitar LateInitializationError
+                            try {
+                              if (Get.isSnackbarOpen == true) {
+                                Get.closeCurrentSnackbar();
+                                // Aguardar o snackbar fechar antes de navegar
+                                Future.delayed(
+                                    const Duration(milliseconds: 200), () {
+                                  if (context.mounted) {
+                                    Navigator.of(context).pop(category['id']);
+                                  }
+                                });
+                              } else {
+                                // Se não há snackbar, navegar diretamente
+                                Navigator.of(context).pop(category['id']);
+                              }
+                            } catch (e) {
+                              // Se houver erro, tentar navegar diretamente
+                              if (context.mounted) {
+                                Navigator.of(context).pop(category['id']);
+                              }
+                            }
                           },
                         ),
                       );

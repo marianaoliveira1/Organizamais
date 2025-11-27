@@ -773,14 +773,16 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
 }
 
 extension on _MonthlySummaryPageState {
+  // OTIMIZADO: Paralelizar queries do Firestore para melhor performance
   Future<List<Map<String, dynamic>>> _fetchGoalDepositDetails() async {
     final goals = Get.find<GoalController>().goal;
     final DateTime start = DateTime(_selectedYear, _selectedMonth, 1);
     final DateTime end =
         DateTime(_selectedYear, _selectedMonth + 1, 0, 23, 59, 59);
-    final List<Map<String, dynamic>> rows = [];
-    for (final g in goals) {
-      if (g.id == null) continue;
+
+    // Executar todas as queries em paralelo ao invés de sequencialmente
+    final futures = goals.map((g) async {
+      if (g.id == null) return <Map<String, dynamic>>[];
       try {
         final qs = await FirebaseFirestore.instance
             .collection('goals')
@@ -790,6 +792,8 @@ extension on _MonthlySummaryPageState {
             .where('date', isGreaterThanOrEqualTo: start)
             .where('date', isLessThanOrEqualTo: end)
             .get();
+
+        final List<Map<String, dynamic>> goalRows = [];
         for (final d in qs.docs) {
           final data = d.data();
           final raw = data['date'];
@@ -801,14 +805,27 @@ extension on _MonthlySummaryPageState {
           } else {
             continue;
           }
-          rows.add({
+          goalRows.add({
             'goalId': g.id,
             'amount': (data['amount'] as num?)?.toDouble() ?? 0.0,
             'date': dt,
           });
         }
-      } catch (_) {}
+        return goalRows;
+      } catch (_) {
+        return <Map<String, dynamic>>[];
+      }
+    }).toList();
+
+    // Aguardar todas as queries em paralelo
+    final results = await Future.wait(futures);
+
+    // Flatten results
+    final List<Map<String, dynamic>> rows = [];
+    for (final result in results) {
+      rows.addAll(result);
     }
+
     return rows;
   }
 }

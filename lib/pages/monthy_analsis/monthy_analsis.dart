@@ -122,6 +122,9 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
 
   List<TransactionModel> _filterYear(List<TransactionModel> all, int year) {
     final now = DateTime.now();
+    final currentYear = now.year;
+    final today = DateTime(now.year, now.month, now.day);
+
     // Cache de datas parseadas para evitar parsing repetido
     final dateCache = <TransactionModel, DateTime>{};
     for (final t in all) {
@@ -135,7 +138,20 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
     return all.where((t) {
       final d = dateCache[t];
       if (d == null) return false;
-      return d.year == year && d.isBefore(now);
+
+      // Verificar se é do ano selecionado
+      if (d.year != year) return false;
+
+      // Se o ano selecionado for o ano atual, filtrar apenas até hoje
+      // Se for um ano passado, mostrar todas as transações daquele ano
+      if (year == currentYear) {
+        final transactionDate = DateTime(d.year, d.month, d.day);
+        return transactionDate.isBefore(today) ||
+            transactionDate.isAtSameMomentAs(today);
+      }
+
+      // Para anos passados, mostrar todas as transações
+      return true;
     }).toList();
   }
 
@@ -345,9 +361,11 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
 
                         // Nova seção: Análise Mensal
 
-                        FinancialSummaryCards(),
+                        FinancialSummaryCards(selectedYear: _selectedYear),
 
                         // Botão de acesso ao resumo mensal
+
+                        MonthlyFinancialChart(selectedYear: _selectedYear),
                         InfoCard(
                           title: 'Resumo Mensal',
                           onTap: () async {
@@ -387,9 +405,7 @@ class _MonthlyAnalysisPageState extends State<MonthlyAnalysisPage> {
                           ),
                         ),
                         SizedBox(height: 16.h),
-                        MonthlyFinancialChart(),
-                        SizedBox(height: 16.h),
-                        AnnualBalanceSplineChart(),
+                        AnnualBalanceSplineChart(selectedYear: _selectedYear),
                         SizedBox(height: 10.h),
                         // Por categoria e tipo (por ANO selecionado)
                         Builder(builder: (context) {

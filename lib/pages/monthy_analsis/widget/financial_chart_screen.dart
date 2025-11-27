@@ -14,8 +14,8 @@ class FinancialChartScreen extends StatelessWidget {
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      body: const SingleChildScrollView(
-        child: MonthlyFinancialChart(),
+      body: SingleChildScrollView(
+        child: MonthlyFinancialChart(selectedYear: DateTime.now().year),
       ),
     );
   }

@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 210.h,
+                      height: 150.h,
                     ),
                     Text(
                       "ORGANIZA+",

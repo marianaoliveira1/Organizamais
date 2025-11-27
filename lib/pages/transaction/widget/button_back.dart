@@ -13,7 +13,27 @@ class ButtonBackTransaction extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.back();
+        // Fechar qualquer snackbar aberto antes de navegar
+        // para evitar LateInitializationError
+        try {
+          if (Get.isSnackbarOpen == true) {
+            Get.closeCurrentSnackbar();
+            // Aguardar o snackbar fechar antes de navegar
+            Future.delayed(const Duration(milliseconds: 200), () {
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            });
+          } else {
+            // Se não há snackbar, navegar diretamente
+            Navigator.of(context).pop();
+          }
+        } catch (e) {
+          // Se houver erro, tentar navegar diretamente
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
       },
       child: Container(
         height: 48.h,

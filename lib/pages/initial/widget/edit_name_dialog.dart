@@ -18,7 +18,8 @@ class _EditNameDialogState extends State<EditNameDialog> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: widget.authController.firebaseUser.value?.displayName);
+    controller = TextEditingController(
+        text: widget.authController.firebaseUser.value?.displayName);
   }
 
   @override
@@ -31,7 +32,9 @@ class _EditNameDialogState extends State<EditNameDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Editar Nome'),
-      content: TextField(controller: controller, decoration: const InputDecoration(hintText: 'Novo nome')),
+      content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Novo nome')),
       actions: [
         TextButton(onPressed: () => Get.back(), child: const Text('Cancelar')),
         TextButton(

@@ -14,8 +14,8 @@ class FinancialDashboard extends StatelessWidget {
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      body: const SingleChildScrollView(
-        child: FinancialSummaryCards(),
+      body: SingleChildScrollView(
+        child: FinancialSummaryCards(selectedYear: DateTime.now().year),
       ),
     );
   }

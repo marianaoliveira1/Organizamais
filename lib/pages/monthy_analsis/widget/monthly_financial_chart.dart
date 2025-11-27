@@ -12,7 +12,9 @@ import 'package:organizamais/widgetes/info_card.dart';
 import 'chart_legend_item.dart';
 
 class MonthlyFinancialChart extends StatelessWidget {
-  const MonthlyFinancialChart({super.key});
+  final int selectedYear;
+
+  const MonthlyFinancialChart({super.key, required this.selectedYear});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,8 @@ class MonthlyFinancialChart extends StatelessWidget {
     final TransactionController controller = Get.find<TransactionController>();
 
     return Obx(() {
-      final monthlyData = _calculateMonthlyData(controller.transaction);
+      final monthlyData =
+          _calculateMonthlyData(controller.transaction, selectedYear);
 
       return InfoCard(
         title: 'Receitas vs Despesas Mensais',
@@ -29,7 +32,7 @@ class MonthlyFinancialChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Ano ${DateTime.now().year} (até hoje)',
+              'Ano $selectedYear (até hoje)',
               style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.grey[600],
@@ -207,8 +210,7 @@ class MonthlyFinancialChart extends StatelessWidget {
   }
 
   Map<int, Map<String, double>> _calculateMonthlyData(
-      List<TransactionModel> transactions) {
-    final currentYear = DateTime.now().year;
+      List<TransactionModel> transactions, int year) {
     final currentDate = DateTime.now();
     final monthlyData = <int, Map<String, double>>{};
 
@@ -221,8 +223,13 @@ class MonthlyFinancialChart extends StatelessWidget {
     for (final transaction in transactions) {
       if (transaction.paymentDay != null) {
         final paymentDate = DateTime.parse(transaction.paymentDay!);
-        if (paymentDate.year == currentYear &&
-            paymentDate.isBefore(currentDate)) {
+        // Se o ano selecionado for o ano atual, filtrar apenas até hoje
+        // Se for um ano passado, mostrar todos os meses
+        final bool shouldInclude = year == DateTime.now().year
+            ? paymentDate.year == year && paymentDate.isBefore(currentDate)
+            : paymentDate.year == year;
+
+        if (shouldInclude) {
           final month = paymentDate.month;
           final value = double.parse(
             transaction.value.replaceAll('.', '').replaceAll(',', '.'),

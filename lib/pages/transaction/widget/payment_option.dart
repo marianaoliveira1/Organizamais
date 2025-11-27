@@ -42,10 +42,32 @@ class PaymentOption extends StatelessWidget {
         ),
         onTap: () {
           // Retorna o título e o caminho do ícone para que o chamador possa exibir ambos
-          Get.back(result: {
-            'title': title,
-            'assetPath': assetPath,
-          });
+          // Fechar qualquer snackbar aberto antes de navegar
+          try {
+            if (Get.isSnackbarOpen == true) {
+              Get.closeCurrentSnackbar();
+              Future.delayed(const Duration(milliseconds: 200), () {
+                if (context.mounted) {
+                  Navigator.of(context).pop({
+                    'title': title,
+                    'assetPath': assetPath,
+                  });
+                }
+              });
+            } else {
+              Navigator.of(context).pop({
+                'title': title,
+                'assetPath': assetPath,
+              });
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.of(context).pop({
+                'title': title,
+                'assetPath': assetPath,
+              });
+            }
+          }
         },
       ),
     );

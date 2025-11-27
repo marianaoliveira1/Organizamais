@@ -497,10 +497,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: b1ac0fe2832c9cc95e5e88b57d627c5e68c223b9657f4b96e1487aa9098c7b82
+      sha256: "517b20870220c48752eafa0ba1a797a092fb22df0d89535fd9991e86ee2cdd9c"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.1"
+    version: "6.3.2"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -870,18 +870,18 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_charts
-      sha256: "75e54c1dea16e0132a942294a82b489986f43f4c72f7ac7c916a02a78b2d6050"
+      sha256: "59e2b0dea7dd0238cd8deeeb87e8117f09e2dd4d2bea91048b70e74c65a3cb18"
       url: "https://pub.dev"
     source: hosted
-    version: "31.1.19"
+    version: "29.1.37+1"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "2d878bce96c4fd1092205a4f72b328f7f05d86b27c3bd55db7fd440e6017352a"
+      sha256: bee87cdfe527b31705190162e3bd27bf468d591ae7c68182244bdfd94e21f737
       url: "https://pub.dev"
     source: hosted
-    version: "31.1.19"
+    version: "29.2.11"
   term_glyph:
     dependency: transitive
     description:

@@ -222,9 +222,9 @@ class _GraphicsPageState extends State<GraphicsPage>
     final double screenWidth = MediaQuery.of(context).size.width;
     final double offset =
         currentMonthIndex * itemWidth - (screenWidth / 2) + (itemWidth / 2);
+    // Verificar se há posições disponíveis antes de acessar
     if (!_monthScrollController.hasClients ||
-        (_monthScrollController.position.hasContentDimensions == false) ||
-        _monthScrollController.position.maxScrollExtent == 0) {
+        _monthScrollController.positions.isEmpty) {
       if (_scrollRetries < 4) {
         _scrollRetries += 1;
         WidgetsBinding.instance
@@ -232,6 +232,28 @@ class _GraphicsPageState extends State<GraphicsPage>
       }
       return;
     }
+    
+    // Verificar dimensões do conteúdo
+    try {
+      if ((_monthScrollController.position.hasContentDimensions == false) ||
+          _monthScrollController.position.maxScrollExtent == 0) {
+        if (_scrollRetries < 4) {
+          _scrollRetries += 1;
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _scrollToCurrentMonth());
+        }
+        return;
+      }
+    } catch (_) {
+      // Se houver erro ao acessar position, tentar novamente
+      if (_scrollRetries < 4) {
+        _scrollRetries += 1;
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _scrollToCurrentMonth());
+      }
+      return;
+    }
+    
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
     final double scrollPosition = offset.clamp(0.0, maxScroll);
     _monthScrollController.animateTo(
@@ -277,6 +299,11 @@ class _GraphicsPageState extends State<GraphicsPage>
 
       // Verificar se position está disponível e tem dimensões
       try {
+        // Verificar se há posições disponíveis antes de acessar
+        if (!_monthScrollController.hasClients || 
+            _monthScrollController.positions.isEmpty) {
+          break;
+        }
         if (!_monthScrollController.position.hasContentDimensions) {
           break;
         }
@@ -298,6 +325,11 @@ class _GraphicsPageState extends State<GraphicsPage>
 
       // Acessar position de forma segura
       try {
+        // Verificar novamente se há posições disponíveis antes de acessar
+        if (!_monthScrollController.hasClients || 
+            _monthScrollController.positions.isEmpty) {
+          break;
+        }
         final double offset =
             i * itemWidth - (screenWidth / 2) + (itemWidth / 2);
         final double maxScroll =

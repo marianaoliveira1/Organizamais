@@ -37,7 +37,26 @@ class PaymentTypePage extends StatelessWidget {
             Icons.arrow_back,
             color: theme.primaryColor,
           ),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            // Fechar qualquer snackbar aberto antes de navegar
+            // para evitar LateInitializationError
+            try {
+              if (Get.isSnackbarOpen == true) {
+                Get.closeCurrentSnackbar();
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                });
+              } else {
+                Navigator.of(context).pop();
+              }
+            } catch (e) {
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
+          },
         ),
       ),
       body: Column(
@@ -102,10 +121,34 @@ class PaymentTypePage extends StatelessWidget {
                                   ),
                                   onTap: () {
                                     // Retorna o nome e o ícone do cartão selecionado
-                                    Get.back(result: {
-                                      'title': card.name,
-                                      'assetPath': card.iconPath,
-                                    });
+                                    // Fechar qualquer snackbar aberto antes de navegar
+                                    try {
+                                      if (Get.isSnackbarOpen == true) {
+                                        Get.closeCurrentSnackbar();
+                                        Future.delayed(
+                                            const Duration(milliseconds: 200),
+                                            () {
+                                          if (context.mounted) {
+                                            Navigator.of(context).pop({
+                                              'title': card.name,
+                                              'assetPath': card.iconPath,
+                                            });
+                                          }
+                                        });
+                                      } else {
+                                        Navigator.of(context).pop({
+                                          'title': card.name,
+                                          'assetPath': card.iconPath,
+                                        });
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop({
+                                          'title': card.name,
+                                          'assetPath': card.iconPath,
+                                        });
+                                      }
+                                    }
                                   },
                                 ),
                               );

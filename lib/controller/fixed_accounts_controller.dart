@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 import 'package:organizamais/controller/auth_controller.dart';
+import 'package:organizamais/controller/transaction_controller.dart';
 
 import '../model/fixed_account_model.dart';
 import '../services/analytics_service.dart';
@@ -80,6 +81,14 @@ class FixedAccountsController extends GetxController {
       _allFixedAccounts.value = newAccounts;
       isLoading.value = false;
 
+      // Invalidar cache de transações fake quando contas fixas mudarem
+      try {
+        final transactionController = Get.find<TransactionController>();
+        transactionController.invalidateFixedAccountsCache();
+      } catch (_) {
+        // TransactionController pode não estar inicializado ainda
+      }
+
       // Reagendar notificações de forma assíncrona para não bloquear
       Future.microtask(() {
         NotificationService().rescheduleAll(_allFixedAccounts);
@@ -149,6 +158,14 @@ class FixedAccountsController extends GetxController {
         _allFixedAccounts[idx] = prev;
       }
       rethrow;
+    }
+
+    // Invalidar cache de transações fake quando contas fixas mudarem
+    try {
+      final transactionController = Get.find<TransactionController>();
+      transactionController.invalidateFixedAccountsCache();
+    } catch (_) {
+      // TransactionController pode não estar inicializado ainda
     }
 
     // Log analytics (não bloqueante)
@@ -241,6 +258,14 @@ class FixedAccountsController extends GetxController {
         _allFixedAccounts.insert(removedIndex, removedItem);
       }
       rethrow;
+    }
+
+    // Invalidar cache de transações fake quando contas fixas mudarem
+    try {
+      final transactionController = Get.find<TransactionController>();
+      transactionController.invalidateFixedAccountsCache();
+    } catch (_) {
+      // TransactionController pode não estar inicializado ainda
     }
 
     // Log analytics (não bloqueante)

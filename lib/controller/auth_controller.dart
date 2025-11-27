@@ -301,14 +301,58 @@ class AuthController extends GetxController {
       isLoading(true);
       _showLoadingDialog();
 
+      // Configure GoogleSignIn with proper scopes and Web Client ID from Firebase
+      // Using Web Client ID (client_type: 3) from google-services.json
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+        // Web Client ID from Firebase Console (OAuth 2.0 Client ID for Web)
+        // This is required for proper authentication flow
+        serverClientId:
+            '1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com',
+      );
+
       // Sign out from Google Sign In first to ensure a fresh sign in
       try {
-        await GoogleSignIn().signOut();
-      } catch (_) {
-        // Ignore if there's no previous session
+        await googleSignIn.signOut();
+      } catch (e) {
+        // Log error but continue - this is not critical
+        FirebaseCrashlytics.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'Google Sign-In signOut error (non-fatal)',
+          fatal: false,
+        );
       }
 
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      // Attempt to sign in with proper error handling
+      GoogleSignInAccount? googleUser;
+      try {
+        googleUser = await googleSignIn.signIn();
+      } catch (e, stackTrace) {
+        _hideLoadingDialog();
+        await perfTrace.stop();
+
+        // Log error to Crashlytics
+        FirebaseCrashlytics.instance.recordError(
+          e,
+          stackTrace,
+          reason: 'Google Sign-In signIn error',
+          fatal: false,
+        );
+
+        // Check if it's a NullPointerException (configuration issue)
+        if (e.toString().contains('NullPointerException') ||
+            e.toString().contains('SignInHubActivity')) {
+          SnackbarHelper.showError(
+              "Erro de configuração do Google Sign-In. Verifique as configurações do Firebase.",
+              title: "Erro ao entrar com Google");
+        } else {
+          SnackbarHelper.showError(
+              "Não foi possível fazer login com Google. Tente novamente.",
+              title: "Erro ao entrar com Google");
+        }
+        return;
+      }
       if (googleUser == null) {
         _hideLoadingDialog();
         await perfTrace.stop();

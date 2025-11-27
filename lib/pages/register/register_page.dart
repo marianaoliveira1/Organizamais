@@ -56,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: 120.h,
+              height: 70.h,
             ),
             Text(
               "ORGANIZA+",
