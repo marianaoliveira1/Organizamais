@@ -1,6 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +15,7 @@ import 'package:organizamais/controller/fixed_accounts_controller.dart';
 import 'package:organizamais/controller/goal_controller.dart';
 import 'package:organizamais/controller/transaction_controller.dart';
 import 'package:organizamais/services/analytics_service.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import '../routes/route.dart';
 import '../utils/snackbar_helper.dart';
@@ -161,7 +166,7 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> register(String name, String email, String password) async {
+  Future<String?> register(String name, String email, String password) async {
     try {
       isLoading(true);
       _showLoadingDialog();
@@ -176,17 +181,17 @@ class AuthController extends GetxController {
       if (trimmedName.isEmpty ||
           trimmedEmail.isEmpty ||
           trimmedPassword.isEmpty) {
+        const message = "Preencha nome, e-mail e senha";
         _hideLoadingDialog();
-        SnackbarHelper.showError("Preencha nome, e-mail e senha",
-            title: "Campos obrigatórios");
-        return;
+        SnackbarHelper.showError(message, title: "Campos obrigatórios");
+        return message;
       }
 
-      if (trimmedPassword.length < 6) {
+      if (trimmedPassword.length < 4) {
+        const message = "A senha deve conter pelo menos 6 caracteres";
         _hideLoadingDialog();
-        SnackbarHelper.showError("A senha deve conter pelo menos 6 caracteres",
-            title: "Senha fraca");
-        return;
+        SnackbarHelper.showError(message, title: "Senha fraca");
+        return message;
       }
 
       var methods = await _auth.fetchSignInMethodsForEmail(trimmedEmail);
@@ -221,6 +226,7 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       isOnboarding = true;
       Get.offAllNamed(Routes.ONBOARD_WELCOME);
+      return null;
     } on FirebaseAuthException catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -231,8 +237,9 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       // Wait a bit for dialog to close before showing snackbar
       await Future.delayed(const Duration(milliseconds: 100));
-      SnackbarHelper.showError(_getAuthErrorMessage(e),
-          title: "Erro ao cadastrar");
+      final message = _getAuthErrorMessage(e);
+      SnackbarHelper.showError(message, title: "Erro ao cadastrar");
+      return message;
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -243,13 +250,15 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       // Wait a bit for dialog to close before showing snackbar
       await Future.delayed(const Duration(milliseconds: 100));
-      SnackbarHelper.showError(e.toString(), title: "Erro ao cadastrar");
+      final message = e.toString();
+      SnackbarHelper.showError(message, title: "Erro ao cadastrar");
+      return message;
     } finally {
       isLoading(false);
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
     try {
       FirebaseCrashlytics.instance.log('Auth.login start');
       FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'email_login');
@@ -263,6 +272,7 @@ class AuthController extends GetxController {
       await _analyticsService.logLogin('email');
 
       _hideLoadingDialog();
+      return null;
     } on FirebaseAuthException catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -273,8 +283,9 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       // Wait a bit for dialog to close before showing snackbar
       await Future.delayed(const Duration(milliseconds: 100));
-      SnackbarHelper.showError(_getAuthErrorMessage(e),
-          title: "Erro ao entrar");
+      final message = _getAuthErrorMessage(e);
+      SnackbarHelper.showError(message, title: "Erro ao entrar");
+      return message;
     } catch (e, st) {
       FirebaseCrashlytics.instance.recordError(
         e,
@@ -285,7 +296,9 @@ class AuthController extends GetxController {
       _hideLoadingDialog();
       // Wait a bit for dialog to close before showing snackbar
       await Future.delayed(const Duration(milliseconds: 100));
-      SnackbarHelper.showError(e.toString(), title: "Erro ao entrar");
+      final message = e.toString();
+      SnackbarHelper.showError(message, title: "Erro ao entrar");
+      return message;
     } finally {
       isLoading(false);
     }
@@ -301,14 +314,14 @@ class AuthController extends GetxController {
       isLoading(true);
       _showLoadingDialog();
 
-      // Configure GoogleSignIn with proper scopes and Web Client ID from Firebase
-      // Using Web Client ID (client_type: 3) from google-services.json
+      // Configure GoogleSignIn
+      // No iOS, se o GoogleService-Info.plist estiver correto, o plugin detecta automaticamente.
+      // O serverClientId é usado principalmente para obter o idToken/serverAuthCode para o Firebase.
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
-        // Web Client ID from Firebase Console (OAuth 2.0 Client ID for Web)
-        // This is required for proper authentication flow
-        serverClientId:
-            '1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com',
+        serverClientId: GetPlatform.isAndroid
+            ? '1008402942918-186gm71ecc55tlp4h1ljpoc5gm018q2m.apps.googleusercontent.com'
+            : null,
       );
 
       // Sign out from Google Sign In first to ensure a fresh sign in
@@ -484,6 +497,190 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> loginWithApple() async {
+    Trace? perfTrace;
+    try {
+      perfTrace = FirebasePerformance.instance.newTrace('auth_apple_login');
+      await perfTrace.start();
+      FirebaseCrashlytics.instance.log('Auth.loginWithApple start');
+      FirebaseCrashlytics.instance.setCustomKey('auth_flow', 'apple_login');
+      isLoading(true);
+      _showLoadingDialog();
+
+      final rawNonce = _generateNonce();
+      final hashedNonce = _sha256ofString(rawNonce);
+
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        SnackbarHelper.showError(
+          "Login com Apple não está disponível neste dispositivo.",
+          title: "Indisponível",
+        );
+        return;
+      }
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+
+      if (appleCredential.identityToken == null) {
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        SnackbarHelper.showError(
+          "Não foi possível obter as credenciais da Apple.",
+          title: "Erro ao entrar com Apple",
+        );
+        return;
+      }
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+        rawNonce: rawNonce,
+      );
+
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
+      await FirebaseCrashlytics.instance
+          .setUserIdentifier(userCredential.user?.uid ?? '');
+
+      final inferredName = [
+        appleCredential.givenName,
+        appleCredential.familyName,
+      ]
+          .whereType<String>()
+          .map((part) => part.trim())
+          .where((part) => part.isNotEmpty)
+          .join(' ');
+
+      if (inferredName.isNotEmpty) {
+        try {
+          await userCredential.user?.updateProfile(displayName: inferredName);
+        } catch (_) {}
+      }
+      await userCredential.user?.reload();
+      firebaseUser.value = _auth.currentUser;
+
+      final userDocRef =
+          _firestore.collection("users").doc(userCredential.user!.uid);
+      final userDoc = await userDocRef.get();
+      final fallbackName = inferredName.isNotEmpty
+          ? inferredName
+          : (userCredential.user?.displayName ?? "Usuário Apple");
+      final fallbackEmail =
+          appleCredential.email ?? userCredential.user?.email ?? '';
+
+      if (!userDoc.exists) {
+        await userDocRef.set({
+          "name": fallbackName,
+          "email": fallbackEmail,
+          "uid": userCredential.user!.uid,
+        });
+
+        await _analyticsService.logSignUp('apple');
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        isOnboarding = true;
+        Get.offAllNamed(Routes.ONBOARD_WELCOME);
+        return;
+      } else {
+        await userDocRef.set({
+          "name": fallbackName,
+          "email": fallbackEmail,
+        }, SetOptions(merge: true));
+
+        await _analyticsService.logLogin('apple');
+        _hideLoadingDialog();
+        await perfTrace.stop();
+        if (Get.currentRoute != Routes.HOME) {
+          Get.offAllNamed(Routes.HOME);
+        }
+      }
+    } on SignInWithAppleAuthorizationException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'apple login authorization error',
+        information: ['code=${e.code.name}'],
+        fatal: false,
+      );
+      _hideLoadingDialog();
+      if (e.code == AuthorizationErrorCode.canceled) {
+        try {
+          await perfTrace?.stop();
+        } catch (_) {}
+        return;
+      }
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(
+        "Não foi possível concluir o login com Apple.",
+        title: "Erro",
+      );
+      try {
+        await perfTrace?.stop();
+      } catch (_) {}
+    } on SignInWithAppleNotSupportedException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'apple login not supported',
+        fatal: false,
+      );
+      _hideLoadingDialog();
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(
+        "O login com Apple não é suportado neste dispositivo.",
+        title: "Indisponível",
+      );
+      try {
+        await perfTrace?.stop();
+      } catch (_) {}
+    } on FirebaseAuthException catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'apple login FirebaseAuthException',
+        information: ['stage=signInWithCredential'],
+      );
+      _hideLoadingDialog();
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(_getAuthErrorMessage(e),
+          title: "Erro ao entrar com Apple");
+      try {
+        await perfTrace?.stop();
+      } catch (_) {}
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        st,
+        reason: 'apple login unexpected error',
+        fatal: false,
+      );
+      _hideLoadingDialog();
+      if (e.toString().toLowerCase().contains('canceled')) {
+        try {
+          await perfTrace?.stop();
+        } catch (_) {}
+        return;
+      }
+      await Future.delayed(const Duration(milliseconds: 100));
+      SnackbarHelper.showError(
+        e.toString(),
+        title: "Erro ao entrar com Apple",
+      );
+      try {
+        await perfTrace?.stop();
+      } catch (_) {}
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> logout() async {
     try {
       FirebaseCrashlytics.instance.log('Auth.logout start');
@@ -574,4 +771,20 @@ class AuthController extends GetxController {
           'Não foi possível deletar sua conta. Tente fazer login novamente e repetir a operação.');
     }
   }
+}
+
+String _generateNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = Random.secure();
+  return List.generate(
+    length,
+    (_) => charset[random.nextInt(charset.length)],
+  ).join();
+}
+
+String _sha256ofString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
 }

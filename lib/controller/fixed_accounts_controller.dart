@@ -56,6 +56,15 @@ class FixedAccountsController extends GetxController {
   List<FixedAccountModel> get allFixedAccounts => _allFixedAccounts;
 
   void startFixedAccountsStream() {
+    final String? uid = Get.find<AuthController>().firebaseUser.value?.uid;
+    if (uid == null || uid.isEmpty) {
+      // Sem usuário autenticado: limpa dados e evita registrar stream inválida
+      fixedAccountsStream?.cancel();
+      _allFixedAccounts.clear();
+      isLoading.value = false;
+      return;
+    }
+
     // Cancelar stream anterior se existir para evitar múltiplas subscrições
     fixedAccountsStream?.cancel();
 
@@ -63,7 +72,7 @@ class FixedAccountsController extends GetxController {
         .collection('fixedAccounts')
         .where(
           'userId',
-          isEqualTo: Get.find<AuthController>().firebaseUser.value?.uid,
+          isEqualTo: uid,
         )
         .snapshots()
         .listen((snapshot) {

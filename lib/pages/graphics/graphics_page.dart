@@ -108,6 +108,7 @@ class _GraphicsPageState extends State<GraphicsPage>
   Set<int> _selectedCategoryIds = {};
   String?
       _expandedPaymentType; // expande detalhes do tipo de pagamento no gráfico
+  String? _expandedGroupedPaymentType; // expande detalhes do gráfico agrupado
   String?
       _expandedMacrocategoria; // expande detalhes da macrocategoria no gráfico
   // final Set<int> _essentialCategoryIds = const {}; // deprecado
@@ -118,6 +119,117 @@ class _GraphicsPageState extends State<GraphicsPage>
   // Flags para animação de entrada única
   static bool _didEntranceAnimateOnce = false;
   bool _shouldPlayEntrance = false;
+
+  String _resolvePaymentGroupLabel(String raw) {
+    final text = (raw.isEmpty ? 'outros' : raw).trim().toLowerCase();
+    bool containsAny(List<String> keywords) =>
+        keywords.any((k) => text.contains(k));
+
+    if (containsAny([
+      'cartão',
+      'cartao',
+      'crédito',
+      'credito',
+      'visa',
+      'master',
+      'nubank',
+      'santander',
+      'itau',
+      'bradesco',
+      'bb',
+      'banco do brasil',
+      'elo',
+      'hipercard',
+      'amex',
+      'credicard',
+      'sicredi',
+      'inter',
+      'c6',
+      'porto'
+    ])) {
+      return 'Cartão de crédito';
+    }
+    if (containsAny(['débito', 'debito'])) {
+      return 'Cartão de débito';
+    }
+    if (containsAny(['pix'])) {
+      return 'PIX';
+    }
+    if (containsAny(['dinheiro', 'cash'])) {
+      return 'Dinheiro';
+    }
+    if (containsAny(['boleto'])) {
+      return 'Boleto';
+    }
+    if (containsAny(
+        ['transfer', 'ted', 'doc', 'depósito', 'deposito', 'bankline'])) {
+      return 'Transferências';
+    }
+    if (containsAny([
+      'vale',
+      'vr',
+      'refei',
+      'benefício',
+      'beneficio',
+      'sodexo',
+      'ticket'
+    ])) {
+      return 'Benefícios / Vale';
+    }
+    if (containsAny([
+      'picpay',
+      'paypal',
+      'mercado pago',
+      'mercadopago',
+      'google pay',
+      'apple pay',
+      'carteira',
+      'wallet'
+    ])) {
+      return 'Carteiras digitais';
+    }
+    if (text == 'outros' || text.isEmpty) {
+      return 'Outros meios';
+    }
+    return raw.trim().isEmpty ? 'Outros meios' : raw.trim();
+  }
+
+  Color _paymentGroupColor(String label) {
+    switch (label) {
+      case 'Cartão de crédito':
+        return DefaultColors.deepPurple;
+      case 'Cartão de débito':
+        return DefaultColors.darkBlue;
+      case 'PIX':
+        return DefaultColors.greenDark;
+      case 'Dinheiro':
+        return DefaultColors.orangeDark;
+      case 'Boleto':
+        return DefaultColors.brown;
+      case 'Transferências':
+        return DefaultColors.blueGrey;
+      case 'Benefícios / Vale':
+        return DefaultColors.pastelLime;
+      case 'Carteiras digitais':
+        return DefaultColors.turquoise;
+      case 'Outros meios':
+        return DefaultColors.slateGrey;
+      default:
+        return _generateColorFromLabel(label);
+    }
+  }
+
+  Color _generateColorFromLabel(String key) {
+    int hash = 0;
+    for (final codeUnit in key.codeUnits) {
+      hash = (hash * 31 + codeUnit) & 0x7fffffff;
+    }
+    final double hue = (hash % 360).toDouble();
+    const double saturation = 0.62;
+    const double lightness = 0.56;
+    return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
+  }
+
   int _classificationVersion = 0; // força rebuild do gráfico de classificações
   Map<int, String> _classificationOverrides = {};
   Map<String, String> _classificationOverridesByName = {};
@@ -232,7 +344,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       }
       return;
     }
-    
+
     // Verificar dimensões do conteúdo
     try {
       if ((_monthScrollController.position.hasContentDimensions == false) ||
@@ -253,7 +365,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       }
       return;
     }
-    
+
     final double maxScroll = _monthScrollController.position.maxScrollExtent;
     final double scrollPosition = offset.clamp(0.0, maxScroll);
     _monthScrollController.animateTo(
@@ -300,7 +412,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       // Verificar se position está disponível e tem dimensões
       try {
         // Verificar se há posições disponíveis antes de acessar
-        if (!_monthScrollController.hasClients || 
+        if (!_monthScrollController.hasClients ||
             _monthScrollController.positions.isEmpty) {
           break;
         }
@@ -326,7 +438,7 @@ class _GraphicsPageState extends State<GraphicsPage>
       // Acessar position de forma segura
       try {
         // Verificar novamente se há posições disponíveis antes de acessar
-        if (!_monthScrollController.hasClients || 
+        if (!_monthScrollController.hasClients ||
             _monthScrollController.positions.isEmpty) {
           break;
         }
@@ -364,6 +476,8 @@ class _GraphicsPageState extends State<GraphicsPage>
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    final bool isTabletLayout = mediaQuery.size.width >= 600;
     final TransactionController transactionController = _transactionController;
 
     // Formatador de moeda brasileira
@@ -408,7 +522,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                     children: [
                       // Lista de meses/ano
                       SizedBox(
-                        height: 30.h,
+                        height: isTabletLayout ? 26.h : 30.h,
                         child: ListView.separated(
                           controller: _monthScrollController,
                           scrollDirection: Axis.horizontal,
@@ -428,7 +542,8 @@ class _GraphicsPageState extends State<GraphicsPage>
                               child: Container(
                                 key: _monthItemKeys.putIfAbsent(
                                     index, () => GlobalKey()),
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: isTabletLayout ? 12.w : 16.w),
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(20.r),
@@ -445,7 +560,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                                     color: selectedMonth == month
                                         ? theme.primaryColor
                                         : DefaultColors.grey,
-                                    fontSize: 11.sp,
+                                    fontSize: isTabletLayout ? 8.sp : 10.sp,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -653,20 +768,35 @@ class _GraphicsPageState extends State<GraphicsPage>
       DateFormat dateFormatter,
       DateFormat dayFormatter,
       RxnInt selectedCategoryId) {
-    return Column(
-      children: [
-        // Line Chart - Despesas diárias (fade-in uma única vez por execução)
-        _entranceWrap(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final mediaQuery = MediaQuery.of(context);
+        final bool useTwoColumns = constraints.maxWidth >= 900;
+        final double verticalGap = useTwoColumns ? 24.h : 20.h;
+        final double descriptionFontSize = useTwoColumns ? 10.sp : 14.sp;
+        final double descriptionIconSize = useTwoColumns ? 16.sp : 20.sp;
+        final double shrinkTextScale = useTwoColumns
+            ? (mediaQuery.textScaleFactor * 0.65).clamp(0.6, 0.95)
+            : mediaQuery.textScaleFactor;
+
+        Widget shrinkForTablet(Widget child) {
+          if (!useTwoColumns) return child;
+          return MediaQuery(
+            data: mediaQuery.copyWith(textScaleFactor: shrinkTextScale),
+            child: child,
+          );
+        }
+
+        final Widget lineChart = _entranceWrap(
           _buildLineChart(
               theme, transactionController, currencyFormatter, dayFormatter),
-        ),
+        );
 
-        InfoCard(
+        final Widget despesasPorCategoriaCard = shrinkForTablet(InfoCard(
           title: 'Despesas por categoria',
           icon: Iconsax.category,
           onTap: null,
           onIconTap: () async {
-            // Abre seletor com os mesmos dados do gráfico
             final filteredTransactions =
                 getFilteredTransactions(transactionController);
             final categories = filteredTransactions
@@ -718,11 +848,9 @@ class _GraphicsPageState extends State<GraphicsPage>
               dateFormatter,
             ),
           ),
-        ),
+        ));
 
-        SizedBox(height: 16.h),
-        // Fixas x Variáveis x Extras (InfoCard)
-        InfoCard(
+        final Widget fixasVsVariaveisCard = InfoCard(
           title: 'Fixas x Variáveis x Extras',
           icon: Iconsax.category,
           onTap: () async {
@@ -755,13 +883,9 @@ class _GraphicsPageState extends State<GraphicsPage>
               ),
             ),
           ),
-        ),
-        SizedBox(height: 20.h),
+        );
 
-        // Card de sugestões 50/30/20
-
-        // Gráfico de Categorias Agrupadas por Macrocategoria (InfoCard)
-        InfoCard(
+        final Widget categoriasAgrupadasCard = shrinkForTablet(InfoCard(
           title: 'Categorias Agrupadas',
           icon: Iconsax.category,
           onTap: null,
@@ -773,11 +897,38 @@ class _GraphicsPageState extends State<GraphicsPage>
               currencyFormatter,
             ),
           ),
-        ),
-        SizedBox(height: 20.h),
+        ));
 
-        // Balanço de troca de gastos (InfoCard)
-        InfoCard(
+        final Widget porTipoPagamentoCard = shrinkForTablet(InfoCard(
+          title: 'Por tipo de pagamento',
+          onTap: () {},
+          backgroundColor: theme.cardColor,
+          content: _entranceWrap(
+            _buildPaymentTypePieSection(
+              theme,
+              transactionController,
+              currencyFormatter,
+              dateFormatter,
+            ),
+          ),
+        ));
+
+        final Widget porTipoPagamentoAgrupadoCard = shrinkForTablet(InfoCard(
+          title: 'Por tipo de pagamento (agrupado)',
+          onTap: () {},
+          backgroundColor: theme.cardColor,
+          content: _entranceWrap(
+            _buildPaymentTypePieSection(
+              theme,
+              transactionController,
+              currencyFormatter,
+              dateFormatter,
+              grouped: true,
+            ),
+          ),
+        ));
+
+        final Widget balancoCard = InfoCard(
           title: 'Balanço de Gastos por Categoria',
           onTap: () async {
             if (!mounted) return;
@@ -800,14 +951,14 @@ class _GraphicsPageState extends State<GraphicsPage>
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Iconsax.wallet,
-                    color: theme.primaryColor, size: 18.sp),
+                    color: theme.primaryColor, size: descriptionIconSize),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   "Acompanhe em detalhes cada categoria em que você utilizou seu dinheiro ao longo do mês.",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: descriptionFontSize,
                     color: theme.primaryColor,
                     fontWeight: FontWeight.w500,
                   ),
@@ -816,16 +967,18 @@ class _GraphicsPageState extends State<GraphicsPage>
               Icon(Icons.chevron_right, color: theme.primaryColor),
             ],
           ),
-        ),
+        );
 
-        SizedBox(height: 20.h),
+        final Widget budgetSuggestionsCard = shrinkForTablet(
+          _buildBudgetSuggestionsCard(
+            theme,
+            transactionController,
+            currencyFormatter,
+            isTablet: useTwoColumns,
+          ),
+        );
 
-        _buildBudgetSuggestionsCard(
-            theme, transactionController, currencyFormatter),
-        SizedBox(height: 20.h),
-
-        // Relatório Mensal (InfoCard)
-        InfoCard(
+        final Widget relatorioMensalCard = shrinkForTablet(InfoCard(
           title: 'Relatório Mensal',
           onTap: () async {
             if (!mounted) return;
@@ -847,15 +1000,15 @@ class _GraphicsPageState extends State<GraphicsPage>
                   color: theme.primaryColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child:
-                    Icon(Iconsax.chart, color: theme.primaryColor, size: 18.sp),
+                child: Icon(Iconsax.chart,
+                    color: theme.primaryColor, size: descriptionIconSize),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   "Veja a diferença de valores entre este mês e o anterior, categoria por categoria",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: descriptionFontSize,
                     color: theme.primaryColor,
                     fontWeight: FontWeight.w500,
                   ),
@@ -864,11 +1017,9 @@ class _GraphicsPageState extends State<GraphicsPage>
               Icon(Icons.chevron_right, color: theme.primaryColor),
             ],
           ),
-        ),
-        SizedBox(height: 20.h),
+        ));
 
-        // Relatório Semanal (InfoCard)
-        InfoCard(
+        final Widget relatorioSemanalCard = shrinkForTablet(InfoCard(
           title: 'Relatório Semanal',
           onTap: () async {
             if (!mounted) return;
@@ -889,14 +1040,14 @@ class _GraphicsPageState extends State<GraphicsPage>
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Iconsax.calendar_1,
-                    color: theme.primaryColor, size: 18.sp),
+                    color: theme.primaryColor, size: descriptionIconSize),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   "Veja receitas, despesas e saldo por semana, com pizza de gastos",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: descriptionFontSize,
                     color: theme.primaryColor,
                     fontWeight: FontWeight.w500,
                   ),
@@ -905,43 +1056,56 @@ class _GraphicsPageState extends State<GraphicsPage>
               Icon(Icons.chevron_right, color: theme.primaryColor),
             ],
           ),
-        ),
-        SizedBox(height: 20.h),
+        ));
 
-        AdsBanner(),
-        SizedBox(height: 24.h),
-
-        InfoCard(
-          title: 'Por tipo de pagamento',
-          onTap: () {},
-          backgroundColor: theme.cardColor,
-          content: _entranceWrap(
-            _buildPaymentTypePieSection(
-              theme,
-              transactionController,
-              currencyFormatter,
-              dateFormatter,
+        return Column(
+          children: [
+            // 1) Despesas diárias/semanais
+            lineChart,
+            SizedBox(height: verticalGap),
+            // 2) Despesas por categoria
+            despesasPorCategoriaCard,
+            SizedBox(height: verticalGap),
+            // 3) Categorias agrupadas
+            categoriasAgrupadasCard,
+            SizedBox(height: verticalGap),
+            // 4) Por tipo de pagamento
+            porTipoPagamentoCard,
+            SizedBox(height: verticalGap),
+            // 5) Por tipo de pagamento (agrupado)
+            porTipoPagamentoAgrupadoCard,
+            SizedBox(height: verticalGap),
+            // 6) Balanço de gastos por categoria
+            balancoCard,
+            SizedBox(height: verticalGap),
+            // 7) Sugestões de orçamento
+            budgetSuggestionsCard,
+            SizedBox(height: verticalGap),
+            // 8) Relatório Mensal
+            relatorioMensalCard,
+            SizedBox(height: verticalGap),
+            // 9) Relatório Semanal
+            relatorioSemanalCard,
+            SizedBox(height: verticalGap),
+            // 10) Fixas x Variáveis x Extras
+            fixasVsVariaveisCard,
+            SizedBox(height: verticalGap),
+            // 11) Receita x Despesa (%)
+            InfoCard(
+              title: 'Receita x Despesa (%)',
+              onTap: () {},
+              backgroundColor: theme.cardColor,
+              content: _entranceWrap(
+                GraficoPorcengtagemReceitaEDespesa(
+                    selectedMonth: selectedMonth),
+              ),
             ),
-          ),
-        ),
-
-        SizedBox(height: 24.h),
-
-        // Receita x Despesa (%) (InfoCard)
-        InfoCard(
-          title: 'Receita x Despesa (%)',
-          onTap: () {},
-          backgroundColor: theme.cardColor,
-          content: _entranceWrap(
-            GraficoPorcengtagemReceitaEDespesa(selectedMonth: selectedMonth),
-          ),
-        ),
-
-        SizedBox(height: 24.h),
-
-        AdsBanner(),
-        SizedBox(height: 24.h),
-      ],
+            SizedBox(height: 24.h),
+            AdsBanner(),
+            SizedBox(height: 24.h),
+          ],
+        );
+      },
     );
   }
 
@@ -1113,8 +1277,7 @@ class _GraphicsPageState extends State<GraphicsPage>
           categoryId != null ? findCategoryById(categoryId) : null;
       final String? categoryName =
           category != null ? category['name'] as String? : null;
-      final String? normalizedName =
-          categoryName != null ? categoryName.trim().toLowerCase() : null;
+      final String? normalizedName = categoryName?.trim().toLowerCase();
       final int? resolvedId = (category != null
               ? (category['id'] is int ? category['id'] as int : null)
               : null) ??
@@ -2125,7 +2288,8 @@ class _GraphicsPageState extends State<GraphicsPage>
       ThemeData theme,
       TransactionController transactionController,
       NumberFormat currencyFormatter,
-      DateFormat dateFormatter) {
+      DateFormat dateFormatter,
+      {bool grouped = false}) {
     Color pickBaseColorFor(String paymentType) {
       String canonical = paymentType.trim().toLowerCase();
       canonical = canonical.replaceAll(RegExp(r'\s+'), ' ');
@@ -2178,8 +2342,9 @@ class _GraphicsPageState extends State<GraphicsPage>
         if (n.contains('inter')) return DefaultColors.orangeDark; // laranja
         if (n.contains('santander')) return Colors.redAccent; // vermelho
         if (n.contains('bradesco')) return DefaultColors.hotPink; // rosa
-        if (n.contains('banco do brasil') || n.contains('bb'))
+        if (n.contains('banco do brasil') || n.contains('bb')) {
           return Colors.amber; // amarelo
+        }
         if (n.contains('caixa')) return DefaultColors.darkBlue; // azul
 
         // Demais cartões: paleta pastel estável
@@ -2258,39 +2423,46 @@ class _GraphicsPageState extends State<GraphicsPage>
         .toList();
     final Map<String, double> byType = {};
     for (final t in txs) {
-      final key = (t.paymentType ?? 'Outros').trim();
+      final rawKey = (t.paymentType ?? 'Outros').trim();
+      final key = grouped ? _resolvePaymentGroupLabel(rawKey) : rawKey;
       byType[key] = (byType[key] ?? 0) + _parseValue(t.value);
     }
     // Garante distinção de cores por rótulo atual
     final labels = byType.keys.toList();
     final Map<String, Color> baseColors = {
-      for (final k in labels) k: pickBaseColorFor(k),
+      for (final k in labels)
+        k: grouped ? _paymentGroupColor(k) : pickBaseColorFor(k),
     };
-    // Ajuste simples para distanciar matizes vizinhos
-    final List<String> order = baseColors.keys.toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    final Map<String, Color> distinctColors = {};
-    final List<double> usedHues = [];
-    double hueOf(Color c) => HSLColor.fromColor(c).hue;
-    double satOf(Color c) => HSLColor.fromColor(c).saturation;
-    double lightOf(Color c) => HSLColor.fromColor(c).lightness;
-    double deltaHue(double a, double b) {
-      final d = (a - b).abs();
-      return d > 180 ? 360 - d : d;
-    }
 
-    for (final k in order) {
-      final Color bc = baseColors[k]!;
-      double h = hueOf(bc);
-      final double s = satOf(bc);
-      final double l = lightOf(bc);
-      int attempts = 0;
-      while (attempts < 36 && usedHues.any((u) => deltaHue(h, u) < 18)) {
-        h = (h + 23) % 360;
-        attempts++;
+    final Map<String, Color> distinctColors = {};
+    if (grouped) {
+      distinctColors.addAll(baseColors);
+    } else {
+      // Ajuste simples para distanciar matizes vizinhos
+      final List<String> order = baseColors.keys.toList()
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      final List<double> usedHues = [];
+      double hueOf(Color c) => HSLColor.fromColor(c).hue;
+      double satOf(Color c) => HSLColor.fromColor(c).saturation;
+      double lightOf(Color c) => HSLColor.fromColor(c).lightness;
+      double deltaHue(double a, double b) {
+        final d = (a - b).abs();
+        return d > 180 ? 360 - d : d;
       }
-      usedHues.add(h);
-      distinctColors[k] = HSLColor.fromAHSL(1.0, h, s, l).toColor();
+
+      for (final k in order) {
+        final Color bc = baseColors[k]!;
+        double h = hueOf(bc);
+        final double s = satOf(bc);
+        final double l = lightOf(bc);
+        int attempts = 0;
+        while (attempts < 36 && usedHues.any((u) => deltaHue(h, u) < 18)) {
+          h = (h + 23) % 360;
+          attempts++;
+        }
+        usedHues.add(h);
+        distinctColors[k] = HSLColor.fromAHSL(1.0, h, s, l).toColor();
+      }
     }
 
     final data = byType.entries
@@ -2351,7 +2523,8 @@ class _GraphicsPageState extends State<GraphicsPage>
       children: [
         Center(
           child: RepaintBoundary(
-            key: ValueKey('payment_type_chart_$selectedMonth'),
+            key: ValueKey(
+                'payment_type_chart_${grouped ? 'grouped_' : ''}$selectedMonth'),
             child: SizedBox(
               height: 180.h,
               child: SfCircularChart(
@@ -2384,8 +2557,13 @@ class _GraphicsPageState extends State<GraphicsPage>
                 onTap: () {
                   final name = (e['paymentType'] as String);
                   setState(() {
-                    _expandedPaymentType =
-                        _expandedPaymentType == name ? null : name;
+                    if (grouped) {
+                      _expandedGroupedPaymentType =
+                          _expandedGroupedPaymentType == name ? null : name;
+                    } else {
+                      _expandedPaymentType =
+                          _expandedPaymentType == name ? null : name;
+                    }
                   });
                 },
                 child: Row(
@@ -2412,7 +2590,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                           Text(
                             '${(total > 0 ? ((e['value'] as double) / total * 100) : 0).toStringAsFixed(0)}% das despesas',
                             style: TextStyle(
-                                fontSize: 10.sp, color: DefaultColors.grey),
+                                fontSize: 12.sp, color: DefaultColors.grey),
                           ),
                           Builder(builder: (context) {
                             final String name = (e['paymentType'] as String);
@@ -2425,8 +2603,11 @@ class _GraphicsPageState extends State<GraphicsPage>
                               }
                               final pt = t.paymentType;
                               if (pt == null) continue;
-                              if (pt.trim().toLowerCase() !=
-                                  name.trim().toLowerCase()) {
+                              final bool matches = grouped
+                                  ? _resolvePaymentGroupLabel(pt) == name
+                                  : pt.trim().toLowerCase() ==
+                                      name.trim().toLowerCase();
+                              if (!matches) {
                                 continue;
                               }
                               final d = DateTime.parse(t.paymentDay!);
@@ -2514,7 +2695,10 @@ class _GraphicsPageState extends State<GraphicsPage>
                           ),
                         ),
                         Icon(
-                          _expandedPaymentType == (e['paymentType'] as String)
+                          (grouped
+                                      ? _expandedGroupedPaymentType
+                                      : _expandedPaymentType) ==
+                                  (e['paymentType'] as String)
                               ? Iconsax.arrow_up_24
                               : Iconsax.arrow_down_1,
                           color: theme.primaryColor,
@@ -2526,7 +2710,10 @@ class _GraphicsPageState extends State<GraphicsPage>
                 ),
               ),
             ),
-            if (_expandedPaymentType == (e['paymentType'] as String))
+            if ((grouped
+                    ? _expandedGroupedPaymentType
+                    : _expandedPaymentType) ==
+                (e['paymentType'] as String))
               Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
                 child: _buildPaymentTypeInlineDetails(
@@ -2535,6 +2722,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                   transactionController: transactionController,
                   currencyFormatter: currencyFormatter,
                   dateFormatter: dateFormatter,
+                  grouped: grouped,
                 ),
               ),
           ]
@@ -2549,6 +2737,7 @@ class _GraphicsPageState extends State<GraphicsPage>
     required TransactionController transactionController,
     required NumberFormat currencyFormatter,
     required DateFormat dateFormatter,
+    bool grouped = false,
   }) {
     final now = DateTime.now();
     // Parse mês/ano selecionado
@@ -2591,7 +2780,9 @@ class _GraphicsPageState extends State<GraphicsPage>
       }
       final pt = t.paymentType;
       if (pt == null) return false;
-      return pt.trim().toLowerCase() == paymentType.trim().toLowerCase();
+      return grouped
+          ? _resolvePaymentGroupLabel(pt) == paymentType
+          : pt.trim().toLowerCase() == paymentType.trim().toLowerCase();
     });
     for (final t in filtered) {
       final d = DateTime.parse(t.paymentDay!);
@@ -2679,7 +2870,10 @@ class _GraphicsPageState extends State<GraphicsPage>
       }
       final pt = t.paymentType;
       if (pt == null) return false;
-      if (pt.trim().toLowerCase() != paymentType.trim().toLowerCase()) {
+      final bool matches = grouped
+          ? _resolvePaymentGroupLabel(pt) == paymentType
+          : pt.trim().toLowerCase() == paymentType.trim().toLowerCase();
+      if (!matches) {
         return false;
       }
       final d = DateTime.parse(t.paymentDay!);
@@ -3128,7 +3322,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                                 Text(
                                   '(${sortedCategories.join(', ')})',
                                   style: TextStyle(
-                                    fontSize: 10.sp,
+                                    fontSize: 12.sp,
                                     color: DefaultColors.grey,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -3144,7 +3338,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                                     Text(
                                       changeLabel,
                                       style: TextStyle(
-                                        fontSize: 11.sp,
+                                        fontSize: 12.sp,
                                         color: changeColor,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -3161,7 +3355,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                               Text(
                                 currencyFormatter.format(value),
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w700,
                                   color: theme.primaryColor,
                                 ),
@@ -3170,7 +3364,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                               Text(
                                 '${pct.toStringAsFixed(1)}%',
                                 style: TextStyle(
-                                  fontSize: 11.sp,
+                                  fontSize: 12.sp,
                                   color: DefaultColors.grey,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -3480,7 +3674,7 @@ class _GraphicsPageState extends State<GraphicsPage>
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                     color: theme.primaryColor,
                   ),
@@ -3490,7 +3684,7 @@ class _GraphicsPageState extends State<GraphicsPage>
             Text(
               '${pct.toStringAsFixed(1)}%',
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 14.sp,
                 color: DefaultColors.grey,
                 fontWeight: FontWeight.w600,
               ),
@@ -3525,8 +3719,9 @@ class _GraphicsPageState extends State<GraphicsPage>
   Widget _buildBudgetSuggestionsCard(
     ThemeData theme,
     TransactionController transactionController,
-    NumberFormat currencyFormatter,
-  ) {
+    NumberFormat currencyFormatter, {
+    bool isTablet = false,
+  }) {
     // Calcular receita total do último mês ou mês atual
     final now = DateTime.now();
     final lastMonth = now.month == 1 ? 12 : now.month - 1;
@@ -3608,6 +3803,11 @@ class _GraphicsPageState extends State<GraphicsPage>
       monthName = monthNames[lastMonth - 1];
     }
 
+    final double iconContainerSize = isTablet ? 32.w : 36.w;
+    final double iconSize = isTablet ? 16.sp : 18.sp;
+    final double horizontalGap = isTablet ? 10.w : 12.w;
+    final double descriptionFont = isTablet ? 10.sp : 12.sp;
+
     return InfoCard(
       title: 'Sugestões de Orçamento',
       onTap: () {
@@ -3617,8 +3817,8 @@ class _GraphicsPageState extends State<GraphicsPage>
       content: Row(
         children: [
           Container(
-            width: 36.w,
-            height: 36.h,
+            width: iconContainerSize,
+            height: iconContainerSize,
             decoration: BoxDecoration(
               color: theme.primaryColor.withOpacity(0.08),
               borderRadius: BorderRadius.circular(12.r),
@@ -3626,15 +3826,15 @@ class _GraphicsPageState extends State<GraphicsPage>
             child: Icon(
               Iconsax.chart_21,
               color: theme.primaryColor,
-              size: 18.sp,
+              size: iconSize,
             ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: horizontalGap),
           Expanded(
             child: Text(
               'Veja sua distribuição financeira automática pelo método 50/30/20 de $monthName.',
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: descriptionFont,
                 color: theme.primaryColor,
                 fontWeight: FontWeight.w500,
               ),

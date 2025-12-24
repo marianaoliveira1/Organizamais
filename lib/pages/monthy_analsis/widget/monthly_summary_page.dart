@@ -221,527 +221,578 @@ class _MonthlySummaryPageState extends State<MonthlySummaryPage> {
           'Seu pico de gastos foi no dia $peakDay (${currency.format(peakValue)})';
     }
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Resumo Mensal',
-          style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: theme.primaryColor),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 12.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 6.h,
-            ),
-            AdsBanner(),
-            SizedBox(
-              height: 10.h,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                          color: theme.primaryColor.withOpacity(.25)),
-                    ),
-                    child: DropdownButton<int>(
-                      isExpanded: true,
-                      value: _selectedMonth,
-                      underline: const SizedBox.shrink(),
-                      items: List.generate(
-                          12,
-                          (i) => DropdownMenuItem<int>(
-                                value: i + 1,
-                                child: Text(_monthsPt[i],
-                                    style: TextStyle(
-                                        color: theme.primaryColor,
-                                        fontSize: 12.sp)),
-                              )),
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => _selectedMonth = v);
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border:
-                        Border.all(color: theme.primaryColor.withOpacity(.25)),
-                  ),
-                  child: Text('$_selectedYear',
-                      style: TextStyle(
-                          color: theme.primaryColor,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600)),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16.h,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 14.w),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Saldo (linha superior)
-                  Row(
-                    children: [
-                      _metricPill(
-                        theme,
-                        label: 'Saldo',
-                        value: saldo,
-                        color: saldo >= 0
-                            ? DefaultColors.greenDark
-                            : DefaultColors.redDark,
-                        currency: currency,
-                        valueFontSize: 16,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8.h),
-                  // Receitas e Despesas (linha inferior)
-                  Row(
-                    children: [
-                      _metricPill(
-                        theme,
-                        label: 'Receitas',
-                        value: receitas,
-                        color: DefaultColors.greenDark,
-                        currency: currency,
-                      ),
-                      SizedBox(width: 8.w),
-                      _metricPill(
-                        theme,
-                        label: 'Despesas',
-                        value: despesas,
-                        color: DefaultColors.redDark,
-                        currency: currency,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 16.h,
-            ),
-            if (peakDayMessage != null) ...[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-                decoration: BoxDecoration(
-                  color: DefaultColors.grey20.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.insights,
-                        size: 18.sp,
-                        color: theme.primaryColor.withOpacity(0.7)),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: Text(
-                        peakDayMessage,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 8.h),
-            ],
-            SizedBox(
-              height: 10.h,
-            ),
-            if (catData.isNotEmpty) ...[
-              Text('Por categoria',
-                  style: TextStyle(
-                      color: theme.primaryColor,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600)),
-              SizedBox(
-                height: 180.h,
-                child: SfCircularChart(
-                  margin: EdgeInsets.zero,
-                  legend: const Legend(isVisible: false),
-                  series: <CircularSeries<Map<String, dynamic>, String>>[
-                    PieSeries<Map<String, dynamic>, String>(
-                      dataSource: catData,
-                      xValueMapper: (e, _) => (e['name'] as String? ?? ''),
-                      yValueMapper: (e, _) => (e['value'] as double),
-                      pointColorMapper: (e, _) =>
-                          (e['color'] as Color?) ??
-                          theme.primaryColor.withOpacity(.3),
-                      dataLabelSettings:
-                          const DataLabelSettings(isVisible: false),
-                      dataLabelMapper: (e, _) {
-                        final v = (e['value'] as double);
-                        final pct = totalCat > 0 ? (v / totalCat) * 100 : 0;
-                        return '${(e['name'] as String? ?? '')}\n${pct.toStringAsFixed(0)}%';
-                      },
-                      explode: true,
-                      explodeIndex: 0,
-                      explodeOffset: '8%',
-                      sortingOrder: SortingOrder.descending,
-                      sortFieldValueMapper: (e, _) => (e['value'] as double),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: catData.length,
-                separatorBuilder: (_, __) => Divider(
-                    height: 1, color: DefaultColors.grey20.withOpacity(.5)),
-                itemBuilder: (_, i) {
-                  final e = catData[i];
-                  final double v = e['value'] as double;
-                  final double pct = totalCat > 0 ? (v / totalCat) * 100 : 0;
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12.w,
-                          height: 12.w,
-                          decoration: BoxDecoration(
-                            color: (e['color'] as Color?) ??
-                                theme.primaryColor.withOpacity(.3),
-                            borderRadius: BorderRadius.circular(3.r),
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                (e['name'] as String? ?? ''),
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    color: theme.primaryColor,
-                                    fontWeight: FontWeight.w600),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (e['weekdayPattern'] != null) ...[
-                                SizedBox(height: 2.h),
-                                Text(
-                                  e['weekdayPattern'] as String,
-                                  style: TextStyle(
-                                    fontSize: 10.sp,
-                                    color: theme.primaryColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text('${pct.toStringAsFixed(0)}%',
-                            style: TextStyle(
-                                fontSize: 10.sp, color: DefaultColors.grey)),
-                        SizedBox(width: 8.w),
-                        Text(currency.format(v),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: theme.primaryColor)),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-            ] else ...[
-              Text('Sem despesas categorizadas neste mês',
-                  style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
-              SizedBox(height: 12.h),
-            ],
-            SizedBox(
-              height: 10.h,
-            ),
-            Text('Parcelas do mês (${parcelas.length})',
-                style: TextStyle(
-                    color: theme.primaryColor,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600)),
-            SizedBox(height: 6.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(parcelas.isEmpty ? 'Nenhuma parcela' : 'Total',
-                    style:
-                        TextStyle(fontSize: 10.sp, color: DefaultColors.grey)),
-                Text(currency.format(totalParcelas),
-                    style: TextStyle(
-                        color: theme.primaryColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600)),
-              ],
-            ),
-            if (parcelas.isNotEmpty) ...[
-              SizedBox(height: 8.h),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: parcelas.length,
-                separatorBuilder: (_, __) => Divider(
-                    height: 1, color: DefaultColors.grey20.withOpacity(.5)),
-                itemBuilder: (_, i) {
-                  final t = parcelas[i];
-                  final v = double.parse(
-                      t.value.replaceAll('.', '').replaceAll(',', '.'));
-                  final String name = (() {
-                    final m = RegExp(r'Parcela\s+(\d+)\s*:\s*(.+)')
-                        .firstMatch(t.title);
-                    if (m != null) {
-                      final num = m.group(1);
-                      final base = m.group(2);
-                      return 'Parcela $num — $base';
-                    }
-                    return t.title;
-                  })();
-                  final String date = t.paymentDay != null
-                      ? DateFormat('dd/MM/yyyy')
-                          .format(DateTime.parse(t.paymentDay!))
-                      : '';
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(name,
-                                  style: TextStyle(
-                                      fontSize: 11.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: theme.primaryColor),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis),
-                              SizedBox(height: 4.h),
-                              Text(date,
-                                  style: TextStyle(
-                                      fontSize: 10.sp,
-                                      color: DefaultColors.grey)),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(currency.format(v),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: theme.primaryColor)),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-            if (payData.isNotEmpty) ...[
-              Text('Por tipo de pagamento',
-                  style: TextStyle(
-                      color: theme.primaryColor,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600)),
-              SizedBox(height: 8.h),
-              SizedBox(
-                height: 180.h,
-                child: SfCircularChart(
-                  margin: EdgeInsets.zero,
-                  legend: const Legend(isVisible: false),
-                  series: <CircularSeries<Map<String, dynamic>, String>>[
-                    PieSeries<Map<String, dynamic>, String>(
-                      dataSource: payData,
-                      xValueMapper: (e, _) => (e['paymentType'] as String),
-                      yValueMapper: (e, _) => (e['value'] as double),
-                      pointColorMapper: (e, _) => (e['color'] as Color),
-                      dataLabelSettings:
-                          const DataLabelSettings(isVisible: false),
-                      dataLabelMapper: (e, _) {
-                        final v = (e['value'] as double);
-                        final pct = payTotal > 0 ? (v / payTotal) * 100 : 0;
-                        return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
-                      },
-                      explode: true,
-                      explodeIndex: 0,
-                      explodeOffset: '8%',
-                      sortingOrder: SortingOrder.descending,
-                      sortFieldValueMapper: (e, _) => (e['value'] as double),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: payData.length,
-                separatorBuilder: (_, __) => Divider(
-                    height: 1, color: DefaultColors.grey20.withOpacity(.5)),
-                itemBuilder: (_, i) {
-                  final e = payData[i];
-                  final double v = e['value'] as double;
-                  final double pct = payTotal > 0 ? (v / payTotal) * 100 : 0;
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12.w,
-                          height: 12.w,
-                          decoration: BoxDecoration(
-                              color: (e['color'] as Color),
-                              shape: BoxShape.circle),
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            (e['paymentType'] as String),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text('${pct.toStringAsFixed(0)}%',
-                            style: TextStyle(
-                                fontSize: 10.sp, color: DefaultColors.grey)),
-                        SizedBox(width: 8.w),
-                        Text(currency.format(v),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: theme.primaryColor)),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isTablet = constraints.maxWidth > 600;
+        final double horizontalPadding =
+            isTablet ? constraints.maxWidth * 0.08 : 20.h;
+        final double fontScale = isTablet ? 1.08 : 1.0;
 
-              // Contas fixas do mês
-              Builder(builder: (context) {
-                final fixedList = txs
-                    .where((t) => t.title.startsWith('Conta fixa:'))
-                    .toList()
-                  ..sort((a, b) => DateTime.parse(a.paymentDay!)
-                      .compareTo(DateTime.parse(b.paymentDay!)));
-                if (fixedList.isEmpty) {
-                  return Text('Sem contas fixas no mês',
-                      style: TextStyle(
-                          fontSize: 10.sp, color: DefaultColors.grey));
-                }
-                return Column(
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: AppBar(
+            title: Text(
+              'Resumo Mensal',
+              style: TextStyle(
+                fontSize: 16.sp * fontScale,
+                fontWeight: FontWeight.w600,
+                color: theme.primaryColor,
+              ),
+            ),
+          ),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isTablet ? 900 : double.infinity,
+              ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: 12.h,
+                ),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Contas fixas do mês',
+                    SizedBox(
+                      height: 6.h,
+                    ),
+                    AdsBanner(),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                  color: theme.primaryColor.withOpacity(.25)),
+                            ),
+                            child: DropdownButton<int>(
+                              isExpanded: true,
+                              value: _selectedMonth,
+                              underline: const SizedBox.shrink(),
+                              items: List.generate(
+                                  12,
+                                  (i) => DropdownMenuItem<int>(
+                                        value: i + 1,
+                                        child: Text(_monthsPt[i],
+                                            style: TextStyle(
+                                                color: theme.primaryColor,
+                                                fontSize: 12.sp)),
+                                      )),
+                              onChanged: (v) {
+                                if (v == null) return;
+                                setState(() => _selectedMonth = v);
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10.h, horizontal: 12.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                                color: theme.primaryColor.withOpacity(.25)),
+                          ),
+                          child: Text('$_selectedYear',
+                              style: TextStyle(
+                                  color: theme.primaryColor,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16.h,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 12.h, horizontal: 14.w),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Saldo (linha superior)
+                          Row(
+                            children: [
+                              _metricPill(
+                                theme,
+                                label: 'Saldo',
+                                value: saldo,
+                                color: saldo >= 0
+                                    ? DefaultColors.greenDark
+                                    : DefaultColors.redDark,
+                                currency: currency,
+                                valueFontSize: 16,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          // Receitas e Despesas (linha inferior)
+                          Row(
+                            children: [
+                              _metricPill(
+                                theme,
+                                label: 'Receitas',
+                                value: receitas,
+                                color: DefaultColors.greenDark,
+                                currency: currency,
+                              ),
+                              SizedBox(width: 8.w),
+                              _metricPill(
+                                theme,
+                                label: 'Despesas',
+                                value: despesas,
+                                color: DefaultColors.redDark,
+                                currency: currency,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16.h,
+                    ),
+                    if (peakDayMessage != null) ...[
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.h, horizontal: 12.w),
+                        decoration: BoxDecoration(
+                          color: DefaultColors.grey20.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.insights,
+                                size: 18.sp,
+                                color: theme.primaryColor.withOpacity(0.7)),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: Text(
+                                peakDayMessage,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                    ],
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    if (catData.isNotEmpty) ...[
+                      Text('Por categoria',
+                          style: TextStyle(
+                              color: theme.primaryColor,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600)),
+                      SizedBox(
+                        height: 180.h,
+                        child: SfCircularChart(
+                          margin: EdgeInsets.zero,
+                          legend: const Legend(isVisible: false),
+                          series: <CircularSeries<Map<String, dynamic>,
+                              String>>[
+                            PieSeries<Map<String, dynamic>, String>(
+                              dataSource: catData,
+                              xValueMapper: (e, _) =>
+                                  (e['name'] as String? ?? ''),
+                              yValueMapper: (e, _) => (e['value'] as double),
+                              pointColorMapper: (e, _) =>
+                                  (e['color'] as Color?) ??
+                                  theme.primaryColor.withOpacity(.3),
+                              dataLabelSettings:
+                                  const DataLabelSettings(isVisible: false),
+                              dataLabelMapper: (e, _) {
+                                final v = (e['value'] as double);
+                                final pct =
+                                    totalCat > 0 ? (v / totalCat) * 100 : 0;
+                                return '${(e['name'] as String? ?? '')}\n${pct.toStringAsFixed(0)}%';
+                              },
+                              explode: true,
+                              explodeIndex: 0,
+                              explodeOffset: '8%',
+                              sortingOrder: SortingOrder.descending,
+                              sortFieldValueMapper: (e, _) =>
+                                  (e['value'] as double),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: catData.length,
+                        separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: DefaultColors.grey20.withOpacity(.5)),
+                        itemBuilder: (_, i) {
+                          final e = catData[i];
+                          final double v = e['value'] as double;
+                          final double pct =
+                              totalCat > 0 ? (v / totalCat) * 100 : 0;
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12.w,
+                                  height: 12.w,
+                                  decoration: BoxDecoration(
+                                    color: (e['color'] as Color?) ??
+                                        theme.primaryColor,
+                                    borderRadius: BorderRadius.circular(3.r),
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        (e['name'] as String? ?? ''),
+                                        style: TextStyle(
+                                            fontSize: 12.sp,
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.w600),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (e['weekdayPattern'] != null) ...[
+                                        SizedBox(height: 2.h),
+                                        Text(
+                                          e['weekdayPattern'] as String,
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                            color: theme.primaryColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text('${pct.toStringAsFixed(0)}%',
+                                    style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: DefaultColors.grey)),
+                                SizedBox(width: 8.w),
+                                Text(currency.format(v),
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 12.h),
+                    ] else ...[
+                      Text('Sem despesas categorizadas neste mês',
+                          style: TextStyle(
+                              color: DefaultColors.grey, fontSize: 10.sp)),
+                      SizedBox(height: 12.h),
+                    ],
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Text('Parcelas do mês (${parcelas.length})',
                         style: TextStyle(
                             color: theme.primaryColor,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600)),
                     SizedBox(height: 6.h),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: fixedList.length,
-                      separatorBuilder: (_, __) => Divider(
-                          height: 1,
-                          color: DefaultColors.grey20.withOpacity(.5)),
-                      itemBuilder: (_, i) {
-                        final t = fixedList[i];
-                        final v = double.parse(
-                            t.value.replaceAll('.', '').replaceAll(',', '.'));
-                        final date = t.paymentDay != null
-                            ? DateFormat('dd/MM/yyyy')
-                                .format(DateTime.parse(t.paymentDay!))
-                            : '';
-                        final name = t.title.replaceFirst('Conta fixa: ', '');
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(name,
-                                        style: TextStyle(
-                                            fontSize: 11.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis),
-                                    SizedBox(height: 4.h),
-                                    Text(date,
-                                        style: TextStyle(
-                                            fontSize: 10.sp,
-                                            color: DefaultColors.grey)),
-                                  ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(parcelas.isEmpty ? 'Nenhuma parcela' : 'Total',
+                            style: TextStyle(
+                                fontSize: 10.sp, color: DefaultColors.grey)),
+                        Text(currency.format(totalParcelas),
+                            style: TextStyle(
+                                color: theme.primaryColor,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                    if (parcelas.isNotEmpty) ...[
+                      SizedBox(height: 8.h),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: parcelas.length,
+                        separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: DefaultColors.grey20.withOpacity(.5)),
+                        itemBuilder: (_, i) {
+                          final t = parcelas[i];
+                          final v = double.parse(
+                              t.value.replaceAll('.', '').replaceAll(',', '.'));
+                          final String name = (() {
+                            final m = RegExp(
+                                    r'Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)')
+                                .firstMatch(t.title);
+                            if (m != null) {
+                              final num = m.group(1);
+                              final total = m.group(2);
+                              final base = m.group(3);
+                              if (total != null) {
+                                return 'Parcela $num de $total — $base';
+                              }
+                              return 'Parcela $num — $base';
+                            }
+                            return t.title;
+                          })();
+                          final String date = t.paymentDay != null
+                              ? DateFormat('dd/MM/yyyy')
+                                  .format(DateTime.parse(t.paymentDay!))
+                              : '';
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(name,
+                                          style: TextStyle(
+                                              fontSize: 11.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.primaryColor),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis),
+                                      SizedBox(height: 4.h),
+                                      Text(date,
+                                          style: TextStyle(
+                                              fontSize: 10.sp,
+                                              color: DefaultColors.grey)),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 8.w),
-                              Text(currency.format(v),
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: theme.primaryColor)),
-                            ],
-                          ),
+                                SizedBox(width: 8.w),
+                                Text(currency.format(v),
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    if (payData.isNotEmpty) ...[
+                      Text('Por tipo de pagamento',
+                          style: TextStyle(
+                              color: theme.primaryColor,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600)),
+                      SizedBox(height: 8.h),
+                      SizedBox(
+                        height: 180.h,
+                        child: SfCircularChart(
+                          margin: EdgeInsets.zero,
+                          legend: const Legend(isVisible: false),
+                          series: <CircularSeries<Map<String, dynamic>,
+                              String>>[
+                            PieSeries<Map<String, dynamic>, String>(
+                              dataSource: payData,
+                              xValueMapper: (e, _) =>
+                                  (e['paymentType'] as String),
+                              yValueMapper: (e, _) => (e['value'] as double),
+                              pointColorMapper: (e, _) => (e['color'] as Color),
+                              dataLabelSettings:
+                                  const DataLabelSettings(isVisible: false),
+                              dataLabelMapper: (e, _) {
+                                final v = (e['value'] as double);
+                                final pct =
+                                    payTotal > 0 ? (v / payTotal) * 100 : 0;
+                                return '${(e['paymentType'] as String)}\n${pct.toStringAsFixed(0)}%';
+                              },
+                              explode: true,
+                              explodeIndex: 0,
+                              explodeOffset: '8%',
+                              sortingOrder: SortingOrder.descending,
+                              sortFieldValueMapper: (e, _) =>
+                                  (e['value'] as double),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: payData.length,
+                        separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: DefaultColors.grey20.withOpacity(.5)),
+                        itemBuilder: (_, i) {
+                          final e = payData[i];
+                          final double v = e['value'] as double;
+                          final double pct =
+                              payTotal > 0 ? (v / payTotal) * 100 : 0;
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12.w,
+                                  height: 12.w,
+                                  decoration: BoxDecoration(
+                                      color: (e['color'] as Color),
+                                      shape: BoxShape.circle),
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Text(
+                                    (e['paymentType'] as String),
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color: theme.primaryColor,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text('${pct.toStringAsFixed(0)}%',
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: DefaultColors.grey)),
+                                SizedBox(width: 8.w),
+                                Text(currency.format(v),
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+
+                      // Contas fixas do mês
+                      Builder(builder: (context) {
+                        final fixedList = txs
+                            .where((t) => t.title.startsWith('Conta fixa:'))
+                            .toList()
+                          ..sort((a, b) => DateTime.parse(a.paymentDay!)
+                              .compareTo(DateTime.parse(b.paymentDay!)));
+                        if (fixedList.isEmpty) {
+                          return Text('Sem contas fixas no mês',
+                              style: TextStyle(
+                                  fontSize: 10.sp, color: DefaultColors.grey));
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Contas fixas do mês',
+                                style: TextStyle(
+                                    color: theme.primaryColor,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600)),
+                            SizedBox(height: 6.h),
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: fixedList.length,
+                              separatorBuilder: (_, __) => Divider(
+                                  height: 1,
+                                  color: DefaultColors.grey20.withOpacity(.5)),
+                              itemBuilder: (_, i) {
+                                final t = fixedList[i];
+                                final v = double.parse(t.value
+                                    .replaceAll('.', '')
+                                    .replaceAll(',', '.'));
+                                final date = t.paymentDay != null
+                                    ? DateFormat('dd/MM/yyyy')
+                                        .format(DateTime.parse(t.paymentDay!))
+                                    : '';
+                                final name =
+                                    t.title.replaceFirst('Conta fixa: ', '');
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(name,
+                                                style: TextStyle(
+                                                    fontSize: 11.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.primaryColor),
+                                                maxLines: 2,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                            SizedBox(height: 4.h),
+                                            Text(date,
+                                                style: TextStyle(
+                                                    fontSize: 10.sp,
+                                                    color: DefaultColors.grey)),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(currency.format(v),
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.primaryColor)),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         );
-                      },
+                      }),
+                    ] else ...[
+                      Text('Sem despesas por tipo neste mês',
+                          style: TextStyle(
+                              color: DefaultColors.grey, fontSize: 10.sp)),
+                    ],
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    AdsBanner(),
+                    SizedBox(
+                      height: 10.h,
                     ),
                   ],
-                );
-              }),
-            ] else ...[
-              Text('Sem despesas por tipo neste mês',
-                  style: TextStyle(color: DefaultColors.grey, fontSize: 10.sp)),
-            ],
-            SizedBox(
-              height: 10.h,
+                ),
+              ),
             ),
-            AdsBanner(),
-            SizedBox(
-              height: 10.h,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

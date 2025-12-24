@@ -316,7 +316,7 @@ class _MonthSelectorResumeState extends State<MonthSelectorResume> {
                   child: Text(
                     _items[index],
                     style: TextStyle(
-                      fontSize: 11.sp,
+                      fontSize: 12.sp,
                       color: isSelected
                           ? Theme.of(context).primaryColor
                           : DefaultColors.grey,

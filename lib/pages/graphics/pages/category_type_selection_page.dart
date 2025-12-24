@@ -158,7 +158,7 @@ class _CategoryTypeSelectionPageState extends State<CategoryTypeSelectionPage> {
                         trailing: SizedBox(
                           width: 100.w,
                           child: DropdownButtonFormField<String>(
-                            value: group,
+                            initialValue: group,
                             decoration:
                                 const InputDecoration(border: InputBorder.none),
                             items: const [

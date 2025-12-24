@@ -20,6 +20,8 @@ class MonthlyFinancialChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final TransactionController controller = Get.find<TransactionController>();
+    final bool isTablet = MediaQuery.of(context).size.width > 600;
+    double sf(double mobile, double tablet) => isTablet ? tablet : mobile;
 
     return Obx(() {
       final monthlyData =
@@ -34,11 +36,11 @@ class MonthlyFinancialChart extends StatelessWidget {
             Text(
               'Ano $selectedYear (até hoje)',
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: sf(12, 14),
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -47,7 +49,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                 ChartLegendItem(label: 'Despesas', color: DefaultColors.red),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 14.h),
             LayoutBuilder(
               builder: (context, constraints) {
                 // Calculate optimal dimensions based on available width
@@ -163,7 +165,7 @@ class MonthlyFinancialChart extends StatelessWidget {
                                 _getMonthAbbr(value.toInt()),
                                 style: TextStyle(
                                   color: Colors.grey[600],
-                                  fontSize: 10,
+                                  fontSize: sf(11, 13),
                                   fontWeight: FontWeight.w500,
                                 ),
                                 textAlign: TextAlign.center,
@@ -182,10 +184,10 @@ class MonthlyFinancialChart extends StatelessWidget {
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 _formatCurrencyShort(value),
-                                style: const TextStyle(
-                                  color: Colors.grey,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 10,
+                                  fontSize: sf(11, 13),
                                 ),
                               );
                             },

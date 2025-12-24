@@ -29,7 +29,7 @@ class PortfolioCard extends StatelessWidget {
         _AnnualAnalysisHeader(
           saldo: saldo,
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 8.h),
         Row(
           children: [
             Expanded(
@@ -54,7 +54,7 @@ class PortfolioCard extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 12.h),
         Row(
           children: [
             Expanded(
@@ -79,9 +79,7 @@ class PortfolioCard extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(
-          height: 10.h,
-        ),
+        SizedBox(height: 6.h),
       ],
     );
   }
@@ -109,22 +107,24 @@ class _AnnualAnalysisHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: AutoSizeText(
-                _formatCurrencyStatic(saldo),
-                maxLines: 1,
-                minFontSize: 16,
-                style: TextStyle(
-                  fontSize: 40.sp,
-                  fontWeight: FontWeight.bold,
-                  color: saldo < 0 ? DefaultColors.red : DefaultColors.green,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          'Saldo',
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w500,
+            color: DefaultColors.grey20,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        AutoSizeText(
+          _formatCurrencyStatic(saldo),
+          maxLines: 1,
+          minFontSize: 20,
+          style: TextStyle(
+            fontSize: 36.sp,
+            fontWeight: FontWeight.bold,
+            color: saldo < 0 ? DefaultColors.red : DefaultColors.green,
+          ),
         ),
       ],
     );

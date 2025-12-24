@@ -9,6 +9,7 @@ class CardsModel {
   final int? closingDay;
   final int? paymentDay;
   final List<String>? paidInvoices; // keys "YYYY-M" ou similares
+  final bool isTotalLimit;
 
   CardsModel({
     this.id,
@@ -20,6 +21,7 @@ class CardsModel {
     this.closingDay,
     this.paymentDay,
     this.paidInvoices,
+    this.isTotalLimit = true,
   });
 
   factory CardsModel.fromMap(Map<String, dynamic> map) {
@@ -35,6 +37,7 @@ class CardsModel {
           map['paymentDay'] != null ? (map['paymentDay'] as num).toInt() : null,
       paidInvoices:
           (map['paidInvoices'] as List?)?.map((e) => e.toString()).toList(),
+      isTotalLimit: map['isTotalLimit'] ?? true,
     );
   }
 
@@ -48,6 +51,7 @@ class CardsModel {
       'closingDay': closingDay,
       'paymentDay': paymentDay,
       'paidInvoices': paidInvoices,
+      'isTotalLimit': isTotalLimit,
     };
   }
 
@@ -61,6 +65,7 @@ class CardsModel {
     int? closingDay,
     int? paymentDay,
     List<String>? paidInvoices,
+    bool? isTotalLimit,
   }) {
     return CardsModel(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class CardsModel {
       closingDay: closingDay ?? this.closingDay,
       paymentDay: paymentDay ?? this.paymentDay,
       paidInvoices: paidInvoices ?? this.paidInvoices,
+      isTotalLimit: isTotalLimit ?? this.isTotalLimit,
     );
   }
 }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax/iconsax.dart';
 
 import 'package:get/get.dart';
 
@@ -19,6 +20,12 @@ class SelectIconPage extends StatefulWidget {
 class _SelectIconPageState extends State<SelectIconPage> {
   final searchController = TextEditingController();
   String searchQuery = '';
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, String>> bankIcons = [
     {'path': 'assets/icon-bank/abc-brasil.png', 'name': 'ABC Brasil'},
@@ -122,78 +129,267 @@ class _SelectIconPageState extends State<SelectIconPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final totalResults = filteredBankIcons.length;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.primaryColor),
+        titleSpacing: 16.w,
         title: Text(
-          'Selecionar Ícone',
-          style: TextStyle(color: theme.primaryColor),
+          'Selecionar ícone',
+          style: TextStyle(
+            color: theme.primaryColor,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
-      body: Column(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: Column(
+            children: [
+              AdsBanner(),
+              SizedBox(height: 12.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                child: Column(
+                  children: [
+                    _buildSearchField(theme),
+                    SizedBox(height: 12.h),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: totalResults == 0
+                      ? _buildEmptyState(theme)
+                      : GridView.builder(
+                          key: ValueKey(searchQuery),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.w, vertical: 8.h),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 500 ? 4 : 3,
+                            mainAxisSpacing: 14.h,
+                            crossAxisSpacing: 12.w,
+                            childAspectRatio: 0.78,
+                          ),
+                          itemCount: totalResults,
+                          itemBuilder: (context, index) {
+                            final bank = filteredBankIcons[index];
+                            return _BankIconTile(
+                              bank: bank,
+                              onTap: () {
+                                widget.onIconSelected(
+                                    bank['path']!, bank['name']!);
+                                Get.back();
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchField(ThemeData theme) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: theme.primaryColor.withOpacity(0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          Icon(Iconsax.search_normal, color: theme.primaryColor, size: 18.sp),
+          SizedBox(width: 8.w),
+          Expanded(
             child: TextField(
               controller: searchController,
               onChanged: (value) {
-                setState(() {
-                  searchQuery = value;
-                });
+                setState(() => searchQuery = value);
               },
-              decoration: InputDecoration(
-                hintText: 'Buscar um ícone',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              decoration: const InputDecoration(
+                hintText: 'Buscar banco, carteira ou cartão',
+                border: InputBorder.none,
               ),
             ),
           ),
-          AdsBanner(),
-          SizedBox(
-            height: 20.h,
+          if (searchQuery.isNotEmpty)
+            IconButton(
+              onPressed: () {
+                searchController.clear();
+                setState(() => searchQuery = '');
+              },
+              icon: Icon(Icons.close, color: theme.primaryColor, size: 18.sp),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(ThemeData theme, int totalResults) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18.r),
+        color: theme.primaryColor.withOpacity(0.05),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Icon(Iconsax.card, color: theme.primaryColor, size: 18.sp),
           ),
+          SizedBox(width: 12.w),
           Expanded(
-            child: filteredBankIcons.isEmpty
-                ? Center(
-                    child: Text('Nenhum banco encontrado'),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 2.h,
-                    ),
-                    itemCount: filteredBankIcons.length,
-                    itemBuilder: (context, index) {
-                      final bank = filteredBankIcons[index];
-                      return ListTile(
-                        onTap: () {
-                          widget.onIconSelected(bank['path']!, bank['name']!);
-                          Get.back();
-                        },
-                        leading: Image.asset(
-                          bank['path']!,
-                          width: 40.w,
-                          height: 40.h,
-                        ),
-                        title: Text(
-                          bank['name']!,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: theme.primaryColor,
-                          ),
-                        ),
-                      );
-                    },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ícones disponíveis',
+                  style: TextStyle(
+                    color: theme.primaryColor,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  '$totalResults opções encontradas',
+                  style: TextStyle(
+                    color: theme.primaryColor.withOpacity(0.8),
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72.w,
+            height: 72.w,
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Iconsax.search_favorite,
+                color: theme.primaryColor, size: 32.sp),
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'Nada encontrado',
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            'Tente outro termo para localizar o banco desejado.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: theme.primaryColor.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BankIconTile extends StatelessWidget {
+  final Map<String, String> bank;
+  final VoidCallback onTap;
+
+  const _BankIconTile({required this.bank, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: theme.primaryColor.withOpacity(0.06)),
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(12.w),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  padding: EdgeInsets.all(12.w),
+                  child: Image.asset(
+                    bank['path']!,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                bank['name']!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

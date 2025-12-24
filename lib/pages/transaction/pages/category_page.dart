@@ -9,6 +9,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../model/transaction_model.dart';
 import '../../../controller/transaction_controller.dart';
+import '../../../utils/snackbar_helper.dart'; // Import added
 
 final List<Map<String, dynamic>> categories_expenses = [
   // ========== MORADIA E CASA ==========
@@ -1021,14 +1022,14 @@ class _CategoryPageState extends State<CategoryPage> {
             child: TextField(
               controller: searchController,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
                 color: theme.primaryColor,
               ),
               decoration: InputDecoration(
                 hintText: 'Pesquisar categoria',
                 hintStyle: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                   color: theme.primaryColor.withOpacity(0.5),
                 ),
@@ -1177,34 +1178,15 @@ class _CategoryPageState extends State<CategoryPage> {
                             return Text(
                               '$monthCount transações nesse mês / $totalCount transações no total',
                               style: TextStyle(
-                                fontSize: 10.sp,
+                                fontSize: 12.sp,
                                 color: theme.hintColor,
                               ),
                             );
                           }),
                           onTap: () {
-                            // Fechar qualquer snackbar aberto antes de navegar
-                            // para evitar LateInitializationError
-                            try {
-                              if (Get.isSnackbarOpen == true) {
-                                Get.closeCurrentSnackbar();
-                                // Aguardar o snackbar fechar antes de navegar
-                                Future.delayed(
-                                    const Duration(milliseconds: 200), () {
-                                  if (context.mounted) {
-                                    Navigator.of(context).pop(category['id']);
-                                  }
-                                });
-                              } else {
-                                // Se não há snackbar, navegar diretamente
-                                Navigator.of(context).pop(category['id']);
-                              }
-                            } catch (e) {
-                              // Se houver erro, tentar navegar diretamente
-                              if (context.mounted) {
-                                Navigator.of(context).pop(category['id']);
-                              }
-                            }
+                            // Fechar qualquer snackbar aberto de forma segura
+                            SnackbarHelper.closeAllSnackbars();
+                            Navigator.of(context).pop(category['id']);
                           },
                         ),
                       );

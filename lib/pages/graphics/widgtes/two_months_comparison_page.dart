@@ -98,7 +98,7 @@ class TwoMonthsComparisonPage extends StatelessWidget {
     final int prevMonth = curMonth == 1 ? 12 : curMonth - 1;
     final int prevYear = curMonth == 1 ? curYear - 1 : curYear;
 
-    List<TransactionModel> _forMonth(int y, int m) {
+    List<TransactionModel> forMonth(int y, int m) {
       final DateTime start = DateTime(y, m, 1);
       final DateTime end = DateTime(y, m + 1, 0, 23, 59, 59);
       final list = tx.transaction.where((t) {
@@ -114,8 +114,8 @@ class TwoMonthsComparisonPage extends StatelessWidget {
       return list;
     }
 
-    final List<TransactionModel> currentList = _forMonth(curYear, curMonth);
-    final List<TransactionModel> previousList = _forMonth(prevYear, prevMonth);
+    final List<TransactionModel> currentList = forMonth(curYear, curMonth);
+    final List<TransactionModel> previousList = forMonth(prevYear, prevMonth);
 
     Widget header() {
       return Container(
@@ -238,7 +238,7 @@ class TwoMonthsComparisonPage extends StatelessWidget {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       );

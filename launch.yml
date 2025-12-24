@@ -1,0 +1,64 @@
+name: launch.expo.dev/flutter/ios
+
+jobs:
+  app-store:
+    type: build
+    params:
+      platform: ios
+      profile: production
+    env:
+      EAS_NO_VCS: '1'
+      FVM_USE_GIT_CACHE: 'false'
+    steps:
+      - name: 🏗️ Prepare project
+        uses: eas/checkout
+
+      - name: 🏗️ Prepare launch
+        run: bun add --global eas-cli @expo/launching@0.0.0-20251113-e253d4db
+
+      - id: flutterSdk
+        name: 🔍 Resolve Flutter SDK
+        run: |-
+          LAUNCH_STDOUT=$(mktemp)
+          LAUNCH_STDERR=$(mktemp)
+          launching flutter:version --dart "^3.10.0" --init 2> $LAUNCH_STDERR > $LAUNCH_STDOUT
+          cat $LAUNCH_STDERR
+          set-output version "$(cat $LAUNCH_STDOUT)"
+
+      - name: 📦 Install Flutter SDK
+        run: |-
+          curl -fsSL https://fvm.app/install.sh | bash
+          fvm flutter --disable-analytics || true
+          fvm dart --disable-analytics || true
+          rm -rf macos
+
+      - name: ⚙️ Configure xcode project
+        run: launching xcode:configure
+
+      - name: 🔍 Resolve iOS build config
+        uses: eas/resolve_build_config
+
+      - name: ⚙️ Configure iOS credentials
+        uses: eas/configure_ios_credentials
+
+      - name: ⚙️ Configure iOS build version
+        uses: eas/configure_ios_version
+
+      - name: 📱 Build iOS app
+        run: |-
+          fvm flutter build ipa --release --export-options-plist ".launch/xcodebuild.plist" --build-name "1.0.169" --build-number "${ eas.metadata.appBuildVersion }"
+          mkdir -p ios/build
+          mv build/ios/ipa/* ios/build/
+
+      - name: ♻️ Storing iOS app
+        uses: eas/find_and_upload_build_artifacts
+
+      - name: 🚀 Submit iOS app
+        run: launching eas:ios-submit --app-bundle-id "${ eas.metadata.appIdentifier }" --app-id "6755600017" --app-name "${ eas.metadata.appName }" --build-id "${ eas.env.EAS_BUILD_ID }" --build-number "${ eas.metadata.appBuildVersion }" --submit-profile "${ eas.env.EAS_BUILD_PROFILE }"
+
+      - name: ♻️ Storing iOS submission
+        uses: eas/create_submission_entity
+        with:
+          build_id: ${ eas.env.EAS_BUILD_ID }
+          asc_app_identifier: '6755600017'
+

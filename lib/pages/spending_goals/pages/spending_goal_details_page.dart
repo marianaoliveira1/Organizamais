@@ -8,6 +8,7 @@ import '../../../controller/spending_goal_controller.dart';
 import '../../../model/spending_goal_model.dart';
 import '../../../widgetes/currency_ipunt_formated.dart';
 import '../../transaction/pages/category_page.dart';
+import '../../../utils/snackbar_helper.dart';
 
 class SpendingGoalDetailsPage extends StatefulWidget {
   final SpendingGoalModel spendingGoal;
@@ -548,14 +549,12 @@ class _SpendingGoalDetailsPageState extends State<SpendingGoalDetailsPage> {
     if (value > 0) {
       // Aqui você implementaria a lógica para salvar o ajuste
       // Por exemplo, criar uma transação de ajuste ou atualizar a meta
-      Get.snackbar(
-        'Sucesso',
-        isAddition
-            ? 'Valor adicionado com sucesso'
-            : 'Valor subtraído com sucesso',
-        backgroundColor: isAddition ? Colors.green : Colors.red,
-        colorText: Colors.white,
-      );
+      if (isAddition) {
+        SnackbarHelper.showSuccess('Valor adicionado com sucesso');
+      } else {
+        SnackbarHelper.showError('Valor subtraído com sucesso',
+            title: 'Sucesso');
+      }
     }
   }
 }

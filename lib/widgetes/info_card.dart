@@ -25,6 +25,14 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    final bool isTablet = mediaQuery.size.width >= 600;
+    final double titleFontSize = isTablet ? 8.sp : 12.sp;
+    final double iconSize = isTablet ? 12.sp : 16.sp;
+    final double verticalPadding = isTablet ? 8.h : 12.h;
+    final double horizontalPadding = isTablet ? 10.w : 14.w;
+    final double spacing = isTablet ? 6.h : 8.h;
+
     return Column(
       children: [
         Row(
@@ -33,7 +41,7 @@ class InfoCard extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: titleFontSize,
                 color: DefaultColors.textGrey,
                 fontWeight: FontWeight.w500,
               ),
@@ -43,19 +51,19 @@ class InfoCard extends StatelessWidget {
                 onTap: onIconTap ?? onTap,
                 child: Icon(
                   icon,
-                  size: 14.sp,
+                  size: iconSize,
                   color: DefaultColors.textGrey,
                 ),
               )
           ],
         ),
-        SizedBox(height: 8.h), // ← Espaçamento adicionado
+        SizedBox(height: spacing), // ← Espaçamento adicionado
         GestureDetector(
           onTap: onTap,
           child: Container(
             padding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 14.w,
+              vertical: verticalPadding,
+              horizontal: horizontalPadding,
             ),
             decoration: BoxDecoration(
               color: backgroundColor ?? theme.cardColor,

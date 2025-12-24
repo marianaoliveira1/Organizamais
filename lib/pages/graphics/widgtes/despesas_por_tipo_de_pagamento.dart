@@ -1485,14 +1485,14 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
   }
 
   String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final regex = RegExp(r'^Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)$');
     final match = regex.firstMatch(t.title);
     if (match == null) return t.title;
     final int current = int.tryParse(match.group(1) ?? '') ?? 0;
-    final String baseTitle = match.group(2) ?? '';
+    final String baseTitle = match.group(3) ?? '';
 
-    String _normPay(String? s) => (s ?? '').trim().toLowerCase();
-    double _parseVal(String v) {
+    String normPay(String? s) => (s ?? '').trim().toLowerCase();
+    double parseVal(String v) {
       return double.tryParse(v
               .replaceAll('R\$', '')
               .trim()
@@ -1501,16 +1501,16 @@ class WidgetListPaymentTypeGraphics extends StatelessWidget {
           0.0;
     }
 
-    final String payNorm = _normPay(t.paymentType);
-    final double val = _parseVal(t.value);
+    final String payNorm = normPay(t.paymentType);
+    final double val = parseVal(t.value);
 
     final int total = all.where((x) {
       final m = regex.firstMatch(x.title);
       if (m == null) return false;
-      final String tBase = m.group(2) ?? '';
+      final String tBase = m.group(3) ?? '';
       if (tBase != baseTitle) return false;
-      if (_normPay(x.paymentType) != payNorm) return false;
-      final double xv = _parseVal(x.value);
+      if (normPay(x.paymentType) != payNorm) return false;
+      final double xv = parseVal(x.value);
       return (xv - val).abs() <= 0.01;
     }).length;
 

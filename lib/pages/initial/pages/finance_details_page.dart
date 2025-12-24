@@ -82,8 +82,11 @@ class FinanceDetailsPage extends StatelessWidget {
         final previousBalance = _getPreviousMonthBalance(transactionController);
         final currentIncome = _getCurrentMonthIncome(transactionController);
         final previousIncome = _getPreviousMonthIncome(transactionController);
-        final currentExpenses = _getCurrentMonthExpenses(transactionController);
-        final previousExpenses =
+        final currentExpensesCommitted =
+            _getCurrentMonthExpensesCommitted(transactionController);
+        final currentExpensesRealized =
+            _getCurrentMonthExpensesToDate(transactionController);
+        final previousExpensesRealized =
             _getPreviousMonthExpenses(transactionController);
 
         return Column(
@@ -107,8 +110,9 @@ class FinanceDetailsPage extends StatelessWidget {
                       previousBalance,
                       currentIncome,
                       previousIncome,
-                      currentExpenses,
-                      previousExpenses,
+                      currentExpensesCommitted,
+                      currentExpensesRealized,
+                      previousExpensesRealized,
                     ),
 
                     SizedBox(height: 14.h),
@@ -386,7 +390,15 @@ class FinanceDetailsPage extends StatelessWidget {
     return _getIncomeForPeriod(controller.transaction, startDate, endDate);
   }
 
-  double _getCurrentMonthExpenses(TransactionController controller) {
+  double _getCurrentMonthExpensesCommitted(TransactionController controller) {
+    final now = DateTime.now();
+    final startDate = DateTime(now.year, now.month, 1);
+    final endDate = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+    return _getExpensesForPeriod(controller.transaction, startDate, endDate);
+  }
+
+  double _getCurrentMonthExpensesToDate(TransactionController controller) {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, 1);
     final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
@@ -428,7 +440,6 @@ class FinanceDetailsPage extends StatelessWidget {
 
   double _getPreviousMonthExpenses(TransactionController controller) {
     final now = DateTime.now();
-    // Corrigindo a lógica: se estamos em julho (mês 7), queremos junho (mês 6)
     final previousMonth = now.month == 1 ? 12 : now.month - 1;
     final previousYear = now.month == 1 ? now.year - 1 : now.year;
 
@@ -581,10 +592,10 @@ class FinanceDetailsPage extends StatelessWidget {
     double previousBalance,
     double currentIncome,
     double previousIncome,
-    double currentExpenses,
+    double currentExpensesCommitted,
+    double currentExpensesRealized,
     double previousExpenses,
   ) {
-    final today = DateTime.now();
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 12.h,
@@ -628,11 +639,42 @@ class FinanceDetailsPage extends StatelessWidget {
             PercentageExplanationType.income,
           ),
           SizedBox(height: 12.h),
+          // SizedBox(height: 12.h),
+          // Container(
+          //   padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+          //   decoration: BoxDecoration(
+          //     color: theme.primaryColor.withOpacity(0.05),
+          //     borderRadius: BorderRadius.circular(10.r),
+          //   ),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //          'Despesas comprometidas no mê,˚ hnbvc/.≤h?., s',
+          //         style: TextStyle(
+          //           fontSize: 11.sp,
+          //           fontWeight: FontWeight.w500,
+          //           color: DefaultColors.grey20,
+          //         ),
+          //       ),
+          //       SizedBox(height: 4.h),
+          //       Text(
+          //         formatter.format(currentExpensesCommitted),
+          //         style: TextStyle(
+          //           fontSize: 16.sp,
+          //           fontWeight: FontWeight.w700,
+          //           color: theme.primaryColor,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          SizedBox(height: 12.h),
           _buildComparisonItem(
             theme,
             formatter,
             "Despesas",
-            currentExpenses,
+            currentExpensesRealized,
             previousExpenses,
             controller.expensePercentageComparison,
             PercentageExplanationType.expense,
@@ -655,7 +697,7 @@ class FinanceDetailsPage extends StatelessWidget {
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
-                    'A comparação é feita entre o período de 1º até o dia ${today.day} do mês atual versus o mesmo período do mês anterior. Isso garante uma comparação justa entre períodos equivalentes.',
+                    'O valor destacado acima soma todas as contas fixas e parcelas previstas para o mês. A comparação abaixo considera apenas as despesas já vencidas até hoje em cada mês, para garantir períodos equivalentes.',
                     style: TextStyle(
                       color: DefaultColors.grey20,
                       fontSize: 11.sp,

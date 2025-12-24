@@ -1309,8 +1309,7 @@ class _BudgetSuggestionsPageState extends State<BudgetSuggestionsPage> {
             categoryId != null ? findCategoryById(categoryId) : null;
         final String? categoryName =
             category != null ? category['name'] as String? : null;
-        final String? normalizedName =
-            categoryName != null ? categoryName.trim().toLowerCase() : null;
+        final String? normalizedName = categoryName?.trim().toLowerCase();
         final int? resolvedId = (category != null
                 ? (category['id'] is int ? category['id'] as int : null)
                 : null) ??

@@ -22,87 +22,117 @@ class PortfolioDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TransactionController transactionController =
         Get.find<TransactionController>();
-    final theme = Theme.of(context);
     final NumberFormat formatter = NumberFormat.currency(
       locale: "pt_BR",
       symbol: "R\$",
     );
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        title: Text(
-          'Análise Mensal ',
-          style: TextStyle(
-            color: theme.primaryColor,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Obx(() {
-        // Agrupa transações por mês até o mês atual
-        final monthlyData = _getMonthlyData(transactionController);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final theme = Theme.of(context);
+        final bool isTablet = constraints.maxWidth > 600;
+        final double contentMaxWidth = isTablet ? 900 : double.infinity;
+        final double horizontalPadding =
+            isTablet ? constraints.maxWidth * 0.08 : 16.0;
+        final double verticalSpacing = isTablet ? 24.0 : 16.0;
+        final double fontScale = isTablet ? 1.12 : 1.0;
 
-        return Column(
-          children: [
-            AdsBanner(),
-            SizedBox(height: 20.h),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Lista de meses
-                    Text(
-                      "Análise por Mês",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Comparação entre os meses",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: DefaultColors.grey20,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-
-                    ...monthlyData
-                        .where((monthData) =>
-                            (monthData['income'] as double) > 0 ||
-                            (monthData['expenses'] as double) > 0)
-                        .map((monthData) => _buildMonthCard(
-                              theme,
-                              formatter,
-                              monthData,
-                              transactionController,
-                            )),
-
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    AdsBanner(),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    _buildFinalAverages(theme, formatter, monthlyData),
-                  ],
-                ),
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            title: Text(
+              'Análise Mensal',
+              style: TextStyle(
+                color: theme.primaryColor,
+                fontSize: 18 * fontScale,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20.h),
-            AdsBanner(),
-          ],
+          ),
+          body: Obx(() {
+            final monthlyData = _getMonthlyData(transactionController);
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: verticalSpacing * 0.5,
+                  ),
+                  child: AdsBanner(),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                          vertical: verticalSpacing * 0.25,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Análise por Mês",
+                              style: TextStyle(
+                                fontSize: 16 * fontScale,
+                                fontWeight: FontWeight.bold,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                            SizedBox(height: verticalSpacing * 0.5),
+                            Text(
+                              "Comparação entre os meses",
+                              style: TextStyle(
+                                fontSize: 12 * fontScale,
+                                fontWeight: FontWeight.w500,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                            SizedBox(height: verticalSpacing),
+                            ...monthlyData
+                                .where((monthData) =>
+                                    (monthData['income'] as double) > 0 ||
+                                    (monthData['expenses'] as double) > 0)
+                                .map(
+                                  (monthData) => _buildMonthCard(
+                                    theme,
+                                    formatter,
+                                    monthData,
+                                    transactionController,
+                                    fontScale,
+                                    isTablet,
+                                  ),
+                                ),
+                            SizedBox(height: verticalSpacing),
+                            AdsBanner(),
+                            SizedBox(height: verticalSpacing),
+                            _buildFinalAverages(
+                              theme,
+                              formatter,
+                              monthlyData,
+                              fontScale,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: horizontalPadding,
+                    right: horizontalPadding,
+                    bottom: verticalSpacing * 0.5,
+                  ),
+                  child: AdsBanner(),
+                ),
+              ],
+            );
+          }),
         );
-      }),
+      },
     );
   }
 
@@ -111,6 +141,8 @@ class PortfolioDetailsPage extends StatelessWidget {
     NumberFormat formatter,
     Map<String, dynamic> monthData,
     TransactionController controller,
+    double fontScale,
+    bool isTablet,
   ) {
     final String monthName = monthData['monthName'];
     final double income = monthData['income'];
@@ -137,19 +169,24 @@ class PortfolioDetailsPage extends StatelessWidget {
         ? (expensesVariation / previousExpenses) * 100
         : 0;
 
+    final double headerFont = 12 * fontScale;
+    final double valueFont = 32 * fontScale;
+    final double labelFont = 12 * fontScale;
+    final double chartHeight = isTablet ? 200 : 160;
+
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.all(9.w),
+      padding: EdgeInsets.all(12),
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 6.w,
+            padding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 6,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,16 +194,16 @@ class PortfolioDetailsPage extends StatelessWidget {
                 Text(
                   monthName,
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: headerFont,
                     fontWeight: FontWeight.w500,
                     color: DefaultColors.grey20,
                   ),
                 ),
-                SizedBox(height: 4.h),
+                const SizedBox(height: 4),
                 Text(
                   formatter.format(balance),
                   style: TextStyle(
-                    fontSize: 32.sp,
+                    fontSize: valueFont,
                     fontWeight: FontWeight.w600,
                     color:
                         balance >= 0 ? DefaultColors.green : DefaultColors.red,
@@ -181,7 +218,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                         Text(
                           'Receitas',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: labelFont,
                             fontWeight: FontWeight.w500,
                             color: DefaultColors.slateGrey,
                           ),
@@ -190,7 +227,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                         Text(
                           formatter.format(income),
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 16 * fontScale,
                             fontWeight: FontWeight.w600,
                             color: theme.primaryColor,
                           ),
@@ -203,7 +240,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                         Text(
                           'Despesas',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: labelFont,
                             fontWeight: FontWeight.w500,
                             color: DefaultColors.slateGrey,
                           ),
@@ -212,7 +249,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                         Text(
                           formatter.format(expenses),
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: 16 * fontScale,
                             fontWeight: FontWeight.w600,
                             color: theme.primaryColor,
                           ),
@@ -224,21 +261,19 @@ class PortfolioDetailsPage extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: 6.h,
-          ),
+          const SizedBox(height: 6),
           if ((income + expenses) > 0) ...[
             Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 10.h,
-                horizontal: 12.w,
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 12,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 8.h),
+                  const SizedBox(height: 8),
                   SizedBox(
-                    height: 160.h,
+                    height: chartHeight,
                     child: SfCircularChart(
                       margin: EdgeInsets.zero,
                       legend: Legend(isVisible: false),
@@ -309,19 +344,19 @@ class PortfolioDetailsPage extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 20.h,
+              height: 20,
             ),
           ],
           Container(
             decoration: BoxDecoration(
               color: theme.scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(
-                12.r,
+                12,
               ),
             ),
             padding: EdgeInsets.symmetric(
-              vertical: 10.h,
-              horizontal: 12.w,
+              vertical: 10,
+              horizontal: 12,
             ),
             child: Column(
               children: [
@@ -338,13 +373,13 @@ class PortfolioDetailsPage extends StatelessWidget {
                           color: incomeVariation >= 0
                               ? DefaultColors.green
                               : DefaultColors.red,
-                          size: 16.sp,
+                          size: 16 * fontScale,
                         ),
-                        SizedBox(width: 4.w),
+                        const SizedBox(width: 4),
                         Text(
                           "Receitas: ",
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12 * fontScale,
                             fontWeight: FontWeight.w500,
                             color: incomeVariation >= 0
                                 ? DefaultColors.green
@@ -356,7 +391,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                     Text(
                       '${incomeVariationPercentage >= 0 ? '+' : ''}${incomeVariationPercentage.toStringAsFixed(1)}% (${incomeVariation >= 0 ? '+' : ''}${formatter.format(incomeVariation)})',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12 * fontScale,
                         fontWeight: FontWeight.w500,
                         color: incomeVariation >= 0
                             ? DefaultColors.green
@@ -380,13 +415,13 @@ class PortfolioDetailsPage extends StatelessWidget {
                           color: expensesVariation <= 0
                               ? DefaultColors.green
                               : DefaultColors.red,
-                          size: 16.sp,
+                          size: 16 * fontScale,
                         ),
-                        SizedBox(width: 4.w),
+                        const SizedBox(width: 4),
                         Text(
                           'Despesas: ',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12 * fontScale,
                             fontWeight: FontWeight.w500,
                             color: expensesVariation <= 0
                                 ? DefaultColors.green
@@ -398,7 +433,7 @@ class PortfolioDetailsPage extends StatelessWidget {
                     Text(
                       ' ${expensesVariationPercentage >= 0 ? '+' : ''}${expensesVariationPercentage.toStringAsFixed(1)}% (${expensesVariation >= 0 ? '+' : ''}${formatter.format(expensesVariation)})',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12 * fontScale,
                         fontWeight: FontWeight.w500,
                         color: expensesVariation <= 0
                             ? DefaultColors.green
@@ -458,8 +493,12 @@ class PortfolioDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFinalAverages(ThemeData theme, NumberFormat formatter,
-      List<Map<String, dynamic>> monthlyData) {
+  Widget _buildFinalAverages(
+    ThemeData theme,
+    NumberFormat formatter,
+    List<Map<String, dynamic>> monthlyData,
+    double fontScale,
+  ) {
     // Filtra meses com receita > 0
     final List<Map<String, dynamic>> monthsWithIncome =
         monthlyData.where((m) => (m['income'] as double) > 0).toList();
@@ -487,70 +526,75 @@ class PortfolioDetailsPage extends StatelessWidget {
     }
 
     return Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(top: 8.h, bottom: 8.h),
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Com base no seu histórico, aqui está uma previsão de receita e despesas (esses valores podem variar):',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
-                color: theme.primaryColor,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Com base no seu histórico, aqui está uma previsão de receita e despesas (esses valores podem variar):',
+            style: TextStyle(
+              fontSize: 12 * fontScale,
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Receita média estimada (últimos 3 meses):',
+                  style: TextStyle(
+                    fontSize: 12 * fontScale,
+                    color: DefaultColors.grey20,
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 8.h),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Receita média estimada (últimos 3 meses):',
-                    style:
-                        TextStyle(fontSize: 12.sp, color: DefaultColors.grey20),
-                  ),
+              const SizedBox(width: 8),
+              Text(
+                formatter.format(avgIncome),
+                style: TextStyle(
+                  fontSize: 12 * fontScale,
+                  fontWeight: FontWeight.w700,
+                  color: theme.primaryColor,
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  formatter.format(avgIncome),
+                textAlign: TextAlign.right,
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Despesas médias estimadas (últimos 3 meses):',
                   style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w700,
-                    color: theme.primaryColor,
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-              ],
-            ),
-            SizedBox(height: 6.h),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Despesas médias estimadas (últimos 3 meses):',
-                    style:
-                        TextStyle(fontSize: 12.sp, color: DefaultColors.grey20),
+                    fontSize: 12 * fontScale,
+                    color: DefaultColors.grey20,
                   ),
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  formatter.format(avgExpenses),
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w700,
-                    color: theme.primaryColor,
-                  ),
-                  textAlign: TextAlign.right,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                formatter.format(avgExpenses),
+                style: TextStyle(
+                  fontSize: 12 * fontScale,
+                  fontWeight: FontWeight.w700,
+                  color: theme.primaryColor,
                 ),
-              ],
-            ),
-          ],
-        ));
+                textAlign: TextAlign.right,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   List<Map<String, dynamic>> _getMonthlyData(TransactionController controller) {
@@ -695,14 +739,14 @@ class PortfolioDetailsPage extends StatelessWidget {
 }
 
 String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
-  final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+  final regex = RegExp(r'^Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)$');
   final match = regex.firstMatch(t.title);
   if (match == null) return t.title;
   final int current = int.tryParse(match.group(1) ?? '') ?? 0;
-  final String baseTitle = match.group(2) ?? '';
+  final String baseTitle = match.group(3) ?? '';
 
-  String _normPay(String? s) => (s ?? '').trim().toLowerCase();
-  double _parseVal(String v) {
+  String normPay(String? s) => (s ?? '').trim().toLowerCase();
+  double parseVal(String v) {
     return double.tryParse(v
             .replaceAll('R\$', '')
             .trim()
@@ -711,16 +755,16 @@ String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
         0.0;
   }
 
-  final String payNorm = _normPay(t.paymentType);
-  final double val = _parseVal(t.value);
+  final String payNorm = normPay(t.paymentType);
+  final double val = parseVal(t.value);
 
   final int total = all.where((x) {
     final m = regex.firstMatch(x.title);
     if (m == null) return false;
-    final String tBase = m.group(2) ?? '';
+    final String tBase = m.group(3) ?? '';
     if (tBase != baseTitle) return false;
-    if (_normPay(x.paymentType) != payNorm) return false;
-    final double xv = _parseVal(x.value);
+    if (normPay(x.paymentType) != payNorm) return false;
+    final double xv = parseVal(x.value);
     return (xv - val).abs() <= 0.01;
   }).length;
 

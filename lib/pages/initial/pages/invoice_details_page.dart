@@ -89,12 +89,20 @@ class InvoiceDetailsPage extends StatelessWidget {
 
     // Calcular dias até o fim do período
     final DateTime now = DateTime.now();
-    final int daysUntilEnd = periodEnd.difference(now).inDays;
-    final String daysText = daysUntilEnd > 0
-        ? '$daysUntilEnd ${daysUntilEnd == 1 ? 'dia' : 'dias'}'
-        : daysUntilEnd == 0
-            ? 'Hoje'
-            : 'Encerrado';
+    final DateTime today = DateTime(now.year, now.month, now.day);
+    final DateTime closingDay =
+        DateTime(periodEnd.year, periodEnd.month, periodEnd.day);
+    final int daysUntilEnd = closingDay.difference(today).inDays;
+    final String daysText;
+    if (daysUntilEnd > 1) {
+      daysText = '$daysUntilEnd dias';
+    } else if (daysUntilEnd == 1) {
+      daysText = '1 dia';
+    } else if (daysUntilEnd == 0) {
+      daysText = 'Hoje';
+    } else {
+      daysText = 'Encerrado';
+    }
 
     // Cor da barra de progresso baseada no uso
     Color progressColor;
@@ -161,7 +169,9 @@ class InvoiceDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Text(
-                          'Faltam $daysText',
+                          daysText == 'Encerrado'
+                              ? 'Encerrado'
+                              : 'Faltam $daysText',
                           style: TextStyle(
                             fontSize: 10.sp,
                             color: theme.primaryColor,
@@ -459,7 +469,7 @@ class InvoiceDetailsPage extends StatelessWidget {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
           ],

@@ -1,16 +1,12 @@
-// ignore_for_file: unused_element
-
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import 'package:organizamais/pages/graphics/graphics_page.dart';
 import 'package:organizamais/pages/initial/initial_page.dart';
 import 'package:organizamais/pages/monthy_analsis/monthy_analsis.dart';
-
 import 'package:organizamais/pages/resume/resume_page.dart';
 import 'package:organizamais/pages/transaction/transaction_page.dart';
 import 'package:organizamais/services/analytics_service.dart';
@@ -40,7 +36,6 @@ class _HomePageState extends State<HomePage>
   bool get wantKeepAlive => true;
 
   void _onItemTapped(int index) {
-    // Evitar rebuilds desnecessários
     if (_selectedIndex == index) return;
 
     if (index == 2) {
@@ -53,7 +48,6 @@ class _HomePageState extends State<HomePage>
         }
       });
     } else {
-      // Log screen view based on index
       switch (index) {
         case 0:
           _analyticsService.logScreenView('initial_page');
@@ -76,29 +70,39 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildNavItem(
-      int index, IconData icon, String label, ThemeData theme) {
+    BuildContext context,
+    int index,
+    IconData icon,
+    String label,
+    ThemeData theme,
+  ) {
     final isSelected = _selectedIndex == index;
+    final isTablet = MediaQuery.of(context).size.width >= 768;
+
     return RepaintBoundary(
       child: GestureDetector(
         onTap: () => _onItemTapped(index),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          padding: EdgeInsets.symmetric(
+            vertical: isTablet ? 10 : 8,
+            horizontal: isTablet ? 16 : 12,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
                 color: isSelected ? theme.primaryColor : DefaultColors.grey,
-                size: 24,
+                size: isTablet ? 28 : 24,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
                   color: isSelected ? theme.primaryColor : DefaultColors.grey,
-                  fontSize: 10,
+                  fontSize: isTablet ? 12.sp : 10.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
@@ -109,30 +113,142 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildOptionButton(
-      String text, Color color, IconData icon, VoidCallback onTap) {
+  Widget _buildCentralActionButton(double size, bool isTablet) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => _onItemTapped(2),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        width: size,
+        height: size,
         decoration: BoxDecoration(
-          border: Border.all(color: color, width: 2),
-          borderRadius: BorderRadius.circular(30),
+          color: DefaultColors.green,
+          borderRadius: BorderRadius.circular(size / 2),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              text,
-              style: TextStyle(
-                color: color,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
+        child: Icon(
+          Iconsax.add,
+          color: DefaultColors.white,
+          size: isTablet ? 24.sp : 22.sp,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBarMobile(
+      BuildContext context, ThemeData theme) {
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
             ),
-            SizedBox(width: 10.w),
-            Icon(icon, color: color),
           ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          context, 0, IconsaxBold.home, "Inicio", theme),
+                      _buildNavItem(
+                          context, 1, IconsaxBold.graph, "Graficos", theme),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w),
+                  child: _buildCentralActionButton(44.w, false),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          context,
+                          3,
+                          IconsaxBold.arrow_swap_horizontal,
+                          "Transações",
+                          theme),
+                      _buildNavItem(
+                          context, 4, IconsaxBold.status_up, "Analise", theme),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBarTablet(
+      BuildContext context, ThemeData theme) {
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          border:
+              const Border(top: BorderSide(color: Colors.black12, width: 1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 32.w,
+              vertical: 12.h,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          context, 0, IconsaxBold.home, "Início", theme),
+                      _buildNavItem(
+                          context, 1, IconsaxBold.graph, "Gráficos", theme),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  flex: 0,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: _buildCentralActionButton(48.w, true),
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          context,
+                          3,
+                          IconsaxBold.arrow_swap_horizontal,
+                          "Transações",
+                          theme),
+                      _buildNavItem(
+                          context, 4, IconsaxBold.status_up, "Análise", theme),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -142,53 +258,16 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     super.build(context);
     final theme = Theme.of(context);
+    final isTablet = MediaQuery.of(context).size.width >= 768;
 
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,
       ),
-      bottomNavigationBar: RepaintBoundary(
-        child: Container(
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(0, IconsaxBold.home, "Inicio", theme),
-                  _buildNavItem(1, IconsaxBold.graph, "Graficos", theme),
-                  const SizedBox(width: 40), // Espaço para o FAB
-                  _buildNavItem(3, IconsaxBold.arrow_swap_horizontal,
-                      "Transações", theme),
-                  _buildNavItem(4, IconsaxBold.status_up, "Analise", theme),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: DefaultColors.green,
-        onPressed: () {
-          _onItemTapped(2);
-        },
-        child: const Icon(
-          Iconsax.add,
-          color: DefaultColors.white,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: isTablet
+          ? _buildBottomNavigationBarTablet(context, theme)
+          : _buildBottomNavigationBarMobile(context, theme),
     );
   }
 }

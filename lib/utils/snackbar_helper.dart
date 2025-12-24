@@ -142,4 +142,15 @@ class SnackbarHelper {
       colorText: Colors.white,
     );
   }
+
+  /// Safely closes all active snackbars
+  static void closeAllSnackbars() {
+    try {
+      if (Get.isSnackbarOpen) {
+        Get.closeAllSnackbars();
+      }
+    } catch (e) {
+      debugPrint('Error closing snackbars: $e');
+    }
+  }
 }

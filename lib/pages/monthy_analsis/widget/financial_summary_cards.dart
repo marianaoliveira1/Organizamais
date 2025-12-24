@@ -38,8 +38,9 @@ class FinancialSummaryCards extends StatelessWidget {
     return controller.transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        if (t.type != TransactionType.receita || date.year != year)
+        if (t.type != TransactionType.receita || date.year != year) {
           return false;
+        }
 
         // Se o ano selecionado for o ano atual, filtrar apenas até hoje
         if (year == currentYear) {
@@ -63,8 +64,9 @@ class FinancialSummaryCards extends StatelessWidget {
     return controller.transaction.where((t) {
       if (t.paymentDay != null) {
         final date = DateTime.parse(t.paymentDay!);
-        if (t.type != TransactionType.despesa || date.year != year)
+        if (t.type != TransactionType.despesa || date.year != year) {
           return false;
+        }
 
         // Se o ano selecionado for o ano atual, filtrar apenas até hoje
         if (year == currentYear) {

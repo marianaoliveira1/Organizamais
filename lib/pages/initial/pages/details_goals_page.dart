@@ -80,47 +80,103 @@ class GoalDetailsPage extends StatelessWidget {
                 builder: (ctx) {
                   return AlertDialog(
                     backgroundColor: theme.cardColor,
-                    title: Text(
-                      'Confirmar exclusão',
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.r),
+                      side: BorderSide(
+                          color: theme.primaryColor.withOpacity(0.06)),
+                    ),
+                    insetPadding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                    titlePadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 8.h),
+                    contentPadding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 8.h),
+                    actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+                    title: Row(
+                      children: [
+                        Container(
+                          width: 40.r,
+                          height: 40.r,
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.delete_forever_outlined,
+                            color: Colors.red,
+                            size: 22.sp,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            'Excluir meta',
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     content: Text(
                       'Tem certeza que deseja deletar esta meta?',
                       style: TextStyle(
-                        color: theme.primaryColor,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
+                        color: DefaultColors.grey20,
+                        fontSize: 13.sp,
+                        height: 1.3,
                       ),
                     ),
                     actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(false),
-                        child: Text(
-                          'Cancelar',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: theme.primaryColor.withOpacity(0.25),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.r),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12.h, horizontal: 8.w),
+                              ),
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                  color: theme.primaryColor,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(true),
-                        style:
-                            TextButton.styleFrom(foregroundColor: Colors.red),
-                        child: Text(
-                          'Deletar',
-                          style: TextStyle(
-                            color: DefaultColors.darkGrey,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.r),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12.h, horizontal: 8.w),
+                                elevation: 0,
+                              ),
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(
+                                'Excluir',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        ],
+                      )
                     ],
                   );
                 },
@@ -843,9 +899,9 @@ class GoalDetailsPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext sheetContext) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter modalSetState) {
+          builder: (BuildContext modalContext, StateSetter modalSetState) {
             // Function to validate form
             void validateForm() {
               modalSetState(() {
@@ -858,7 +914,7 @@ class GoalDetailsPage extends StatelessWidget {
                 left: 16.w,
                 right: 16.w,
                 top: 16.h,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16.h,
+                bottom: MediaQuery.of(modalContext).viewInsets.bottom + 16.h,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -923,7 +979,7 @@ class GoalDetailsPage extends StatelessWidget {
                     trailing: Icon(Icons.calendar_today),
                     onTap: () async {
                       final DateTime? picked = await showDatePicker(
-                        context: context,
+                        context: modalContext,
                         initialDate: selectedDate,
                         firstDate: DateTime(2000),
                         lastDate: DateTime(2101),
@@ -972,7 +1028,9 @@ class GoalDetailsPage extends StatelessWidget {
                                 }
                               } catch (_) {}
                               goalNotifierParam.value = updatedGoal;
-                              Navigator.pop(context);
+                              if (modalContext.mounted) {
+                                Navigator.pop(modalContext);
+                              }
                             }
                           : null, // Disable button when not valid
                       child: Text(
@@ -1011,9 +1069,9 @@ class GoalDetailsPage extends StatelessWidget {
           top: Radius.circular(20.r),
         ),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext sheetContext) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter modalSetState) {
+          builder: (BuildContext modalContext, StateSetter modalSetState) {
             // Function to validate form
             void validateForm() {
               modalSetState(() {
@@ -1027,7 +1085,7 @@ class GoalDetailsPage extends StatelessWidget {
                 left: 16.w,
                 right: 16.w,
                 top: 16.h,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16.h,
+                bottom: MediaQuery.of(modalContext).viewInsets.bottom + 16.h,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1089,7 +1147,7 @@ class GoalDetailsPage extends StatelessWidget {
                     trailing: Icon(Icons.calendar_today),
                     onTap: () async {
                       final DateTime? picked = await showDatePicker(
-                        context: context,
+                        context: modalContext,
                         initialDate: selectedDate,
                         firstDate: DateTime(2000),
                         lastDate: DateTime(2101),
@@ -1138,7 +1196,9 @@ class GoalDetailsPage extends StatelessWidget {
                                 }
                               } catch (_) {}
                               goalNotifierParam.value = updatedGoal;
-                              Navigator.pop(context);
+                              if (modalContext.mounted) {
+                                Navigator.pop(modalContext);
+                              }
                             }
                           : null, // Disable button when not valid
                       child: Text(

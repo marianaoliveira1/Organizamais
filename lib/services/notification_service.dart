@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -17,23 +18,43 @@ class NotificationService {
   Future<void> init() async {
     if (_initialized) return;
 
-    const AndroidInitializationSettings androidInit =
-        AndroidInitializationSettings('@drawable/ic_notification');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidInit);
-    await _plugin.initialize(initSettings);
-
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
-    await android?.requestNotificationsPermission();
-
     try {
+      // Usa o nome definido no flutter_launcher_icons (launcher_icon) em vez do padrão (ic_launcher)
+      const AndroidInitializationSettings androidInit =
+          AndroidInitializationSettings('@mipmap/launcher_icon');
+
+      const DarwinInitializationSettings darwinInit =
+          DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
+
+      const InitializationSettings initSettings = InitializationSettings(
+        android: androidInit,
+        iOS: darwinInit,
+        macOS: darwinInit,
+      );
+      await _plugin.initialize(initSettings);
+
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        await android.requestNotificationsPermission();
+        await android.requestExactAlarmsPermission();
+      }
+
       tz.initializeTimeZones();
       // Access local to ensure initialization
       if (kDebugMode) debugPrint('Timezone: ${tz.local.name}');
-    } catch (_) {
-      tz.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation('America/Sao_Paulo'));
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+            '[NotificationService] Failed to initialize notifications: $e');
+      }
+      // Silenciosamente falha para não travar o app
+      _initialized = false;
+      return;
     }
 
     _initialized = true;
@@ -47,7 +68,48 @@ class NotificationService {
         priority: Priority.high,
       );
 
+  DarwinNotificationDetails _darwinDetails() => const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
   int _idFor(String accountId) => accountId.hashCode & 0x7fffffff;
+
+  Future<void> _scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime trigger,
+    required AndroidScheduleMode mode,
+  }) {
+    return _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      trigger,
+      NotificationDetails(
+        android: _channel(),
+        iOS: _darwinDetails(),
+        macOS: _darwinDetails(),
+      ),
+      androidScheduleMode: mode,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+    );
+  }
+
+  bool _isExactAlarmPermissionIssue(PlatformException error) {
+    final String raw = '${error.code} ${error.message}'.toLowerCase();
+    return raw.contains('schedule_exact_alarm') ||
+        raw.contains('use_exact_alarm') ||
+        raw.contains('exact alarm permission') ||
+        raw.contains('exact alarms are not permitted') ||
+        raw.contains('exact alarms') ||
+        raw.contains('alarmmanager') ||
+        raw.contains('targetsdkversion');
+  }
 
   Future<void> scheduleDueDay(FixedAccountModel account) async {
     await init();
@@ -64,17 +126,41 @@ class NotificationService {
     await _plugin.cancel(id);
 
     final tz.TZDateTime firstTrigger = _nextAt12(day);
-    await _plugin.zonedSchedule(
-      id,
-      '🔔 Alerta',
-      'Hoje a conta fixa "${account.title}" vence hoje! 📅',
-      firstTrigger,
-      NotificationDetails(android: _channel()),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
-    );
+    try {
+      await _scheduleNotification(
+        id: id,
+        title: '🔔 Alerta',
+        body: 'Hoje a conta fixa "${account.title}" vence hoje! 📅',
+        trigger: firstTrigger,
+        mode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } on PlatformException catch (e) {
+      if (_isExactAlarmPermissionIssue(e)) {
+        if (kDebugMode) {
+          debugPrint(
+            '[NotificationService] Exact alarm permission missing. Falling back to inexact schedule: $e',
+          );
+        }
+        await _scheduleNotification(
+          id: id,
+          title: '🔔 Alerta',
+          body: 'Hoje a conta fixa "${account.title}" vence hoje! 📅',
+          trigger: firstTrigger,
+          mode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      } else {
+        if (kDebugMode) {
+          debugPrint(
+              '[NotificationService] Failed to schedule notification: $e');
+        }
+      }
+    } catch (e, s) {
+      if (kDebugMode) {
+        debugPrint(
+            '[NotificationService] Unexpected error scheduling notification: $e');
+        debugPrint('$s');
+      }
+    }
   }
 
   Future<void> cancelFor(String accountId) async {
@@ -86,9 +172,18 @@ class NotificationService {
     await init();
     for (final a in accounts) {
       if (a.id == null) continue;
-      await _plugin.cancel(_idFor(a.id!));
-      if (a.deactivatedAt == null) {
-        await scheduleDueDay(a);
+      try {
+        await _plugin.cancel(_idFor(a.id!));
+        if (a.deactivatedAt == null) {
+          await scheduleDueDay(a);
+        }
+      } catch (e, s) {
+        if (kDebugMode) {
+          debugPrint(
+            '[NotificationService] Unable to reschedule account ${a.id}: $e',
+          );
+          debugPrint('$s');
+        }
       }
     }
   }

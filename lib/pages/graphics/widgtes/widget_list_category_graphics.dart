@@ -58,6 +58,11 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         var categoryColor = item['color'] as Color;
         var categoryIcon =
             item['icon'] as String?; // Obtém o ícone da categoria
+        final bool isTablet = MediaQuery.of(context).size.width >= 600;
+        final double iconContainerSize =
+            (isTablet ? 28.0 : 38.0).w; // menor em tablets
+        final double iconInnerSize = (isTablet ? 20.0 : 26.0).w;
+        final double iconBorderRadius = (isTablet ? 6.0 : 8.0).r;
 
         return Column(
           children: [
@@ -82,17 +87,17 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                   child: Row(
                     children: [
                       Container(
-                        width: 38.w,
-                        height: 38.h,
+                        width: iconContainerSize,
+                        height: iconContainerSize,
                         decoration: BoxDecoration(
                           color: categoryColor,
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(iconBorderRadius),
                         ),
                         child: Center(
                           child: Image.asset(
                             categoryIcon ?? 'assets/icons/category.png',
-                            width: 24.w,
-                            height: 24.h,
+                            width: iconInnerSize,
+                            height: iconInnerSize,
                           ),
                         ),
                       ),
@@ -120,6 +125,38 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                 ),
                                 SizedBox(width: 8.w),
                                 Builder(builder: (context) {
+                                  List<TextSpan> buildCurrencySpans(
+                                      double amount,
+                                      Color color,
+                                      FontWeight weight) {
+                                    final String valueOnly = currencyFormatter
+                                        .format(amount)
+                                        .replaceAll('R\$', '')
+                                        .trim();
+                                    final double valueFontSize =
+                                        isTablet ? 8.sp : 14.sp;
+                                    final double symbolFontSize =
+                                        isTablet ? 8.sp : 14.sp;
+                                    return [
+                                      TextSpan(
+                                        text: 'R\$ ',
+                                        style: TextStyle(
+                                          fontSize: symbolFontSize,
+                                          fontWeight: weight,
+                                          color: color,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: valueOnly,
+                                        style: TextStyle(
+                                          fontSize: valueFontSize,
+                                          fontWeight: weight,
+                                          color: color,
+                                        ),
+                                      ),
+                                    ];
+                                  }
+
                                   final bool hasBudget =
                                       budgets.containsKey(categoryId);
                                   final double? budget = budgets[categoryId];
@@ -127,43 +164,36 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                     return RichText(
                                       text: TextSpan(
                                         children: [
-                                          TextSpan(
-                                            text:
-                                                currencyFormatter.format(valor),
-                                            style: TextStyle(
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.w700,
-                                              color: theme.primaryColor,
-                                            ),
+                                          ...buildCurrencySpans(
+                                            valor,
+                                            theme.primaryColor,
+                                            FontWeight.w700,
                                           ),
                                           TextSpan(
                                             text: ' de ',
                                             style: TextStyle(
-                                              fontSize: 12.sp,
+                                              fontSize: isTablet ? 8.sp : 12.sp,
                                               color: DefaultColors.grey,
                                             ),
                                           ),
-                                          TextSpan(
-                                            text: currencyFormatter
-                                                .format(budget),
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: DefaultColors.grey,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                          ...buildCurrencySpans(
+                                            budget,
+                                            DefaultColors.grey,
+                                            FontWeight.w500,
                                           ),
                                         ],
                                       ),
                                     );
                                   }
-                                  return Text(
-                                    currencyFormatter.format(valor),
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: theme.primaryColor,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  return RichText(
                                     textAlign: TextAlign.end,
+                                    text: TextSpan(
+                                      children: buildCurrencySpans(
+                                        valor,
+                                        theme.primaryColor,
+                                        FontWeight.w600,
+                                      ),
+                                    ),
                                   );
                                 }),
                               ],
@@ -213,7 +243,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                       Text(
                                         '${pctExpenses.toStringAsFixed(0)}% das despesas',
                                         style: TextStyle(
-                                          fontSize: 11.sp,
+                                          fontSize: 12.sp,
                                           color: DefaultColors.grey,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -331,7 +361,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                   Text(
                                     cmpText,
                                     style: TextStyle(
-                                      fontSize: 11.sp,
+                                      fontSize: 12.sp,
                                       color: cmpColor,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -533,41 +563,59 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                       SizedBox(
                         height: 16.h,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Transações (${categoryTransactions.length})',
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: DefaultColors.grey,
-                                fontWeight: FontWeight.w700,
-                              )),
-                          SizedBox(width: 12.w),
-                          GestureDetector(
-                            onTap: () async {
-                              Get.to(() => TwoMonthsComparisonPage(
-                                    categoryId: categoryId,
-                                    title: (item['name'] as String? ?? ''),
-                                    iconPath: item['icon'] as String?,
-                                    selectedMonthName: monthName,
-                                  ));
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 6.h),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: theme.primaryColor),
-                                borderRadius: BorderRadius.circular(16.r),
-                              ),
-                              child: Text(
-                                'Ver mês atual e anterior',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Transações (${categoryTransactions.length})',
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
+                              SizedBox(width: 8.w),
+                              Flexible(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        Get.to(() => TwoMonthsComparisonPage(
+                                              categoryId: categoryId,
+                                              title: (item['name'] as String? ??
+                                                  ''),
+                                              iconPath: item['icon'] as String?,
+                                              selectedMonthName: monthName,
+                                            ));
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 6.h),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: theme.primaryColor),
+                                          borderRadius:
+                                              BorderRadius.circular(16.r),
+                                        ),
+                                        child: Text(
+                                          'Ver mês atual e anterior',
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                       ListView.separated(
                         shrinkWrap: true,
@@ -607,16 +655,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width: 120.w,
-                                        child: Text(
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
                                           _withInstallmentLabel(
                                               transaction,
                                               Get.find<TransactionController>()
@@ -629,36 +675,36 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      Text(
-                                        formattedDate,
-                                        style: TextStyle(
-                                          fontSize: 10.sp,
-                                          color: DefaultColors.grey,
+                                        SizedBox(height: 2.h),
+                                        Text(
+                                          formattedDate,
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                            color: DefaultColors.grey,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        currencyFormatter
-                                            .format(transactionValue),
-                                        style: TextStyle(
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: theme.primaryColor,
-                                          letterSpacing: -0.5,
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          currencyFormatter
+                                              .format(transactionValue),
+                                          style: TextStyle(
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: theme.primaryColor,
+                                            letterSpacing: -0.5,
+                                          ),
+                                          textAlign: TextAlign.end,
                                         ),
-                                        textAlign: TextAlign.end,
-                                      ),
-                                      SizedBox(
-                                        width: 120.w,
-                                        child: Text(
+                                        SizedBox(height: 4.h),
+                                        Text(
                                           transaction.paymentType ?? 'N/A',
                                           style: TextStyle(
                                             fontSize: 10.sp,
@@ -669,9 +715,9 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.end,
                                         ),
-                                      ),
-                                    ],
-                                  )
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -761,14 +807,14 @@ class WidgetListCategoryGraphics extends StatelessWidget {
   }
 
   String _withInstallmentLabel(TransactionModel t, List<TransactionModel> all) {
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+    final regex = RegExp(r'^Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)$');
     final match = regex.firstMatch(t.title);
     if (match == null) return t.title;
     final int current = int.tryParse(match.group(1) ?? '') ?? 0;
-    final String baseTitle = match.group(2) ?? '';
+    final String baseTitle = match.group(3) ?? '';
 
-    String _normPay(String? s) => (s ?? '').trim().toLowerCase();
-    double _parseVal(String v) {
+    String normPay(String? s) => (s ?? '').trim().toLowerCase();
+    double parseVal(String v) {
       return double.tryParse(v
               .replaceAll('R\$', '')
               .trim()
@@ -777,16 +823,16 @@ class WidgetListCategoryGraphics extends StatelessWidget {
           0.0;
     }
 
-    final String payNorm = _normPay(t.paymentType);
-    final double val = _parseVal(t.value);
+    final String payNorm = normPay(t.paymentType);
+    final double val = parseVal(t.value);
 
     final int total = all.where((x) {
       final m = regex.firstMatch(x.title);
       if (m == null) return false;
-      final String tBase = m.group(2) ?? '';
+      final String tBase = m.group(3) ?? '';
       if (tBase != baseTitle) return false;
-      if (_normPay(x.paymentType) != payNorm) return false;
-      final double xv = _parseVal(x.value);
+      if (normPay(x.paymentType) != payNorm) return false;
+      final double xv = parseVal(x.value);
       return (xv - val).abs() <= 0.01;
     }).length;
 
@@ -1089,10 +1135,10 @@ class WidgetListCategoryGraphics extends StatelessWidget {
         ? 'Esta é uma categoria nova, então ainda não temos dados para comparar com o mês anterior.'
         : (isNeutral
             ? 'Sem mudanças: seus valores ficaram iguais, com 0% de variação em relação ao mês passado. '
-                'No mesmo dia do mês anterior (${sameDayText}), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.'
+                'No mesmo dia do mês anterior ($sameDayText), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.'
             : 'Seus gastos ${increased ? 'aumentaram' : 'diminuíram'} ${pctDisp.abs().toStringAsFixed(1)}%. '
                 'Isso representa ${increased ? 'R\$ ${_formatCurrency(diffAbs)} a mais' : 'R\$ ${_formatCurrency(diffAbs)} a menos'}. '
-                'No mesmo dia do mês anterior (${sameDayText}), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.');
+                'No mesmo dia do mês anterior ($sameDayText), o valor era R\$ ${_formatCurrency(previousValue)} e agora está em R\$ ${_formatCurrency(currentValue)}.');
 
     return Container(
       decoration: BoxDecoration(
@@ -1136,16 +1182,25 @@ class WidgetListCategoryGraphics extends StatelessWidget {
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(16.r)),
                   ),
-                  builder: (ctx) {
+                  builder: (BuildContext modalContext) {
                     bool isLoading = false;
                     return StatefulBuilder(
-                      builder: (ctx, setState) {
+                      builder:
+                          (BuildContext context, StateSetter modalSetState) {
                         Future<void> handleWatch() async {
                           if (isLoading) return;
-                          setState(() => isLoading = true);
+
+                          if (context.mounted) {
+                            modalSetState(() => isLoading = true);
+                          }
+
                           await AdsInterstitial.show();
-                          setState(() => isLoading = false);
-                          Navigator.of(ctx).pop();
+
+                          if (!context.mounted) return;
+
+                          modalSetState(() => isLoading = false);
+
+                          Navigator.of(context).pop();
                           Get.to(() => AnaliseMensalParcialWidget(
                                 categoryId: categoryId,
                                 categoryName: (categoryName ?? ''),
@@ -1157,7 +1212,7 @@ class WidgetListCategoryGraphics extends StatelessWidget {
 
                         return Container(
                           padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w,
-                              24.h + MediaQuery.of(ctx).viewInsets.bottom),
+                              24.h + MediaQuery.of(context).viewInsets.bottom),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1402,11 +1457,12 @@ class _BenefitItem extends StatelessWidget {
 }
 
 class _CategoryMonthComparePage extends StatelessWidget {
-  const _CategoryMonthComparePage(
-      {required this.categoryId,
-      required this.categoryName,
-      this.categoryColor,
-      this.selectedMonthName});
+  const _CategoryMonthComparePage({
+    required this.categoryId,
+    required this.categoryName,
+    this.categoryColor,
+    this.selectedMonthName,
+  });
 
   final int categoryId;
   final String categoryName;
@@ -1730,12 +1786,13 @@ class _SameDayComparePage extends StatelessWidget {
   final String? categoryName;
   final String? categoryIcon;
   final Color? categoryColor;
-  const _SameDayComparePage(
-      {required this.categoryId,
-      required this.monthName,
-      this.categoryName,
-      this.categoryIcon,
-      this.categoryColor});
+  const _SameDayComparePage({
+    required this.categoryId,
+    required this.monthName,
+    this.categoryName,
+    this.categoryIcon,
+    this.categoryColor,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,3 @@
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -175,6 +174,11 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
         NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
     final theme = Theme.of(context);
+    final media = MediaQuery.of(context);
+    final bool isTablet = media.size.width >= 600;
+    final double textScale = isTablet
+        ? media.textScaleFactor
+        : media.textScaleFactor.clamp(0.9, 1.0);
 
     final TransactionController controller = Get.find<TransactionController>();
 
@@ -206,389 +210,408 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
     final List<Map<String, dynamic>> analysis =
         _generateMonthlyAnalysis(monthlyData);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          paymentType,
-          style: TextStyle(fontSize: 18.sp),
-        ),
+    return MediaQuery(
+      data: media.copyWith(textScaler: TextScaler.linear(textScale)),
+      child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-      ),
-      body: Column(
-        children: [
-          AdsBanner(),
-          SizedBox(height: 5.h),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Summary
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Resumo Anual',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: DefaultColors.grey20,
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            Container(
-                              width: 16.w,
-                              height: 16.h,
-                              decoration: BoxDecoration(
-                                color: paymentColor,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: Text(
-                                paymentType,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.primaryColor,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Text(
-                              currencyFormatter.format(totalValue),
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: theme.primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          'Representa ${percentual.toStringAsFixed(1)}% do total anual',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: DefaultColors.grey,
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        // progress percent bar instead of donut
-                        _buildPercentBar(percentual, paymentColor, theme),
-                        SizedBox(height: 12.h),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  AdsBanner(),
-                  SizedBox(height: 24.h),
-                  // Monthly summary stats (Avg / Min / Max)
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: _buildMonthlyStats(
-                        transactions, theme, currencyFormatter),
-                  ),
-                  SizedBox(height: 24.h),
-                  AdsBanner(),
-                  SizedBox(height: 24.h),
-                  // Monthly chart
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Evolução Mensal ($currentYear)',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: DefaultColors.grey20,
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                        // Progress bar: this payment type over the year
-
-                        SizedBox(height: 16.h),
-                        SizedBox(
-                          height: 220.h,
-                          child: BarChart(
-                            BarChartData(
-                              alignment: BarChartAlignment.center,
-                              maxY: _getOptimalMaxY(monthlyData),
-                              barTouchData: BarTouchData(
-                                enabled: true,
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipColor: (group) =>
-                                      Colors.blueGrey.withOpacity(0.8),
-                                  tooltipRoundedRadius: 8,
-                                  getTooltipItem:
-                                      (group, groupIndex, rod, rodIndex) {
-                                    final month =
-                                        _getMonthName(group.x.toInt());
-                                    final value = rod.toY;
-                                    return BarTooltipItem(
-                                      '$month\n${_formatCurrency(value)}',
-                                      TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.sp,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              titlesData: FlTitlesData(
-                                show: true,
-                                rightTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false),
-                                ),
-                                topTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) {
-                                      return Transform.rotate(
-                                        angle: -0.5,
-                                        child: SizedBox(
-                                          width: 24.w * 3,
-                                          child: Text(
-                                            _getMonthAbbr(value.toInt()),
-                                            style: TextStyle(
-                                              color: DefaultColors.grey,
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    reservedSize: 45,
-                                  ),
-                                ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 45.w,
-                                    interval: _getOptimalInterval(
-                                        _getMaxValue(monthlyData)),
-                                    getTitlesWidget: (value, meta) {
-                                      if (value < 0) {
-                                        return const SizedBox.shrink();
-                                      }
-                                      return Text(
-                                        _formatCurrencyShort(value),
-                                        style: TextStyle(
-                                          color: DefaultColors.grey,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 8.sp,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              borderData: FlBorderData(show: false),
-                              barGroups:
-                                  _createBarGroups(monthlyData, barWidth: 14.w),
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: false,
-                                horizontalInterval: _getOptimalInterval(
-                                    _getMaxValue(monthlyData)),
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: DefaultColors.grey.withOpacity(0.2),
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  AdsBanner(),
-
-                  if (analysis.isNotEmpty) ...[
-                    SizedBox(height: 24.h),
+        appBar: AppBar(
+          title: Text(
+            paymentType,
+            style: TextStyle(
+              fontSize: isTablet ? 18.sp : 16.sp,
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor,
+            ),
+          ),
+          backgroundColor: theme.scaffoldBackgroundColor,
+        ),
+        body: Column(
+          children: [
+            AdsBanner(),
+            SizedBox(height: 8.h),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Summary
                     Container(
-                      padding: EdgeInsets.all(16.w),
+                      padding: EdgeInsets.all(14.w),
                       decoration: BoxDecoration(
                         color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(14.r),
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.05)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Análise Mensal',
+                            'Resumo Anual',
                             style: TextStyle(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              color: DefaultColors.grey20,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Row(
+                            children: [
+                              Container(
+                                width: 16.w,
+                                height: 16.h,
+                                decoration: BoxDecoration(
+                                  color: paymentColor,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Text(
+                                  paymentType,
+                                  style: TextStyle(
+                                    fontSize: isTablet ? 15.sp : 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.primaryColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Text(
+                                currencyFormatter.format(totalValue),
+                                style: TextStyle(
+                                  fontSize: isTablet ? 15.sp : 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            'Representa ${percentual.toStringAsFixed(1)}% do total anual',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: DefaultColors.grey,
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          // progress percent bar instead of donut
+                          _buildPercentBar(percentual, paymentColor, theme),
+                          SizedBox(height: 12.h),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    AdsBanner(),
+                    SizedBox(height: 20.h),
+                    // Monthly summary stats (Avg / Min / Max)
+                    Container(
+                      padding: EdgeInsets.all(14.w),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(14.r),
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.05)),
+                      ),
+                      child: _buildMonthlyStats(
+                          transactions, theme, currencyFormatter),
+                    ),
+                    SizedBox(height: 20.h),
+                    AdsBanner(),
+                    SizedBox(height: 20.h),
+                    // Monthly chart
+                    Container(
+                      padding: EdgeInsets.all(14.w),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(14.r),
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.05)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Evolução Mensal ($currentYear)',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
                               color: DefaultColors.grey20,
                             ),
                           ),
                           SizedBox(height: 16.h),
-                          ...analysis
-                              .map((item) => _buildAnalysisItem(item, theme)),
-                        ],
-                      ),
-                    ),
-                  ],
-                  SizedBox(height: 24.h),
-
-                  AdsBanner(),
-                  SizedBox(height: 20.h),
-
-                  // Transactions list
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Transações - $paymentType',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: DefaultColors.grey20,
-                          ),
-                        ),
-                        if (transactions.isEmpty)
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 40.h),
-                              child: Text(
-                                'Nenhuma transação encontrada',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: DefaultColors.grey,
+                          SizedBox(
+                            height: 220.h,
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.center,
+                                maxY: _getOptimalMaxY(monthlyData),
+                                barTouchData: BarTouchData(
+                                  enabled: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    getTooltipColor: (group) =>
+                                        Colors.blueGrey.withOpacity(0.8),
+                                    tooltipRoundedRadius: 8,
+                                    getTooltipItem:
+                                        (group, groupIndex, rod, rodIndex) {
+                                      final month =
+                                          _getMonthName(group.x.toInt());
+                                      final value = rod.toY;
+                                      return BarTooltipItem(
+                                        '$month\n${_formatCurrency(value)}',
+                                        TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12.sp,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, meta) {
+                                        return Transform.rotate(
+                                          angle: -0.5,
+                                          child: SizedBox(
+                                            width: 24.w * 3,
+                                            child: Text(
+                                              _getMonthAbbr(value.toInt()),
+                                              style: TextStyle(
+                                                color: DefaultColors.grey,
+                                                fontSize: 10.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      reservedSize: 45,
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 45.w,
+                                      interval: _getOptimalInterval(
+                                          _getMaxValue(monthlyData)),
+                                      getTitlesWidget: (value, meta) {
+                                        if (value < 0) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return Text(
+                                          _formatCurrencyShort(value),
+                                          style: TextStyle(
+                                            color: DefaultColors.grey,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 8.sp,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                barGroups: _createBarGroups(monthlyData,
+                                    barWidth: 14.w),
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawVerticalLine: false,
+                                  horizontalInterval: _getOptimalInterval(
+                                      _getMaxValue(monthlyData)),
+                                  getDrawingHorizontalLine: (value) {
+                                    return FlLine(
+                                      color:
+                                          DefaultColors.grey.withOpacity(0.2),
+                                      strokeWidth: 1,
+                                    );
+                                  },
                                 ),
                               ),
                             ),
                           ),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: transactions.length,
-                          separatorBuilder: (context, index) => Divider(
-                            color: DefaultColors.grey20.withOpacity(.5),
-                            height: 1,
-                          ),
-                          itemBuilder: (context, index) {
-                            final t = transactions[index];
-                            final double value = double.parse(
-                              t.value.replaceAll('.', '').replaceAll(',', '.'),
-                            );
-                            final String formattedDate = t.paymentDay != null
-                                ? dateFormatter
-                                    .format(DateTime.parse(t.paymentDay!))
-                                : 'Data não informada';
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    AdsBanner(),
 
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 12.h),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 150.w,
-                                        child: Text(
-                                          t.title,
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Get.theme.primaryColor,
-                                          ),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Text(
-                                        currencyFormatter.format(value),
-                                        style: TextStyle(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Get.theme.primaryColor,
-                                        ),
-                                      ),
-                                    ],
+                    if (analysis.isNotEmpty) ...[
+                      SizedBox(height: 20.h),
+                      Container(
+                        padding: EdgeInsets.all(14.w),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(14.r),
+                          border: Border.all(
+                              color: theme.primaryColor.withOpacity(.05)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Análise Mensal',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: DefaultColors.grey20,
+                              ),
+                            ),
+                            SizedBox(height: 16.h),
+                            ...analysis
+                                .map((item) => _buildAnalysisItem(item, theme)),
+                          ],
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: 20.h),
+
+                    AdsBanner(),
+                    SizedBox(height: 20.h),
+
+                    // Transactions list
+                    Container(
+                      padding: EdgeInsets.all(14.w),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(14.r),
+                        border: Border.all(
+                            color: theme.primaryColor.withOpacity(.05)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Transações - $paymentType',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: DefaultColors.grey20,
+                            ),
+                          ),
+                          if (transactions.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 32.h),
+                                child: Text(
+                                  'Nenhuma transação encontrada',
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: DefaultColors.grey,
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        formattedDate,
-                                        style: TextStyle(
-                                          fontSize: 11.sp,
-                                          color: DefaultColors.grey20,
+                                ),
+                              ),
+                            ),
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: transactions.length,
+                            separatorBuilder: (context, index) => Divider(
+                              color: DefaultColors.grey20.withOpacity(.5),
+                              height: 1,
+                            ),
+                            itemBuilder: (context, index) {
+                              final t = transactions[index];
+                              final double value = double.parse(
+                                t.value
+                                    .replaceAll('.', '')
+                                    .replaceAll(',', '.'),
+                              );
+                              final String formattedDate = t.paymentDay != null
+                                  ? dateFormatter
+                                      .format(DateTime.parse(t.paymentDay!))
+                                  : 'Data não informada';
+
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.h),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: 160.w,
+                                          child: Text(
+                                            t.title,
+                                            style: TextStyle(
+                                              fontSize:
+                                                  isTablet ? 13.sp : 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.primaryColor,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: 110.w,
-                                        child: Text(
-                                          t.paymentType ?? 'N/A',
+                                        Text(
+                                          currencyFormatter.format(value),
+                                          style: TextStyle(
+                                            fontSize: isTablet ? 13.sp : 12.sp,
+                                            fontWeight: FontWeight.w700,
+                                            color: theme.primaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          formattedDate,
                                           style: TextStyle(
                                             fontSize: 11.sp,
                                             color: DefaultColors.grey20,
                                           ),
-                                          textAlign: TextAlign.end,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                                        SizedBox(
+                                          width: 120.w,
+                                          child: Text(
+                                            t.paymentType ?? 'N/A',
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              color: DefaultColors.grey20,
+                                            ),
+                                            textAlign: TextAlign.end,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  SizedBox(height: 24.h),
-                  AdsBanner(),
-                ],
+                    SizedBox(height: 20.h),
+                    AdsBanner(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -857,71 +880,6 @@ class PaymentTypeAnalysisPage extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DonutPercent extends StatelessWidget {
-  final double percent; // 0..100
-  final Color color;
-
-  const _DonutPercent({
-    required this.percent,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final double clamped = percent.clamp(0, 100);
-
-    final double size = 60.w;
-    final double outerRadius = (size / 2).w;
-    // centerRadius não é mais usado com Syncfusion Pie
-
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SfCircularChart(
-            margin: EdgeInsets.zero,
-            legend: Legend(isVisible: false),
-            series: <CircularSeries<Map<String, dynamic>, String>>[
-              PieSeries<Map<String, dynamic>, String>(
-                dataSource: [
-                  {
-                    'name': 'Filled',
-                    'value': clamped <= 0 ? 0.0001 : clamped,
-                    'color': color
-                  },
-                  {
-                    'name': 'Remain',
-                    'value': (100 - clamped) <= 0 ? 0.0001 : (100 - clamped),
-                    'color': DefaultColors.greyLight
-                  },
-                ],
-                xValueMapper: (Map<String, dynamic> e, _) =>
-                    (e['name'] as String),
-                yValueMapper: (Map<String, dynamic> e, _) =>
-                    (e['value'] as double),
-                pointColorMapper: (Map<String, dynamic> e, _) =>
-                    (e['color'] as Color),
-                dataLabelSettings: const DataLabelSettings(isVisible: false),
-              )
-            ],
-          ),
-          Text(
-            '${clamped.toStringAsFixed(1).replaceAll('.', ',')}%',
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-              color: theme.primaryColor,
-            ),
-          )
         ],
       ),
     );

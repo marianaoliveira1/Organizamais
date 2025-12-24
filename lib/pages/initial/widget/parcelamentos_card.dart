@@ -71,14 +71,18 @@ class ParcelamentosCard extends StatelessWidget {
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildParcelamentosContent(theme),
+            _buildParcelamentosContent(context, theme),
           ],
         ),
       );
     });
   }
 
-  Widget _buildParcelamentosContent(ThemeData theme) {
+  Widget _buildParcelamentosContent(BuildContext context, ThemeData theme) {
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
+    final double titleFont = isTablet ? 8.sp : 14.sp;
+    final double subtitleFont = isTablet ? 6.sp : 12.sp;
+    final double totalFont = isTablet ? 10.sp : 12.sp;
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
 
@@ -120,10 +124,10 @@ class ParcelamentosCard extends StatelessWidget {
     // Contar quantas parcelas únicas (produtos diferentes) existem
     final produtosUnicos = <String>{};
     for (final parcela in parcelamentos) {
-      final regex = RegExp(r'Parcela (\d+): (.+)');
+      final regex = RegExp(r'Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)');
       final match = regex.firstMatch(parcela.title);
       if (match != null) {
-        produtosUnicos.add(match.group(2)!);
+        produtosUnicos.add(match.group(3)!);
       }
     }
 
@@ -131,22 +135,23 @@ class ParcelamentosCard extends StatelessWidget {
       children: [
         ...parcelamentos.map((parcela) {
           // Extrai informações da parcela do título
-          final regex = RegExp(r'Parcela (\d+): (.+)');
+          final regex =
+              RegExp(r'Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)');
           final match = regex.firstMatch(parcela.title);
           final parcelaAtual = match?.group(1) ?? '1';
-          final tituloOriginal = match?.group(2) ?? parcela.title;
+          final tituloOriginal = match?.group(3) ?? parcela.title;
 
           // Normalizações para agrupar por série única
-          String _normPay(String? s) => (s ?? '').trim().toLowerCase();
-          final normalizedPay = _normPay(parcela.paymentType);
+          String normPay(String? s) => (s ?? '').trim().toLowerCase();
+          final normalizedPay = normPay(parcela.paymentType);
           final valuePerInstallment = _parseCurrencyValue(parcela.value);
 
           // Todas as transações que pertencem a esta mesma série (mesmo título, paymentType e valor por parcela)
           final sameSeries = _transactionController.transaction.where((t) {
             final m2 = regex.firstMatch(t.title);
-            final base2 = m2?.group(2) ?? t.title;
+            final base2 = m2?.group(3) ?? t.title;
             if (base2 != tituloOriginal) return false;
-            if (_normPay(t.paymentType) != normalizedPay) return false;
+            if (normPay(t.paymentType) != normalizedPay) return false;
             final v2 = _parseCurrencyValue(t.value);
             return (v2 - valuePerInstallment).abs() <= 0.005;
           }).toList();
@@ -191,38 +196,40 @@ class ParcelamentosCard extends StatelessWidget {
                         'Parcela $parcelaAtual de $totalParcelas',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 9.sp,
+                          fontSize: 10.sp,
                           color: DefaultColors.grey20,
                         ),
                       ),
                       SizedBox(height: 2.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 140.w,
+                          Expanded(
                             child: Text(
                               tituloOriginal,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
+                                fontSize: titleFont,
                                 color: theme.primaryColor,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(
-                            width: 110.w,
-                            child: Text(
-                              _formatCurrency(
-                                  _parseCurrencyValue(parcela.value)),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
-                                color: theme.primaryColor,
+                          SizedBox(width: 12.w),
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                _formatCurrency(
+                                    _parseCurrencyValue(parcela.value)),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: titleFont,
+                                  color: theme.primaryColor,
+                                ),
+                                textAlign: TextAlign.end,
                               ),
-                              textAlign: TextAlign.end,
                             ),
                           ),
                         ],
@@ -230,32 +237,36 @@ class ParcelamentosCard extends StatelessWidget {
                       SizedBox(height: 4.h),
                       if (parcela.paymentDay != null)
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              DateFormat('dd/MM/yyyy').format(
-                                DateTime.parse(parcela.paymentDay!),
-                              ),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10.sp,
-                                color: DefaultColors.grey20,
+                            Expanded(
+                              child: Text(
+                                DateFormat('dd/MM/yyyy').format(
+                                  DateTime.parse(parcela.paymentDay!),
+                                ),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: subtitleFont,
+                                  color: DefaultColors.grey20,
+                                ),
                               ),
                             ),
                             if (parcela.paymentType != null &&
                                 parcela.paymentType!.isNotEmpty)
-                              SizedBox(
-                                width: 115.w,
-                                child: Text(
-                                  parcela.paymentType!,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 10.sp,
-                                    color: DefaultColors.grey20,
+                              Flexible(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    parcela.paymentType!,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: subtitleFont,
+                                      color: DefaultColors.grey20,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  textAlign: TextAlign.end,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                           ],
@@ -281,7 +292,7 @@ class ParcelamentosCard extends StatelessWidget {
               style: TextStyle(
                 color: theme.primaryColor,
                 fontWeight: FontWeight.bold,
-                fontSize: 12.sp,
+                fontSize: totalFont,
               ),
             ),
           ],

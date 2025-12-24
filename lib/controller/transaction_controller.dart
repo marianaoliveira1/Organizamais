@@ -502,7 +502,7 @@ class TransactionController extends GetxController {
               userId: userId,
               value: localizedValueString,
               paymentDay: newPaymentDay,
-              title: 'Parcela ${i + 1}: ${transaction.title}',
+              title: 'Parcela ${i + 1} de $installments: ${transaction.title}',
             )
             .toMap();
         final docRef =

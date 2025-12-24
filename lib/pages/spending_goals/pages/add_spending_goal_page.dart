@@ -13,6 +13,7 @@ import '../../transaction/transaction_page.dart';
 import '../../transaction/widget/button_select_category.dart';
 import '../../transaction/widget/title_transaction.dart';
 import '../spending_goals_page.dart';
+import '../../../utils/snackbar_helper.dart';
 
 class AddSpendingGoalPage extends StatefulWidget {
   const AddSpendingGoalPage({super.key});
@@ -104,12 +105,7 @@ class _AddSpendingGoalPageState extends State<AddSpendingGoalPage> {
       await spendingGoalController.addSpendingGoal(spendingGoal);
       Get.offAll(() => SpendingGoalsPage());
     } catch (e) {
-      Get.snackbar(
-        'Erro',
-        'Erro ao salvar meta: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      SnackbarHelper.showError('Erro ao salvar meta: $e');
     } finally {
       setState(() {
         _isLoading = false;

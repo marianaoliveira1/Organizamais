@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/card_controller.dart';
 import '../../../utils/color.dart';
+import '../../../utils/snackbar_helper.dart';
 import 'payment_option.dart';
 
 class PaymentTypePage extends StatelessWidget {
@@ -121,34 +122,13 @@ class PaymentTypePage extends StatelessWidget {
                                   ),
                                   onTap: () {
                                     // Retorna o nome e o ícone do cartão selecionado
-                                    // Fechar qualquer snackbar aberto antes de navegar
-                                    try {
-                                      if (Get.isSnackbarOpen == true) {
-                                        Get.closeCurrentSnackbar();
-                                        Future.delayed(
-                                            const Duration(milliseconds: 200),
-                                            () {
-                                          if (context.mounted) {
-                                            Navigator.of(context).pop({
-                                              'title': card.name,
-                                              'assetPath': card.iconPath,
-                                            });
-                                          }
-                                        });
-                                      } else {
-                                        Navigator.of(context).pop({
-                                          'title': card.name,
-                                          'assetPath': card.iconPath,
-                                        });
-                                      }
-                                    } catch (e) {
-                                      if (context.mounted) {
-                                        Navigator.of(context).pop({
-                                          'title': card.name,
-                                          'assetPath': card.iconPath,
-                                        });
-                                      }
-                                    }
+                                    // Fechar qualquer snackbar aberto de forma segura
+                                    SnackbarHelper.closeAllSnackbars();
+
+                                    Navigator.of(context).pop({
+                                      'title': card.name,
+                                      'assetPath': card.iconPath,
+                                    });
                                   },
                                 ),
                               );

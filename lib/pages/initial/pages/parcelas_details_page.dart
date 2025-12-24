@@ -6,6 +6,7 @@ import 'package:organizamais/utils/color.dart';
 import '../../../ads_banner/ads_banner.dart';
 import '../../../controller/transaction_controller.dart';
 import '../../../model/transaction_model.dart';
+import '../../../utils/snackbar_helper.dart';
 
 class ParcelasDetailsPage extends StatelessWidget {
   final String productName;
@@ -47,57 +48,112 @@ class ParcelasDetailsPage extends StatelessWidget {
   // Função para mostrar dialog de confirmação de exclusão
   void _showDeleteConfirmation(
       BuildContext context, String transactionId, String parcelaInfo) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext ctx) {
         return AlertDialog(
-          title: Text(
-            'Excluir Parcela',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
+          backgroundColor: theme.cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+            side: BorderSide(color: theme.primaryColor.withOpacity(0.06)),
+          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+          titlePadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 8.h),
+          contentPadding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 8.h),
+          actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+          title: Row(
+            children: [
+              Container(
+                width: 40.r,
+                height: 40.r,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete_forever_outlined,
+                  color: Colors.red,
+                  size: 22.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  'Excluir parcela',
+                  style: TextStyle(
+                    color: theme.primaryColor,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
           ),
           content: Text(
             'Tem certeza que deseja excluir a $parcelaInfo?',
             style: TextStyle(
-              fontSize: 14.sp,
               color: DefaultColors.grey20,
+              fontSize: 13.sp,
+              height: 1.3,
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancelar',
-                style: TextStyle(
-                  color: DefaultColors.grey20,
-                  fontSize: 14.sp,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: theme.primaryColor.withOpacity(0.25),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+                    ),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _transactionController.deleteTransaction(transactionId);
-                Navigator.of(context).pop();
-                Get.snackbar(
-                  'Sucesso',
-                  'Parcela excluída com sucesso!',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(
-                'Excluir',
-                style: TextStyle(fontSize: 14.sp),
-              ),
-            ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      _transactionController.deleteTransaction(transactionId);
+                      Navigator.of(ctx).pop();
+                      SnackbarHelper.showSuccess(
+                          'Parcela excluída com sucesso!');
+                    },
+                    child: Text(
+                      'Excluir',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         );
       },
@@ -113,13 +169,13 @@ class ParcelasDetailsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: theme.primaryColor,
-          ),
-          onPressed: () => Get.back(),
-        ),
+        // leading: IconButton(
+        //   icon: Icon(
+        //     Icons.arrow_back,
+        //     color: theme.primaryColor,
+        //   ),
+        //   onPressed: () => Get.back(),
+        // ),
         title: Text(
           'Detalhes das Parcelas',
           style: TextStyle(
@@ -145,23 +201,24 @@ class ParcelasDetailsPage extends StatelessWidget {
               child: Obx(() {
                 // Filtra todas as parcelas deste produto com critérios adicionais do grupo
                 final all = _transactionController.transaction;
-                final regexBase = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)$');
+                final regexBase =
+                    RegExp(r'Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)');
                 final String? normalizedPaymentType =
                     filterPaymentType?.trim().toLowerCase();
 
                 // Função para normalizar paymentType
-                String _normPay(String? s) => (s ?? '').trim().toLowerCase();
+                String normPay(String? s) => (s ?? '').trim().toLowerCase();
 
                 // Função que retorna a chave yyyy-MM do primeiro vencimento da série
-                String _seriesStartKeyFor(TransactionModel t) {
+                String seriesStartKeyFor(TransactionModel t) {
                   final mt = regexBase.firstMatch(t.title);
-                  final base = mt != null ? mt.group(2) ?? '' : '';
+                  final base = mt != null ? mt.group(3) ?? '' : '';
                   final sameGroup = all.where((x) {
                     final mx = regexBase.firstMatch(x.title);
-                    final bx = mx != null ? mx.group(2) ?? '' : '';
+                    final bx = mx != null ? mx.group(3) ?? '' : '';
                     if (bx != base) return false;
                     if (normalizedPaymentType != null &&
-                        _normPay(x.paymentType) != normalizedPaymentType) {
+                        normPay(x.paymentType) != normalizedPaymentType) {
                       return false;
                     }
                     if (installmentValue != null) {
@@ -186,10 +243,10 @@ class ParcelasDetailsPage extends StatelessWidget {
                 var parcelasProduct = all.where((t) {
                   final m = regexBase.firstMatch(t.title);
                   if (m == null) return false;
-                  final base = m.group(2) ?? '';
+                  final base = m.group(3) ?? '';
                   if (base != productName) return false;
                   if (normalizedPaymentType != null &&
-                      _normPay(t.paymentType) != normalizedPaymentType) {
+                      normPay(t.paymentType) != normalizedPaymentType) {
                     return false;
                   }
                   if (installmentValue != null) {
@@ -197,15 +254,15 @@ class ParcelasDetailsPage extends StatelessWidget {
                     if ((v - installmentValue!).abs() > 0.005) return false;
                   }
                   if (seriesStartKey != null && seriesStartKey!.isNotEmpty) {
-                    return _seriesStartKeyFor(t) == seriesStartKey;
+                    return seriesStartKeyFor(t) == seriesStartKey;
                   }
                   return true;
                 }).toList();
 
                 // Ordena por número da parcela
                 parcelasProduct.sort((a, b) {
-                  final regexA = RegExp(r'Parcela (\d+):');
-                  final regexB = RegExp(r'Parcela (\d+):');
+                  final regexA = RegExp(r'Parcela\s+(\d+)');
+                  final regexB = RegExp(r'Parcela\s+(\d+)');
                   final matchA = regexA.firstMatch(a.title);
                   final matchB = regexB.firstMatch(b.title);
 
@@ -498,7 +555,7 @@ class ParcelasDetailsPage extends StatelessWidget {
                           final parcela = parcelasUnique[index];
 
                           // Extrai número da parcela
-                          final regex = RegExp(r'Parcela (\d+):');
+                          final regex = RegExp(r'Parcela\s+(\d+)');
                           final match = regex.firstMatch(parcela.title);
                           final numeroParcela =
                               match?.group(1) ?? '${index + 1}';

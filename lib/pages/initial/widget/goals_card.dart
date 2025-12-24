@@ -30,6 +30,7 @@ class GoalsCard extends StatelessWidget {
           Get.to(() => const AddGoalPage());
         },
         content: Obx(() {
+          final isTablet = MediaQuery.of(context).size.width >= 600;
           final goals = goalController.goal;
           if (goals.isEmpty) {
             return SizedBox(
@@ -81,6 +82,17 @@ class GoalsCard extends StatelessWidget {
               final double clamped = progress.clamp(0.0, 1.0);
               final int percent = (clamped * 100).round();
               final Color progressColor = DefaultColors.greenDark;
+              final double nameFont = isTablet ? 10.sp : 14.sp;
+              final double dateFont = isTablet ? 8.sp : 12.sp;
+              final double currencyFont = isTablet ? 8.sp : 12.sp;
+              final double percentBadgeFont = isTablet ? 8.sp : 10.sp;
+              final currencyFormatter =
+                  NumberFormat.currency(locale: 'pt_BR', symbol: '');
+              final currentValueStr =
+                  currencyFormatter.format(goal.currentValue).trim();
+              final targetValueStr = currencyFormatter.format(target).trim();
+              final double prefixFont =
+                  (currencyFont * (isTablet ? 0.75 : 0.85));
 
               return InkWell(
                 onTap: () => Get.to(() => GoalDetailsPage(initialGoal: goal)),
@@ -122,7 +134,7 @@ class GoalsCard extends StatelessWidget {
                                 Text(
                                   goal.name,
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: nameFont,
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -133,7 +145,7 @@ class GoalsCard extends StatelessWidget {
                                 Text(
                                   goal.date,
                                   style: TextStyle(
-                                    fontSize: 11.sp,
+                                    fontSize: dateFont,
                                     color: DefaultColors.grey,
                                   ),
                                 ),
@@ -193,7 +205,7 @@ class GoalsCard extends StatelessWidget {
                                     '$percent%',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 10.sp,
+                                      fontSize: percentBadgeFont,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -207,22 +219,49 @@ class GoalsCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            NumberFormat.currency(
-                                    locale: 'pt_BR', symbol: 'R\$')
-                                .format(goal.currentValue),
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: DefaultColors.grey,
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'R\$ ',
+                                  style: TextStyle(
+                                    fontSize: prefixFont,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: currentValueStr,
+                                  style: TextStyle(
+                                    fontSize: currencyFont,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            NumberFormat.currency(
-                                    locale: 'pt_BR', symbol: 'R\$')
-                                .format(target),
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: DefaultColors.grey,
+                          RichText(
+                            textAlign: TextAlign.end,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'R\$ ',
+                                  style: TextStyle(
+                                    fontSize: prefixFont,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: targetValueStr,
+                                  style: TextStyle(
+                                    fontSize: currencyFont,
+                                    color: DefaultColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],

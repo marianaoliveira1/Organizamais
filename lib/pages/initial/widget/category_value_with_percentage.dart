@@ -46,9 +46,9 @@ class CategoryValueWithPercentage extends StatelessWidget {
                   title,
                   maxLines: 1,
                   style: TextStyle(
-                    fontSize: 10.sp,
+                    fontSize: 12.sp,
                     color: color,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 // Sempre mostrar quando temos valores locais ou quando percentageResult tem dados
@@ -89,8 +89,8 @@ class CategoryValueWithPercentage extends StatelessWidget {
               maxLines: 1,
               minFontSize: 10,
               style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
                 color: theme.primaryColor,
               ),
             ),

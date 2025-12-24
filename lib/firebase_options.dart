@@ -69,7 +69,7 @@ class DefaultFirebaseOptions {
     projectId: 'organizamais-fe8f4',
     storageBucket: 'organizamais-fe8f4.firebasestorage.app',
     iosClientId: '1008402942918-misvegur2pr77p855au4ql7q51m1ih6s.apps.googleusercontent.com',
-    iosBundleId: 'com.example.organizamais',
+    iosBundleId: 'com.organiza.organizamais',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -79,7 +79,7 @@ class DefaultFirebaseOptions {
     projectId: 'organizamais-fe8f4',
     storageBucket: 'organizamais-fe8f4.firebasestorage.app',
     iosClientId: '1008402942918-misvegur2pr77p855au4ql7q51m1ih6s.apps.googleusercontent.com',
-    iosBundleId: 'com.example.organizamais',
+    iosBundleId: 'com.organiza.organizamais',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

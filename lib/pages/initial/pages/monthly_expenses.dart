@@ -104,115 +104,317 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
                   ...withoutBudget
                 ];
 
-                return Column(
-                  children: [
-                    AdsBanner(),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) => setState(() {
-                          _query = value.trim().toLowerCase();
-                        }),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.search, size: 18.sp),
-                          hintText: 'Pesquisar categorias',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 10.h, horizontal: 12.w),
-                        ),
+                return SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AdsBanner(),
+                      SizedBox(height: 14.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: _buildSearchField(theme),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: EdgeInsets.all(16.w),
-                        itemCount: cats.length,
-                        separatorBuilder: (_, __) => SizedBox(height: 8.h),
-                        itemBuilder: (context, index) {
-                          final c = cats[index];
-                          final Color color =
-                              (c['color'] as Color?) ?? theme.primaryColor;
-                          final String icon = (c['icon'] as String?) ?? '';
-                          final String name = (c['name'] as String?) ?? '';
-                          final int categoryId = (c['id'] as int?) ?? -1;
-                          final double? currentBudget = budgets[categoryId];
+                      SizedBox(height: 12.h),
+                      Expanded(
+                        child: cats.isEmpty
+                            ? _buildEmptyState(theme)
+                            : ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                padding:
+                                    EdgeInsets.fromLTRB(20.w, 4.h, 20.w, 28.h),
+                                itemCount: cats.length,
+                                separatorBuilder: (_, __) =>
+                                    SizedBox(height: 12.h),
+                                itemBuilder: (context, index) {
+                                  final c = cats[index];
+                                  final Color color = (c['color'] as Color?) ??
+                                      theme.primaryColor;
+                                  final String icon =
+                                      (c['icon'] as String?) ?? '';
+                                  final String name =
+                                      (c['name'] as String?) ?? '';
+                                  final int categoryId =
+                                      (c['id'] as int?) ?? -1;
+                                  final double? currentBudget =
+                                      budgets[categoryId];
 
-                          return Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.h, horizontal: 12.w),
-                            decoration: BoxDecoration(
-                              color: theme.cardColor,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Row(
-                              children: [
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 38.w,
-                                      height: 38.w,
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                      ),
+                                  return _buildCategoryTile(
+                                    theme: theme,
+                                    name: name,
+                                    iconPath: icon,
+                                    color: color,
+                                    currentBudget: currentBudget,
+                                    onTap: () => _showEditBudgetSheet(
+                                      context,
+                                      uid,
+                                      categoryId,
+                                      name,
+                                      currentBudget,
                                     ),
-                                    if (icon.isNotEmpty)
-                                      Image.asset(icon,
-                                          width: 24.w, height: 24.w)
-                                    else
-                                      Icon(Icons.category,
-                                          color: Colors.white, size: 18.sp),
-                                  ],
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        name,
-                                        style: TextStyle(
-                                          color: theme.primaryColor,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      if (currentBudget != null)
-                                        Text(
-                                          'Orçamento: R\$ ${_formatCurrencyBR(currentBudget)}',
-                                          style: TextStyle(
-                                            color: DefaultColors.grey,
-                                            fontSize: 11.sp,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.edit,
-                                      color: theme.primaryColor, size: 18.sp),
-                                  onPressed: () => _showEditBudgetSheet(context,
-                                      uid, categoryId, name, currentBudget),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                                  );
+                                },
+                              ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
+    );
+  }
+
+  Widget _buildHeaderCard(
+      ThemeData theme, int categoriesWithBudget, int totalCategories) {
+    final bool hasBudgets = categoriesWithBudget > 0;
+    final String title =
+        hasBudgets ? 'Revise seus limites' : 'Comece pelos limites';
+    final String subtitle = hasBudgets
+        ? '$categoriesWithBudget de $totalCategories categorias já possuem orçamento configurado.'
+        : 'Defina um valor mensal para cada categoria e acompanhe o quanto ainda pode gastar.';
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(color: theme.primaryColor.withOpacity(0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.05),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Icon(
+              Icons.pie_chart_outline_rounded,
+              color: theme.primaryColor,
+              size: 20.sp,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor.withOpacity(0.75),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField(ThemeData theme) {
+    return TextField(
+      controller: _searchController,
+      onChanged: (value) => setState(() {
+        _query = value.trim().toLowerCase();
+      }),
+      decoration: InputDecoration(
+        prefixIcon: Icon(Icons.search, size: 18.sp, color: theme.primaryColor),
+        suffixIcon: _query.isNotEmpty
+            ? IconButton(
+                icon: Icon(Icons.close,
+                    size: 16.sp, color: theme.primaryColor.withOpacity(0.7)),
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() => _query = '');
+                },
+              )
+            : null,
+        hintText: 'Pesquisar categorias',
+        filled: true,
+        fillColor: theme.cardColor,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18.r),
+          borderSide: BorderSide(color: theme.primaryColor.withOpacity(0.08)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18.r),
+          borderSide: BorderSide(color: theme.primaryColor.withOpacity(0.08)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18.r),
+          borderSide: BorderSide(color: theme.primaryColor.withOpacity(0.4)),
+        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
+      ),
+      style: TextStyle(
+        fontSize: 13.sp,
+        color: theme.primaryColor,
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(18.w),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.playlist_add_outlined,
+                color: theme.primaryColor,
+                size: 28.sp,
+              ),
+            ),
+            SizedBox(height: 18.h),
+            Text(
+              'Nenhuma categoria encontrada',
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+                color: theme.primaryColor,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Ajuste o termo de busca ou crie um orçamento para começar a acompanhar seus limites.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: theme.primaryColor.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryTile({
+    required ThemeData theme,
+    required String name,
+    required String iconPath,
+    required Color color,
+    required double? currentBudget,
+    required VoidCallback onTap,
+  }) {
+    final bool hasBudget = currentBudget != null && currentBudget > 0;
+    final String subtitle = hasBudget
+        ? 'Limite mensal configurado'
+        : 'Toque para definir um orçamento';
+    final double budgetValue = currentBudget ?? 0;
+
+    return Material(
+      color: theme.cardColor,
+      borderRadius: BorderRadius.circular(22.r),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22.r),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+          child: Row(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 46.w,
+                    height: 46.w,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                  ),
+                  if (iconPath.isNotEmpty)
+                    Image.asset(iconPath, width: 26.w, height: 26.w)
+                  else
+                    Icon(Icons.category_outlined,
+                        color: theme.cardColor, size: 20.sp),
+                ],
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: DefaultColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+                decoration: BoxDecoration(
+                  color: hasBudget
+                      ? theme.primaryColor.withOpacity(0.12)
+                      : theme.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(
+                    color:
+                        theme.primaryColor.withOpacity(hasBudget ? 0.2 : 0.12),
+                  ),
+                ),
+                child: Text(
+                  hasBudget
+                      ? 'R\$ ${_formatCurrencyBR(budgetValue)}'
+                      : 'Definir',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: theme.primaryColor.withOpacity(0.5),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -224,83 +426,195 @@ class _MonthlyExpensesState extends State<MonthlyExpenses> {
           ? 'R\$ ${_formatCurrencyBR(currentBudget)}'
           : '',
     );
-    // Preload interstitial before showing the sheet
+    final String buttonLabel =
+        currentBudget != null ? 'Atualizar orçamento' : 'Salvar orçamento';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16.w,
-            right: 16.w,
-            top: 16.h,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16.h,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AdsBanner(),
-              SizedBox(height: 10.h),
-              Text(
-                'Definir orçamento para $name',
-                style: TextStyle(
-                    fontSize: 14.sp,
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20.w,
+              right: 20.w,
+              top: 16.h,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20.h,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 18.h),
+                Text(
+                  currentBudget != null
+                      ? 'Atualize o orçamento'
+                      : 'Defina um orçamento',
+                  style: TextStyle(
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w700,
-                    color: theme.primaryColor),
-              ),
-              SizedBox(height: 12.h),
-              TextField(
-                controller: controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: [CurrencyCentsInputFormatter()],
-                decoration: InputDecoration(
-                  hintText: 'R\$ 0,00',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r)),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide:
-                        BorderSide(color: theme.primaryColor.withOpacity(.5)),
+                    color: theme.primaryColor,
                   ),
                 ),
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final String raw = controller.text;
-                    final double amount = _parseBR(raw);
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(uid)
-                        .collection('categoryBudgets')
-                        .doc(categoryId.toString())
-                        .set({'categoryId': categoryId, 'amount': amount},
-                            SetOptions(merge: true));
-
-                    // Mostra o anúncio intersticial antes de fechar o modal
-                    await AdsInterstitial.show();
-
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
-                    foregroundColor: theme.cardColor,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r)),
+                SizedBox(height: 6.h),
+                Text(
+                  'Esse limite será usado nos alertas e comparativos mensais.',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: theme.primaryColor.withOpacity(0.75),
                   ),
-                  child: Text('Salvar'),
                 ),
-              )
-            ],
+                SizedBox(height: 18.h),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(18.r),
+                    border:
+                        Border.all(color: theme.primaryColor.withOpacity(0.08)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Categoria',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.primaryColor.withOpacity(0.6),
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 18.h),
+                Text(
+                  'Valor mensal',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [CurrencyCentsInputFormatter()],
+                  decoration: InputDecoration(
+                    hintText: 'R\$ 0,00',
+                    filled: true,
+                    fillColor: theme.cardColor,
+                    prefixIcon: Icon(
+                      Icons.attach_money,
+                      color: theme.primaryColor,
+                      size: 18.sp,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18.r),
+                      borderSide: BorderSide(
+                        color: theme.primaryColor.withOpacity(0.12),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18.r),
+                      borderSide: BorderSide(
+                        color: theme.primaryColor.withOpacity(0.12),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18.r),
+                      borderSide: BorderSide(
+                        color: theme.primaryColor.withOpacity(0.4),
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 14.h,
+                      horizontal: 12.w,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: theme.primaryColor,
+                          side: BorderSide(
+                            color: theme.primaryColor.withOpacity(0.3),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14.r),
+                          ),
+                        ),
+                        child: const Text('Cancelar'),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final String raw = controller.text;
+                          final double amount = _parseBR(raw);
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(uid)
+                              .collection('categoryBudgets')
+                              .doc(categoryId.toString())
+                              .set(
+                            {'categoryId': categoryId, 'amount': amount},
+                            SetOptions(merge: true),
+                          );
+                          await AdsInterstitial.show();
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: theme.cardColor,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14.r),
+                          ),
+                        ),
+                        child: Text(buttonLabel),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

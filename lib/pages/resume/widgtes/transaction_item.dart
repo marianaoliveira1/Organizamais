@@ -133,7 +133,7 @@ class TransactionItem extends StatelessWidget {
                               color: isFuture
                                   ? DefaultColors.grey
                                   : theme.primaryColor,
-                              fontSize: 13.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 3,
@@ -153,7 +153,7 @@ class TransactionItem extends StatelessWidget {
                                     color: isFuture
                                         ? DefaultColors.grey.withOpacity(0.6)
                                         : DefaultColors.grey20,
-                                    fontSize: 11.sp,
+                                    fontSize: 12.sp,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -172,7 +172,7 @@ class TransactionItem extends StatelessWidget {
                                     'Em breve',
                                     style: TextStyle(
                                       color: DefaultColors.grey,
-                                      fontSize: 10.sp,
+                                      fontSize: 11.sp,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -207,7 +207,7 @@ class TransactionItem extends StatelessWidget {
                               '$sign ${_formatValue(transaction.value)}',
                               style: TextStyle(
                                 color: valueColor,
-                                fontSize: 13.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 2,
@@ -222,7 +222,7 @@ class TransactionItem extends StatelessWidget {
                               color: isFuture
                                   ? DefaultColors.grey.withOpacity(0.6)
                                   : DefaultColors.grey20,
-                              fontSize: 11.sp,
+                              fontSize: 12.sp,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -244,37 +244,114 @@ class TransactionItem extends StatelessWidget {
   void _showDeleteConfirmationDialog(
       BuildContext context, dynamic transaction) {
     final theme = Theme.of(context);
+    final String title = 'Excluir transação';
+    final String subtitle =
+        'Você poderá cadastrar novamente se precisar. Confirmar exclusão?';
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardColor,
-        content: Text(
-            'Tem certeza que deseja excluir a transação "${transaction.title}"?'),
-        actions: [
-          TextButton(
-            child: Text(
-              'Cancelar',
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+          side: BorderSide(color: theme.primaryColor.withOpacity(0.06)),
+        ),
+        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+        contentPadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 12.h),
+        actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
+        title: null,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52.r,
+              height: 52.r,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.red,
+                size: 24.sp,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              title,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.primaryColor,
-                fontSize: 12.sp,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: Text(
-              'Excluir',
+            SizedBox(height: 8.h),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: DefaultColors.grey20,
-                fontSize: 12.sp,
+                fontSize: 13.sp,
+                height: 1.3,
               ),
             ),
-            onPressed: () {
-              final controller = Get.find<TransactionController>();
-              controller.deleteTransaction(transaction.id!);
-              Navigator.of(context).pop();
-            },
-          ),
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: theme.primaryColor.withOpacity(0.25),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Cancelar',
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    final controller = Get.find<TransactionController>();
+                    controller.deleteTransaction(transaction.id!);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Excluir',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -300,14 +377,14 @@ class TransactionItem extends StatelessWidget {
       List<dynamic> allTransactions, dynamic tx) {
     final String? title = (tx as dynamic).title as String?;
     if (title == null) return null;
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
+    final regex = RegExp(r'^Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)');
     final match = regex.firstMatch(title);
     if (match == null) return null;
     final int current = int.tryParse(match.group(1) ?? '') ?? 0;
-    final String baseTitle = match.group(2) ?? '';
+    final String baseTitle = match.group(3) ?? '';
 
-    String _normPay(String? s) => (s ?? '').trim().toLowerCase();
-    double _parseVal(dynamic v) {
+    String normPay(String? s) => (s ?? '').trim().toLowerCase();
+    double parseVal(dynamic v) {
       if (v is num) return v.toDouble();
       if (v is String) {
         final cleaned = v
@@ -320,20 +397,20 @@ class TransactionItem extends StatelessWidget {
       return 0.0;
     }
 
-    final String payNorm = _normPay((tx as dynamic).paymentType as String?);
-    final double val = _parseVal((tx as dynamic).value);
+    final String payNorm = normPay((tx as dynamic).paymentType as String?);
+    final double val = parseVal((tx as dynamic).value);
 
     final int total = allTransactions.where((t) {
       final String? tTitle = (t as dynamic).title as String?;
       if (tTitle == null) return false;
       final m = regex.firstMatch(tTitle);
       if (m == null) return false;
-      final String tBase = m.group(2) ?? '';
+      final String tBase = m.group(3) ?? '';
       if (tBase != baseTitle) return false;
-      if (_normPay((t as dynamic).paymentType as String?) != payNorm) {
+      if (normPay((t as dynamic).paymentType as String?) != payNorm) {
         return false;
       }
-      final double tv = _parseVal((t as dynamic).value);
+      final double tv = parseVal((t as dynamic).value);
       return (tv - val).abs() <= 0.01;
     }).length;
 
@@ -345,10 +422,10 @@ class TransactionItem extends StatelessWidget {
     final String? title = (tx as dynamic).title as String?;
     final label = _computeInstallmentLabelForTx(all, tx);
     if (label == null) return title ?? '';
-    final regex = RegExp(r'^Parcela\s+(\d+)\s*:\s*(.+)');
+    final regex = RegExp(r'^Parcela\s+(\d+)(?:\s+de\s+(\d+))?[:\-]\s*(.+)');
     final match = title != null ? regex.firstMatch(title) : null;
     if (match == null) return title ?? '';
-    final baseTitle = match.group(2) ?? '';
+    final baseTitle = match.group(3) ?? '';
     return '$label — $baseTitle';
   }
 

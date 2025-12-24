@@ -208,7 +208,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       hintStyle: TextStyle(
                         color: DefaultColors.white,
                         fontWeight: FontWeight.w500,
-                        fontSize: 48.sp,
+                        fontSize: 52.sp,
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide.none,
@@ -219,7 +219,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                     style: TextStyle(
                       color: DefaultColors.white,
-                      fontSize: 48.sp,
+                      fontSize: 52.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     keyboardType: TextInputType.number,
@@ -543,24 +543,8 @@ class _TransactionPageState extends State<TransactionPage> {
                                 id: widget.transaction!.id,
                               ));
                               if (mounted) {
-                                // Fechar qualquer snackbar aberto antes de navegar
-                                try {
-                                  if (Get.isSnackbarOpen == true) {
-                                    Get.closeCurrentSnackbar();
-                                    Future.delayed(
-                                        const Duration(milliseconds: 200), () {
-                                      if (mounted) {
-                                        Navigator.of(context).pop();
-                                      }
-                                    });
-                                  } else {
-                                    Navigator.of(context).pop();
-                                  }
-                                } catch (e) {
-                                  if (mounted) {
-                                    Navigator.of(context).pop();
-                                  }
-                                }
+                                // Apenas fecha a tela; evitar tocar snackbar controller
+                                Navigator.of(context).pop();
                               }
                               return;
                             }
@@ -572,24 +556,8 @@ class _TransactionPageState extends State<TransactionPage> {
 
                             // Navegar para ResumePage após salvar
                             if (mounted) {
-                              // Fechar qualquer snackbar aberto antes de navegar
-                              try {
-                                if (Get.isSnackbarOpen == true) {
-                                  Get.closeCurrentSnackbar();
-                                  Future.delayed(
-                                      const Duration(milliseconds: 200), () {
-                                    if (mounted) {
-                                      Navigator.of(context).pop(3);
-                                    }
-                                  });
-                                } else {
-                                  Navigator.of(context).pop(3);
-                                }
-                              } catch (e) {
-                                if (mounted) {
-                                  Navigator.of(context).pop(3);
-                                }
-                              }
+                              // Fecha a tela diretamente; evita chamar snackbar controller
+                              Navigator.of(context).pop(3);
                             }
                             return;
                           } catch (e) {

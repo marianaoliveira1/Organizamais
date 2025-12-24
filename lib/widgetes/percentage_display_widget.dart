@@ -51,7 +51,14 @@ class PercentageDisplayWidget extends StatelessWidget {
           computedPercent = 999.9; // Representa aumento infinito
         } else {
           // Calcular porcentagem normal: ((atual - anterior) / anterior) * 100
-          computedPercent = ((curr - prev) / prev) * 100.0;
+          double referencePrev = prev;
+          if (explanationType == PercentageExplanationType.balance &&
+              prev.abs() >= 0.01) {
+            // Para saldo, comparar usando o módulo do valor anterior para evitar
+            // porcentagens negativas quando o saldo anterior era negativo.
+            referencePrev = prev.abs();
+          }
+          computedPercent = ((curr - prev) / referencePrev) * 100.0;
         }
 
         // Determinar tipo baseado no sinal e no tipo de transação
@@ -171,7 +178,7 @@ class PercentageDisplayWidget extends StatelessWidget {
             Text(
               effectiveResult.displayText,
               style: TextStyle(
-                fontSize: (textFontSizeSp ?? 10.sp),
+                fontSize: (textFontSizeSp ?? 12.sp),
                 fontWeight: FontWeight.w600,
                 color: circleColor,
               ),
@@ -179,7 +186,7 @@ class PercentageDisplayWidget extends StatelessWidget {
             SizedBox(width: 2.w),
             Icon(
               iconData,
-              size: 12.sp,
+              size: 15.sp,
               color: circleColor,
             ),
           ],

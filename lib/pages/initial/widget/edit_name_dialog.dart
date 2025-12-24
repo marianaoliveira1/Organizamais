@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
-
 import 'package:organizamais/controller/auth_controller.dart';
 
 class EditNameDialog extends StatefulWidget {
@@ -36,11 +34,13 @@ class _EditNameDialogState extends State<EditNameDialog> {
           controller: controller,
           decoration: const InputDecoration(hintText: 'Novo nome')),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Cancelar')),
+        TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar')),
         TextButton(
           onPressed: () {
             widget.authController.updateDisplayName(controller.text);
-            Get.back();
+            Navigator.of(context).pop();
           },
           child: const Text(
             'Salvar',

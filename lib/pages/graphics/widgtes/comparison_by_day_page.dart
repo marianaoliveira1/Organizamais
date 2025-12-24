@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../controller/transaction_controller.dart';
-import '../../../model/transaction_model.dart';
 import '../../../utils/color.dart';
 
 class ComparisonByDayPage extends StatelessWidget {
@@ -28,13 +27,13 @@ class ComparisonByDayPage extends StatelessWidget {
         final d = DateTime.tryParse(t.paymentDay!);
         if (d != null) {
           firstDate =
-              (firstDate == null || d.isBefore(firstDate!)) ? d : firstDate;
+              (firstDate == null || d.isBefore(firstDate)) ? d : firstDate;
         }
       }
     }
     final DateTime start = firstDate == null
         ? DateTime(DateTime.now().year, DateTime.now().month - 1, 1)
-        : DateTime(firstDate!.year, firstDate!.month - 1, 1);
+        : DateTime(firstDate.year, firstDate.month - 1, 1);
     final DateTime end = DateTime(DateTime.now().year, DateTime.now().month, 1);
 
     final List<_MonthRow> rows = [];
