@@ -1186,7 +1186,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           onTap: () {
                             // Fechar qualquer snackbar aberto de forma segura
                             SnackbarHelper.closeAllSnackbars();
-                            Navigator.of(context).pop(category['id']);
+                                    Navigator.of(context).pop(category['id']);
                           },
                         ),
                       );

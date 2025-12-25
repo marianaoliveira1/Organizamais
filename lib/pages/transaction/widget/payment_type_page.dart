@@ -125,10 +125,10 @@ class PaymentTypePage extends StatelessWidget {
                                     // Fechar qualquer snackbar aberto de forma segura
                                     SnackbarHelper.closeAllSnackbars();
 
-                                    Navigator.of(context).pop({
-                                      'title': card.name,
-                                      'assetPath': card.iconPath,
-                                    });
+                                        Navigator.of(context).pop({
+                                          'title': card.name,
+                                          'assetPath': card.iconPath,
+                                        });
                                   },
                                 ),
                               );

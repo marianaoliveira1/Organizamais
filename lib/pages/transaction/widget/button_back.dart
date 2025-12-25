@@ -15,7 +15,7 @@ class ButtonBackTransaction extends StatelessWidget {
       onTap: () {
         // Fechar qualquer snackbar aberto de forma segura
         SnackbarHelper.closeAllSnackbars();
-        Navigator.of(context).pop();
+            Navigator.of(context).pop();
       },
       child: Container(
         height: 48.h,
