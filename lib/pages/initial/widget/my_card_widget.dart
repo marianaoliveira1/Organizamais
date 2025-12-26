@@ -9,6 +9,7 @@ import '../../../controller/transaction_controller.dart';
 import '../../../utils/color.dart';
 import '../../../utils/snackbar_helper.dart';
 import '../pages/add_card_page.dart';
+import '../pages/invoice_details_page.dart';
 
 class MyCardsWidget extends StatefulWidget {
   const MyCardsWidget({
@@ -106,26 +107,12 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                 if (index == cards.length) {
                   double totalCredit = 0.0;
                   for (final c in cards) {
-                    final summary = widget.cardController.getCardSummary(
+                    final m = widget.cardController.getCreditCardMetrics(
                       allTransactions: transactions,
                       card: c,
                     );
-
-                    final CardCycleDates cyc = widget.cardController
-                        .computeCycleDates(
-                            now, c.closingDay ?? 1, c.paymentDay ?? 1);
-
-                    final bool wasPaid =
-                        _isInvoicePaid(c.id, c.name, cyc, c.paidInvoices);
-                    final bool afterClosing = !now.isBefore(cyc.openEnd);
-                    final bool beforePayment = !now.isAfter(cyc.paymentDate);
-                    final bool showClosed =
-                        afterClosing && beforePayment && !wasPaid;
-
-                    // CORREÇÃO: Somar a fatura que está sendo exibida (Fechada ou Aberta)
-                    totalCredit += showClosed
-                        ? summary.closedInvoiceTotal
-                        : summary.currentInvoiceTotal;
+                    // Rodapé sempre soma a fatura atual (definição do app)
+                    totalCredit += m.currentInvoiceTotal;
                   }
 
                   return Padding(
@@ -155,7 +142,7 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                 }
 
                 final card = cards[index];
-                final summary = widget.cardController.getCardSummary(
+                final m = widget.cardController.getCreditCardMetrics(
                   allTransactions: transactions,
                   card: card,
                 );
@@ -171,13 +158,16 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                 final bool showClosedSection =
                     afterClosing && beforePayment && !wasPaid;
 
-                final double limit = summary.totalLimit;
-                final double available = summary.availableLimit;
-                final double spent = summary.blockedTotal;
-
-                final double ratio =
-                    (limit > 0) ? (spent / limit).clamp(0.0, 1.0) : 0.0;
-                final double usagePercent = ratio * 100;
+                final double limit = m.totalLimit;
+                final double available = m.availableLimit;
+                final double ratio = m.usageRatio;
+                final double usagePercent = m.usagePercent;
+                final bool hasInstallments = m.upcomingInvoices
+                    .any((inv) => inv.installmentPortion > 0.009);
+                final double nextInstallment =
+                    (hasInstallments && m.upcomingInvoices.length > 1)
+                        ? m.upcomingInvoices[1].installmentPortion
+                        : 0.0;
 
                 Color progressColor;
                 if (usagePercent <= 40) {
@@ -409,6 +399,27 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                         ],
                                       ),
                                     ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 4.h),
+                                      decoration: BoxDecoration(
+                                        color: progressColor.withOpacity(0.12),
+                                        borderRadius:
+                                            BorderRadius.circular(999.r),
+                                        border: Border.all(
+                                          color:
+                                              progressColor.withOpacity(0.20),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        percentLabel,
+                                        style: TextStyle(
+                                          color: progressColor,
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -416,47 +427,109 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                 padding: EdgeInsets.symmetric(horizontal: 18.w),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(percentLabel,
-                                            style: TextStyle(
-                                                color: theme.primaryColor,
-                                                fontSize: 10.sp,
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    SizedBox(height: 6.h),
                                     _UsageBar(
-                                        ratio: ratio,
-                                        progressColor: progressColor,
-                                        isWhiteBg: false),
+                                      ratio: ratio,
+                                      progressColor: progressColor,
+                                      isWhiteBg: false,
+                                    ),
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 12.h),
+                              SizedBox(height: 14.h),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 18.w),
-                                child: Row(
+                                child: Column(
                                   children: [
-                                    Expanded(
-                                      child: _InvoiceInfoColumn(
-                                        label: "Fatura atual",
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _TopMetricBox(
+                                            title: 'FATURA ATUAL',
+                                            value: formatter
+                                                .format(m.currentInvoiceTotal),
+                                            icon: Icons.trending_up,
+                                            accent: DefaultColors.vibrantRed,
+                                            background: DefaultColors.pastelRed,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12.w),
+                                        Expanded(
+                                          child: _TopMetricBox(
+                                            title: 'DISPONÍVEL',
+                                            value: formatter.format(available),
+                                            icon: Icons.attach_money,
+                                            accent: DefaultColors.greenDark,
+                                            background:
+                                                DefaultColors.pastelGreen,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (hasInstallments) ...[
+                                      SizedBox(height: 14.h),
+                                      _InfoLine(
+                                        label: 'Comprometido (parcelas)',
                                         value: formatter.format(
-                                            summary.currentInvoiceTotal),
-                                        theme: theme,
+                                            m.futureInstallmentsCommitted),
+                                        valueColor: theme.primaryColor,
                                       ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: _InvoiceInfoColumn(
-                                        label: "Limite disponível",
-                                        value: formatter.format(available),
-                                        theme: theme,
-                                        crossAlign: CrossAxisAlignment.end,
-                                      ),
-                                    ),
+                                      if (nextInstallment > 0.009) ...[
+                                        SizedBox(height: 10.h),
+                                        Divider(
+                                          height: 1,
+                                          color: theme.primaryColor
+                                              .withOpacity(0.08),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        _InfoLine(
+                                          label: 'Próxima parcela',
+                                          value:
+                                              formatter.format(nextInstallment),
+                                          valueColor: DefaultColors.vibrantBlue,
+                                        ),
+                                      ] else ...[
+                                        // Sem parcela no próximo ciclo, não mostrar linha
+                                        Container(),
+                                      ],
+                                    ],
                                   ],
+                                ),
+                              ),
+                              SizedBox(height: 14.h),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 18.w),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: DefaultColors.black,
+                                      foregroundColor: Colors.white,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 14.h),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(14.r),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    onPressed: () {
+                                      Get.to(
+                                        () => InvoiceDetailsPage(
+                                          cardName: card.name,
+                                          periodStart: cycle.openStart,
+                                          periodEnd: cycle.openEnd,
+                                          title: 'Fatura atual',
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Ver fatura',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -498,19 +571,53 @@ class _MyCardsWidgetState extends State<MyCardsWidget> {
                                             child: _InvoiceInfoColumn(
                                                 label: 'total da fatura',
                                                 value: formatter.format(
-                                                    summary.closedInvoiceTotal),
+                                                    m.currentInvoiceTotal),
                                                 theme: theme)),
                                         Expanded(
                                             child: _InvoiceInfoColumn(
                                                 label: 'próxima fatura',
-                                                value: formatter.format(summary
-                                                    .currentInvoiceTotal),
+                                                value: formatter
+                                                    .format(m.nextInvoiceTotal),
                                                 theme: theme,
                                                 crossAlign:
                                                     CrossAxisAlignment.end)),
                                       ],
                                     ),
                                     SizedBox(height: 16.h),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: DefaultColors.black,
+                                          foregroundColor: Colors.white,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 14.h),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.r),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        onPressed: () {
+                                          Get.to(
+                                            () => InvoiceDetailsPage(
+                                              cardName: card.name,
+                                              periodStart: cycle.closedStart,
+                                              periodEnd: cycle.closedEnd,
+                                              title: 'Fatura do mês',
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'Ver fatura',
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10.h),
                                     SizedBox(
                                       width: double.infinity,
                                       child: ElevatedButton(
@@ -824,6 +931,103 @@ class _InvoiceInfoColumn extends StatelessWidget {
                 color: theme.primaryColor,
                 fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis),
+      ],
+    );
+  }
+}
+
+class _TopMetricBox extends StatelessWidget {
+  const _TopMetricBox({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    required this.background,
+  });
+
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color accent;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: background.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: accent.withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: accent, size: 18.sp),
+              SizedBox(width: 8.w),
+              Text(
+                title,
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w900,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoLine extends StatelessWidget {
+  const _InfoLine({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
+
+  final String label;
+  final String value;
+  final Color valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.sp,
+            color: theme.primaryColor.withOpacity(0.75),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 15.sp,
+            color: valueColor,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ],
     );
   }

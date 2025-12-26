@@ -10,7 +10,11 @@ import 'auth_controller.dart';
 
 import '../model/transaction_model.dart';
 import '../utils/performance_helpers.dart';
+import '../model/credit_card_models.dart';
 
+/// OBS: Mantido por compatibilidade temporária com telas antigas.
+/// Use `CreditCardMetrics` + `getCreditCardMetrics` para novos cálculos/UX.
+@Deprecated('Use CreditCardMetrics/getCreditCardMetrics')
 class CardSummary {
   final double availableLimit;
   final double blockedTotal;
@@ -135,10 +139,261 @@ class CardController extends GetxController {
     );
   }
 
+  DateTime _adjustToMonthDayOrLast(DateTime base, int preferredDay) {
+    final DateTime created = DateTime(base.year, base.month, preferredDay);
+    // Se estourar (ex: 31), o DateTime rola para o mês seguinte; corrigimos pro último dia do mês.
+    if (created.month != base.month) {
+      return DateTime(base.year, base.month + 1, 0);
+    }
+    return created;
+  }
+
+  String _invoiceKeyFromPaymentDate(
+      String? cardIdOrNull, DateTime paymentDate) {
+    final String cardKey = cardIdOrNull ?? 'card';
+    return '$cardKey-${paymentDate.year}-${paymentDate.month}';
+  }
+
+  /// NOVO: Métricas completas do cartão seguindo as regras pedidas.
+  ///
+  /// - **Fatura atual**: total das compras do ciclo atual (à vista + parcelas que vencem neste ciclo).
+  /// - **Próxima fatura**: total do próximo ciclo (parcelas do próximo ciclo + compras após fechamento).
+  /// - **Parcelamento**: compromete limite imediatamente; libera conforme cada fatura é marcada paga.
+  /// - **Limite disponível**: \(totalLimit - blockedTotal\)
+  ///   onde blockedTotal = (fatura atual se não paga) + (compras futuras já feitas) + (parcelas futuras não pagas).
+  CreditCardMetrics getCreditCardMetrics({
+    required CardsModel card,
+    required Iterable<TransactionModel> allTransactions,
+    int monthsAhead = 12,
+  }) {
+    final DateTime now = DateTime.now();
+    final int closingDay = card.closingDay ?? 1;
+    final int paymentDay = card.paymentDay ?? 1;
+    final double totalLimit = card.limit ?? 0.0;
+    final String cardNameLower = card.name.trim().toLowerCase();
+    final Set<String> paidKeys = (card.paidInvoices ?? []).toSet();
+
+    final CardCycleDates currentCycle =
+        computeCycleDates(now, closingDay, paymentDay);
+    final CardCycleDates nextCycle = computeCycleDates(
+        currentCycle.openEnd.add(const Duration(days: 2)),
+        closingDay,
+        paymentDay);
+
+    final String currentKey =
+        generateInvoiceKey(card.id, card.name, currentCycle);
+    final String nextKey = generateInvoiceKey(card.id, card.name, nextCycle);
+
+    // Mapa de compras à vista por fatura (invoiceKey)
+    final Map<String, double> oneTimeByKey = {};
+    // Parcelamentos (séries) identificados
+    final Map<String, InstallmentPurchase> plans = {};
+    // Estrutura explícita (normalizada) para auditoria/cálculo
+    final List<CreditCardTransaction> normalized = [];
+
+    // Dedup de transações (evita somar 2x o mesmo lançamento)
+    final Set<String> processedIds = {};
+
+    for (final t in allTransactions) {
+      if (t.paymentDay == null || t.type != TransactionType.despesa) continue;
+      if ((t.paymentType ?? '').trim().toLowerCase() != cardNameLower) continue;
+
+      final String id = t.id ?? '${t.title}_${t.paymentDay}_${t.value}';
+      if (processedIds.contains(id)) continue;
+      processedIds.add(id);
+
+      final DateTime? d = PerformanceHelpers.safeParseDate(t.paymentDay!);
+      if (d == null) continue;
+
+      final double val = PerformanceHelpers.parseCurrencyValue(t.value);
+
+      final parcela = parseParcela(t.title);
+      int? atual = parcela.atual;
+      int? total = parcela.total;
+      final String description =
+          (parcela.description ?? t.title).trim().toLowerCase();
+
+      try {
+        final int? tFromModel = (t as dynamic).installments as int?;
+        if (tFromModel != null && tFromModel > 1) total = tFromModel;
+      } catch (_) {}
+
+      final bool isInstallment =
+          (total != null && total > 1) || (atual != null);
+
+      if (!isInstallment) {
+        final cyc = computeCycleDates(d, closingDay, paymentDay);
+        final key = generateInvoiceKey(card.id, card.name, cyc);
+        oneTimeByKey[key] = (oneTimeByKey[key] ?? 0.0) + val;
+        normalized.add(CreditCardTransaction(
+          id: id,
+          creditCardId: card.id ?? card.name,
+          amount: val,
+          installments: 1,
+          installmentAmount: val,
+          currentInstallment: 1,
+          purchaseDate: d,
+          dueDate: d,
+        ));
+        continue;
+      }
+
+      final int tTotal = total ?? 1;
+      final int tAtual = atual ?? 1;
+
+      // Se a transação não traz "Parcela X de Y" (atual == null) mas tem total de parcelas,
+      // assumimos que o valor armazenado é o TOTAL da compra e derivamos o valor da parcela.
+      // Isso evita que compras parceladas sejam tratadas como à vista na fatura atual.
+      final double installmentValue =
+          (atual == null && tTotal > 1) ? (val / tTotal) : val;
+
+      // Data teórica da 1ª parcela (para diferenciar compras iguais em meses diferentes)
+      final DateTime rawFirst = DateTime(d.year, d.month - (tAtual - 1), 1);
+      final DateTime first = _adjustToMonthDayOrLast(rawFirst, d.day);
+
+      final String seriesKey =
+          '${description}_${installmentValue.toStringAsFixed(2)}_${tTotal}_${first.year}_${first.month}';
+
+      plans.putIfAbsent(
+        seriesKey,
+        () => InstallmentPurchase(
+          seriesKey: seriesKey,
+          description: description,
+          installmentValue: installmentValue,
+          totalInstallments: tTotal,
+          firstInstallmentDate: first,
+        ),
+      );
+      normalized.add(CreditCardTransaction(
+        id: id,
+        creditCardId: card.id ?? card.name,
+        amount: installmentValue * tTotal,
+        installments: tTotal,
+        installmentAmount: installmentValue,
+        currentInstallment: tAtual,
+        purchaseDate: first,
+        dueDate: d,
+      ));
+    }
+
+    // Construir janela de meses baseada na paymentDate do ciclo atual
+    final DateTime anchorMonth = DateTime(
+        currentCycle.paymentDate.year, currentCycle.paymentDate.month, 1);
+    final List<DateTime> months = [
+      for (int i = 0; i <= monthsAhead; i++)
+        DateTime(anchorMonth.year, anchorMonth.month + i, 1)
+    ];
+
+    // Parcelas por invoiceKey
+    final Map<String, double> installmentByKey = {};
+
+    for (final plan in plans.values) {
+      for (int i = 1; i <= plan.totalInstallments; i++) {
+        final DateTime raw = DateTime(plan.firstInstallmentDate.year,
+            plan.firstInstallmentDate.month + (i - 1), 1);
+        final DateTime instDate =
+            _adjustToMonthDayOrLast(raw, plan.firstInstallmentDate.day);
+        final cyc = computeCycleDates(instDate, closingDay, paymentDay);
+        final key = generateInvoiceKey(card.id, card.name, cyc);
+        installmentByKey[key] =
+            (installmentByKey[key] ?? 0.0) + plan.installmentValue;
+      }
+    }
+
+    // Upcoming invoices
+    final List<InvoiceMonth> upcoming = [];
+    for (int idx = 0; idx < months.length; idx++) {
+      final DateTime m = months[idx];
+      // Usa um dia no fim do mês como referência para obter paymentDate consistente
+      final DateTime ref = DateTime(m.year, m.month + 1, 0);
+      final cyc = computeCycleDates(ref, closingDay, paymentDay);
+      final key = generateInvoiceKey(card.id, card.name, cyc);
+
+      final double inst = installmentByKey[key] ?? 0.0;
+      final double ot = oneTimeByKey[key] ?? 0.0;
+      final double invTotal = inst + ot;
+
+      // compromisso remanescente (parcelas) após pagar este mês
+      double remainingAfter = 0.0;
+      for (int j = idx + 1; j < months.length; j++) {
+        final DateTime mj = months[j];
+        final DateTime refj = DateTime(mj.year, mj.month + 1, 0);
+        final cycj = computeCycleDates(refj, closingDay, paymentDay);
+        final keyj = generateInvoiceKey(card.id, card.name, cycj);
+        final bool paid = paidKeys.contains(keyj);
+        if (!paid) remainingAfter += installmentByKey[keyj] ?? 0.0;
+      }
+
+      upcoming.add(InvoiceMonth(
+        paymentDate: cyc.paymentDate,
+        invoiceTotal: invTotal,
+        installmentPortion: inst,
+        oneTimePortion: ot,
+        remainingInstallmentCommitmentAfterPay: remainingAfter,
+      ));
+    }
+
+    // Totais atuais
+    final double currentInvoiceTotal = (oneTimeByKey[currentKey] ?? 0.0) +
+        (installmentByKey[currentKey] ?? 0.0);
+    final double nextInvoiceTotal =
+        (oneTimeByKey[nextKey] ?? 0.0) + (installmentByKey[nextKey] ?? 0.0);
+
+    // Bloqueio no limite seguindo as regras do usuário:
+    // limiteUsado = faturaAtual + comprometidoParcelado
+    // - faturaAtual só entra se não estiver marcada como paga
+    // - comprometidoParcelado = soma das parcelas futuras (meses > atual) não pagas
+    double blockedTotal = 0.0;
+
+    if (!paidKeys.contains(currentKey)) {
+      blockedTotal += currentInvoiceTotal;
+    }
+
+    double futureInstallmentsCommitted = 0.0;
+
+    // upcoming[0] é o mês corrente (paymentDate do ciclo atual). A partir de 1 são meses futuros.
+    for (int i = 1; i < upcoming.length; i++) {
+      final inv = upcoming[i];
+      final invKey = _invoiceKeyFromPaymentDate(card.id, inv.paymentDate);
+      final bool paid = paidKeys.contains(invKey);
+      if (paid) continue;
+      futureInstallmentsCommitted += inv.installmentPortion;
+    }
+
+    blockedTotal += futureInstallmentsCommitted;
+
+    final double availableLimit =
+        (totalLimit - blockedTotal).clamp(0.0, totalLimit);
+
+    return CreditCardMetrics(
+      totalLimit: totalLimit,
+      availableLimit: availableLimit,
+      blockedTotal: blockedTotal,
+      currentInvoiceTotal: currentInvoiceTotal,
+      futureInstallmentsCommitted: futureInstallmentsCommitted,
+      nextInvoiceTotal: nextInvoiceTotal,
+      upcomingInvoices: upcoming,
+    );
+  }
+
   CardSummary getCardSummary({
     required Iterable<TransactionModel> allTransactions,
     required CardsModel card,
   }) {
+    // Compat: converte o novo modelo para o antigo.
+    final m =
+        getCreditCardMetrics(allTransactions: allTransactions, card: card);
+    return CardSummary(
+      availableLimit: m.availableLimit,
+      blockedTotal: m.blockedTotal,
+      totalLimit: m.totalLimit,
+      currentInvoiceTotal: m.currentInvoiceTotal,
+      nextInvoiceTotal: m.nextInvoiceTotal,
+      closedInvoiceTotal: 0.0,
+    );
+  }
+
+  /*
     final now = DateTime.now();
     final closingDay = card.closingDay ?? 1;
     final paymentDay = card.paymentDay ?? 1;
@@ -291,6 +546,7 @@ class CardController extends GetxController {
       closedInvoiceTotal: closedInvoiceTotal,
     );
   }
+  */
 
   String generateInvoiceKey(
       String? cardIdOrNull, String cardName, CardCycleDates cycle) {
